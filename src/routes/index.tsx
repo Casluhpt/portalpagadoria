@@ -1,13 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import {
-  DollarSign,
-  FileText,
-  Building2,
-  Truck,
-  Search,
-  Plus,
-} from "lucide-react";
+import { Check, ChevronDown, Filter, RotateCcw } from "lucide-react";
 import {
   Bar,
   BarChart,
@@ -21,133 +14,117 @@ import {
   Tooltip,
   XAxis,
   YAxis,
+  LabelList,
 } from "recharts";
 
 import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 import baseData from "@/data/base-bi.json";
+import logoAsset from "@/assets/profarma-logo.png.asset.json";
 
 type Row = {
   prePedido: number | null;
   issuer: string | null;
   supplier: string | null;
-  invoiceNumber: string | null;
-  accountGroup: string | number | null;
-  center: string | number | null;
   company: number | null;
   dueDate: string | null;
   grossAmount: number | null;
   registerDate: string | null;
   descStatus: string | null;
-  log: string | null;
-  text: string | null;
   action: string | null;
   Empresa: string | null;
 };
 
 const rows = baseData as Row[];
 
-const CHART_COLORS = [
-  "oklch(0.55 0.22 295)",
-  "oklch(0.7 0.18 320)",
-  "oklch(0.65 0.18 265)",
-  "oklch(0.75 0.15 340)",
-  "oklch(0.6 0.2 275)",
-  "oklch(0.8 0.14 310)",
-];
+const PIE_COLORS = ["#c084fc", "#a855f7", "#7e22ce", "#9333ea", "#d8b4fe", "#e9d5ff"];
 
 const brl = (n: number) =>
   n.toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
 
-const brlFull = (n: number) =>
-  n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-
-const monthLabel = (iso: string) => {
-  const d = new Date(iso);
-  return d.toLocaleDateString("pt-BR", { month: "short", year: "2-digit" });
+const monthKey = (iso: string) => iso.slice(0, 7);
+const monthLabel = (key: string) => {
+  const [y, m] = key.split("-");
+  const names = [
+    "jan", "fev", "mar", "abr", "mai", "jun",
+    "jul", "ago", "set", "out", "nov", "dez",
+  ];
+  return `${names[Number(m) - 1]}/${y.slice(2)}`;
 };
 
 export const Route = createFileRoute("/")({
   component: Dashboard,
 });
 
-function Dashboard() {
-  const [search, setSearch] = useState("");
-  const [empresaFilter, setEmpresaFilter] = useState<string>("all");
-  const [statusFilter, setStatusFilter] = useState<string>("all");
+function uniqSorted<T>(arr: (T | null | undefined)[]): T[] {
+  return Array.from(new Set(arr.filter((v): v is T => v != null && v !== ""))).sort(
+    (a, b) => String(a).localeCompare(String(b), "pt-BR")
+  );
+}
 
-  const empresas = useMemo(
-    () => Array.from(new Set(rows.map((r) => r.Empresa).filter(Boolean) as string[])).sort(),
-    []
-  );
-  const statuses = useMemo(
-    () => Array.from(new Set(rows.map((r) => r.descStatus).filter(Boolean) as string[])).sort(),
-    []
-  );
+function Dashboard() {
+  const allStatus = useMemo(() => uniqSorted(rows.map((r) => r.descStatus)), []);
+  const allEmpresas = useMemo(() => uniqSorted(rows.map((r) => r.Empresa)), []);
+  const allIssuers = useMemo(() => uniqSorted(rows.map((r) => r.issuer)), []);
+  const allActions = useMemo(() => uniqSorted(rows.map((r) => r.action)), []);
+
+  const dateBounds = useMemo(() => {
+    const dates = rows.map((r) => r.dueDate).filter((d): d is string => !!d).sort();
+    return { min: dates[0] ?? "", max: dates[dates.length - 1] ?? "" };
+  }, []);
+
+  const [dateFrom, setDateFrom] = useState<string>(dateBounds.min);
+  const [dateTo, setDateTo] = useState<string>(dateBounds.max);
+  const [status, setStatus] = useState<string[]>([]);
+  const [empresas, setEmpresas] = useState<string[]>([]);
+  const [issuers, setIssuers] = useState<string[]>([]);
+  const [actions, setActions] = useState<string[]>([]);
 
   const filtered = useMemo(() => {
-    const q = search.trim().toLowerCase();
     return rows.filter((r) => {
-      if (empresaFilter !== "all" && r.Empresa !== empresaFilter) return false;
-      if (statusFilter !== "all" && r.descStatus !== statusFilter) return false;
-      if (!q) return true;
-      return (
-        (r.supplier ?? "").toLowerCase().includes(q) ||
-        (r.issuer ?? "").toLowerCase().includes(q) ||
-        String(r.prePedido ?? "").includes(q)
-      );
+      if (r.dueDate) {
+        if (dateFrom && r.dueDate < dateFrom) return false;
+        if (dateTo && r.dueDate > dateTo) return false;
+      }
+      if (status.length && !status.includes(r.descStatus ?? "")) return false;
+      if (empresas.length && !empresas.includes(r.Empresa ?? "")) return false;
+      if (issuers.length && !issuers.includes(r.issuer ?? "")) return false;
+      if (actions.length && !actions.includes(r.action ?? "")) return false;
+      return true;
     });
-  }, [search, empresaFilter, statusFilter]);
+  }, [dateFrom, dateTo, status, empresas, issuers, actions]);
 
-  const stats = useMemo(() => {
-    const total = filtered.reduce((s, r) => s + (r.grossAmount ?? 0), 0);
-    const pedidos = new Set(filtered.map((r) => r.prePedido)).size;
-    const empresasCount = new Set(filtered.map((r) => r.Empresa)).size;
-    const fornecedores = new Set(filtered.map((r) => r.supplier)).size;
-    return { total, pedidos, empresasCount, fornecedores, linhas: filtered.length };
-  }, [filtered]);
+  const total = filtered.length;
+  const valorTotal = filtered.reduce((s, r) => s + (r.grossAmount ?? 0), 0);
 
-  const byEmpresa = useMemo(() => {
+  const byMonth = useMemo(() => {
     const m = new Map<string, number>();
     for (const r of filtered) {
-      const k = r.Empresa ?? "—";
-      m.set(k, (m.get(k) ?? 0) + (r.grossAmount ?? 0));
+      if (!r.dueDate) continue;
+      const k = monthKey(r.dueDate);
+      m.set(k, (m.get(k) ?? 0) + 1);
     }
-    return Array.from(m, ([name, valor]) => ({ name, valor }))
-      .sort((a, b) => b.valor - a.valor)
-      .slice(0, 8);
+    return Array.from(m, ([k, count]) => ({ key: k, label: monthLabel(k), count }))
+      .sort((a, b) => a.key.localeCompare(b.key));
   }, [filtered]);
 
-  const byStatus = useMemo(() => {
+  const byUser = useMemo(() => {
     const m = new Map<string, number>();
     for (const r of filtered) {
-      const k = r.descStatus ?? "—";
+      const k = r.issuer ?? "—";
       m.set(k, (m.get(k) ?? 0) + 1);
     }
     return Array.from(m, ([name, value]) => ({ name, value })).sort(
@@ -155,43 +132,43 @@ function Dashboard() {
     );
   }, [filtered]);
 
-  const byMonth = useMemo(() => {
+  const byModalidade = useMemo(() => {
     const m = new Map<string, number>();
     for (const r of filtered) {
-      if (!r.dueDate) continue;
-      const key = r.dueDate.slice(0, 7);
-      m.set(key, (m.get(key) ?? 0) + (r.grossAmount ?? 0));
+      const k = r.action ?? "—";
+      m.set(k, (m.get(k) ?? 0) + 1);
     }
-    return Array.from(m, ([key, valor]) => ({ key, label: monthLabel(key + "-01"), valor }))
-      .sort((a, b) => a.key.localeCompare(b.key));
+    return Array.from(m, ([name, count]) => ({ name, count })).sort(
+      (a, b) => b.count - a.count
+    );
   }, [filtered]);
 
-  const topFornecedores = useMemo(() => {
+  const byEmpresa = useMemo(() => {
     const m = new Map<string, number>();
     for (const r of filtered) {
-      const k = r.supplier ?? "—";
-      m.set(k, (m.get(k) ?? 0) + (r.grossAmount ?? 0));
+      const k = r.Empresa ?? "—";
+      m.set(k, (m.get(k) ?? 0) + 1);
     }
-    return Array.from(m, ([name, valor]) => ({ name, valor }))
-      .sort((a, b) => b.valor - a.valor)
-      .slice(0, 5);
+    return Array.from(m, ([name, count]) => ({ name, count })).sort(
+      (a, b) => b.count - a.count
+    );
   }, [filtered]);
 
-  const recent = useMemo(
-    () =>
-      [...filtered]
-        .sort((a, b) => (b.registerDate ?? "").localeCompare(a.registerDate ?? ""))
-        .slice(0, 15),
-    [filtered]
-  );
-
-  const statusVariant = (s: string | null) => {
-    if (s === "Finalizado") return "bg-primary/15 text-primary border-primary/20";
-    if (s === "Processando...") return "bg-accent text-accent-foreground border-accent";
-    if (s?.startsWith("Aprovador")) return "bg-secondary text-secondary-foreground border-secondary";
-    if (s?.startsWith("Recusado")) return "bg-destructive/15 text-destructive border-destructive/20";
-    return "bg-muted text-muted-foreground border-border";
+  const resetAll = () => {
+    setDateFrom(dateBounds.min);
+    setDateTo(dateBounds.max);
+    setStatus([]);
+    setEmpresas([]);
+    setIssuers([]);
+    setActions([]);
   };
+
+  const activeFilterCount =
+    (status.length ? 1 : 0) +
+    (empresas.length ? 1 : 0) +
+    (issuers.length ? 1 : 0) +
+    (actions.length ? 1 : 0) +
+    (dateFrom !== dateBounds.min || dateTo !== dateBounds.max ? 1 : 0);
 
   return (
     <SidebarProvider>
@@ -200,290 +177,263 @@ function Dashboard() {
         <div className="flex flex-1 flex-col">
           <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-border bg-background/80 px-4 backdrop-blur">
             <SidebarTrigger />
-            <div className="flex flex-1 items-center justify-between gap-3">
-              <div>
-                <h1 className="text-sm font-semibold text-foreground">Painel BI</h1>
-                <p className="text-xs text-muted-foreground">
-                  {stats.linhas.toLocaleString("pt-BR")} lançamentos filtrados
-                </p>
-              </div>
-              <Button
-                size="sm"
-                className="bg-[image:var(--gradient-primary)] text-primary-foreground shadow-[var(--shadow-elegant)] hover:opacity-90"
-              >
-                <Plus className="mr-1 h-4 w-4" /> Novo
-              </Button>
+            <div>
+              <h1 className="text-sm font-semibold text-foreground">Painel BI</h1>
+              <p className="text-xs text-muted-foreground">
+                {total.toLocaleString("pt-BR")} lançamentos · {brl(valorTotal)}
+              </p>
             </div>
           </header>
 
-          <main className="flex-1 space-y-6 p-6">
-            {/* Hero */}
-            <div className="relative overflow-hidden rounded-2xl bg-[image:var(--gradient-primary)] p-6 text-primary-foreground shadow-[var(--shadow-elegant)]">
-              <div className="absolute -right-16 -top-16 h-48 w-48 rounded-full bg-white/10 blur-2xl" />
-              <div className="absolute -bottom-20 -left-10 h-56 w-56 rounded-full bg-white/10 blur-3xl" />
-              <div className="relative flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-                <div>
-                  <Badge className="bg-white/20 text-primary-foreground hover:bg-white/25">
-                    Base BI
-                  </Badge>
-                  <h2 className="mt-3 text-2xl font-semibold">Visão consolidada de pré-pedidos</h2>
-                  <p className="mt-1 max-w-xl text-sm text-primary-foreground/85">
-                    Acompanhe valores, status e fornecedores em todas as empresas do grupo.
-                  </p>
+          <main className="flex-1 p-4 lg:p-6">
+            {/* PURPLE CANVAS */}
+            <div
+              className="relative overflow-hidden rounded-3xl p-5 lg:p-7 text-white shadow-[0_20px_60px_-20px_rgba(88,28,135,0.6)]"
+              style={{
+                background:
+                  "linear-gradient(135deg, #4c1d95 0%, #6d28d9 45%, #7c3aed 100%)",
+              }}
+            >
+              {/* Ambient glow */}
+              <div className="pointer-events-none absolute -right-20 -top-20 h-72 w-72 rounded-full bg-fuchsia-400/20 blur-3xl" />
+              <div className="pointer-events-none absolute -bottom-24 -left-16 h-80 w-80 rounded-full bg-violet-300/20 blur-3xl" />
+
+              {/* Top row: logo + total geral + filters trigger */}
+              <div className="relative grid grid-cols-1 items-center gap-4 lg:grid-cols-[auto_1fr_auto]">
+                <div className="flex items-center gap-3 rounded-2xl bg-white/95 px-4 py-3 shadow-lg">
+                  <img
+                    src={logoAsset.url}
+                    alt="Grupo Profarma 65 anos"
+                    className="h-10 w-auto lg:h-12"
+                  />
                 </div>
-                <div className="text-right">
-                  <div className="text-xs uppercase tracking-wide text-primary-foreground/75">
-                    Valor total filtrado
+
+                <div className="flex items-center justify-center">
+                  <div className="rounded-2xl bg-white/10 px-8 py-3 text-center backdrop-blur ring-1 ring-white/15">
+                    <div className="text-xs font-medium uppercase tracking-[0.2em] text-violet-100">
+                      Total Geral
+                    </div>
+                    <div className="mt-1 text-4xl font-bold text-white lg:text-5xl">
+                      {total.toLocaleString("pt-BR")}
+                    </div>
+                    <div className="mt-0.5 text-xs text-violet-100/90">
+                      {brl(valorTotal)}
+                    </div>
                   </div>
-                  <div className="text-3xl font-semibold">{brl(stats.total)}</div>
+                </div>
+
+                <div className="flex items-center justify-end gap-2">
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={resetAll}
+                    className="bg-white/10 text-white hover:bg-white/20 border-white/20"
+                  >
+                    <RotateCcw className="mr-1 h-3.5 w-3.5" /> Limpar
+                  </Button>
                 </div>
               </div>
-            </div>
 
-            {/* Filtros */}
-            <div className="flex flex-col gap-3 rounded-xl border border-border bg-card p-3 sm:flex-row sm:items-center">
-              <div className="relative flex-1">
-                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Buscar por fornecedor, emissor ou pré-pedido..."
-                  className="pl-9"
+              {/* Filters row */}
+              <div className="relative mt-5 grid grid-cols-2 gap-2 md:grid-cols-3 lg:grid-cols-6">
+                <div className="col-span-2 md:col-span-1">
+                  <FilterLabel>De</FilterLabel>
+                  <Input
+                    type="date"
+                    value={dateFrom}
+                    min={dateBounds.min}
+                    max={dateBounds.max}
+                    onChange={(e) => setDateFrom(e.target.value)}
+                    className="h-9 border-white/20 bg-white/10 text-white placeholder:text-white/60 [color-scheme:dark]"
+                  />
+                </div>
+                <div className="col-span-2 md:col-span-1">
+                  <FilterLabel>Até</FilterLabel>
+                  <Input
+                    type="date"
+                    value={dateTo}
+                    min={dateBounds.min}
+                    max={dateBounds.max}
+                    onChange={(e) => setDateTo(e.target.value)}
+                    className="h-9 border-white/20 bg-white/10 text-white placeholder:text-white/60 [color-scheme:dark]"
+                  />
+                </div>
+                <MultiSelect
+                  label="Status"
+                  options={allStatus}
+                  value={status}
+                  onChange={setStatus}
+                />
+                <MultiSelect
+                  label="Colaboradores"
+                  options={allIssuers}
+                  value={issuers}
+                  onChange={setIssuers}
+                />
+                <MultiSelect
+                  label="Empresas"
+                  options={allEmpresas}
+                  value={empresas}
+                  onChange={setEmpresas}
+                />
+                <MultiSelect
+                  label="Lançamentos"
+                  options={allActions}
+                  value={actions}
+                  onChange={setActions}
                 />
               </div>
-              <Select value={empresaFilter} onValueChange={setEmpresaFilter}>
-                <SelectTrigger className="sm:w-48">
-                  <SelectValue placeholder="Empresa" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Todas as empresas</SelectItem>
-                  {empresas.map((e) => (
-                    <SelectItem key={e} value={e}>
-                      {e}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="sm:w-48">
-                  <SelectValue placeholder="Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Todos os status</SelectItem>
-                  {statuses.map((s) => (
-                    <SelectItem key={s} value={s}>
-                      {s}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
 
-            {/* Stats */}
-            <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              <StatCard label="Valor total" value={brl(stats.total)} icon={DollarSign} />
-              <StatCard label="Pré-pedidos" value={stats.pedidos.toLocaleString("pt-BR")} icon={FileText} />
-              <StatCard label="Empresas" value={String(stats.empresasCount)} icon={Building2} />
-              <StatCard label="Fornecedores" value={String(stats.fornecedores)} icon={Truck} />
-            </section>
+              {activeFilterCount > 0 && (
+                <div className="relative mt-3 flex items-center gap-2 text-xs text-violet-100">
+                  <Filter className="h-3.5 w-3.5" />
+                  {activeFilterCount} filtro{activeFilterCount > 1 ? "s" : ""} ativo
+                  {activeFilterCount > 1 ? "s" : ""}
+                </div>
+              )}
 
-            {/* Charts row */}
-            <section className="grid gap-4 lg:grid-cols-3">
-              <Card className="lg:col-span-2 border-border/60">
-                <CardHeader>
-                  <CardTitle className="text-base">Valor por empresa</CardTitle>
-                  <CardDescription>Top empresas por valor bruto</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ResponsiveContainer width="100%" height={280}>
-                    <BarChart data={byEmpresa} margin={{ left: 8, right: 8, top: 8 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-                      <XAxis dataKey="name" tick={{ fontSize: 12, fill: "var(--muted-foreground)" }} />
+              {/* Charts grid */}
+              <div className="relative mt-6 grid gap-4 lg:grid-cols-2">
+                <PurpleCard title="Lançamentos por Mês">
+                  <ResponsiveContainer width="100%" height={230}>
+                    <BarChart data={byMonth} margin={{ top: 24, right: 8, left: 0, bottom: 4 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
+                      <XAxis
+                        dataKey="label"
+                        tick={{ fontSize: 11, fill: "rgba(255,255,255,0.85)" }}
+                        axisLine={{ stroke: "rgba(255,255,255,0.2)" }}
+                        tickLine={false}
+                      />
                       <YAxis
-                        tick={{ fontSize: 12, fill: "var(--muted-foreground)" }}
-                        tickFormatter={(v) => brl(v as number).replace("R$", "")}
+                        tick={{ fontSize: 11, fill: "rgba(255,255,255,0.7)" }}
+                        axisLine={false}
+                        tickLine={false}
                       />
-                      <Tooltip
-                        contentStyle={{
-                          background: "var(--popover)",
-                          border: "1px solid var(--border)",
-                          borderRadius: 12,
-                          color: "var(--popover-foreground)",
-                        }}
-                        formatter={(v) => brlFull(v as number)}
-                      />
-                      <Bar dataKey="valor" radius={[8, 8, 0, 0]} fill="oklch(0.55 0.22 295)" />
+                      <Tooltip content={<DarkTooltip />} cursor={{ fill: "rgba(255,255,255,0.06)" }} />
+                      <Bar dataKey="count" radius={[6, 6, 0, 0]} fill="#c084fc">
+                        <LabelList
+                          dataKey="count"
+                          position="top"
+                          fill="#fff"
+                          fontSize={11}
+                          fontWeight={600}
+                        />
+                      </Bar>
                     </BarChart>
                   </ResponsiveContainer>
-                </CardContent>
-              </Card>
+                </PurpleCard>
 
-              <Card className="border-border/60">
-                <CardHeader>
-                  <CardTitle className="text-base">Status</CardTitle>
-                  <CardDescription>Distribuição de lançamentos</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ResponsiveContainer width="100%" height={220}>
-                    <PieChart>
-                      <Pie
-                        data={byStatus}
-                        dataKey="value"
-                        nameKey="name"
-                        innerRadius={55}
-                        outerRadius={85}
-                        paddingAngle={2}
-                      >
-                        {byStatus.map((_, i) => (
-                          <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
-                        ))}
-                      </Pie>
-                      <Tooltip
-                        contentStyle={{
-                          background: "var(--popover)",
-                          border: "1px solid var(--border)",
-                          borderRadius: 12,
-                          color: "var(--popover-foreground)",
-                        }}
-                      />
-                    </PieChart>
-                  </ResponsiveContainer>
-                  <div className="mt-2 space-y-1.5">
-                    {byStatus.map((s, i) => (
-                      <div key={s.name} className="flex items-center justify-between text-xs">
-                        <div className="flex items-center gap-2">
+                <PurpleCard title="Lançamentos por Usuários">
+                  <div className="flex items-center gap-4">
+                    <div className="flex-1">
+                      <ResponsiveContainer width="100%" height={230}>
+                        <PieChart>
+                          <Pie
+                            data={byUser}
+                            dataKey="value"
+                            nameKey="name"
+                            innerRadius={0}
+                            outerRadius={90}
+                            stroke="rgba(76, 29, 149, 0.6)"
+                            strokeWidth={2}
+                            label={({ percent }) =>
+                              percent && percent > 0.03
+                                ? `${(percent * 100).toFixed(1)}%`
+                                : ""
+                            }
+                            labelLine={false}
+                          >
+                            {byUser.map((_, i) => (
+                              <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
+                            ))}
+                          </Pie>
+                          <Tooltip content={<DarkTooltip />} />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </div>
+                    <div className="w-40 space-y-2 pr-2">
+                      <div className="text-xs font-semibold uppercase tracking-wide text-violet-100">
+                        Usuário
+                      </div>
+                      {byUser.map((u, i) => (
+                        <div key={u.name} className="flex items-center gap-2 text-xs">
                           <span
                             className="inline-block h-2.5 w-2.5 rounded-full"
-                            style={{ background: CHART_COLORS[i % CHART_COLORS.length] }}
+                            style={{ background: PIE_COLORS[i % PIE_COLORS.length] }}
                           />
-                          <span className="text-foreground">{s.name}</span>
+                          <span className="flex-1 truncate text-white/90">{u.name}</span>
+                          <span className="text-white/70">{u.value}</span>
                         </div>
-                        <span className="text-muted-foreground">
-                          {s.value.toLocaleString("pt-BR")}
-                        </span>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
-                </CardContent>
-              </Card>
-            </section>
+                </PurpleCard>
 
-            {/* Second row */}
-            <section className="grid gap-4 lg:grid-cols-3">
-              <Card className="lg:col-span-2 border-border/60">
-                <CardHeader>
-                  <CardTitle className="text-base">Evolução por vencimento</CardTitle>
-                  <CardDescription>Soma do valor bruto por mês</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ResponsiveContainer width="100%" height={260}>
-                    <LineChart data={byMonth} margin={{ left: 8, right: 8, top: 8 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-                      <XAxis dataKey="label" tick={{ fontSize: 12, fill: "var(--muted-foreground)" }} />
-                      <YAxis
-                        tick={{ fontSize: 12, fill: "var(--muted-foreground)" }}
-                        tickFormatter={(v) => brl(v as number).replace("R$", "")}
+                <PurpleCard title="Lançamentos por Modalidades">
+                  <ResponsiveContainer width="100%" height={240}>
+                    <LineChart data={byModalidade} margin={{ top: 24, right: 12, left: 0, bottom: 32 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
+                      <XAxis
+                        dataKey="name"
+                        tick={{ fontSize: 10, fill: "rgba(255,255,255,0.85)" }}
+                        axisLine={{ stroke: "rgba(255,255,255,0.2)" }}
+                        tickLine={false}
+                        angle={-30}
+                        textAnchor="end"
+                        interval={0}
+                        height={50}
                       />
-                      <Tooltip
-                        contentStyle={{
-                          background: "var(--popover)",
-                          border: "1px solid var(--border)",
-                          borderRadius: 12,
-                          color: "var(--popover-foreground)",
-                        }}
-                        formatter={(v) => brlFull(v as number)}
-                      />
+                      <YAxis hide />
+                      <Tooltip content={<DarkTooltip />} />
                       <Line
                         type="monotone"
-                        dataKey="valor"
-                        stroke="oklch(0.55 0.22 295)"
+                        dataKey="count"
+                        stroke="#e9d5ff"
                         strokeWidth={2.5}
-                        dot={{ r: 3, fill: "oklch(0.55 0.22 295)" }}
-                        activeDot={{ r: 5 }}
-                      />
+                        dot={{ r: 4, fill: "#c084fc", stroke: "#fff", strokeWidth: 1 }}
+                      >
+                        <LabelList
+                          dataKey="count"
+                          position="top"
+                          fill="#fff"
+                          fontSize={11}
+                          fontWeight={600}
+                        />
+                      </Line>
                     </LineChart>
                   </ResponsiveContainer>
-                </CardContent>
-              </Card>
+                </PurpleCard>
 
-              <Card className="border-border/60">
-                <CardHeader>
-                  <CardTitle className="text-base">Top fornecedores</CardTitle>
-                  <CardDescription>Por valor bruto</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {topFornecedores.map((f, i) => {
-                    const max = topFornecedores[0]?.valor || 1;
-                    const pct = (f.valor / max) * 100;
-                    return (
-                      <div key={f.name} className="space-y-1">
-                        <div className="flex items-center justify-between gap-2 text-xs">
-                          <span className="truncate font-medium text-foreground" title={f.name}>
-                            {i + 1}. {f.name}
-                          </span>
-                          <span className="text-muted-foreground">{brl(f.valor)}</span>
-                        </div>
-                        <div className="h-2 overflow-hidden rounded-full bg-muted">
-                          <div
-                            className="h-full rounded-full bg-[image:var(--gradient-primary)]"
-                            style={{ width: `${pct}%` }}
-                          />
-                        </div>
-                      </div>
-                    );
-                  })}
-                </CardContent>
-              </Card>
-            </section>
-
-            {/* Table */}
-            <Card className="border-border/60">
-              <CardHeader>
-                <CardTitle className="text-base">Lançamentos recentes</CardTitle>
-                <CardDescription>15 registros mais recentes conforme os filtros</CardDescription>
-              </CardHeader>
-              <CardContent className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Pré-pedido</TableHead>
-                      <TableHead>Emissor</TableHead>
-                      <TableHead>Fornecedor</TableHead>
-                      <TableHead>Empresa</TableHead>
-                      <TableHead>Vencimento</TableHead>
-                      <TableHead className="text-right">Valor</TableHead>
-                      <TableHead>Status</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {recent.map((r, i) => (
-                      <TableRow key={i}>
-                        <TableCell className="font-mono text-xs">{r.prePedido}</TableCell>
-                        <TableCell className="text-xs">{r.issuer}</TableCell>
-                        <TableCell className="max-w-xs truncate text-xs" title={r.supplier ?? ""}>
-                          {r.supplier}
-                        </TableCell>
-                        <TableCell className="text-xs">{r.Empresa}</TableCell>
-                        <TableCell className="text-xs">
-                          {r.dueDate ? new Date(r.dueDate).toLocaleDateString("pt-BR") : "—"}
-                        </TableCell>
-                        <TableCell className="text-right text-xs font-medium">
-                          {brl(r.grossAmount ?? 0)}
-                        </TableCell>
-                        <TableCell>
-                          <Badge
-                            variant="outline"
-                            className={statusVariant(r.descStatus)}
-                          >
-                            {r.descStatus}
-                          </Badge>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
+                <PurpleCard title="Lançamentos por Empresas">
+                  <ResponsiveContainer width="100%" height={240}>
+                    <BarChart data={byEmpresa} margin={{ top: 24, right: 8, left: 0, bottom: 32 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
+                      <XAxis
+                        dataKey="name"
+                        tick={{ fontSize: 10, fill: "rgba(255,255,255,0.85)" }}
+                        axisLine={{ stroke: "rgba(255,255,255,0.2)" }}
+                        tickLine={false}
+                        angle={-30}
+                        textAnchor="end"
+                        interval={0}
+                        height={50}
+                      />
+                      <YAxis hide />
+                      <Tooltip content={<DarkTooltip />} cursor={{ fill: "rgba(255,255,255,0.06)" }} />
+                      <Bar dataKey="count" radius={[6, 6, 0, 0]} fill="#a855f7">
+                        <LabelList
+                          dataKey="count"
+                          position="top"
+                          fill="#fff"
+                          fontSize={11}
+                          fontWeight={600}
+                        />
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                </PurpleCard>
+              </div>
+            </div>
           </main>
         </div>
       </div>
@@ -491,28 +441,123 @@ function Dashboard() {
   );
 }
 
-function StatCard({
+function FilterLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <Label className="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-violet-100/90">
+      {children}
+    </Label>
+  );
+}
+
+function MultiSelect({
   label,
+  options,
   value,
-  icon: Icon,
+  onChange,
 }: {
   label: string;
-  value: string;
-  icon: React.ComponentType<{ className?: string }>;
+  options: string[];
+  value: string[];
+  onChange: (v: string[]) => void;
+}) {
+  const toggle = (opt: string, checked: boolean) => {
+    onChange(checked ? [...value, opt] : value.filter((v) => v !== opt));
+  };
+  const summary =
+    value.length === 0
+      ? "Todos"
+      : value.length === 1
+        ? value[0]
+        : `${value.length} selecionados`;
+
+  return (
+    <div className="min-w-0">
+      <FilterLabel>{label}</FilterLabel>
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            className="h-9 w-full justify-between border-white/20 bg-white/10 px-3 text-left text-xs font-medium text-white hover:bg-white/20 hover:text-white"
+          >
+            <span className="truncate">{summary}</span>
+            <ChevronDown className="ml-1 h-3.5 w-3.5 shrink-0 opacity-70" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-56 p-0" align="start">
+          <div className="flex items-center justify-between border-b border-border px-3 py-2 text-xs">
+            <span className="font-medium">{label}</span>
+            {value.length > 0 && (
+              <button
+                onClick={() => onChange([])}
+                className="text-primary hover:underline"
+              >
+                Limpar
+              </button>
+            )}
+          </div>
+          <ScrollArea className="max-h-64">
+            <div className="p-1">
+              {options.map((opt) => {
+                const checked = value.includes(opt);
+                return (
+                  <label
+                    key={opt}
+                    className="flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-accent"
+                  >
+                    <Checkbox
+                      checked={checked}
+                      onCheckedChange={(c) => toggle(opt, !!c)}
+                    />
+                    <span className="flex-1 truncate">{opt}</span>
+                    {checked && <Check className="h-3.5 w-3.5 text-primary" />}
+                  </label>
+                );
+              })}
+            </div>
+          </ScrollArea>
+        </PopoverContent>
+      </Popover>
+    </div>
+  );
+}
+
+function PurpleCard({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
 }) {
   return (
-    <Card className="border-border/60 shadow-sm transition hover:shadow-[var(--shadow-elegant)]">
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardDescription className="text-xs font-medium uppercase tracking-wide">
-          {label}
-        </CardDescription>
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[image:var(--gradient-primary)] text-primary-foreground">
-          <Icon className="h-4 w-4" />
-        </div>
+    <Card className="border-white/10 bg-white/[0.06] shadow-[0_10px_30px_-15px_rgba(0,0,0,0.4)] backdrop-blur">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-center text-sm font-semibold text-white">
+          {title}
+        </CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="text-2xl font-semibold text-foreground">{value}</div>
-      </CardContent>
+      <CardContent className="pt-0">{children}</CardContent>
     </Card>
+  );
+}
+
+function DarkTooltip({
+  active,
+  payload,
+  label,
+}: {
+  active?: boolean;
+  payload?: Array<{ name?: string; value?: number; payload?: { name?: string } }>;
+  label?: string | number;
+}) {
+  if (!active || !payload?.length) return null;
+  const p = payload[0];
+  const name = label ?? p?.payload?.name ?? p?.name;
+  return (
+    <div className="rounded-lg border border-white/20 bg-[#2e1065] px-3 py-2 text-xs text-white shadow-xl">
+      <div className="font-semibold">{name}</div>
+      <div className="text-violet-200">
+        {(p?.value ?? 0).toLocaleString("pt-BR")} lançamentos
+      </div>
+    </div>
   );
 }
