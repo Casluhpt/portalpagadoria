@@ -48,7 +48,17 @@ type Row = {
   Empresa: string | null;
 };
 
-const rows = baseData as Row[];
+const prettyIssuer = (v: string | null) => {
+  if (!v) return v;
+  const base = v.split(".")[0].toLowerCase();
+  return base.charAt(0).toUpperCase() + base.slice(1);
+};
+
+const rows: Row[] = (baseData as Row[]).map((r) => ({
+  ...r,
+  issuer: prettyIssuer(r.issuer),
+}));
+
 
 const PIE_COLORS = ["#c084fc", "#a855f7", "#7e22ce", "#9333ea", "#d8b4fe", "#e9d5ff"];
 
@@ -210,13 +220,13 @@ function Dashboard() {
 
                 <div className="flex items-center justify-center">
                   <div className="rounded-2xl bg-white/10 px-8 py-3 text-center backdrop-blur ring-1 ring-white/15">
-                    <div className="text-xs font-medium uppercase tracking-[0.2em] text-violet-100">
+                    <div className="text-sm font-semibold uppercase tracking-[0.2em] text-violet-100">
                       Total Geral
                     </div>
-                    <div className="mt-1 text-4xl font-bold text-white lg:text-5xl">
+                    <div className="mt-1 text-5xl font-bold text-white lg:text-6xl">
                       {total.toLocaleString("pt-BR")}
                     </div>
-                    <div className="mt-0.5 text-xs text-violet-100/90">
+                    <div className="mt-1 text-sm text-violet-100/90">
                       {brl(valorTotal)}
                     </div>
                   </div>
@@ -244,7 +254,7 @@ function Dashboard() {
                     min={dateBounds.min}
                     max={dateBounds.max}
                     onChange={(e) => setDateFrom(e.target.value)}
-                    className="h-9 border-white/20 bg-white/10 text-white placeholder:text-white/60 [color-scheme:dark]"
+                    className="h-10 border-white/20 bg-white/10 text-sm text-white placeholder:text-white/60 [color-scheme:dark]"
                   />
                 </div>
                 <div className="col-span-2 md:col-span-1">
@@ -255,7 +265,7 @@ function Dashboard() {
                     min={dateBounds.min}
                     max={dateBounds.max}
                     onChange={(e) => setDateTo(e.target.value)}
-                    className="h-9 border-white/20 bg-white/10 text-white placeholder:text-white/60 [color-scheme:dark]"
+                    className="h-10 border-white/20 bg-white/10 text-sm text-white placeholder:text-white/60 [color-scheme:dark]"
                   />
                 </div>
                 <MultiSelect
@@ -300,12 +310,12 @@ function Dashboard() {
                       <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
                       <XAxis
                         dataKey="label"
-                        tick={{ fontSize: 11, fill: "rgba(255,255,255,0.85)" }}
+                        tick={{ fontSize: 14, fill: "rgba(255,255,255,0.95)", fontWeight: 600 }}
                         axisLine={{ stroke: "rgba(255,255,255,0.2)" }}
                         tickLine={false}
                       />
                       <YAxis
-                        tick={{ fontSize: 11, fill: "rgba(255,255,255,0.7)" }}
+                        tick={{ fontSize: 13, fill: "rgba(255,255,255,0.85)", fontWeight: 500 }}
                         axisLine={false}
                         tickLine={false}
                       />
@@ -315,7 +325,7 @@ function Dashboard() {
                           dataKey="count"
                           position="top"
                           fill="#fff"
-                          fontSize={11}
+                          fontSize={14}
                           fontWeight={600}
                         />
                       </Bar>
@@ -351,12 +361,12 @@ function Dashboard() {
                         </PieChart>
                       </ResponsiveContainer>
                     </div>
-                    <div className="w-40 space-y-2 pr-2">
-                      <div className="text-xs font-semibold uppercase tracking-wide text-violet-100">
+                    <div className="w-48 space-y-2 pr-2">
+                      <div className="text-sm font-semibold uppercase tracking-wide text-violet-100">
                         Usuário
                       </div>
                       {byUser.map((u, i) => (
-                        <div key={u.name} className="flex items-center gap-2 text-xs">
+                        <div key={u.name} className="flex items-center gap-2 text-sm">
                           <span
                             className="inline-block h-2.5 w-2.5 rounded-full"
                             style={{ background: PIE_COLORS[i % PIE_COLORS.length] }}
@@ -375,7 +385,7 @@ function Dashboard() {
                       <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
                       <XAxis
                         dataKey="name"
-                        tick={{ fontSize: 10, fill: "rgba(255,255,255,0.85)" }}
+                        tick={{ fontSize: 13, fill: "rgba(255,255,255,0.95)", fontWeight: 600 }}
                         axisLine={{ stroke: "rgba(255,255,255,0.2)" }}
                         tickLine={false}
                         angle={-30}
@@ -396,7 +406,7 @@ function Dashboard() {
                           dataKey="count"
                           position="top"
                           fill="#fff"
-                          fontSize={11}
+                          fontSize={14}
                           fontWeight={600}
                         />
                       </Line>
@@ -410,7 +420,7 @@ function Dashboard() {
                       <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
                       <XAxis
                         dataKey="name"
-                        tick={{ fontSize: 10, fill: "rgba(255,255,255,0.85)" }}
+                        tick={{ fontSize: 13, fill: "rgba(255,255,255,0.95)", fontWeight: 600 }}
                         axisLine={{ stroke: "rgba(255,255,255,0.2)" }}
                         tickLine={false}
                         angle={-30}
@@ -425,7 +435,7 @@ function Dashboard() {
                           dataKey="count"
                           position="top"
                           fill="#fff"
-                          fontSize={11}
+                          fontSize={14}
                           fontWeight={600}
                         />
                       </Bar>
@@ -443,7 +453,7 @@ function Dashboard() {
 
 function FilterLabel({ children }: { children: React.ReactNode }) {
   return (
-    <Label className="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-violet-100/90">
+    <Label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-violet-100">
       {children}
     </Label>
   );
@@ -477,7 +487,7 @@ function MultiSelect({
         <PopoverTrigger asChild>
           <Button
             variant="outline"
-            className="h-9 w-full justify-between border-white/20 bg-white/10 px-3 text-left text-xs font-medium text-white hover:bg-white/20 hover:text-white"
+            className="h-10 w-full justify-between border-white/20 bg-white/10 px-3 text-left text-sm font-medium text-white hover:bg-white/20 hover:text-white"
           >
             <span className="truncate">{summary}</span>
             <ChevronDown className="ml-1 h-3.5 w-3.5 shrink-0 opacity-70" />
@@ -531,7 +541,7 @@ function PurpleCard({
   return (
     <Card className="border-white/10 bg-white/[0.06] shadow-[0_10px_30px_-15px_rgba(0,0,0,0.4)] backdrop-blur">
       <CardHeader className="pb-2">
-        <CardTitle className="text-center text-sm font-semibold text-white">
+        <CardTitle className="text-center text-base font-semibold text-white lg:text-lg">
           {title}
         </CardTitle>
       </CardHeader>
@@ -553,7 +563,7 @@ function DarkTooltip({
   const p = payload[0];
   const name = label ?? p?.payload?.name ?? p?.name;
   return (
-    <div className="rounded-lg border border-white/20 bg-[#2e1065] px-3 py-2 text-xs text-white shadow-xl">
+    <div className="rounded-lg border border-white/20 bg-[#2e1065] px-3 py-2 text-sm text-white shadow-xl">
       <div className="font-semibold">{name}</div>
       <div className="text-violet-200">
         {(p?.value ?? 0).toLocaleString("pt-BR")} lançamentos
