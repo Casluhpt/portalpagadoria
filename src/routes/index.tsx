@@ -58,7 +58,7 @@ const rows: Row[] = (baseData as Row[]).map((r) => ({
   ...r,
   issuer: prettyIssuer(r.issuer),
 }));
-const rows = baseData as Row[];
+
 
 const PIE_COLORS = ["#c084fc", "#a855f7", "#7e22ce", "#9333ea", "#d8b4fe", "#e9d5ff"];
 
