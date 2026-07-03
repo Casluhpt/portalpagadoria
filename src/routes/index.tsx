@@ -48,6 +48,16 @@ type Row = {
   Empresa: string | null;
 };
 
+const prettyIssuer = (v: string | null) => {
+  if (!v) return v;
+  const base = v.split(".")[0].toLowerCase();
+  return base.charAt(0).toUpperCase() + base.slice(1);
+};
+
+const rows: Row[] = (baseData as Row[]).map((r) => ({
+  ...r,
+  issuer: prettyIssuer(r.issuer),
+}));
 const rows = baseData as Row[];
 
 const PIE_COLORS = ["#c084fc", "#a855f7", "#7e22ce", "#9333ea", "#d8b4fe", "#e9d5ff"];
