@@ -159,8 +159,8 @@ function Dashboard() {
   }, [filtered]);
 
   const resetAll = () => {
-    setDateFrom(dateBounds.min);
-    setDateTo(dateBounds.max);
+    setDateFrom("");
+    setDateTo("");
     setStatus([]);
     setEmpresas([]);
     setIssuers([]);
@@ -172,7 +172,7 @@ function Dashboard() {
     (empresas.length ? 1 : 0) +
     (issuers.length ? 1 : 0) +
     (actions.length ? 1 : 0) +
-    (dateFrom !== dateBounds.min || dateTo !== dateBounds.max ? 1 : 0);
+    (dateFrom || dateTo ? 1 : 0);
 
   return (
     <SidebarProvider>
@@ -181,11 +181,18 @@ function Dashboard() {
         <div className="flex flex-1 flex-col">
           <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-border bg-background/80 px-4 backdrop-blur">
             <SidebarTrigger />
-            <div>
-              <h1 className="text-sm font-semibold text-foreground">Painel BI</h1>
-              <p className="text-xs text-muted-foreground">
-                {total.toLocaleString("pt-BR")} lançamentos · {brl(valorTotal)}
-              </p>
+            <div className="flex flex-1 items-center gap-3">
+              <div>
+                <h1 className="text-sm font-semibold text-foreground">Principal</h1>
+                <p className="text-xs text-muted-foreground">
+                  {isLoading
+                    ? "Carregando lançamentos…"
+                    : error
+                      ? "Erro ao carregar dados"
+                      : `${total.toLocaleString("pt-BR")} lançamentos · ${brl(valorTotal)}`}
+                </p>
+              </div>
+              {isLoading && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
             </div>
           </header>
 
