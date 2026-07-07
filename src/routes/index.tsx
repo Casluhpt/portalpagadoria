@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { Check, ChevronDown, Filter, RotateCcw } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { Check, ChevronDown, Filter, Loader2, RotateCcw } from "lucide-react";
 import {
   Bar,
   BarChart,
@@ -21,7 +22,6 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -32,21 +32,10 @@ import {
 } from "@/components/ui/popover";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
-import baseData from "@/data/base-bi.json";
+import { fetchAllLancamentos, lancamentosQueryKey, type Lancamento } from "@/lib/lancamentos";
 import logoAsset from "@/assets/profarma-logo.png.asset.json";
 
-type Row = {
-  prePedido: number | null;
-  issuer: string | null;
-  supplier: string | null;
-  company: number | null;
-  dueDate: string | null;
-  grossAmount: number | null;
-  registerDate: string | null;
-  descStatus: string | null;
-  action: string | null;
-  Empresa: string | null;
-};
+type Row = Lancamento;
 
 const prettyIssuer = (v: string | null) => {
   if (!v) return v;
@@ -54,10 +43,8 @@ const prettyIssuer = (v: string | null) => {
   return base.charAt(0).toUpperCase() + base.slice(1);
 };
 
-const rows: Row[] = (baseData as Row[]).map((r) => ({
-  ...r,
-  issuer: prettyIssuer(r.issuer),
-}));
+const applyDisplay = (data: Lancamento[]): Row[] =>
+  data.map((r) => ({ ...r, issuer: prettyIssuer(r.issuer) }));
 
 
 const PIE_COLORS = ["#c084fc", "#a855f7", "#7e22ce", "#9333ea", "#d8b4fe", "#e9d5ff"];
@@ -86,18 +73,25 @@ function uniqSorted<T>(arr: (T | null | undefined)[]): T[] {
 }
 
 function Dashboard() {
-  const allStatus = useMemo(() => uniqSorted(rows.map((r) => r.descStatus)), []);
-  const allEmpresas = useMemo(() => uniqSorted(rows.map((r) => r.Empresa)), []);
-  const allIssuers = useMemo(() => uniqSorted(rows.map((r) => r.issuer)), []);
-  const allActions = useMemo(() => uniqSorted(rows.map((r) => r.action)), []);
+  const { data: raw, isLoading, error } = useQuery({
+    queryKey: lancamentosQueryKey,
+    queryFn: fetchAllLancamentos,
+    staleTime: 30_000,
+  });
+  const rows = useMemo(() => applyDisplay(raw ?? []), [raw]);
+
+  const allStatus = useMemo(() => uniqSorted(rows.map((r) => r.descStatus)), [rows]);
+  const allEmpresas = useMemo(() => uniqSorted(rows.map((r) => r.Empresa)), [rows]);
+  const allIssuers = useMemo(() => uniqSorted(rows.map((r) => r.issuer)), [rows]);
+  const allActions = useMemo(() => uniqSorted(rows.map((r) => r.action)), [rows]);
 
   const dateBounds = useMemo(() => {
     const dates = rows.map((r) => r.dueDate).filter((d): d is string => !!d).sort();
     return { min: dates[0] ?? "", max: dates[dates.length - 1] ?? "" };
-  }, []);
+  }, [rows]);
 
-  const [dateFrom, setDateFrom] = useState<string>(dateBounds.min);
-  const [dateTo, setDateTo] = useState<string>(dateBounds.max);
+  const [dateFrom, setDateFrom] = useState<string>("");
+  const [dateTo, setDateTo] = useState<string>("");
   const [status, setStatus] = useState<string[]>([]);
   const [empresas, setEmpresas] = useState<string[]>([]);
   const [issuers, setIssuers] = useState<string[]>([]);
@@ -115,7 +109,7 @@ function Dashboard() {
       if (actions.length && !actions.includes(r.action ?? "")) return false;
       return true;
     });
-  }, [dateFrom, dateTo, status, empresas, issuers, actions]);
+  }, [rows, dateFrom, dateTo, status, empresas, issuers, actions]);
 
   const total = filtered.length;
   const valorTotal = filtered.reduce((s, r) => s + (r.grossAmount ?? 0), 0);
@@ -165,8 +159,8 @@ function Dashboard() {
   }, [filtered]);
 
   const resetAll = () => {
-    setDateFrom(dateBounds.min);
-    setDateTo(dateBounds.max);
+    setDateFrom("");
+    setDateTo("");
     setStatus([]);
     setEmpresas([]);
     setIssuers([]);
@@ -178,7 +172,7 @@ function Dashboard() {
     (empresas.length ? 1 : 0) +
     (issuers.length ? 1 : 0) +
     (actions.length ? 1 : 0) +
-    (dateFrom !== dateBounds.min || dateTo !== dateBounds.max ? 1 : 0);
+    (dateFrom || dateTo ? 1 : 0);
 
   return (
     <SidebarProvider>
@@ -187,11 +181,18 @@ function Dashboard() {
         <div className="flex flex-1 flex-col">
           <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-border bg-background/80 px-4 backdrop-blur">
             <SidebarTrigger />
-            <div>
-              <h1 className="text-sm font-semibold text-foreground">Painel BI</h1>
-              <p className="text-xs text-muted-foreground">
-                {total.toLocaleString("pt-BR")} lançamentos · {brl(valorTotal)}
-              </p>
+            <div className="flex flex-1 items-center gap-3">
+              <div>
+                <h1 className="text-sm font-semibold text-foreground">Principal</h1>
+                <p className="text-xs text-muted-foreground">
+                  {isLoading
+                    ? "Carregando lançamentos…"
+                    : error
+                      ? "Erro ao carregar dados"
+                      : `${total.toLocaleString("pt-BR")} lançamentos · ${brl(valorTotal)}`}
+                </p>
+              </div>
+              {isLoading && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
             </div>
           </header>
 
