@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { LayoutDashboard, BarChart3, Users, ShoppingBag, Settings, Sparkles } from "lucide-react";
+import { LayoutDashboard, Database, Sparkles } from "lucide-react";
 
 import {
   Sidebar,
@@ -14,11 +14,8 @@ import {
 } from "@/components/ui/sidebar";
 
 const items = [
-  { title: "Visão geral", url: "/", icon: LayoutDashboard },
-  { title: "Analytics", url: "/analytics", icon: BarChart3 },
-  { title: "Clientes", url: "/clientes", icon: Users },
-  { title: "Pedidos", url: "/pedidos", icon: ShoppingBag },
-  { title: "Configurações", url: "/configuracoes", icon: Settings },
+  { title: "Principal", url: "/", icon: LayoutDashboard },
+  { title: "Base", url: "/base", icon: Database },
 ];
 
 export function AppSidebar() {
@@ -33,7 +30,7 @@ export function AppSidebar() {
           </div>
           <div className="flex flex-col leading-tight group-data-[collapsible=icon]:hidden">
             <span className="text-sm font-semibold text-sidebar-foreground">Painel</span>
-            <span className="text-xs text-muted-foreground">Workspace</span>
+            <span className="text-xs text-muted-foreground">Profarma</span>
           </div>
         </div>
       </SidebarHeader>
