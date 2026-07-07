@@ -14,7 +14,69 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      lancamentos: {
+        Row: {
+          account_group: string | null
+          action: string | null
+          center: string | null
+          company: number | null
+          created_at: string
+          desc_status: string | null
+          due_date: string | null
+          empresa: string | null
+          gross_amount: number | null
+          id: string
+          invoice_number: string | null
+          issuer: string | null
+          log: string | null
+          pre_pedido: number | null
+          register_date: string | null
+          supplier: string | null
+          text_field: string | null
+          updated_at: string
+        }
+        Insert: {
+          account_group?: string | null
+          action?: string | null
+          center?: string | null
+          company?: number | null
+          created_at?: string
+          desc_status?: string | null
+          due_date?: string | null
+          empresa?: string | null
+          gross_amount?: number | null
+          id?: string
+          invoice_number?: string | null
+          issuer?: string | null
+          log?: string | null
+          pre_pedido?: number | null
+          register_date?: string | null
+          supplier?: string | null
+          text_field?: string | null
+          updated_at?: string
+        }
+        Update: {
+          account_group?: string | null
+          action?: string | null
+          center?: string | null
+          company?: number | null
+          created_at?: string
+          desc_status?: string | null
+          due_date?: string | null
+          empresa?: string | null
+          gross_amount?: number | null
+          id?: string
+          invoice_number?: string | null
+          issuer?: string | null
+          log?: string | null
+          pre_pedido?: number | null
+          register_date?: string | null
+          supplier?: string | null
+          text_field?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
