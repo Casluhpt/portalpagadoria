@@ -43,10 +43,8 @@ const prettyIssuer = (v: string | null) => {
   return base.charAt(0).toUpperCase() + base.slice(1);
 };
 
-const rows: Row[] = (baseData as Row[]).map((r) => ({
-  ...r,
-  issuer: prettyIssuer(r.issuer),
-}));
+const applyDisplay = (data: Lancamento[]): Row[] =>
+  data.map((r) => ({ ...r, issuer: prettyIssuer(r.issuer) }));
 
 
 const PIE_COLORS = ["#c084fc", "#a855f7", "#7e22ce", "#9333ea", "#d8b4fe", "#e9d5ff"];
@@ -75,9 +73,16 @@ function uniqSorted<T>(arr: (T | null | undefined)[]): T[] {
 }
 
 function Dashboard() {
-  const allStatus = useMemo(() => uniqSorted(rows.map((r) => r.descStatus)), []);
-  const allEmpresas = useMemo(() => uniqSorted(rows.map((r) => r.Empresa)), []);
-  const allIssuers = useMemo(() => uniqSorted(rows.map((r) => r.issuer)), []);
+  const { data: raw, isLoading, error } = useQuery({
+    queryKey: lancamentosQueryKey,
+    queryFn: fetchAllLancamentos,
+    staleTime: 30_000,
+  });
+  const rows = useMemo(() => applyDisplay(raw ?? []), [raw]);
+
+  const allStatus = useMemo(() => uniqSorted(rows.map((r) => r.descStatus)), [rows]);
+  const allEmpresas = useMemo(() => uniqSorted(rows.map((r) => r.Empresa)), [rows]);
+  const allIssuers = useMemo(() => uniqSorted(rows.map((r) => r.issuer)), [rows]);
   const allActions = useMemo(() => uniqSorted(rows.map((r) => r.action)), []);
 
   const dateBounds = useMemo(() => {
