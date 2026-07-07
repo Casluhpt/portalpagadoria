@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { Check, ChevronDown, Filter, RotateCcw } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { Check, ChevronDown, Filter, Loader2, RotateCcw } from "lucide-react";
 import {
   Bar,
   BarChart,
@@ -21,7 +22,6 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -32,21 +32,10 @@ import {
 } from "@/components/ui/popover";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
-import baseData from "@/data/base-bi.json";
+import { fetchAllLancamentos, lancamentosQueryKey, type Lancamento } from "@/lib/lancamentos";
 import logoAsset from "@/assets/profarma-logo.png.asset.json";
 
-type Row = {
-  prePedido: number | null;
-  issuer: string | null;
-  supplier: string | null;
-  company: number | null;
-  dueDate: string | null;
-  grossAmount: number | null;
-  registerDate: string | null;
-  descStatus: string | null;
-  action: string | null;
-  Empresa: string | null;
-};
+type Row = Lancamento;
 
 const prettyIssuer = (v: string | null) => {
   if (!v) return v;
