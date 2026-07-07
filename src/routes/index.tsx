@@ -83,15 +83,15 @@ function Dashboard() {
   const allStatus = useMemo(() => uniqSorted(rows.map((r) => r.descStatus)), [rows]);
   const allEmpresas = useMemo(() => uniqSorted(rows.map((r) => r.Empresa)), [rows]);
   const allIssuers = useMemo(() => uniqSorted(rows.map((r) => r.issuer)), [rows]);
-  const allActions = useMemo(() => uniqSorted(rows.map((r) => r.action)), []);
+  const allActions = useMemo(() => uniqSorted(rows.map((r) => r.action)), [rows]);
 
   const dateBounds = useMemo(() => {
     const dates = rows.map((r) => r.dueDate).filter((d): d is string => !!d).sort();
     return { min: dates[0] ?? "", max: dates[dates.length - 1] ?? "" };
-  }, []);
+  }, [rows]);
 
-  const [dateFrom, setDateFrom] = useState<string>(dateBounds.min);
-  const [dateTo, setDateTo] = useState<string>(dateBounds.max);
+  const [dateFrom, setDateFrom] = useState<string>("");
+  const [dateTo, setDateTo] = useState<string>("");
   const [status, setStatus] = useState<string[]>([]);
   const [empresas, setEmpresas] = useState<string[]>([]);
   const [issuers, setIssuers] = useState<string[]>([]);
@@ -109,7 +109,7 @@ function Dashboard() {
       if (actions.length && !actions.includes(r.action ?? "")) return false;
       return true;
     });
-  }, [dateFrom, dateTo, status, empresas, issuers, actions]);
+  }, [rows, dateFrom, dateTo, status, empresas, issuers, actions]);
 
   const total = filtered.length;
   const valorTotal = filtered.reduce((s, r) => s + (r.grossAmount ?? 0), 0);
