@@ -9,9 +9,17 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ProvisaoRouteImport } from './routes/provisao'
 import { Route as BaseRouteImport } from './routes/base'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ProvisaoIndexRouteImport } from './routes/provisao.index'
+import { Route as ProvisaoBaseRouteImport } from './routes/provisao.base'
 
+const ProvisaoRoute = ProvisaoRouteImport.update({
+  id: '/provisao',
+  path: '/provisao',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BaseRoute = BaseRouteImport.update({
   id: '/base',
   path: '/base',
@@ -22,35 +30,61 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProvisaoIndexRoute = ProvisaoIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ProvisaoRoute,
+} as any)
+const ProvisaoBaseRoute = ProvisaoBaseRouteImport.update({
+  id: '/base',
+  path: '/base',
+  getParentRoute: () => ProvisaoRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/base': typeof BaseRoute
+  '/provisao': typeof ProvisaoRouteWithChildren
+  '/provisao/base': typeof ProvisaoBaseRoute
+  '/provisao/': typeof ProvisaoIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/base': typeof BaseRoute
+  '/provisao/base': typeof ProvisaoBaseRoute
+  '/provisao': typeof ProvisaoIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/base': typeof BaseRoute
+  '/provisao': typeof ProvisaoRouteWithChildren
+  '/provisao/base': typeof ProvisaoBaseRoute
+  '/provisao/': typeof ProvisaoIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/base'
+  fullPaths: '/' | '/base' | '/provisao' | '/provisao/base' | '/provisao/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/base'
-  id: '__root__' | '/' | '/base'
+  to: '/' | '/base' | '/provisao/base' | '/provisao'
+  id: '__root__' | '/' | '/base' | '/provisao' | '/provisao/base' | '/provisao/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   BaseRoute: typeof BaseRoute
+  ProvisaoRoute: typeof ProvisaoRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/provisao': {
+      id: '/provisao'
+      path: '/provisao'
+      fullPath: '/provisao'
+      preLoaderRoute: typeof ProvisaoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/base': {
       id: '/base'
       path: '/base'
@@ -65,12 +99,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/provisao/': {
+      id: '/provisao/'
+      path: '/'
+      fullPath: '/provisao/'
+      preLoaderRoute: typeof ProvisaoIndexRouteImport
+      parentRoute: typeof ProvisaoRoute
+    }
+    '/provisao/base': {
+      id: '/provisao/base'
+      path: '/base'
+      fullPath: '/provisao/base'
+      preLoaderRoute: typeof ProvisaoBaseRouteImport
+      parentRoute: typeof ProvisaoRoute
+    }
   }
 }
+
+interface ProvisaoRouteChildren {
+  ProvisaoBaseRoute: typeof ProvisaoBaseRoute
+  ProvisaoIndexRoute: typeof ProvisaoIndexRoute
+}
+
+const ProvisaoRouteChildren: ProvisaoRouteChildren = {
+  ProvisaoBaseRoute: ProvisaoBaseRoute,
+  ProvisaoIndexRoute: ProvisaoIndexRoute,
+}
+
+const ProvisaoRouteWithChildren = ProvisaoRoute._addFileChildren(
+  ProvisaoRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   BaseRoute: BaseRoute,
+  ProvisaoRoute: ProvisaoRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
