@@ -24,8 +24,15 @@ const toModel = (r: Row): Provisao => ({
   valor: r.valor == null ? null : Number(r.valor),
 });
 
-const toRow = (m: Partial<Provisao>) => {
-  const out: Record<string, unknown> = {};
+type InsertRow = {
+  data?: string | null;
+  empresa?: string | null;
+  banco?: string | null;
+  valor?: number | null;
+};
+
+const toRow = (m: Partial<Provisao>): InsertRow => {
+  const out: InsertRow = {};
   if ("data" in m) out.data = m.data ?? null;
   if ("empresa" in m) out.empresa = m.empresa ?? null;
   if ("banco" in m) out.banco = m.banco ?? null;

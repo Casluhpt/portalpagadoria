@@ -9,9 +9,15 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ProvisaoRouteImport } from './routes/provisao'
 import { Route as BaseRouteImport } from './routes/base'
 import { Route as IndexRouteImport } from './routes/index'
 
+const ProvisaoRoute = ProvisaoRouteImport.update({
+  id: '/provisao',
+  path: '/provisao',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BaseRoute = BaseRouteImport.update({
   id: '/base',
   path: '/base',
@@ -26,31 +32,42 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/base': typeof BaseRoute
+  '/provisao': typeof ProvisaoRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/base': typeof BaseRoute
+  '/provisao': typeof ProvisaoRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/base': typeof BaseRoute
+  '/provisao': typeof ProvisaoRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/base'
+  fullPaths: '/' | '/base' | '/provisao'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/base'
-  id: '__root__' | '/' | '/base'
+  to: '/' | '/base' | '/provisao'
+  id: '__root__' | '/' | '/base' | '/provisao'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   BaseRoute: typeof BaseRoute
+  ProvisaoRoute: typeof ProvisaoRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/provisao': {
+      id: '/provisao'
+      path: '/provisao'
+      fullPath: '/provisao'
+      preLoaderRoute: typeof ProvisaoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/base': {
       id: '/base'
       path: '/base'
@@ -71,6 +88,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   BaseRoute: BaseRoute,
+  ProvisaoRoute: ProvisaoRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

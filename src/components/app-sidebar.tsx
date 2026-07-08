@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { LayoutDashboard, Database, Sparkles } from "lucide-react";
+import { LayoutDashboard, Database, Sparkles, Wallet } from "lucide-react";
 
 import {
   Sidebar,
@@ -14,8 +14,9 @@ import {
 } from "@/components/ui/sidebar";
 
 const items = [
-  { title: "Principal", url: "/", icon: LayoutDashboard },
-  { title: "Base", url: "/base", icon: Database },
+  { title: "Principal", url: "/", icon: LayoutDashboard, match: (p: string) => p === "/" },
+  { title: "Base", url: "/base", icon: Database, match: (p: string) => p === "/base" },
+  { title: "Provisão Diária", url: "/provisao", icon: Wallet, match: (p: string) => p.startsWith("/provisao") },
 ];
 
 export function AppSidebar() {
@@ -41,7 +42,7 @@ export function AppSidebar() {
             <SidebarMenu>
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild isActive={currentPath === item.url}>
+                  <SidebarMenuButton asChild isActive={item.match(currentPath)}>
                     <Link to={item.url} className="flex items-center gap-2">
                       <item.icon className="h-4 w-4" />
                       <span>{item.title}</span>
