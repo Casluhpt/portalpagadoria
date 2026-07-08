@@ -77,6 +77,36 @@ export type Database = {
         }
         Relationships: []
       }
+      provisao_diaria: {
+        Row: {
+          banco: string | null
+          created_at: string
+          data: string | null
+          empresa: string | null
+          id: string
+          updated_at: string
+          valor: number | null
+        }
+        Insert: {
+          banco?: string | null
+          created_at?: string
+          data?: string | null
+          empresa?: string | null
+          id?: string
+          updated_at?: string
+          valor?: number | null
+        }
+        Update: {
+          banco?: string | null
+          created_at?: string
+          data?: string | null
+          empresa?: string | null
+          id?: string
+          updated_at?: string
+          valor?: number | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
