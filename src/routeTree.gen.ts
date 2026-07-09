@@ -10,11 +10,13 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as UsuariosRouteImport } from './routes/usuarios'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RegistrosExcluidosRouteImport } from './routes/registros-excluidos'
 import { Route as ProvisaoRouteImport } from './routes/provisao'
 import { Route as PrincipalRouteImport } from './routes/principal'
 import { Route as PagamentosRouteImport } from './routes/pagamentos'
 import { Route as HistoricoRouteImport } from './routes/historico'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as FechamentoRouteImport } from './routes/fechamento'
 import { Route as ExportacaoRouteImport } from './routes/exportacao'
 import { Route as DivergenciasRouteImport } from './routes/divergencias'
@@ -34,6 +36,11 @@ import { Route as ProvisaoBaseRouteImport } from './routes/provisao.base'
 const UsuariosRoute = UsuariosRouteImport.update({
   id: '/usuarios',
   path: '/usuarios',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RegistrosExcluidosRoute = RegistrosExcluidosRouteImport.update({
@@ -59,6 +66,11 @@ const PagamentosRoute = PagamentosRouteImport.update({
 const HistoricoRoute = HistoricoRouteImport.update({
   id: '/historico',
   path: '/historico',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FechamentoRoute = FechamentoRouteImport.update({
@@ -151,11 +163,13 @@ export interface FileRoutesByFullPath {
   '/divergencias': typeof DivergenciasRoute
   '/exportacao': typeof ExportacaoRoute
   '/fechamento': typeof FechamentoRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/historico': typeof HistoricoRoute
   '/pagamentos': typeof PagamentosRoute
   '/principal': typeof PrincipalRoute
   '/provisao': typeof ProvisaoRouteWithChildren
   '/registros-excluidos': typeof RegistrosExcluidosRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/usuarios': typeof UsuariosRoute
   '/provisao/base': typeof ProvisaoBaseRoute
   '/provisao/': typeof ProvisaoIndexRoute
@@ -174,10 +188,12 @@ export interface FileRoutesByTo {
   '/divergencias': typeof DivergenciasRoute
   '/exportacao': typeof ExportacaoRoute
   '/fechamento': typeof FechamentoRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/historico': typeof HistoricoRoute
   '/pagamentos': typeof PagamentosRoute
   '/principal': typeof PrincipalRoute
   '/registros-excluidos': typeof RegistrosExcluidosRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/usuarios': typeof UsuariosRoute
   '/provisao/base': typeof ProvisaoBaseRoute
   '/provisao': typeof ProvisaoIndexRoute
@@ -197,11 +213,13 @@ export interface FileRoutesById {
   '/divergencias': typeof DivergenciasRoute
   '/exportacao': typeof ExportacaoRoute
   '/fechamento': typeof FechamentoRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/historico': typeof HistoricoRoute
   '/pagamentos': typeof PagamentosRoute
   '/principal': typeof PrincipalRoute
   '/provisao': typeof ProvisaoRouteWithChildren
   '/registros-excluidos': typeof RegistrosExcluidosRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/usuarios': typeof UsuariosRoute
   '/provisao/base': typeof ProvisaoBaseRoute
   '/provisao/': typeof ProvisaoIndexRoute
@@ -222,11 +240,13 @@ export interface FileRouteTypes {
     | '/divergencias'
     | '/exportacao'
     | '/fechamento'
+    | '/forgot-password'
     | '/historico'
     | '/pagamentos'
     | '/principal'
     | '/provisao'
     | '/registros-excluidos'
+    | '/reset-password'
     | '/usuarios'
     | '/provisao/base'
     | '/provisao/'
@@ -245,10 +265,12 @@ export interface FileRouteTypes {
     | '/divergencias'
     | '/exportacao'
     | '/fechamento'
+    | '/forgot-password'
     | '/historico'
     | '/pagamentos'
     | '/principal'
     | '/registros-excluidos'
+    | '/reset-password'
     | '/usuarios'
     | '/provisao/base'
     | '/provisao'
@@ -267,11 +289,13 @@ export interface FileRouteTypes {
     | '/divergencias'
     | '/exportacao'
     | '/fechamento'
+    | '/forgot-password'
     | '/historico'
     | '/pagamentos'
     | '/principal'
     | '/provisao'
     | '/registros-excluidos'
+    | '/reset-password'
     | '/usuarios'
     | '/provisao/base'
     | '/provisao/'
@@ -291,11 +315,13 @@ export interface RootRouteChildren {
   DivergenciasRoute: typeof DivergenciasRoute
   ExportacaoRoute: typeof ExportacaoRoute
   FechamentoRoute: typeof FechamentoRoute
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
   HistoricoRoute: typeof HistoricoRoute
   PagamentosRoute: typeof PagamentosRoute
   PrincipalRoute: typeof PrincipalRoute
   ProvisaoRoute: typeof ProvisaoRouteWithChildren
   RegistrosExcluidosRoute: typeof RegistrosExcluidosRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   UsuariosRoute: typeof UsuariosRoute
 }
 
@@ -306,6 +332,13 @@ declare module '@tanstack/react-router' {
       path: '/usuarios'
       fullPath: '/usuarios'
       preLoaderRoute: typeof UsuariosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/registros-excluidos': {
@@ -341,6 +374,13 @@ declare module '@tanstack/react-router' {
       path: '/historico'
       fullPath: '/historico'
       preLoaderRoute: typeof HistoricoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/fechamento': {
@@ -479,23 +519,15 @@ const rootRouteChildren: RootRouteChildren = {
   DivergenciasRoute: DivergenciasRoute,
   ExportacaoRoute: ExportacaoRoute,
   FechamentoRoute: FechamentoRoute,
+  ForgotPasswordRoute: ForgotPasswordRoute,
   HistoricoRoute: HistoricoRoute,
   PagamentosRoute: PagamentosRoute,
   PrincipalRoute: PrincipalRoute,
   ProvisaoRoute: ProvisaoRouteWithChildren,
   RegistrosExcluidosRoute: RegistrosExcluidosRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   UsuariosRoute: UsuariosRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
