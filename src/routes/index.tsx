@@ -3,11 +3,11 @@ import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import {
   ArrowUpRight,
+  Banknote,
   BarChart3,
   CalendarDays,
   CheckCircle2,
   Clock,
-  FileArchive,
   LineChart,
   ScrollText,
   ShieldCheck,
@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 
 import { AppSidebar } from "@/components/app-sidebar";
+import { HeaderActions } from "@/components/header-actions";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -62,7 +63,7 @@ function PortalPage() {
     return { totalMes, colaboradores, provHoje, empresasProv, totalLanc: lanc.length };
   }, [lanc, prov]);
 
-  const modules = [
+  const modules: ModuleDef[] = [
     {
       key: "resultados",
       title: "Resultados Principais",
@@ -80,9 +81,27 @@ function PortalPage() {
         "Total de colaboradores pagos",
         "Valor líquido processado",
         "Comparativo mensal e anual",
-        "Evolução de pagamentos",
       ],
-      responsavel: "Equipe Pagadoria",
+      updated: "hoje",
+    },
+    {
+      key: "pagamentos",
+      title: "Pagamentos Diversos",
+      subtitle: "Gestão dos pagamentos diversos processados pela Pagadoria.",
+      objetivo: "Importação, versionamento mensal e conciliação LG × Bankmanager × Itaú.",
+      base: "Base de Pagamentos",
+      baseTo: "/pagamentos",
+      to: "/pagamentos",
+      cta: "Acessar Pagamentos",
+      icon: Banknote,
+      accent: "from-emerald-600 to-teal-800",
+      chip: "bg-emerald-100 text-emerald-800",
+      bullets: [
+        "Importação Excel/CSV",
+        "Versionamento mensal",
+        "Conciliação multi-fonte",
+        "Aprovação e pagamento",
+      ],
       updated: "hoje",
     },
     {
@@ -103,29 +122,7 @@ function PortalPage() {
         "Diferença previsto x realizado",
         "Tendência de fechamento",
       ],
-      responsavel: "Tesouraria",
       updated: "hoje",
-    },
-    {
-      key: "anexos",
-      title: "Base de Anexos",
-      subtitle: "Centralização de documentos complementares da operação.",
-      objetivo: "Arquivos de apoio e documentação utilizada nos processos de Pagadoria.",
-      base: "Base de Anexos",
-      baseTo: "/anexos",
-      to: "/anexos",
-      cta: "Acessar Arquivos",
-      icon: FileArchive,
-      accent: "from-slate-700 to-slate-900",
-      chip: "bg-slate-200 text-slate-800",
-      bullets: [
-        "Comprovantes",
-        "Relatórios e arquivos bancários",
-        "Layouts e documentações",
-        "Evidências operacionais",
-      ],
-      responsavel: "Back Office",
-      updated: "esta semana",
     },
     {
       key: "conciliacao",
@@ -145,10 +142,9 @@ function PortalPage() {
         "Status de fechamento",
         "Percentual de conciliação",
       ],
-      responsavel: "Financeiro",
       updated: "diariamente",
     },
-  ] as const;
+  ];
 
   return (
     <SidebarProvider>
@@ -162,19 +158,21 @@ function PortalPage() {
               <span className="text-sm font-semibold text-slate-800">Portal Pagadoria</span>
               <span className="text-[11px] text-slate-500">Central de inteligência financeira</span>
             </div>
-            <div className="ml-auto flex items-center gap-2 text-xs text-slate-500">
-              <CalendarDays className="h-4 w-4" />
-              {new Date().toLocaleDateString("pt-BR", {
-                weekday: "long",
-                day: "2-digit",
-                month: "long",
-                year: "numeric",
-              })}
+            <div className="ml-auto flex items-center gap-3">
+              <div className="hidden items-center gap-1 text-xs text-slate-500 md:flex">
+                <CalendarDays className="h-4 w-4" />
+                {new Date().toLocaleDateString("pt-BR", {
+                  weekday: "long",
+                  day: "2-digit",
+                  month: "long",
+                  year: "numeric",
+                })}
+              </div>
+              <HeaderActions />
             </div>
           </header>
 
           <main className="flex-1 space-y-8 p-6 lg:p-8">
-            {/* Hero */}
             <section className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-indigo-900 via-violet-800 to-purple-900 p-8 text-white shadow-xl">
               <div className="absolute -right-16 -top-16 h-64 w-64 rounded-full bg-white/10 blur-3xl" />
               <div className="absolute -bottom-20 -left-10 h-72 w-72 rounded-full bg-fuchsia-400/10 blur-3xl" />
@@ -185,9 +183,8 @@ function PortalPage() {
                   </Badge>
                   <h1 className="text-3xl font-bold tracking-tight md:text-4xl">Pagadoria</h1>
                   <p className="mt-2 text-base text-white/80 md:text-lg">
-                    Central de inteligência da Pagadoria com foco em resultados, provisões, bases de
-                    apoio e conciliações financeiras. Ponto único de acesso para análise operacional
-                    e tomada de decisão.
+                    Central de inteligência da Pagadoria com foco em resultados, pagamentos,
+                    provisões e conciliações financeiras.
                   </p>
                 </div>
                 <div className="flex gap-2">
@@ -202,15 +199,14 @@ function PortalPage() {
                     variant="outline"
                     className="border-white/30 bg-transparent text-white hover:bg-white/10"
                   >
-                    <Link to="/provisao">
-                      <Wallet className="mr-2 h-4 w-4" /> Provisão do dia
+                    <Link to="/pagamentos">
+                      <Banknote className="mr-2 h-4 w-4" /> Pagamentos Diversos
                     </Link>
                   </Button>
                 </div>
               </div>
             </section>
 
-            {/* KPIs */}
             <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
               <KpiCard
                 label="Total pago no mês"
@@ -242,16 +238,11 @@ function PortalPage() {
               />
             </section>
 
-            {/* Modules grid 2x2 */}
             <section className="grid gap-6 md:grid-cols-2">
               {modules.map((m) => (
                 <ModuleCard key={m.key} m={m} />
               ))}
             </section>
-
-            <p className="pb-4 text-center text-xs text-slate-400">
-              Layout inspirado em portais de Business Intelligence e Centros de Operação Financeira.
-            </p>
           </main>
         </div>
       </div>
@@ -311,7 +302,6 @@ type ModuleDef = {
   accent: string;
   chip: string;
   bullets: readonly string[];
-  responsavel: string;
   updated: string;
 };
 
@@ -353,9 +343,6 @@ function ModuleCard({ m }: { m: ModuleDef }) {
           </span>
           <span className="flex items-center gap-1">
             <Clock className="h-3.5 w-3.5" /> Atualizado: {m.updated}
-          </span>
-          <span className="flex items-center gap-1">
-            <Users className="h-3.5 w-3.5" /> Resp.: {m.responsavel}
           </span>
         </div>
 

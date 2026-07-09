@@ -14,7 +14,7 @@ import {
   Settings,
   FileCheck2,
   AlertTriangle,
-  Bell,
+  
   Download,
   BarChart3,
   History,
@@ -65,7 +65,7 @@ const mainItems: MenuItem[] = [
   { title: "Administração do Portal", url: "/administracao", icon: Settings, match: (p) => p.startsWith("/administracao"), adminOnly: true },
   { title: "Fechamento de Competência", url: "/fechamento", icon: FileCheck2, match: (p) => p.startsWith("/fechamento") },
   { title: "Central de Divergências", url: "/divergencias", icon: AlertTriangle, match: (p) => p.startsWith("/divergencias") },
-  { title: "Notificações e Alertas", url: "/alertas", icon: Bell, match: (p) => p.startsWith("/alertas") },
+  
   { title: "Exportação de Relatórios", url: "/exportacao", icon: Download, match: (p) => p.startsWith("/exportacao") },
 ];
 

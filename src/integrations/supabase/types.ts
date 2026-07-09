@@ -14,6 +14,173 @@ export type Database = {
   }
   public: {
     Tables: {
+      comunicado_leituras: {
+        Row: {
+          comunicado_id: string
+          lido_em: string
+          user_id: string
+        }
+        Insert: {
+          comunicado_id: string
+          lido_em?: string
+          user_id: string
+        }
+        Update: {
+          comunicado_id?: string
+          lido_em?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comunicado_leituras_comunicado_id_fkey"
+            columns: ["comunicado_id"]
+            isOneToOne: false
+            referencedRelation: "comunicados"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      comunicados: {
+        Row: {
+          criado_em: string
+          criado_por: string | null
+          id: string
+          mensagem: string
+          titulo: string
+        }
+        Insert: {
+          criado_em?: string
+          criado_por?: string | null
+          id?: string
+          mensagem: string
+          titulo: string
+        }
+        Update: {
+          criado_em?: string
+          criado_por?: string | null
+          id?: string
+          mensagem?: string
+          titulo?: string
+        }
+        Relationships: []
+      }
+      lancamentos: {
+        Row: {
+          account_group: string | null
+          action: string | null
+          center: string | null
+          company: number | null
+          created_at: string
+          desc_status: string | null
+          due_date: string | null
+          empresa: string | null
+          gross_amount: number | null
+          id: string
+          invoice_number: string | null
+          issuer: string | null
+          log: string | null
+          pre_pedido: number | null
+          register_date: string | null
+          supplier: string | null
+          text_field: string | null
+          updated_at: string
+        }
+        Insert: {
+          account_group?: string | null
+          action?: string | null
+          center?: string | null
+          company?: number | null
+          created_at?: string
+          desc_status?: string | null
+          due_date?: string | null
+          empresa?: string | null
+          gross_amount?: number | null
+          id?: string
+          invoice_number?: string | null
+          issuer?: string | null
+          log?: string | null
+          pre_pedido?: number | null
+          register_date?: string | null
+          supplier?: string | null
+          text_field?: string | null
+          updated_at?: string
+        }
+        Update: {
+          account_group?: string | null
+          action?: string | null
+          center?: string | null
+          company?: number | null
+          created_at?: string
+          desc_status?: string | null
+          due_date?: string | null
+          empresa?: string | null
+          gross_amount?: number | null
+          id?: string
+          invoice_number?: string | null
+          issuer?: string | null
+          log?: string | null
+          pre_pedido?: number | null
+          register_date?: string | null
+          supplier?: string | null
+          text_field?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          atualizado_em: string
+          criado_em: string
+          email: string | null
+          id: string
+          nome: string | null
+        }
+        Insert: {
+          atualizado_em?: string
+          criado_em?: string
+          email?: string | null
+          id: string
+          nome?: string | null
+        }
+        Update: {
+          atualizado_em?: string
+          criado_em?: string
+          email?: string | null
+          id?: string
+          nome?: string | null
+        }
+        Relationships: []
+      }
+      provisao_diaria: {
+        Row: {
+          banco: string | null
+          created_at: string
+          data: string | null
+          empresa: string | null
+          id: string
+          updated_at: string
+          valor: number | null
+        }
+        Insert: {
+          banco?: string | null
+          created_at?: string
+          data?: string | null
+          empresa?: string | null
+          id?: string
+          updated_at?: string
+          valor?: number | null
+        }
+        Update: {
+          banco?: string | null
+          created_at?: string
+          data?: string | null
+          empresa?: string | null
+          id?: string
+          updated_at?: string
+          valor?: number | null
+        }
+        Relationships: []
+      }
       solicitacao_updates: {
         Row: {
           autor_email: string | null
@@ -94,14 +261,44 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
+      app_role:
+        | "administrador"
+        | "criador_competencia"
+        | "operacional"
+        | "consulta"
+        | "auditor"
       solicitacao_status:
         | "aberta"
         | "em_analise"
@@ -242,6 +439,13 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      app_role: [
+        "administrador",
+        "criador_competencia",
+        "operacional",
+        "consulta",
+        "auditor",
+      ],
       solicitacao_status: [
         "aberta",
         "em_analise",
