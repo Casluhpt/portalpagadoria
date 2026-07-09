@@ -14,6 +14,57 @@ export type Database = {
   }
   public: {
     Tables: {
+      audit_log: {
+        Row: {
+          acao: string
+          competencia: string | null
+          created_at: string
+          id: string
+          ip: string | null
+          justificativa: string | null
+          modulo: string
+          registro_id: string | null
+          resultado: string | null
+          user_agent: string | null
+          user_email: string | null
+          user_id: string | null
+          valores_anteriores: Json | null
+          valores_novos: Json | null
+        }
+        Insert: {
+          acao: string
+          competencia?: string | null
+          created_at?: string
+          id?: string
+          ip?: string | null
+          justificativa?: string | null
+          modulo: string
+          registro_id?: string | null
+          resultado?: string | null
+          user_agent?: string | null
+          user_email?: string | null
+          user_id?: string | null
+          valores_anteriores?: Json | null
+          valores_novos?: Json | null
+        }
+        Update: {
+          acao?: string
+          competencia?: string | null
+          created_at?: string
+          id?: string
+          ip?: string | null
+          justificativa?: string | null
+          modulo?: string
+          registro_id?: string | null
+          resultado?: string | null
+          user_agent?: string | null
+          user_email?: string | null
+          user_id?: string | null
+          valores_anteriores?: Json | null
+          valores_novos?: Json | null
+        }
+        Relationships: []
+      }
       lancamentos: {
         Row: {
           account_group: string | null
@@ -77,6 +128,30 @@ export type Database = {
         }
         Relationships: []
       }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          nome: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id: string
+          nome?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          nome?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       provisao_diaria: {
         Row: {
           banco: string | null
@@ -107,15 +182,50 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          created_at: string
+          granted_by: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          granted_by?: string | null
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          granted_by?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role:
+        | "administrador"
+        | "criador_competencia"
+        | "operacional"
+        | "consulta"
+        | "auditor"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -242,6 +352,14 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: [
+        "administrador",
+        "criador_competencia",
+        "operacional",
+        "consulta",
+        "auditor",
+      ],
+    },
   },
 } as const
