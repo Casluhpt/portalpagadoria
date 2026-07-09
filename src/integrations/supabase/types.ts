@@ -14,83 +14,195 @@ export type Database = {
   }
   public: {
     Tables: {
-      solicitacao_updates: {
+      audit_log: {
         Row: {
-          autor_email: string | null
-          autor_nome: string
-          autor_tipo: string
-          criado_em: string
+          acao: string
+          competencia: string | null
+          created_at: string
           id: string
-          mensagem: string
-          novo_status: Database["public"]["Enums"]["solicitacao_status"] | null
-          solicitacao_id: string
+          ip: string | null
+          justificativa: string | null
+          modulo: string
+          registro_id: string | null
+          resultado: string | null
+          user_agent: string | null
+          user_email: string | null
+          user_id: string | null
+          valores_anteriores: Json | null
+          valores_novos: Json | null
         }
         Insert: {
-          autor_email?: string | null
-          autor_nome: string
-          autor_tipo: string
-          criado_em?: string
+          acao: string
+          competencia?: string | null
+          created_at?: string
           id?: string
-          mensagem: string
-          novo_status?: Database["public"]["Enums"]["solicitacao_status"] | null
-          solicitacao_id: string
+          ip?: string | null
+          justificativa?: string | null
+          modulo: string
+          registro_id?: string | null
+          resultado?: string | null
+          user_agent?: string | null
+          user_email?: string | null
+          user_id?: string | null
+          valores_anteriores?: Json | null
+          valores_novos?: Json | null
         }
         Update: {
-          autor_email?: string | null
-          autor_nome?: string
-          autor_tipo?: string
-          criado_em?: string
+          acao?: string
+          competencia?: string | null
+          created_at?: string
           id?: string
-          mensagem?: string
-          novo_status?: Database["public"]["Enums"]["solicitacao_status"] | null
-          solicitacao_id?: string
+          ip?: string | null
+          justificativa?: string | null
+          modulo?: string
+          registro_id?: string | null
+          resultado?: string | null
+          user_agent?: string | null
+          user_email?: string | null
+          user_id?: string | null
+          valores_anteriores?: Json | null
+          valores_novos?: Json | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "solicitacao_updates_solicitacao_id_fkey"
-            columns: ["solicitacao_id"]
-            isOneToOne: false
-            referencedRelation: "solicitacoes"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
-      solicitacoes: {
+      lancamentos: {
         Row: {
-          assunto: string
-          atualizado_em: string
-          codigo: string
-          criado_em: string
-          descricao: string
+          account_group: string | null
+          action: string | null
+          center: string | null
+          company: number | null
+          created_at: string
+          desc_status: string | null
+          due_date: string | null
+          empresa: string | null
+          gross_amount: number | null
           id: string
-          solicitante_email: string
-          solicitante_nome: string
-          status: Database["public"]["Enums"]["solicitacao_status"]
-          tipo: Database["public"]["Enums"]["solicitacao_tipo"]
+          invoice_number: string | null
+          issuer: string | null
+          log: string | null
+          pre_pedido: number | null
+          register_date: string | null
+          supplier: string | null
+          text_field: string | null
+          updated_at: string
         }
         Insert: {
-          assunto: string
-          atualizado_em?: string
-          codigo: string
-          criado_em?: string
-          descricao: string
+          account_group?: string | null
+          action?: string | null
+          center?: string | null
+          company?: number | null
+          created_at?: string
+          desc_status?: string | null
+          due_date?: string | null
+          empresa?: string | null
+          gross_amount?: number | null
           id?: string
-          solicitante_email: string
-          solicitante_nome: string
-          status?: Database["public"]["Enums"]["solicitacao_status"]
-          tipo: Database["public"]["Enums"]["solicitacao_tipo"]
+          invoice_number?: string | null
+          issuer?: string | null
+          log?: string | null
+          pre_pedido?: number | null
+          register_date?: string | null
+          supplier?: string | null
+          text_field?: string | null
+          updated_at?: string
         }
         Update: {
-          assunto?: string
-          atualizado_em?: string
-          codigo?: string
-          criado_em?: string
-          descricao?: string
+          account_group?: string | null
+          action?: string | null
+          center?: string | null
+          company?: number | null
+          created_at?: string
+          desc_status?: string | null
+          due_date?: string | null
+          empresa?: string | null
+          gross_amount?: number | null
           id?: string
-          solicitante_email?: string
-          solicitante_nome?: string
-          status?: Database["public"]["Enums"]["solicitacao_status"]
-          tipo?: Database["public"]["Enums"]["solicitacao_tipo"]
+          invoice_number?: string | null
+          issuer?: string | null
+          log?: string | null
+          pre_pedido?: number | null
+          register_date?: string | null
+          supplier?: string | null
+          text_field?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          nome: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id: string
+          nome?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          nome?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      provisao_diaria: {
+        Row: {
+          banco: string | null
+          created_at: string
+          data: string | null
+          empresa: string | null
+          id: string
+          updated_at: string
+          valor: number | null
+        }
+        Insert: {
+          banco?: string | null
+          created_at?: string
+          data?: string | null
+          empresa?: string | null
+          id?: string
+          updated_at?: string
+          valor?: number | null
+        }
+        Update: {
+          banco?: string | null
+          created_at?: string
+          data?: string | null
+          empresa?: string | null
+          id?: string
+          updated_at?: string
+          valor?: number | null
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          granted_by: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          granted_by?: string | null
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          granted_by?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
         }
         Relationships: []
       }
@@ -99,22 +211,21 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      solicitacao_status:
-        | "aberta"
-        | "em_analise"
-        | "respondida"
-        | "concluida"
-        | "cancelada"
-      solicitacao_tipo:
-        | "pagamento_diverso"
-        | "provisao"
-        | "holerite"
-        | "ferias"
-        | "rescisao"
-        | "outro"
+      app_role:
+        | "administrador"
+        | "criador_competencia"
+        | "operacional"
+        | "consulta"
+        | "auditor"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -242,20 +353,12 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      solicitacao_status: [
-        "aberta",
-        "em_analise",
-        "respondida",
-        "concluida",
-        "cancelada",
-      ],
-      solicitacao_tipo: [
-        "pagamento_diverso",
-        "provisao",
-        "holerite",
-        "ferias",
-        "rescisao",
-        "outro",
+      app_role: [
+        "administrador",
+        "criador_competencia",
+        "operacional",
+        "consulta",
+        "auditor",
       ],
     },
   },

@@ -9,25 +9,128 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as NovaSolicitacaoRouteImport } from './routes/nova-solicitacao'
-import { Route as MinhasSolicitacoesRouteImport } from './routes/minhas-solicitacoes'
-import { Route as IdentificarRouteImport } from './routes/identificar'
+import { Route as UsuariosRouteImport } from './routes/usuarios'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as RegistrosExcluidosRouteImport } from './routes/registros-excluidos'
+import { Route as ProvisaoRouteImport } from './routes/provisao'
+import { Route as PrincipalRouteImport } from './routes/principal'
+import { Route as PagamentosRouteImport } from './routes/pagamentos'
+import { Route as HistoricoRouteImport } from './routes/historico'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
+import { Route as FechamentoRouteImport } from './routes/fechamento'
+import { Route as ExportacaoRouteImport } from './routes/exportacao'
+import { Route as DivergenciasRouteImport } from './routes/divergencias'
+import { Route as DashboardGerencialRouteImport } from './routes/dashboard-gerencial'
+import { Route as ConfiguracoesRouteImport } from './routes/configuracoes'
+import { Route as ConciliacaoRouteImport } from './routes/conciliacao'
+import { Route as BaseRouteImport } from './routes/base'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuditoriaRouteImport } from './routes/auditoria'
+import { Route as AnexosRouteImport } from './routes/anexos'
+import { Route as AlertasRouteImport } from './routes/alertas'
+import { Route as AdministracaoRouteImport } from './routes/administracao'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as SolicitacaoIdRouteImport } from './routes/solicitacao.$id'
+import { Route as ProvisaoIndexRouteImport } from './routes/provisao.index'
+import { Route as ProvisaoBaseRouteImport } from './routes/provisao.base'
 
-const NovaSolicitacaoRoute = NovaSolicitacaoRouteImport.update({
-  id: '/nova-solicitacao',
-  path: '/nova-solicitacao',
+const UsuariosRoute = UsuariosRouteImport.update({
+  id: '/usuarios',
+  path: '/usuarios',
   getParentRoute: () => rootRouteImport,
 } as any)
-const MinhasSolicitacoesRoute = MinhasSolicitacoesRouteImport.update({
-  id: '/minhas-solicitacoes',
-  path: '/minhas-solicitacoes',
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IdentificarRoute = IdentificarRouteImport.update({
-  id: '/identificar',
-  path: '/identificar',
+const RegistrosExcluidosRoute = RegistrosExcluidosRouteImport.update({
+  id: '/registros-excluidos',
+  path: '/registros-excluidos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProvisaoRoute = ProvisaoRouteImport.update({
+  id: '/provisao',
+  path: '/provisao',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrincipalRoute = PrincipalRouteImport.update({
+  id: '/principal',
+  path: '/principal',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PagamentosRoute = PagamentosRouteImport.update({
+  id: '/pagamentos',
+  path: '/pagamentos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HistoricoRoute = HistoricoRouteImport.update({
+  id: '/historico',
+  path: '/historico',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FechamentoRoute = FechamentoRouteImport.update({
+  id: '/fechamento',
+  path: '/fechamento',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExportacaoRoute = ExportacaoRouteImport.update({
+  id: '/exportacao',
+  path: '/exportacao',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DivergenciasRoute = DivergenciasRouteImport.update({
+  id: '/divergencias',
+  path: '/divergencias',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardGerencialRoute = DashboardGerencialRouteImport.update({
+  id: '/dashboard-gerencial',
+  path: '/dashboard-gerencial',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConfiguracoesRoute = ConfiguracoesRouteImport.update({
+  id: '/configuracoes',
+  path: '/configuracoes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConciliacaoRoute = ConciliacaoRouteImport.update({
+  id: '/conciliacao',
+  path: '/conciliacao',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BaseRoute = BaseRouteImport.update({
+  id: '/base',
+  path: '/base',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuditoriaRoute = AuditoriaRouteImport.update({
+  id: '/auditoria',
+  path: '/auditoria',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AnexosRoute = AnexosRouteImport.update({
+  id: '/anexos',
+  path: '/anexos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AlertasRoute = AlertasRouteImport.update({
+  id: '/alertas',
+  path: '/alertas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdministracaoRoute = AdministracaoRouteImport.update({
+  id: '/administracao',
+  path: '/administracao',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -35,87 +138,333 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SolicitacaoIdRoute = SolicitacaoIdRouteImport.update({
-  id: '/solicitacao/$id',
-  path: '/solicitacao/$id',
-  getParentRoute: () => rootRouteImport,
+const ProvisaoIndexRoute = ProvisaoIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ProvisaoRoute,
+} as any)
+const ProvisaoBaseRoute = ProvisaoBaseRouteImport.update({
+  id: '/base',
+  path: '/base',
+  getParentRoute: () => ProvisaoRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/identificar': typeof IdentificarRoute
-  '/minhas-solicitacoes': typeof MinhasSolicitacoesRoute
-  '/nova-solicitacao': typeof NovaSolicitacaoRoute
-  '/solicitacao/$id': typeof SolicitacaoIdRoute
+  '/administracao': typeof AdministracaoRoute
+  '/alertas': typeof AlertasRoute
+  '/anexos': typeof AnexosRoute
+  '/auditoria': typeof AuditoriaRoute
+  '/auth': typeof AuthRoute
+  '/base': typeof BaseRoute
+  '/conciliacao': typeof ConciliacaoRoute
+  '/configuracoes': typeof ConfiguracoesRoute
+  '/dashboard-gerencial': typeof DashboardGerencialRoute
+  '/divergencias': typeof DivergenciasRoute
+  '/exportacao': typeof ExportacaoRoute
+  '/fechamento': typeof FechamentoRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/historico': typeof HistoricoRoute
+  '/pagamentos': typeof PagamentosRoute
+  '/principal': typeof PrincipalRoute
+  '/provisao': typeof ProvisaoRouteWithChildren
+  '/registros-excluidos': typeof RegistrosExcluidosRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/usuarios': typeof UsuariosRoute
+  '/provisao/base': typeof ProvisaoBaseRoute
+  '/provisao/': typeof ProvisaoIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/identificar': typeof IdentificarRoute
-  '/minhas-solicitacoes': typeof MinhasSolicitacoesRoute
-  '/nova-solicitacao': typeof NovaSolicitacaoRoute
-  '/solicitacao/$id': typeof SolicitacaoIdRoute
+  '/administracao': typeof AdministracaoRoute
+  '/alertas': typeof AlertasRoute
+  '/anexos': typeof AnexosRoute
+  '/auditoria': typeof AuditoriaRoute
+  '/auth': typeof AuthRoute
+  '/base': typeof BaseRoute
+  '/conciliacao': typeof ConciliacaoRoute
+  '/configuracoes': typeof ConfiguracoesRoute
+  '/dashboard-gerencial': typeof DashboardGerencialRoute
+  '/divergencias': typeof DivergenciasRoute
+  '/exportacao': typeof ExportacaoRoute
+  '/fechamento': typeof FechamentoRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/historico': typeof HistoricoRoute
+  '/pagamentos': typeof PagamentosRoute
+  '/principal': typeof PrincipalRoute
+  '/registros-excluidos': typeof RegistrosExcluidosRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/usuarios': typeof UsuariosRoute
+  '/provisao/base': typeof ProvisaoBaseRoute
+  '/provisao': typeof ProvisaoIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/identificar': typeof IdentificarRoute
-  '/minhas-solicitacoes': typeof MinhasSolicitacoesRoute
-  '/nova-solicitacao': typeof NovaSolicitacaoRoute
-  '/solicitacao/$id': typeof SolicitacaoIdRoute
+  '/administracao': typeof AdministracaoRoute
+  '/alertas': typeof AlertasRoute
+  '/anexos': typeof AnexosRoute
+  '/auditoria': typeof AuditoriaRoute
+  '/auth': typeof AuthRoute
+  '/base': typeof BaseRoute
+  '/conciliacao': typeof ConciliacaoRoute
+  '/configuracoes': typeof ConfiguracoesRoute
+  '/dashboard-gerencial': typeof DashboardGerencialRoute
+  '/divergencias': typeof DivergenciasRoute
+  '/exportacao': typeof ExportacaoRoute
+  '/fechamento': typeof FechamentoRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/historico': typeof HistoricoRoute
+  '/pagamentos': typeof PagamentosRoute
+  '/principal': typeof PrincipalRoute
+  '/provisao': typeof ProvisaoRouteWithChildren
+  '/registros-excluidos': typeof RegistrosExcluidosRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/usuarios': typeof UsuariosRoute
+  '/provisao/base': typeof ProvisaoBaseRoute
+  '/provisao/': typeof ProvisaoIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/identificar'
-    | '/minhas-solicitacoes'
-    | '/nova-solicitacao'
-    | '/solicitacao/$id'
+    | '/administracao'
+    | '/alertas'
+    | '/anexos'
+    | '/auditoria'
+    | '/auth'
+    | '/base'
+    | '/conciliacao'
+    | '/configuracoes'
+    | '/dashboard-gerencial'
+    | '/divergencias'
+    | '/exportacao'
+    | '/fechamento'
+    | '/forgot-password'
+    | '/historico'
+    | '/pagamentos'
+    | '/principal'
+    | '/provisao'
+    | '/registros-excluidos'
+    | '/reset-password'
+    | '/usuarios'
+    | '/provisao/base'
+    | '/provisao/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/identificar'
-    | '/minhas-solicitacoes'
-    | '/nova-solicitacao'
-    | '/solicitacao/$id'
+    | '/administracao'
+    | '/alertas'
+    | '/anexos'
+    | '/auditoria'
+    | '/auth'
+    | '/base'
+    | '/conciliacao'
+    | '/configuracoes'
+    | '/dashboard-gerencial'
+    | '/divergencias'
+    | '/exportacao'
+    | '/fechamento'
+    | '/forgot-password'
+    | '/historico'
+    | '/pagamentos'
+    | '/principal'
+    | '/registros-excluidos'
+    | '/reset-password'
+    | '/usuarios'
+    | '/provisao/base'
+    | '/provisao'
   id:
     | '__root__'
     | '/'
-    | '/identificar'
-    | '/minhas-solicitacoes'
-    | '/nova-solicitacao'
-    | '/solicitacao/$id'
+    | '/administracao'
+    | '/alertas'
+    | '/anexos'
+    | '/auditoria'
+    | '/auth'
+    | '/base'
+    | '/conciliacao'
+    | '/configuracoes'
+    | '/dashboard-gerencial'
+    | '/divergencias'
+    | '/exportacao'
+    | '/fechamento'
+    | '/forgot-password'
+    | '/historico'
+    | '/pagamentos'
+    | '/principal'
+    | '/provisao'
+    | '/registros-excluidos'
+    | '/reset-password'
+    | '/usuarios'
+    | '/provisao/base'
+    | '/provisao/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  IdentificarRoute: typeof IdentificarRoute
-  MinhasSolicitacoesRoute: typeof MinhasSolicitacoesRoute
-  NovaSolicitacaoRoute: typeof NovaSolicitacaoRoute
-  SolicitacaoIdRoute: typeof SolicitacaoIdRoute
+  AdministracaoRoute: typeof AdministracaoRoute
+  AlertasRoute: typeof AlertasRoute
+  AnexosRoute: typeof AnexosRoute
+  AuditoriaRoute: typeof AuditoriaRoute
+  AuthRoute: typeof AuthRoute
+  BaseRoute: typeof BaseRoute
+  ConciliacaoRoute: typeof ConciliacaoRoute
+  ConfiguracoesRoute: typeof ConfiguracoesRoute
+  DashboardGerencialRoute: typeof DashboardGerencialRoute
+  DivergenciasRoute: typeof DivergenciasRoute
+  ExportacaoRoute: typeof ExportacaoRoute
+  FechamentoRoute: typeof FechamentoRoute
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
+  HistoricoRoute: typeof HistoricoRoute
+  PagamentosRoute: typeof PagamentosRoute
+  PrincipalRoute: typeof PrincipalRoute
+  ProvisaoRoute: typeof ProvisaoRouteWithChildren
+  RegistrosExcluidosRoute: typeof RegistrosExcluidosRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
+  UsuariosRoute: typeof UsuariosRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/nova-solicitacao': {
-      id: '/nova-solicitacao'
-      path: '/nova-solicitacao'
-      fullPath: '/nova-solicitacao'
-      preLoaderRoute: typeof NovaSolicitacaoRouteImport
+    '/usuarios': {
+      id: '/usuarios'
+      path: '/usuarios'
+      fullPath: '/usuarios'
+      preLoaderRoute: typeof UsuariosRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/minhas-solicitacoes': {
-      id: '/minhas-solicitacoes'
-      path: '/minhas-solicitacoes'
-      fullPath: '/minhas-solicitacoes'
-      preLoaderRoute: typeof MinhasSolicitacoesRouteImport
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/identificar': {
-      id: '/identificar'
-      path: '/identificar'
-      fullPath: '/identificar'
-      preLoaderRoute: typeof IdentificarRouteImport
+    '/registros-excluidos': {
+      id: '/registros-excluidos'
+      path: '/registros-excluidos'
+      fullPath: '/registros-excluidos'
+      preLoaderRoute: typeof RegistrosExcluidosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/provisao': {
+      id: '/provisao'
+      path: '/provisao'
+      fullPath: '/provisao'
+      preLoaderRoute: typeof ProvisaoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/principal': {
+      id: '/principal'
+      path: '/principal'
+      fullPath: '/principal'
+      preLoaderRoute: typeof PrincipalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pagamentos': {
+      id: '/pagamentos'
+      path: '/pagamentos'
+      fullPath: '/pagamentos'
+      preLoaderRoute: typeof PagamentosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/historico': {
+      id: '/historico'
+      path: '/historico'
+      fullPath: '/historico'
+      preLoaderRoute: typeof HistoricoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fechamento': {
+      id: '/fechamento'
+      path: '/fechamento'
+      fullPath: '/fechamento'
+      preLoaderRoute: typeof FechamentoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/exportacao': {
+      id: '/exportacao'
+      path: '/exportacao'
+      fullPath: '/exportacao'
+      preLoaderRoute: typeof ExportacaoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/divergencias': {
+      id: '/divergencias'
+      path: '/divergencias'
+      fullPath: '/divergencias'
+      preLoaderRoute: typeof DivergenciasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard-gerencial': {
+      id: '/dashboard-gerencial'
+      path: '/dashboard-gerencial'
+      fullPath: '/dashboard-gerencial'
+      preLoaderRoute: typeof DashboardGerencialRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/configuracoes': {
+      id: '/configuracoes'
+      path: '/configuracoes'
+      fullPath: '/configuracoes'
+      preLoaderRoute: typeof ConfiguracoesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/conciliacao': {
+      id: '/conciliacao'
+      path: '/conciliacao'
+      fullPath: '/conciliacao'
+      preLoaderRoute: typeof ConciliacaoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/base': {
+      id: '/base'
+      path: '/base'
+      fullPath: '/base'
+      preLoaderRoute: typeof BaseRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auditoria': {
+      id: '/auditoria'
+      path: '/auditoria'
+      fullPath: '/auditoria'
+      preLoaderRoute: typeof AuditoriaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/anexos': {
+      id: '/anexos'
+      path: '/anexos'
+      fullPath: '/anexos'
+      preLoaderRoute: typeof AnexosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/alertas': {
+      id: '/alertas'
+      path: '/alertas'
+      fullPath: '/alertas'
+      preLoaderRoute: typeof AlertasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/administracao': {
+      id: '/administracao'
+      path: '/administracao'
+      fullPath: '/administracao'
+      preLoaderRoute: typeof AdministracaoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -125,22 +474,59 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/solicitacao/$id': {
-      id: '/solicitacao/$id'
-      path: '/solicitacao/$id'
-      fullPath: '/solicitacao/$id'
-      preLoaderRoute: typeof SolicitacaoIdRouteImport
-      parentRoute: typeof rootRouteImport
+    '/provisao/': {
+      id: '/provisao/'
+      path: '/'
+      fullPath: '/provisao/'
+      preLoaderRoute: typeof ProvisaoIndexRouteImport
+      parentRoute: typeof ProvisaoRoute
+    }
+    '/provisao/base': {
+      id: '/provisao/base'
+      path: '/base'
+      fullPath: '/provisao/base'
+      preLoaderRoute: typeof ProvisaoBaseRouteImport
+      parentRoute: typeof ProvisaoRoute
     }
   }
 }
 
+interface ProvisaoRouteChildren {
+  ProvisaoBaseRoute: typeof ProvisaoBaseRoute
+  ProvisaoIndexRoute: typeof ProvisaoIndexRoute
+}
+
+const ProvisaoRouteChildren: ProvisaoRouteChildren = {
+  ProvisaoBaseRoute: ProvisaoBaseRoute,
+  ProvisaoIndexRoute: ProvisaoIndexRoute,
+}
+
+const ProvisaoRouteWithChildren = ProvisaoRoute._addFileChildren(
+  ProvisaoRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  IdentificarRoute: IdentificarRoute,
-  MinhasSolicitacoesRoute: MinhasSolicitacoesRoute,
-  NovaSolicitacaoRoute: NovaSolicitacaoRoute,
-  SolicitacaoIdRoute: SolicitacaoIdRoute,
+  AdministracaoRoute: AdministracaoRoute,
+  AlertasRoute: AlertasRoute,
+  AnexosRoute: AnexosRoute,
+  AuditoriaRoute: AuditoriaRoute,
+  AuthRoute: AuthRoute,
+  BaseRoute: BaseRoute,
+  ConciliacaoRoute: ConciliacaoRoute,
+  ConfiguracoesRoute: ConfiguracoesRoute,
+  DashboardGerencialRoute: DashboardGerencialRoute,
+  DivergenciasRoute: DivergenciasRoute,
+  ExportacaoRoute: ExportacaoRoute,
+  FechamentoRoute: FechamentoRoute,
+  ForgotPasswordRoute: ForgotPasswordRoute,
+  HistoricoRoute: HistoricoRoute,
+  PagamentosRoute: PagamentosRoute,
+  PrincipalRoute: PrincipalRoute,
+  ProvisaoRoute: ProvisaoRouteWithChildren,
+  RegistrosExcluidosRoute: RegistrosExcluidosRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
+  UsuariosRoute: UsuariosRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
