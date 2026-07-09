@@ -7,7 +7,15 @@ import {
   Home,
   FileArchive,
   ShieldCheck,
+  LogIn,
+  LogOut,
+  User,
 } from "lucide-react";
+import { toast } from "sonner";
+
+import { supabase } from "@/integrations/supabase/client";
+import { useSession } from "@/hooks/use-session";
+import { Button } from "@/components/ui/button";
 
 import {
   Sidebar,
