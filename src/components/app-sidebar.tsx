@@ -1,5 +1,13 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { LayoutDashboard, Database, Sparkles, Wallet } from "lucide-react";
+import {
+  LayoutDashboard,
+  Database,
+  Sparkles,
+  Wallet,
+  Home,
+  FileArchive,
+  ShieldCheck,
+} from "lucide-react";
 
 import {
   Sidebar,
@@ -14,9 +22,12 @@ import {
 } from "@/components/ui/sidebar";
 
 const items = [
-  { title: "Principal", url: "/", icon: LayoutDashboard, match: (p: string) => p === "/" },
+  { title: "Portal", url: "/", icon: Home, match: (p: string) => p === "/" },
+  { title: "Principal", url: "/principal", icon: LayoutDashboard, match: (p: string) => p === "/principal" },
   { title: "Base", url: "/base", icon: Database, match: (p: string) => p === "/base" },
   { title: "Provisão Diária", url: "/provisao", icon: Wallet, match: (p: string) => p.startsWith("/provisao") },
+  { title: "Anexos", url: "/anexos", icon: FileArchive, match: (p: string) => p.startsWith("/anexos") },
+  { title: "Conciliação", url: "/conciliacao", icon: ShieldCheck, match: (p: string) => p.startsWith("/conciliacao") },
 ];
 
 export function AppSidebar() {
@@ -30,7 +41,7 @@ export function AppSidebar() {
             <Sparkles className="h-5 w-5" />
           </div>
           <div className="flex flex-col leading-tight group-data-[collapsible=icon]:hidden">
-            <span className="text-sm font-semibold text-sidebar-foreground">Painel</span>
+            <span className="text-sm font-semibold text-sidebar-foreground">Pagadoria</span>
             <span className="text-xs text-muted-foreground">Profarma</span>
           </div>
         </div>
