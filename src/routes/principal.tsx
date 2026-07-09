@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+export const Route = createFileRoute("/principal")({ component: PrincipalPage });
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Check, ChevronDown, Filter, Loader2, RotateCcw } from "lucide-react";
@@ -62,7 +63,7 @@ const monthLabel = (key: string) => {
   return `${names[Number(m) - 1]}/${y.slice(2)}`;
 };
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/principal")({
   component: Dashboard,
 });
 
