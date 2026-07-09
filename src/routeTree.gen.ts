@@ -13,6 +13,7 @@ import { Route as ProvisaoRouteImport } from './routes/provisao'
 import { Route as PrincipalRouteImport } from './routes/principal'
 import { Route as ConciliacaoRouteImport } from './routes/conciliacao'
 import { Route as BaseRouteImport } from './routes/base'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AnexosRouteImport } from './routes/anexos'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProvisaoIndexRouteImport } from './routes/provisao.index'
@@ -36,6 +37,11 @@ const ConciliacaoRoute = ConciliacaoRouteImport.update({
 const BaseRoute = BaseRouteImport.update({
   id: '/base',
   path: '/base',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AnexosRoute = AnexosRouteImport.update({
@@ -62,6 +68,7 @@ const ProvisaoBaseRoute = ProvisaoBaseRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/anexos': typeof AnexosRoute
+  '/auth': typeof AuthRoute
   '/base': typeof BaseRoute
   '/conciliacao': typeof ConciliacaoRoute
   '/principal': typeof PrincipalRoute
@@ -72,6 +79,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/anexos': typeof AnexosRoute
+  '/auth': typeof AuthRoute
   '/base': typeof BaseRoute
   '/conciliacao': typeof ConciliacaoRoute
   '/principal': typeof PrincipalRoute
@@ -82,6 +90,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/anexos': typeof AnexosRoute
+  '/auth': typeof AuthRoute
   '/base': typeof BaseRoute
   '/conciliacao': typeof ConciliacaoRoute
   '/principal': typeof PrincipalRoute
@@ -94,6 +103,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/anexos'
+    | '/auth'
     | '/base'
     | '/conciliacao'
     | '/principal'
@@ -104,6 +114,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/anexos'
+    | '/auth'
     | '/base'
     | '/conciliacao'
     | '/principal'
@@ -113,6 +124,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/anexos'
+    | '/auth'
     | '/base'
     | '/conciliacao'
     | '/principal'
@@ -124,6 +136,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AnexosRoute: typeof AnexosRoute
+  AuthRoute: typeof AuthRoute
   BaseRoute: typeof BaseRoute
   ConciliacaoRoute: typeof ConciliacaoRoute
   PrincipalRoute: typeof PrincipalRoute
@@ -158,6 +171,13 @@ declare module '@tanstack/react-router' {
       path: '/base'
       fullPath: '/base'
       preLoaderRoute: typeof BaseRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/anexos': {
@@ -208,6 +228,7 @@ const ProvisaoRouteWithChildren = ProvisaoRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AnexosRoute: AnexosRoute,
+  AuthRoute: AuthRoute,
   BaseRoute: BaseRoute,
   ConciliacaoRoute: ConciliacaoRoute,
   PrincipalRoute: PrincipalRoute,

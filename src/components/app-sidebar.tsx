@@ -7,7 +7,15 @@ import {
   Home,
   FileArchive,
   ShieldCheck,
+  LogIn,
+  LogOut,
+  User,
 } from "lucide-react";
+import { toast } from "sonner";
+
+import { supabase } from "@/integrations/supabase/client";
+import { useSession } from "@/hooks/use-session";
+import { Button } from "@/components/ui/button";
 
 import {
   Sidebar,
@@ -32,6 +40,13 @@ const items = [
 
 export function AppSidebar() {
   const currentPath = useRouterState({ select: (r) => r.location.pathname });
+  const { user } = useSession();
+
+  const handleSignOut = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) toast.error(error.message);
+    else toast.success("Sessão encerrada");
+  };
 
   return (
     <Sidebar collapsible="icon">
@@ -64,7 +79,37 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        <SidebarGroup className="mt-auto">
+          <SidebarGroupContent>
+            {user ? (
+              <div className="space-y-2 px-2 pb-2 group-data-[collapsible=icon]:hidden">
+                <div className="flex items-center gap-2 rounded-md bg-sidebar-accent/40 px-2 py-1.5 text-xs text-sidebar-foreground">
+                  <User className="h-3.5 w-3.5" />
+                  <span className="truncate" title={user.email ?? ""}>{user.email}</span>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full"
+                  onClick={handleSignOut}
+                >
+                  <LogOut className="mr-2 h-4 w-4" /> Sair
+                </Button>
+              </div>
+            ) : (
+              <div className="px-2 pb-2 group-data-[collapsible=icon]:hidden">
+                <Button asChild variant="default" size="sm" className="w-full">
+                  <Link to="/auth">
+                    <LogIn className="mr-2 h-4 w-4" /> Entrar para editar
+                  </Link>
+                </Button>
+              </div>
+            )}
+          </SidebarGroupContent>
+        </SidebarGroup>
       </SidebarContent>
     </Sidebar>
   );
 }
+
