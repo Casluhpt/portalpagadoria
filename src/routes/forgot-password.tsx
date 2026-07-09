@@ -63,6 +63,7 @@ function ForgotPasswordPage() {
                   type="email"
                   required
                   autoComplete="email"
+                  placeholder="usuario@profarma.com.br"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
