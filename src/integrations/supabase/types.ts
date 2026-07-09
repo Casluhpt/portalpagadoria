@@ -127,6 +127,126 @@ export type Database = {
         }
         Relationships: []
       }
+      pagamentos_audit: {
+        Row: {
+          acao: string
+          created_at: string
+          id: string
+          pagamento_id: string | null
+          snapshot: Json | null
+          user_id: string | null
+          user_nome: string | null
+        }
+        Insert: {
+          acao: string
+          created_at?: string
+          id?: string
+          pagamento_id?: string | null
+          snapshot?: Json | null
+          user_id?: string | null
+          user_nome?: string | null
+        }
+        Update: {
+          acao?: string
+          created_at?: string
+          id?: string
+          pagamento_id?: string | null
+          snapshot?: Json | null
+          user_id?: string | null
+          user_nome?: string | null
+        }
+        Relationships: []
+      }
+      pagamentos_diversos: {
+        Row: {
+          arquivo_remessa: string | null
+          banco: string | null
+          celula: string | null
+          colaborador_nome: string
+          competencia: string | null
+          competencia_ano: number | null
+          created_at: string
+          data_credito: string | null
+          descricao_pagamento: string | null
+          diferenca_bank_itau: number | null
+          diferenca_lg_finnet: number | null
+          empresa: string | null
+          ev_saida_folha_mensal: number | null
+          folha: string | null
+          id: string
+          natureza_pagamento: string | null
+          observacao: string | null
+          qtde_colaboradores: number | null
+          registrado_em: string
+          registrado_por: string | null
+          status_bankmanager: string | null
+          status_itau: string | null
+          tipo_arquivo: string | null
+          updated_at: string
+          valor_bankmanager: number | null
+          valor_itau: number | null
+          valor_lg: number | null
+        }
+        Insert: {
+          arquivo_remessa?: string | null
+          banco?: string | null
+          celula?: string | null
+          colaborador_nome: string
+          competencia?: string | null
+          competencia_ano?: number | null
+          created_at?: string
+          data_credito?: string | null
+          descricao_pagamento?: string | null
+          diferenca_bank_itau?: number | null
+          diferenca_lg_finnet?: number | null
+          empresa?: string | null
+          ev_saida_folha_mensal?: number | null
+          folha?: string | null
+          id?: string
+          natureza_pagamento?: string | null
+          observacao?: string | null
+          qtde_colaboradores?: number | null
+          registrado_em?: string
+          registrado_por?: string | null
+          status_bankmanager?: string | null
+          status_itau?: string | null
+          tipo_arquivo?: string | null
+          updated_at?: string
+          valor_bankmanager?: number | null
+          valor_itau?: number | null
+          valor_lg?: number | null
+        }
+        Update: {
+          arquivo_remessa?: string | null
+          banco?: string | null
+          celula?: string | null
+          colaborador_nome?: string
+          competencia?: string | null
+          competencia_ano?: number | null
+          created_at?: string
+          data_credito?: string | null
+          descricao_pagamento?: string | null
+          diferenca_bank_itau?: number | null
+          diferenca_lg_finnet?: number | null
+          empresa?: string | null
+          ev_saida_folha_mensal?: number | null
+          folha?: string | null
+          id?: string
+          natureza_pagamento?: string | null
+          observacao?: string | null
+          qtde_colaboradores?: number | null
+          registrado_em?: string
+          registrado_por?: string | null
+          status_bankmanager?: string | null
+          status_itau?: string | null
+          tipo_arquivo?: string | null
+          updated_at?: string
+          valor_bankmanager?: number | null
+          valor_itau?: number | null
+          valor_lg?: number | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           atualizado_em: string
