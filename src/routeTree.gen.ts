@@ -9,38 +9,115 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as NovaSolicitacaoRouteImport } from './routes/nova-solicitacao'
+import { Route as MinhasSolicitacoesRouteImport } from './routes/minhas-solicitacoes'
+import { Route as IdentificarRouteImport } from './routes/identificar'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SolicitacaoIdRouteImport } from './routes/solicitacao.$id'
 
+const NovaSolicitacaoRoute = NovaSolicitacaoRouteImport.update({
+  id: '/nova-solicitacao',
+  path: '/nova-solicitacao',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MinhasSolicitacoesRoute = MinhasSolicitacoesRouteImport.update({
+  id: '/minhas-solicitacoes',
+  path: '/minhas-solicitacoes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IdentificarRoute = IdentificarRouteImport.update({
+  id: '/identificar',
+  path: '/identificar',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SolicitacaoIdRoute = SolicitacaoIdRouteImport.update({
+  id: '/solicitacao/$id',
+  path: '/solicitacao/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/identificar': typeof IdentificarRoute
+  '/minhas-solicitacoes': typeof MinhasSolicitacoesRoute
+  '/nova-solicitacao': typeof NovaSolicitacaoRoute
+  '/solicitacao/$id': typeof SolicitacaoIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/identificar': typeof IdentificarRoute
+  '/minhas-solicitacoes': typeof MinhasSolicitacoesRoute
+  '/nova-solicitacao': typeof NovaSolicitacaoRoute
+  '/solicitacao/$id': typeof SolicitacaoIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/identificar': typeof IdentificarRoute
+  '/minhas-solicitacoes': typeof MinhasSolicitacoesRoute
+  '/nova-solicitacao': typeof NovaSolicitacaoRoute
+  '/solicitacao/$id': typeof SolicitacaoIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/identificar'
+    | '/minhas-solicitacoes'
+    | '/nova-solicitacao'
+    | '/solicitacao/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/identificar'
+    | '/minhas-solicitacoes'
+    | '/nova-solicitacao'
+    | '/solicitacao/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/identificar'
+    | '/minhas-solicitacoes'
+    | '/nova-solicitacao'
+    | '/solicitacao/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  IdentificarRoute: typeof IdentificarRoute
+  MinhasSolicitacoesRoute: typeof MinhasSolicitacoesRoute
+  NovaSolicitacaoRoute: typeof NovaSolicitacaoRoute
+  SolicitacaoIdRoute: typeof SolicitacaoIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/nova-solicitacao': {
+      id: '/nova-solicitacao'
+      path: '/nova-solicitacao'
+      fullPath: '/nova-solicitacao'
+      preLoaderRoute: typeof NovaSolicitacaoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/minhas-solicitacoes': {
+      id: '/minhas-solicitacoes'
+      path: '/minhas-solicitacoes'
+      fullPath: '/minhas-solicitacoes'
+      preLoaderRoute: typeof MinhasSolicitacoesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/identificar': {
+      id: '/identificar'
+      path: '/identificar'
+      fullPath: '/identificar'
+      preLoaderRoute: typeof IdentificarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +125,22 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/solicitacao/$id': {
+      id: '/solicitacao/$id'
+      path: '/solicitacao/$id'
+      fullPath: '/solicitacao/$id'
+      preLoaderRoute: typeof SolicitacaoIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  IdentificarRoute: IdentificarRoute,
+  MinhasSolicitacoesRoute: MinhasSolicitacoesRoute,
+  NovaSolicitacaoRoute: NovaSolicitacaoRoute,
+  SolicitacaoIdRoute: SolicitacaoIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
