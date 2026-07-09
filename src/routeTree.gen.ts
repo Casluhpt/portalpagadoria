@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as ProvisaoRouteImport } from './routes/provisao'
 import { Route as PrincipalRouteImport } from './routes/principal'
 import { Route as BaseRouteImport } from './routes/base'
+import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProvisaoIndexRouteImport } from './routes/provisao.index'
 import { Route as ProvisaoBaseRouteImport } from './routes/provisao.base'
 
@@ -30,6 +31,11 @@ const BaseRoute = BaseRouteImport.update({
   path: '/base',
   getParentRoute: () => rootRouteImport,
 } as any)
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProvisaoIndexRoute = ProvisaoIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -42,6 +48,7 @@ const ProvisaoBaseRoute = ProvisaoBaseRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
+  '/': typeof IndexRoute
   '/base': typeof BaseRoute
   '/principal': typeof PrincipalRoute
   '/provisao': typeof ProvisaoRouteWithChildren
@@ -49,6 +56,7 @@ export interface FileRoutesByFullPath {
   '/provisao/': typeof ProvisaoIndexRoute
 }
 export interface FileRoutesByTo {
+  '/': typeof IndexRoute
   '/base': typeof BaseRoute
   '/principal': typeof PrincipalRoute
   '/provisao/base': typeof ProvisaoBaseRoute
@@ -56,6 +64,7 @@ export interface FileRoutesByTo {
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
   '/base': typeof BaseRoute
   '/principal': typeof PrincipalRoute
   '/provisao': typeof ProvisaoRouteWithChildren
@@ -65,15 +74,17 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
+    | '/'
     | '/base'
     | '/principal'
     | '/provisao'
     | '/provisao/base'
     | '/provisao/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/base' | '/principal' | '/provisao/base' | '/provisao'
+  to: '/' | '/base' | '/principal' | '/provisao/base' | '/provisao'
   id:
     | '__root__'
+    | '/'
     | '/base'
     | '/principal'
     | '/provisao'
@@ -82,6 +93,7 @@ export interface FileRouteTypes {
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
+  IndexRoute: typeof IndexRoute
   BaseRoute: typeof BaseRoute
   PrincipalRoute: typeof PrincipalRoute
   ProvisaoRoute: typeof ProvisaoRouteWithChildren
@@ -108,6 +120,13 @@ declare module '@tanstack/react-router' {
       path: '/base'
       fullPath: '/base'
       preLoaderRoute: typeof BaseRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/provisao/': {
@@ -142,6 +161,7 @@ const ProvisaoRouteWithChildren = ProvisaoRoute._addFileChildren(
 )
 
 const rootRouteChildren: RootRouteChildren = {
+  IndexRoute: IndexRoute,
   BaseRoute: BaseRoute,
   PrincipalRoute: PrincipalRoute,
   ProvisaoRoute: ProvisaoRouteWithChildren,

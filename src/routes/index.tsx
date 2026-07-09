@@ -49,8 +49,8 @@ function PortalPage() {
 
   const kpis = useMemo(() => {
     const mes = currentMonth();
-    const doMes = lanc.filter((r) => (r.due_date ?? "").startsWith(mes));
-    const totalMes = doMes.reduce((s, r) => s + (Number(r.gross_amount) || 0), 0);
+    const doMes = lanc.filter((r) => (r.dueDate ?? "").startsWith(mes));
+    const totalMes = doMes.reduce((s, r) => s + (Number(r.grossAmount) || 0), 0);
     const colaboradores = new Set(
       doMes.map((r) => (r.issuer || "").split(".")[0].toLowerCase()).filter(Boolean),
     ).size;
