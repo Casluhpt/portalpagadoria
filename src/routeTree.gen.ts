@@ -15,6 +15,7 @@ import { Route as ProvisaoRouteImport } from './routes/provisao'
 import { Route as PrincipalRouteImport } from './routes/principal'
 import { Route as PagamentosRouteImport } from './routes/pagamentos'
 import { Route as HistoricoRouteImport } from './routes/historico'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as FechamentoRouteImport } from './routes/fechamento'
 import { Route as ExportacaoRouteImport } from './routes/exportacao'
 import { Route as DivergenciasRouteImport } from './routes/divergencias'
@@ -59,6 +60,11 @@ const PagamentosRoute = PagamentosRouteImport.update({
 const HistoricoRoute = HistoricoRouteImport.update({
   id: '/historico',
   path: '/historico',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FechamentoRoute = FechamentoRouteImport.update({
@@ -151,6 +157,7 @@ export interface FileRoutesByFullPath {
   '/divergencias': typeof DivergenciasRoute
   '/exportacao': typeof ExportacaoRoute
   '/fechamento': typeof FechamentoRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/historico': typeof HistoricoRoute
   '/pagamentos': typeof PagamentosRoute
   '/principal': typeof PrincipalRoute
@@ -174,6 +181,7 @@ export interface FileRoutesByTo {
   '/divergencias': typeof DivergenciasRoute
   '/exportacao': typeof ExportacaoRoute
   '/fechamento': typeof FechamentoRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/historico': typeof HistoricoRoute
   '/pagamentos': typeof PagamentosRoute
   '/principal': typeof PrincipalRoute
@@ -197,6 +205,7 @@ export interface FileRoutesById {
   '/divergencias': typeof DivergenciasRoute
   '/exportacao': typeof ExportacaoRoute
   '/fechamento': typeof FechamentoRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/historico': typeof HistoricoRoute
   '/pagamentos': typeof PagamentosRoute
   '/principal': typeof PrincipalRoute
@@ -222,6 +231,7 @@ export interface FileRouteTypes {
     | '/divergencias'
     | '/exportacao'
     | '/fechamento'
+    | '/forgot-password'
     | '/historico'
     | '/pagamentos'
     | '/principal'
@@ -245,6 +255,7 @@ export interface FileRouteTypes {
     | '/divergencias'
     | '/exportacao'
     | '/fechamento'
+    | '/forgot-password'
     | '/historico'
     | '/pagamentos'
     | '/principal'
@@ -267,6 +278,7 @@ export interface FileRouteTypes {
     | '/divergencias'
     | '/exportacao'
     | '/fechamento'
+    | '/forgot-password'
     | '/historico'
     | '/pagamentos'
     | '/principal'
@@ -291,6 +303,7 @@ export interface RootRouteChildren {
   DivergenciasRoute: typeof DivergenciasRoute
   ExportacaoRoute: typeof ExportacaoRoute
   FechamentoRoute: typeof FechamentoRoute
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
   HistoricoRoute: typeof HistoricoRoute
   PagamentosRoute: typeof PagamentosRoute
   PrincipalRoute: typeof PrincipalRoute
@@ -341,6 +354,13 @@ declare module '@tanstack/react-router' {
       path: '/historico'
       fullPath: '/historico'
       preLoaderRoute: typeof HistoricoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/fechamento': {
@@ -479,6 +499,7 @@ const rootRouteChildren: RootRouteChildren = {
   DivergenciasRoute: DivergenciasRoute,
   ExportacaoRoute: ExportacaoRoute,
   FechamentoRoute: FechamentoRoute,
+  ForgotPasswordRoute: ForgotPasswordRoute,
   HistoricoRoute: HistoricoRoute,
   PagamentosRoute: PagamentosRoute,
   PrincipalRoute: PrincipalRoute,
