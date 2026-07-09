@@ -10,6 +10,8 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as UsuariosRouteImport } from './routes/usuarios'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RegistrosExcluidosRouteImport } from './routes/registros-excluidos'
 import { Route as ProvisaoRouteImport } from './routes/provisao'
 import { Route as PrincipalRouteImport } from './routes/principal'
@@ -35,6 +37,11 @@ import { Route as ProvisaoBaseRouteImport } from './routes/provisao.base'
 const UsuariosRoute = UsuariosRouteImport.update({
   id: '/usuarios',
   path: '/usuarios',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RegistrosExcluidosRoute = RegistrosExcluidosRouteImport.update({
@@ -163,6 +170,7 @@ export interface FileRoutesByFullPath {
   '/principal': typeof PrincipalRoute
   '/provisao': typeof ProvisaoRouteWithChildren
   '/registros-excluidos': typeof RegistrosExcluidosRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/usuarios': typeof UsuariosRoute
   '/provisao/base': typeof ProvisaoBaseRoute
   '/provisao/': typeof ProvisaoIndexRoute
@@ -186,6 +194,7 @@ export interface FileRoutesByTo {
   '/pagamentos': typeof PagamentosRoute
   '/principal': typeof PrincipalRoute
   '/registros-excluidos': typeof RegistrosExcluidosRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/usuarios': typeof UsuariosRoute
   '/provisao/base': typeof ProvisaoBaseRoute
   '/provisao': typeof ProvisaoIndexRoute
@@ -211,6 +220,7 @@ export interface FileRoutesById {
   '/principal': typeof PrincipalRoute
   '/provisao': typeof ProvisaoRouteWithChildren
   '/registros-excluidos': typeof RegistrosExcluidosRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/usuarios': typeof UsuariosRoute
   '/provisao/base': typeof ProvisaoBaseRoute
   '/provisao/': typeof ProvisaoIndexRoute
@@ -237,6 +247,7 @@ export interface FileRouteTypes {
     | '/principal'
     | '/provisao'
     | '/registros-excluidos'
+    | '/reset-password'
     | '/usuarios'
     | '/provisao/base'
     | '/provisao/'
@@ -260,6 +271,7 @@ export interface FileRouteTypes {
     | '/pagamentos'
     | '/principal'
     | '/registros-excluidos'
+    | '/reset-password'
     | '/usuarios'
     | '/provisao/base'
     | '/provisao'
@@ -284,6 +296,7 @@ export interface FileRouteTypes {
     | '/principal'
     | '/provisao'
     | '/registros-excluidos'
+    | '/reset-password'
     | '/usuarios'
     | '/provisao/base'
     | '/provisao/'
@@ -309,6 +322,7 @@ export interface RootRouteChildren {
   PrincipalRoute: typeof PrincipalRoute
   ProvisaoRoute: typeof ProvisaoRouteWithChildren
   RegistrosExcluidosRoute: typeof RegistrosExcluidosRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   UsuariosRoute: typeof UsuariosRoute
 }
 
@@ -319,6 +333,13 @@ declare module '@tanstack/react-router' {
       path: '/usuarios'
       fullPath: '/usuarios'
       preLoaderRoute: typeof UsuariosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/registros-excluidos': {
@@ -505,6 +526,7 @@ const rootRouteChildren: RootRouteChildren = {
   PrincipalRoute: PrincipalRoute,
   ProvisaoRoute: ProvisaoRouteWithChildren,
   RegistrosExcluidosRoute: RegistrosExcluidosRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   UsuariosRoute: UsuariosRoute,
 }
 export const routeTree = rootRouteImport
