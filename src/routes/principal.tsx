@@ -1,5 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-export const Route = createFileRoute("/principal")({ component: PrincipalPage });
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Check, ChevronDown, Filter, Loader2, RotateCcw } from "lucide-react";
