@@ -43,11 +43,6 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
   path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ResetPasswordRoute = ResetPasswordRouteImport.update({
-  id: '/reset-password',
-  path: '/reset-password',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const RegistrosExcluidosRoute = RegistrosExcluidosRouteImport.update({
   id: '/registros-excluidos',
   path: '/registros-excluidos',
@@ -175,7 +170,6 @@ export interface FileRoutesByFullPath {
   '/provisao': typeof ProvisaoRouteWithChildren
   '/registros-excluidos': typeof RegistrosExcluidosRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/reset-password': typeof ResetPasswordRoute
   '/usuarios': typeof UsuariosRoute
   '/provisao/base': typeof ProvisaoBaseRoute
   '/provisao/': typeof ProvisaoIndexRoute
@@ -199,7 +193,6 @@ export interface FileRoutesByTo {
   '/pagamentos': typeof PagamentosRoute
   '/principal': typeof PrincipalRoute
   '/registros-excluidos': typeof RegistrosExcluidosRoute
-  '/reset-password': typeof ResetPasswordRoute
   '/reset-password': typeof ResetPasswordRoute
   '/usuarios': typeof UsuariosRoute
   '/provisao/base': typeof ProvisaoBaseRoute
@@ -226,7 +219,6 @@ export interface FileRoutesById {
   '/principal': typeof PrincipalRoute
   '/provisao': typeof ProvisaoRouteWithChildren
   '/registros-excluidos': typeof RegistrosExcluidosRoute
-  '/reset-password': typeof ResetPasswordRoute
   '/reset-password': typeof ResetPasswordRoute
   '/usuarios': typeof UsuariosRoute
   '/provisao/base': typeof ProvisaoBaseRoute
