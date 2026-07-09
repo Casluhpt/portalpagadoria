@@ -9,16 +9,38 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as UsuariosRouteImport } from './routes/usuarios'
+import { Route as RegistrosExcluidosRouteImport } from './routes/registros-excluidos'
 import { Route as ProvisaoRouteImport } from './routes/provisao'
 import { Route as PrincipalRouteImport } from './routes/principal'
+import { Route as PagamentosRouteImport } from './routes/pagamentos'
+import { Route as HistoricoRouteImport } from './routes/historico'
+import { Route as FechamentoRouteImport } from './routes/fechamento'
+import { Route as ExportacaoRouteImport } from './routes/exportacao'
+import { Route as DivergenciasRouteImport } from './routes/divergencias'
+import { Route as DashboardGerencialRouteImport } from './routes/dashboard-gerencial'
+import { Route as ConfiguracoesRouteImport } from './routes/configuracoes'
 import { Route as ConciliacaoRouteImport } from './routes/conciliacao'
 import { Route as BaseRouteImport } from './routes/base'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuditoriaRouteImport } from './routes/auditoria'
 import { Route as AnexosRouteImport } from './routes/anexos'
+import { Route as AlertasRouteImport } from './routes/alertas'
+import { Route as AdministracaoRouteImport } from './routes/administracao'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProvisaoIndexRouteImport } from './routes/provisao.index'
 import { Route as ProvisaoBaseRouteImport } from './routes/provisao.base'
 
+const UsuariosRoute = UsuariosRouteImport.update({
+  id: '/usuarios',
+  path: '/usuarios',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RegistrosExcluidosRoute = RegistrosExcluidosRouteImport.update({
+  id: '/registros-excluidos',
+  path: '/registros-excluidos',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProvisaoRoute = ProvisaoRouteImport.update({
   id: '/provisao',
   path: '/provisao',
@@ -27,6 +49,41 @@ const ProvisaoRoute = ProvisaoRouteImport.update({
 const PrincipalRoute = PrincipalRouteImport.update({
   id: '/principal',
   path: '/principal',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PagamentosRoute = PagamentosRouteImport.update({
+  id: '/pagamentos',
+  path: '/pagamentos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HistoricoRoute = HistoricoRouteImport.update({
+  id: '/historico',
+  path: '/historico',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FechamentoRoute = FechamentoRouteImport.update({
+  id: '/fechamento',
+  path: '/fechamento',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExportacaoRoute = ExportacaoRouteImport.update({
+  id: '/exportacao',
+  path: '/exportacao',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DivergenciasRoute = DivergenciasRouteImport.update({
+  id: '/divergencias',
+  path: '/divergencias',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardGerencialRoute = DashboardGerencialRouteImport.update({
+  id: '/dashboard-gerencial',
+  path: '/dashboard-gerencial',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConfiguracoesRoute = ConfiguracoesRouteImport.update({
+  id: '/configuracoes',
+  path: '/configuracoes',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ConciliacaoRoute = ConciliacaoRouteImport.update({
@@ -44,9 +101,24 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuditoriaRoute = AuditoriaRouteImport.update({
+  id: '/auditoria',
+  path: '/auditoria',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AnexosRoute = AnexosRouteImport.update({
   id: '/anexos',
   path: '/anexos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AlertasRoute = AlertasRouteImport.update({
+  id: '/alertas',
+  path: '/alertas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdministracaoRoute = AdministracaoRouteImport.update({
+  id: '/administracao',
+  path: '/administracao',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -67,34 +139,70 @@ const ProvisaoBaseRoute = ProvisaoBaseRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/administracao': typeof AdministracaoRoute
+  '/alertas': typeof AlertasRoute
   '/anexos': typeof AnexosRoute
+  '/auditoria': typeof AuditoriaRoute
   '/auth': typeof AuthRoute
   '/base': typeof BaseRoute
   '/conciliacao': typeof ConciliacaoRoute
+  '/configuracoes': typeof ConfiguracoesRoute
+  '/dashboard-gerencial': typeof DashboardGerencialRoute
+  '/divergencias': typeof DivergenciasRoute
+  '/exportacao': typeof ExportacaoRoute
+  '/fechamento': typeof FechamentoRoute
+  '/historico': typeof HistoricoRoute
+  '/pagamentos': typeof PagamentosRoute
   '/principal': typeof PrincipalRoute
   '/provisao': typeof ProvisaoRouteWithChildren
+  '/registros-excluidos': typeof RegistrosExcluidosRoute
+  '/usuarios': typeof UsuariosRoute
   '/provisao/base': typeof ProvisaoBaseRoute
   '/provisao/': typeof ProvisaoIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/administracao': typeof AdministracaoRoute
+  '/alertas': typeof AlertasRoute
   '/anexos': typeof AnexosRoute
+  '/auditoria': typeof AuditoriaRoute
   '/auth': typeof AuthRoute
   '/base': typeof BaseRoute
   '/conciliacao': typeof ConciliacaoRoute
+  '/configuracoes': typeof ConfiguracoesRoute
+  '/dashboard-gerencial': typeof DashboardGerencialRoute
+  '/divergencias': typeof DivergenciasRoute
+  '/exportacao': typeof ExportacaoRoute
+  '/fechamento': typeof FechamentoRoute
+  '/historico': typeof HistoricoRoute
+  '/pagamentos': typeof PagamentosRoute
   '/principal': typeof PrincipalRoute
+  '/registros-excluidos': typeof RegistrosExcluidosRoute
+  '/usuarios': typeof UsuariosRoute
   '/provisao/base': typeof ProvisaoBaseRoute
   '/provisao': typeof ProvisaoIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/administracao': typeof AdministracaoRoute
+  '/alertas': typeof AlertasRoute
   '/anexos': typeof AnexosRoute
+  '/auditoria': typeof AuditoriaRoute
   '/auth': typeof AuthRoute
   '/base': typeof BaseRoute
   '/conciliacao': typeof ConciliacaoRoute
+  '/configuracoes': typeof ConfiguracoesRoute
+  '/dashboard-gerencial': typeof DashboardGerencialRoute
+  '/divergencias': typeof DivergenciasRoute
+  '/exportacao': typeof ExportacaoRoute
+  '/fechamento': typeof FechamentoRoute
+  '/historico': typeof HistoricoRoute
+  '/pagamentos': typeof PagamentosRoute
   '/principal': typeof PrincipalRoute
   '/provisao': typeof ProvisaoRouteWithChildren
+  '/registros-excluidos': typeof RegistrosExcluidosRoute
+  '/usuarios': typeof UsuariosRoute
   '/provisao/base': typeof ProvisaoBaseRoute
   '/provisao/': typeof ProvisaoIndexRoute
 }
@@ -102,49 +210,111 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/administracao'
+    | '/alertas'
     | '/anexos'
+    | '/auditoria'
     | '/auth'
     | '/base'
     | '/conciliacao'
+    | '/configuracoes'
+    | '/dashboard-gerencial'
+    | '/divergencias'
+    | '/exportacao'
+    | '/fechamento'
+    | '/historico'
+    | '/pagamentos'
     | '/principal'
     | '/provisao'
+    | '/registros-excluidos'
+    | '/usuarios'
     | '/provisao/base'
     | '/provisao/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/administracao'
+    | '/alertas'
     | '/anexos'
+    | '/auditoria'
     | '/auth'
     | '/base'
     | '/conciliacao'
+    | '/configuracoes'
+    | '/dashboard-gerencial'
+    | '/divergencias'
+    | '/exportacao'
+    | '/fechamento'
+    | '/historico'
+    | '/pagamentos'
     | '/principal'
+    | '/registros-excluidos'
+    | '/usuarios'
     | '/provisao/base'
     | '/provisao'
   id:
     | '__root__'
     | '/'
+    | '/administracao'
+    | '/alertas'
     | '/anexos'
+    | '/auditoria'
     | '/auth'
     | '/base'
     | '/conciliacao'
+    | '/configuracoes'
+    | '/dashboard-gerencial'
+    | '/divergencias'
+    | '/exportacao'
+    | '/fechamento'
+    | '/historico'
+    | '/pagamentos'
     | '/principal'
     | '/provisao'
+    | '/registros-excluidos'
+    | '/usuarios'
     | '/provisao/base'
     | '/provisao/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdministracaoRoute: typeof AdministracaoRoute
+  AlertasRoute: typeof AlertasRoute
   AnexosRoute: typeof AnexosRoute
+  AuditoriaRoute: typeof AuditoriaRoute
   AuthRoute: typeof AuthRoute
   BaseRoute: typeof BaseRoute
   ConciliacaoRoute: typeof ConciliacaoRoute
+  ConfiguracoesRoute: typeof ConfiguracoesRoute
+  DashboardGerencialRoute: typeof DashboardGerencialRoute
+  DivergenciasRoute: typeof DivergenciasRoute
+  ExportacaoRoute: typeof ExportacaoRoute
+  FechamentoRoute: typeof FechamentoRoute
+  HistoricoRoute: typeof HistoricoRoute
+  PagamentosRoute: typeof PagamentosRoute
   PrincipalRoute: typeof PrincipalRoute
   ProvisaoRoute: typeof ProvisaoRouteWithChildren
+  RegistrosExcluidosRoute: typeof RegistrosExcluidosRoute
+  UsuariosRoute: typeof UsuariosRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/usuarios': {
+      id: '/usuarios'
+      path: '/usuarios'
+      fullPath: '/usuarios'
+      preLoaderRoute: typeof UsuariosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/registros-excluidos': {
+      id: '/registros-excluidos'
+      path: '/registros-excluidos'
+      fullPath: '/registros-excluidos'
+      preLoaderRoute: typeof RegistrosExcluidosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/provisao': {
       id: '/provisao'
       path: '/provisao'
@@ -157,6 +327,55 @@ declare module '@tanstack/react-router' {
       path: '/principal'
       fullPath: '/principal'
       preLoaderRoute: typeof PrincipalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pagamentos': {
+      id: '/pagamentos'
+      path: '/pagamentos'
+      fullPath: '/pagamentos'
+      preLoaderRoute: typeof PagamentosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/historico': {
+      id: '/historico'
+      path: '/historico'
+      fullPath: '/historico'
+      preLoaderRoute: typeof HistoricoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fechamento': {
+      id: '/fechamento'
+      path: '/fechamento'
+      fullPath: '/fechamento'
+      preLoaderRoute: typeof FechamentoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/exportacao': {
+      id: '/exportacao'
+      path: '/exportacao'
+      fullPath: '/exportacao'
+      preLoaderRoute: typeof ExportacaoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/divergencias': {
+      id: '/divergencias'
+      path: '/divergencias'
+      fullPath: '/divergencias'
+      preLoaderRoute: typeof DivergenciasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard-gerencial': {
+      id: '/dashboard-gerencial'
+      path: '/dashboard-gerencial'
+      fullPath: '/dashboard-gerencial'
+      preLoaderRoute: typeof DashboardGerencialRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/configuracoes': {
+      id: '/configuracoes'
+      path: '/configuracoes'
+      fullPath: '/configuracoes'
+      preLoaderRoute: typeof ConfiguracoesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/conciliacao': {
@@ -180,11 +399,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auditoria': {
+      id: '/auditoria'
+      path: '/auditoria'
+      fullPath: '/auditoria'
+      preLoaderRoute: typeof AuditoriaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/anexos': {
       id: '/anexos'
       path: '/anexos'
       fullPath: '/anexos'
       preLoaderRoute: typeof AnexosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/alertas': {
+      id: '/alertas'
+      path: '/alertas'
+      fullPath: '/alertas'
+      preLoaderRoute: typeof AlertasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/administracao': {
+      id: '/administracao'
+      path: '/administracao'
+      fullPath: '/administracao'
+      preLoaderRoute: typeof AdministracaoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -227,12 +467,24 @@ const ProvisaoRouteWithChildren = ProvisaoRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdministracaoRoute: AdministracaoRoute,
+  AlertasRoute: AlertasRoute,
   AnexosRoute: AnexosRoute,
+  AuditoriaRoute: AuditoriaRoute,
   AuthRoute: AuthRoute,
   BaseRoute: BaseRoute,
   ConciliacaoRoute: ConciliacaoRoute,
+  ConfiguracoesRoute: ConfiguracoesRoute,
+  DashboardGerencialRoute: DashboardGerencialRoute,
+  DivergenciasRoute: DivergenciasRoute,
+  ExportacaoRoute: ExportacaoRoute,
+  FechamentoRoute: FechamentoRoute,
+  HistoricoRoute: HistoricoRoute,
+  PagamentosRoute: PagamentosRoute,
   PrincipalRoute: PrincipalRoute,
   ProvisaoRoute: ProvisaoRouteWithChildren,
+  RegistrosExcluidosRoute: RegistrosExcluidosRoute,
+  UsuariosRoute: UsuariosRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
