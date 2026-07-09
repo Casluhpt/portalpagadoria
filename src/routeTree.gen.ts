@@ -11,7 +11,6 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as UsuariosRouteImport } from './routes/usuarios'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
-import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RegistrosExcluidosRouteImport } from './routes/registros-excluidos'
 import { Route as ProvisaoRouteImport } from './routes/provisao'
 import { Route as PrincipalRouteImport } from './routes/principal'
@@ -37,6 +36,11 @@ import { Route as ProvisaoBaseRouteImport } from './routes/provisao.base'
 const UsuariosRoute = UsuariosRouteImport.update({
   id: '/usuarios',
   path: '/usuarios',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
@@ -171,6 +175,7 @@ export interface FileRoutesByFullPath {
   '/provisao': typeof ProvisaoRouteWithChildren
   '/registros-excluidos': typeof RegistrosExcluidosRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/usuarios': typeof UsuariosRoute
   '/provisao/base': typeof ProvisaoBaseRoute
   '/provisao/': typeof ProvisaoIndexRoute
@@ -194,6 +199,7 @@ export interface FileRoutesByTo {
   '/pagamentos': typeof PagamentosRoute
   '/principal': typeof PrincipalRoute
   '/registros-excluidos': typeof RegistrosExcluidosRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/reset-password': typeof ResetPasswordRoute
   '/usuarios': typeof UsuariosRoute
   '/provisao/base': typeof ProvisaoBaseRoute
@@ -220,6 +226,7 @@ export interface FileRoutesById {
   '/principal': typeof PrincipalRoute
   '/provisao': typeof ProvisaoRouteWithChildren
   '/registros-excluidos': typeof RegistrosExcluidosRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/reset-password': typeof ResetPasswordRoute
   '/usuarios': typeof UsuariosRoute
   '/provisao/base': typeof ProvisaoBaseRoute
