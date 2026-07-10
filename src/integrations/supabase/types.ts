@@ -250,21 +250,27 @@ export type Database = {
           criado_em: string
           email: string | null
           id: string
+          last_seen_at: string | null
           nome: string | null
+          presence_status: string
         }
         Insert: {
           atualizado_em?: string
           criado_em?: string
           email?: string | null
           id: string
+          last_seen_at?: string | null
           nome?: string | null
+          presence_status?: string
         }
         Update: {
           atualizado_em?: string
           criado_em?: string
           email?: string | null
           id?: string
+          last_seen_at?: string | null
           nome?: string | null
+          presence_status?: string
         }
         Relationships: []
       }
@@ -442,6 +448,7 @@ export type Database = {
         Returns: boolean
       }
       mark_password_changed: { Args: never; Returns: undefined }
+      set_presence: { Args: { _status: string }; Returns: undefined }
     }
     Enums: {
       app_role:
