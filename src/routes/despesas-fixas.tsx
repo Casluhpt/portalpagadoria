@@ -54,6 +54,7 @@ type LinhaAgrupada = {
   categoria: CategoriaDespesa;
   grupo: GrupoDespesa;
   descricao: string;
+  ordem: number;
   registros: (DespesaFixa | null)[]; // 12
   totalPrevisto: number;
   totalLancado: number;
