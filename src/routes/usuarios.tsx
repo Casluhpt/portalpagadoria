@@ -345,6 +345,24 @@ function UsuariosTable() {
                     })()}
                   </div>
                 </td>
+                <td className="whitespace-nowrap border-b border-border px-3 py-2">
+                  <Select
+                    value={u.setor ?? ""}
+                    disabled={setorMut.isPending}
+                    onValueChange={(v) =>
+                      setorMut.mutate({ userId: u.id, setor: v as Setor })
+                    }
+                  >
+                    <SelectTrigger className="h-8 w-[160px] text-xs">
+                      <SelectValue placeholder="—" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {ALLOWED_SETORES.map((s) => (
+                        <SelectItem key={s} value={s} className="text-xs">{s}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </td>
                 <td className="whitespace-nowrap border-b border-border px-3 py-2 text-xs text-muted-foreground">
                   {u.created_at ? format(new Date(u.created_at), "dd/MM/yyyy HH:mm") : "—"}
                 </td>
