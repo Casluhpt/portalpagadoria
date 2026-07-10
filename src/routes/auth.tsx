@@ -10,6 +10,13 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import profarmaLogo from "@/assets/profarma-logo.png.asset.json";
 import { useSession } from "@/hooks/use-session";
 
@@ -112,10 +119,14 @@ function SignInForm() {
   );
 }
 
+const SETORES = ["FOLHA/FÉRIAS", "RESCISÃO", "BENEFICIOS", "VISITANTE"] as const;
+type Setor = (typeof SETORES)[number];
+
 function SignUpForm() {
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [setor, setSetor] = useState<Setor | "">("");
   const [loading, setLoading] = useState(false);
   const [nomeError, setNomeError] = useState<string | null>(null);
 
@@ -134,6 +145,7 @@ function SignUpForm() {
       setNomeError(nameErr);
       return toast.error(nameErr);
     }
+    if (!setor) return toast.error("Selecione o setor.");
     if (password.length < 8) return toast.error("Senha precisa de ao menos 8 caracteres.");
     setLoading(true);
     const { error } = await supabase.auth.signUp({
@@ -141,7 +153,7 @@ function SignUpForm() {
       password,
       options: {
         emailRedirectTo: `${window.location.origin}/`,
-        data: { nome: trimmedNome },
+        data: { nome: trimmedNome, setor },
       },
     });
     setLoading(false);
@@ -180,6 +192,19 @@ function SignUpForm() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
+      </div>
+      <div className="space-y-1.5">
+        <Label htmlFor="su-setor">Setor</Label>
+        <Select value={setor} onValueChange={(v) => setSetor(v as Setor)}>
+          <SelectTrigger id="su-setor">
+            <SelectValue placeholder="Selecione o setor" />
+          </SelectTrigger>
+          <SelectContent>
+            {SETORES.map((s) => (
+              <SelectItem key={s} value={s}>{s}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
       <div className="space-y-1.5">
         <Label htmlFor="su-pw">Senha (mín. 8)</Label>
