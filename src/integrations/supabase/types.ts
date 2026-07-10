@@ -340,6 +340,7 @@ export type Database = {
           last_seen_at: string | null
           nome: string | null
           presence_status: string
+          setor: string | null
         }
         Insert: {
           atualizado_em?: string
@@ -349,6 +350,7 @@ export type Database = {
           last_seen_at?: string | null
           nome?: string | null
           presence_status?: string
+          setor?: string | null
         }
         Update: {
           atualizado_em?: string
@@ -358,6 +360,7 @@ export type Database = {
           last_seen_at?: string | null
           nome?: string | null
           presence_status?: string
+          setor?: string | null
         }
         Relationships: []
       }
