@@ -3,7 +3,8 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ShieldCheck, ArrowLeft, CheckCircle2, AlertTriangle, Percent, Clock } from "lucide-react";
+import { ShieldCheck, ArrowLeft, CheckCircle2, AlertTriangle, Percent, Clock, ShieldAlert } from "lucide-react";
+import { useRoles } from "@/hooks/use-roles";
 
 export const Route = createFileRoute("/conciliacao")({
   component: ConciliacaoPage,
