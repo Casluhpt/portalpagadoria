@@ -404,6 +404,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      ensure_viewer_role: { Args: never; Returns: undefined }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -419,6 +420,7 @@ export type Database = {
         | "operacional"
         | "consulta"
         | "auditor"
+        | "viewer"
       solicitacao_status:
         | "aberta"
         | "em_analise"
@@ -565,6 +567,7 @@ export const Constants = {
         "operacional",
         "consulta",
         "auditor",
+        "viewer",
       ],
       solicitacao_status: [
         "aberta",

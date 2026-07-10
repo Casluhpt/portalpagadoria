@@ -13,6 +13,12 @@ export function useRoles() {
     queryKey: ["user-roles", userId],
     enabled: !!userId,
     queryFn: async (): Promise<AppRole[]> => {
+      // Ensure a signed-in user has at least the viewer role.
+      try {
+        await supabase.rpc("ensure_viewer_role" as never);
+      } catch {
+        /* ignore */
+      }
       const { data, error } = await supabase
         .from("user_roles")
         .select("role")
@@ -26,6 +32,7 @@ export function useRoles() {
   const roles = query.data ?? [];
   const has = (role: AppRole) => roles.includes(role);
   const hasAny = (list: AppRole[]) => list.some((r) => roles.includes(r));
+  const isViewer = roles.length > 0 && roles.every((r) => r === "viewer");
 
   return {
     roles,
@@ -35,6 +42,7 @@ export function useRoles() {
     isOperacional: has("operacional"),
     isCriador: has("criador_competencia"),
     isConsulta: has("consulta"),
+    isViewer,
     has,
     hasAny,
   };
