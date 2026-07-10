@@ -275,6 +275,7 @@ export type Database = {
           data: string | null
           empresa: string | null
           id: string
+          pagamento_id: string | null
           updated_at: string
           valor: number | null
         }
@@ -284,6 +285,7 @@ export type Database = {
           data?: string | null
           empresa?: string | null
           id?: string
+          pagamento_id?: string | null
           updated_at?: string
           valor?: number | null
         }
@@ -293,10 +295,19 @@ export type Database = {
           data?: string | null
           empresa?: string | null
           id?: string
+          pagamento_id?: string | null
           updated_at?: string
           valor?: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "provisao_diaria_pagamento_id_fkey"
+            columns: ["pagamento_id"]
+            isOneToOne: true
+            referencedRelation: "pagamentos_diversos"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       solicitacao_updates: {
         Row: {
