@@ -121,7 +121,9 @@ export function AppSidebar() {
     return true;
   };
 
+  const [confirmSignOut, setConfirmSignOut] = useState(false);
   const handleSignOut = async () => {
+    setConfirmSignOut(false);
     const { error } = await supabase.auth.signOut();
     if (error) toast.error(error.message);
     else toast.success("Sessão encerrada");
