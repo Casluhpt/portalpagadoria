@@ -38,6 +38,12 @@ import {
   type Pagamento,
 } from "@/lib/pagamentos-constants";
 
+const HIDDEN_COLUMN_KEYS = new Set<string>([
+  "valor_bankmanager","status_bankmanager","diferenca_lg_finnet",
+  "valor_itau","status_itau","diferenca_bank_itau","natureza_pagamento",
+]);
+const VISIBLE_CAMPOS = PAGAMENTO_CAMPOS.filter((c) => !HIDDEN_COLUMN_KEYS.has(c.key));
+
 export const Route = createFileRoute("/pagamentos")({
   component: PagamentosPage,
 });
@@ -312,7 +318,7 @@ function LancamentosTab({ colaboradorNome, userId }: { colaboradorNome: string; 
               <thead className="sticky top-0 z-10 bg-muted/95 backdrop-blur">
                 <tr>
                   <th className="w-10 border-b border-border px-2 py-2 text-left font-semibold text-muted-foreground">#</th>
-                  {PAGAMENTO_CAMPOS.map((c) => (
+                  {VISIBLE_CAMPOS.map((c) => (
                     <th
                       key={c.key}
                       className="cursor-pointer select-none whitespace-nowrap border-b border-r border-border px-2 py-2 text-left font-semibold text-foreground hover:bg-muted"
@@ -333,7 +339,7 @@ function LancamentosTab({ colaboradorNome, userId }: { colaboradorNome: string; 
                 {rows.map((r, i) => (
                   <tr key={r.id} className="group hover:bg-muted/40">
                     <td className="border-b border-border px-2 py-1 text-muted-foreground">{i + 1}</td>
-                    {PAGAMENTO_CAMPOS.map((c) => (
+                    {VISIBLE_CAMPOS.map((c) => (
                       <EditableCell
                         key={c.key}
                         row={r}
@@ -350,7 +356,7 @@ function LancamentosTab({ colaboradorNome, userId }: { colaboradorNome: string; 
                 ))}
                 {rows.length === 0 && (
                   <tr>
-                    <td colSpan={PAGAMENTO_CAMPOS.length + 2} className="px-4 py-16 text-center text-sm text-muted-foreground">
+                    <td colSpan={VISIBLE_CAMPOS.length + 2} className="px-4 py-16 text-center text-sm text-muted-foreground">
                       Nenhum lançamento. Clique em "Novo" ou importe uma planilha Excel.
                     </td>
                   </tr>
