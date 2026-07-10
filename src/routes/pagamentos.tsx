@@ -411,7 +411,7 @@ function EditableCell({
             <SelectValue placeholder="—" />
           </SelectTrigger>
           <SelectContent>
-            {opts.map((o) => <SelectItem key={o} value={o}>{o}</SelectItem>)}
+            {opts.map((o: string) => <SelectItem key={o} value={o}>{o}</SelectItem>)}
           </SelectContent>
         </Select>
       </td>
