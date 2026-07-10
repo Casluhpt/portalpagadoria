@@ -125,6 +125,7 @@ export type Database = {
           numero_nf: string | null
           numero_pedido: string | null
           observacao: string | null
+          ordem: number
           tipo: string
           updated_at: string
           valor: number
@@ -150,6 +151,7 @@ export type Database = {
           numero_nf?: string | null
           numero_pedido?: string | null
           observacao?: string | null
+          ordem?: number
           tipo?: string
           updated_at?: string
           valor?: number
@@ -175,6 +177,7 @@ export type Database = {
           numero_nf?: string | null
           numero_pedido?: string | null
           observacao?: string | null
+          ordem?: number
           tipo?: string
           updated_at?: string
           valor?: number

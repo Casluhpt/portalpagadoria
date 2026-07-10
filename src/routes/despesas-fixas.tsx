@@ -54,6 +54,7 @@ type LinhaAgrupada = {
   categoria: CategoriaDespesa;
   grupo: GrupoDespesa;
   descricao: string;
+  ordem: number;
   registros: (DespesaFixa | null)[]; // 12
   totalPrevisto: number;
   totalLancado: number;
@@ -112,6 +113,7 @@ function DespesasFixasPage() {
           categoria: r.categoria,
           grupo: grupoDeCategoria(r.categoria),
           descricao: r.descricao,
+          ordem: (r as any).ordem ?? 0,
           registros: Array.from({ length: 12 }, () => null),
           totalPrevisto: 0,
           totalLancado: 0,
@@ -127,17 +129,16 @@ function DespesasFixasPage() {
         };
         map.set(key, l);
       }
-      l!.registros[r.mes - 1] = r;
+      l.registros[r.mes - 1] = r;
       const v = Number(r.valor) || 0;
-      l!.totalPrevisto += v;
-      if (r.lancado) l!.totalLancado += v;
-      // meta: prefer non-null
+      l.totalPrevisto += v;
+      if (r.lancado) l.totalLancado += v;
       (["empresa_codigo","empresa_nome","conta","centro_custo","numero_pedido","nome_real","notas"] as const).forEach((k) => {
         if (!l!.meta[k] && (r as any)[k]) l!.meta[k] = (r as any)[k];
       });
     });
     return Array.from(map.values()).sort(
-      (a, b) => a.categoria.localeCompare(b.categoria) || a.descricao.localeCompare(b.descricao),
+      (a, b) => a.categoria.localeCompare(b.categoria) || a.ordem - b.ordem || a.descricao.localeCompare(b.descricao),
     );
   }, [data]);
 

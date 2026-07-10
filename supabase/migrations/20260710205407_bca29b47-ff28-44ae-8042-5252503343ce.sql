@@ -1,0 +1,1 @@
+DELETE FROM public.despesas_fixas WHERE ano=2026 AND ctid NOT IN (SELECT MIN(ctid) FROM public.despesas_fixas WHERE ano=2026 GROUP BY categoria, descricao, mes);

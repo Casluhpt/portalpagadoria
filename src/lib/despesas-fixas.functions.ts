@@ -19,6 +19,7 @@ export const EMPRESAS = [
   { codigo: "5000", nome: "CSB" },
   { codigo: "8500", nome: "ROSÁRIO" },
   { codigo: "2500", nome: "PROFARMA HB" },
+  { codigo: "5400", nome: "CSB HB" },
 ] as const;
 
 export type DespesaFixa = {
@@ -41,6 +42,7 @@ export type DespesaFixa = {
   lancado: boolean;
   nome_real: string | null;
   notas: string | null;
+  ordem: number;
   created_by: string | null;
   created_by_nome: string | null;
   created_at: string;
@@ -56,6 +58,7 @@ export const listDespesasFixas = createServerFn({ method: "GET" })
       .select("*")
       .eq("ano", data.ano)
       .order("categoria", { ascending: true })
+      .order("ordem", { ascending: true })
       .order("descricao", { ascending: true })
       .order("mes", { ascending: true });
     if (error) throw error;
