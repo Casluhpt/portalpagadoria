@@ -125,7 +125,7 @@ function RootComponent() {
       <PresenceHeartbeat />
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
-      <Toaster position="top-right" richColors />
+      <Toaster position="top-right" richColors closeButton />
     </QueryClientProvider>
   );
 }
