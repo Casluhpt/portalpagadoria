@@ -84,3 +84,31 @@ export const resetUserPassword = createServerFn({ method: "POST" })
     if (error) throw error;
     return { ok: true };
   });
+
+const ALLOWED_ROLES = ["administrador", "viewer"] as const;
+
+export const setUserRole = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { userId: string; role: "administrador" | "viewer" }) => {
+    if (!input?.userId) throw new Error("userId é obrigatório");
+    if (!ALLOWED_ROLES.includes(input.role)) throw new Error("Perfil inválido");
+    return input;
+  })
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    if (data.userId === context.userId && data.role !== "administrador") {
+      throw new Error("Você não pode remover seu próprio acesso de administrador.");
+    }
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error: delErr } = await supabaseAdmin
+      .from("user_roles")
+      .delete()
+      .eq("user_id", data.userId)
+      .in("role", [...ALLOWED_ROLES]);
+    if (delErr) throw delErr;
+    const { error: insErr } = await supabaseAdmin
+      .from("user_roles")
+      .insert({ user_id: data.userId, role: data.role });
+    if (insErr) throw insErr;
+    return { ok: true };
+  });

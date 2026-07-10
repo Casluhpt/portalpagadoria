@@ -17,9 +17,14 @@ import {
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
 import { useRoles } from "@/hooks/use-roles";
-import { listAdminUsers, resetUserPassword, type AdminUserRow } from "@/lib/admin-users.functions";
+import { useSession } from "@/hooks/use-session";
+import { useQueryClient } from "@tanstack/react-query";
+import { listAdminUsers, resetUserPassword, setUserRole, type AdminUserRow } from "@/lib/admin-users.functions";
 
 export const Route = createFileRoute("/usuarios")({
   component: UsuariosPage,
@@ -90,6 +95,9 @@ function roleVariant(r: string): "default" | "secondary" | "outline" | "destruct
 function UsuariosTable() {
   const listFn = useServerFn(listAdminUsers);
   const resetFn = useServerFn(resetUserPassword);
+  const setRoleFn = useServerFn(setUserRole);
+  const qc = useQueryClient();
+  const { user } = useSession();
   const [search, setSearch] = useState("");
 
   const { data = [], isLoading, error, refetch, isFetching } = useQuery({
@@ -103,6 +111,16 @@ function UsuariosTable() {
       resetFn({ data: { email, redirectTo: `${window.location.origin}/reset-password` } }),
     onSuccess: () => toast.success("Email de redefinição enviado."),
     onError: (e: any) => toast.error(e?.message ?? "Falha ao enviar email"),
+  });
+
+  const roleMut = useMutation({
+    mutationFn: (vars: { userId: string; role: "administrador" | "viewer" }) =>
+      setRoleFn({ data: vars }),
+    onSuccess: () => {
+      toast.success("Perfil atualizado.");
+      qc.invalidateQueries({ queryKey: ["admin-users"] });
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Falha ao atualizar perfil"),
   });
 
   const rows = useMemo(() => {
@@ -170,19 +188,46 @@ function UsuariosTable() {
                 <td className="border-b border-border px-3 py-2">{u.nome ?? "—"}</td>
                 <td className="border-b border-border px-3 py-2 font-mono text-xs">{u.email ?? "—"}</td>
                 <td className="border-b border-border px-3 py-2">
-                  <div className="flex flex-wrap gap-1">
-                    {u.roles.length === 0 ? (
-                      <Badge variant="outline" className="gap-1">
-                        <Eye className="h-3 w-3" /> Sem perfil
-                      </Badge>
-                    ) : (
-                      u.roles.map((r) => (
-                        <Badge key={r} variant={roleVariant(r)} className="gap-1">
-                          {r === "administrador" && <ShieldCheck className="h-3 w-3" />}
-                          {roleLabel(r)}
-                        </Badge>
-                      ))
-                    )}
+                  <div className="flex flex-wrap items-center gap-2">
+                    {(() => {
+                      const current: "administrador" | "viewer" =
+                        u.roles.includes("administrador") ? "administrador" : "viewer";
+                      const isSelf = user?.id === u.id;
+                      const otherRoles = u.roles.filter((r) => r !== "administrador" && r !== "viewer");
+                      return (
+                        <>
+                          <Select
+                            value={current}
+                            disabled={roleMut.isPending || isSelf}
+                            onValueChange={(v) =>
+                              roleMut.mutate({ userId: u.id, role: v as "administrador" | "viewer" })
+                            }
+                          >
+                            <SelectTrigger className="h-8 w-[160px] text-xs">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="administrador">
+                                <span className="inline-flex items-center gap-1">
+                                  <ShieldCheck className="h-3 w-3" /> Administrador
+                                </span>
+                              </SelectItem>
+                              <SelectItem value="viewer">
+                                <span className="inline-flex items-center gap-1">
+                                  <Eye className="h-3 w-3" /> Viewer
+                                </span>
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                          {otherRoles.map((r) => (
+                            <Badge key={r} variant={roleVariant(r)}>{roleLabel(r)}</Badge>
+                          ))}
+                          {isSelf && (
+                            <span className="text-[10px] text-muted-foreground">(você)</span>
+                          )}
+                        </>
+                      );
+                    })()}
                   </div>
                 </td>
                 <td className="whitespace-nowrap border-b border-border px-3 py-2 text-xs text-muted-foreground">
