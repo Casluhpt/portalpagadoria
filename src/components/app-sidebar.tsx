@@ -92,7 +92,7 @@ export function AppSidebar() {
   const { roles, isAdmin, isViewer, hasAny, loading: rolesLoading } = useRoles();
 
   // Viewer users have access to a limited set of routes.
-  const VIEWER_ALLOWED = ["/pagamentos", "/dashboard-gerencial", "/divergencias"];
+  const VIEWER_ALLOWED = ["/pagamentos", "/divergencias"];
   const isViewerAllowed = (path: string) =>
     VIEWER_ALLOWED.some((p) => path === p || path.startsWith(p + "/"));
 
