@@ -132,8 +132,8 @@ function DespesasFixasPage() {
       l.totalPrevisto += v;
       if (r.lancado) l.totalLancado += v;
       // meta: prefer non-null
-      (["empresa_codigo","empresa_nome","conta","centro_custo","numero_pedido"] as const).forEach((k) => {
-        if (!l!.meta[k] && (r as any)[k]) l!.meta[k] = (r as any)[k];
+      (["empresa_codigo","empresa_nome","conta","centro_custo","numero_pedido","nome_real","notas"] as const).forEach((k) => {
+        if (!l.meta[k] && (r as any)[k]) l.meta[k] = (r as any)[k];
       });
     });
     return Array.from(map.values()).sort(
