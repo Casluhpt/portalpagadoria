@@ -20,6 +20,7 @@ import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as FechamentoRouteImport } from './routes/fechamento'
 import { Route as ExportacaoRouteImport } from './routes/exportacao'
 import { Route as DivergenciasRouteImport } from './routes/divergencias'
+import { Route as DespesasFixasRouteImport } from './routes/despesas-fixas'
 import { Route as DashboardGerencialRouteImport } from './routes/dashboard-gerencial'
 import { Route as ConfiguracoesRouteImport } from './routes/configuracoes'
 import { Route as ConciliacaoRouteImport } from './routes/conciliacao'
@@ -86,6 +87,11 @@ const ExportacaoRoute = ExportacaoRouteImport.update({
 const DivergenciasRoute = DivergenciasRouteImport.update({
   id: '/divergencias',
   path: '/divergencias',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DespesasFixasRoute = DespesasFixasRouteImport.update({
+  id: '/despesas-fixas',
+  path: '/despesas-fixas',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardGerencialRoute = DashboardGerencialRouteImport.update({
@@ -160,6 +166,7 @@ export interface FileRoutesByFullPath {
   '/conciliacao': typeof ConciliacaoRoute
   '/configuracoes': typeof ConfiguracoesRoute
   '/dashboard-gerencial': typeof DashboardGerencialRoute
+  '/despesas-fixas': typeof DespesasFixasRoute
   '/divergencias': typeof DivergenciasRoute
   '/exportacao': typeof ExportacaoRoute
   '/fechamento': typeof FechamentoRoute
@@ -185,6 +192,7 @@ export interface FileRoutesByTo {
   '/conciliacao': typeof ConciliacaoRoute
   '/configuracoes': typeof ConfiguracoesRoute
   '/dashboard-gerencial': typeof DashboardGerencialRoute
+  '/despesas-fixas': typeof DespesasFixasRoute
   '/divergencias': typeof DivergenciasRoute
   '/exportacao': typeof ExportacaoRoute
   '/fechamento': typeof FechamentoRoute
@@ -210,6 +218,7 @@ export interface FileRoutesById {
   '/conciliacao': typeof ConciliacaoRoute
   '/configuracoes': typeof ConfiguracoesRoute
   '/dashboard-gerencial': typeof DashboardGerencialRoute
+  '/despesas-fixas': typeof DespesasFixasRoute
   '/divergencias': typeof DivergenciasRoute
   '/exportacao': typeof ExportacaoRoute
   '/fechamento': typeof FechamentoRoute
@@ -237,6 +246,7 @@ export interface FileRouteTypes {
     | '/conciliacao'
     | '/configuracoes'
     | '/dashboard-gerencial'
+    | '/despesas-fixas'
     | '/divergencias'
     | '/exportacao'
     | '/fechamento'
@@ -262,6 +272,7 @@ export interface FileRouteTypes {
     | '/conciliacao'
     | '/configuracoes'
     | '/dashboard-gerencial'
+    | '/despesas-fixas'
     | '/divergencias'
     | '/exportacao'
     | '/fechamento'
@@ -286,6 +297,7 @@ export interface FileRouteTypes {
     | '/conciliacao'
     | '/configuracoes'
     | '/dashboard-gerencial'
+    | '/despesas-fixas'
     | '/divergencias'
     | '/exportacao'
     | '/fechamento'
@@ -312,6 +324,7 @@ export interface RootRouteChildren {
   ConciliacaoRoute: typeof ConciliacaoRoute
   ConfiguracoesRoute: typeof ConfiguracoesRoute
   DashboardGerencialRoute: typeof DashboardGerencialRoute
+  DespesasFixasRoute: typeof DespesasFixasRoute
   DivergenciasRoute: typeof DivergenciasRoute
   ExportacaoRoute: typeof ExportacaoRoute
   FechamentoRoute: typeof FechamentoRoute
@@ -402,6 +415,13 @@ declare module '@tanstack/react-router' {
       path: '/divergencias'
       fullPath: '/divergencias'
       preLoaderRoute: typeof DivergenciasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/despesas-fixas': {
+      id: '/despesas-fixas'
+      path: '/despesas-fixas'
+      fullPath: '/despesas-fixas'
+      preLoaderRoute: typeof DespesasFixasRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard-gerencial': {
@@ -516,6 +536,7 @@ const rootRouteChildren: RootRouteChildren = {
   ConciliacaoRoute: ConciliacaoRoute,
   ConfiguracoesRoute: ConfiguracoesRoute,
   DashboardGerencialRoute: DashboardGerencialRoute,
+  DespesasFixasRoute: DespesasFixasRoute,
   DivergenciasRoute: DivergenciasRoute,
   ExportacaoRoute: ExportacaoRoute,
   FechamentoRoute: FechamentoRoute,

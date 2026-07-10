@@ -103,6 +103,48 @@ export type Database = {
         }
         Relationships: []
       }
+      despesas_fixas: {
+        Row: {
+          ano: number
+          categoria: string
+          created_at: string
+          created_by: string | null
+          created_by_nome: string | null
+          descricao: string
+          id: string
+          mes: number
+          observacao: string | null
+          updated_at: string
+          valor: number
+        }
+        Insert: {
+          ano?: number
+          categoria: string
+          created_at?: string
+          created_by?: string | null
+          created_by_nome?: string | null
+          descricao: string
+          id?: string
+          mes: number
+          observacao?: string | null
+          updated_at?: string
+          valor?: number
+        }
+        Update: {
+          ano?: number
+          categoria?: string
+          created_at?: string
+          created_by?: string | null
+          created_by_nome?: string | null
+          descricao?: string
+          id?: string
+          mes?: number
+          observacao?: string | null
+          updated_at?: string
+          valor?: number
+        }
+        Relationships: []
+      }
       lancamentos: {
         Row: {
           account_group: string | null
