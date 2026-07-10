@@ -123,10 +123,15 @@ function LancamentosTab({ colaboradorNome, userId }: { colaboradorNome: string; 
   const invalidate = () => qc.invalidateQueries({ queryKey: pagamentosQueryKey });
 
   const createMut = useMutation({
-    mutationFn: () => createPagamento({}, colaboradorNome, userId),
-    onSuccess: () => { invalidate(); toast.success("Novo lançamento adicionado"); },
+    mutationFn: (qty: number) =>
+      qty <= 1
+        ? createPagamento({}, colaboradorNome, userId).then(() => 1)
+        : createPagamentosBulk(Array.from({ length: qty }, () => ({})), colaboradorNome, userId),
+    onSuccess: (n) => { invalidate(); toast.success(`${n} lançamento(s) adicionado(s)`); },
     onError: (e: Error) => toast.error("Falha ao inserir: " + e.message),
   });
+  const [novoQty, setNovoQty] = useState<number>(1);
+  const [novoOpen, setNovoOpen] = useState(false);
 
   const updateMut = useMutation({
     mutationFn: ({ id, patch }: { id: string; patch: PagamentoInput }) => updatePagamento(id, patch),
