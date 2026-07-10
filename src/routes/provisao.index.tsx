@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { fetchAllProvisao, provisaoQueryKey } from "@/lib/provisao";
 import { comunicadosQueryKey, publicarComunicado } from "@/lib/comunicados";
+import { createLancamento, lancamentosQueryKey } from "@/lib/lancamentos";
 import {
   fetchFechamentoDia, fecharProvisaoDia, reabrirProvisaoDia,
   provisaoFechamentosKey, todayISO,
@@ -61,10 +62,26 @@ function ProvisaoDashboard() {
         user.id,
       );
       await fecharProvisaoDia(hoje);
+      // Marcação em Resultados Principais (dashboard /principal)
+      const nome =
+        (user.user_metadata as { nome?: string; full_name?: string } | null)?.nome ??
+        (user.user_metadata as { full_name?: string } | null)?.full_name ??
+        user.email ??
+        "Sistema";
+      await createLancamento({
+        dueDate: hoje,
+        registerDate: hoje,
+        issuer: nome,
+        action: "Provisão Diária",
+        descStatus: "Provisão Enviada",
+        Empresa: "Provisão Diária",
+        text: `Provisão Diária enviada em ${fmtBR(hoje)}`,
+      });
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: comunicadosQueryKey });
       qc.invalidateQueries({ queryKey: provisaoFechamentosKey });
+      qc.invalidateQueries({ queryKey: lancamentosQueryKey });
       toast.success("Provisão do dia enviada e fechada para novos lançamentos.");
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Falha ao notificar"),
