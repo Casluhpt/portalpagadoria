@@ -42,6 +42,7 @@ import type { ComponentType } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/hooks/use-session";
 import { useRoles, type AppRole } from "@/hooks/use-roles";
+import { useProfile } from "@/hooks/use-profile";
 import { Button } from "@/components/ui/button";
 
 import {
@@ -100,6 +101,7 @@ export function AppSidebar() {
   const navigate = useNavigate();
   const { user } = useSession();
   const { roles, isAdmin, isViewer, hasAny, loading: rolesLoading } = useRoles();
+  const { setor } = useProfile();
 
   // Viewer users have access to a limited set of routes.
   const VIEWER_ALLOWED = ["/pagamentos", "/divergencias"];
@@ -195,6 +197,9 @@ export function AppSidebar() {
                       : primaryRole
                       ? roleLabel[primaryRole]
                       : "Sem perfil atribuído"}
+                    {setor ? (
+                      <span className="ml-1 normal-case text-sidebar-foreground/70">· {setor}</span>
+                    ) : null}
                   </div>
                 </div>
                 <Button variant="outline" size="sm" className="w-full" onClick={() => setConfirmSignOut(true)}>
