@@ -134,7 +134,7 @@ function NotifList({
           {items.map((c) => (
             <li
               key={c.id}
-              className={`flex gap-3 px-4 py-3 text-sm ${c.lido ? "bg-white" : "bg-violet-50/60"}`}
+              className={`group relative flex gap-3 px-4 py-3 pr-9 text-sm ${c.lido ? "bg-white" : "bg-violet-50/60"}`}
             >
               <span
                 className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${c.lido ? "bg-slate-300" : "bg-violet-600"}`}
@@ -154,6 +154,15 @@ function NotifList({
                   </button>
                 )}
               </div>
+              {!c.lido && (
+                <button
+                  onClick={() => onMark(c.id)}
+                  aria-label="Fechar notificação"
+                  className="absolute right-2 top-2 rounded-full p-1 text-slate-400 opacity-0 transition hover:bg-slate-100 hover:text-slate-700 group-hover:opacity-100 focus:opacity-100"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              )}
             </li>
           ))}
         </ul>
