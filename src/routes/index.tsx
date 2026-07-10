@@ -89,6 +89,27 @@ function PortalPage() {
   };
   const visibleVersoes = versoes.filter((v) => !dismissed.includes(v.versao));
 
+  const [carouselIdx, setCarouselIdx] = useState(0);
+  const [slideKey, setSlideKey] = useState(0);
+  useEffect(() => {
+    if (carouselIdx >= visibleVersoes.length) setCarouselIdx(0);
+  }, [visibleVersoes.length, carouselIdx]);
+  useEffect(() => {
+    if (visibleVersoes.length <= 1) return;
+    const t = setInterval(() => {
+      setCarouselIdx((i) => (i + 1) % visibleVersoes.length);
+      setSlideKey((k) => k + 1);
+    }, 7000);
+    return () => clearInterval(t);
+  }, [visibleVersoes.length]);
+  const goTo = (i: number) => {
+    if (visibleVersoes.length === 0) return;
+    const n = ((i % visibleVersoes.length) + visibleVersoes.length) % visibleVersoes.length;
+    setCarouselIdx(n);
+    setSlideKey((k) => k + 1);
+  };
+
+
 
   const kpis = useMemo(() => {
     const mes = currentMonth();
