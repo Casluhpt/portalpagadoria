@@ -175,6 +175,15 @@ function UsuariosTable() {
     onError: (e: any) => toast.error(e?.message ?? "Falha ao enviar convite"),
   });
 
+  const deleteMut = useMutation({
+    mutationFn: (userId: string) => deleteFn({ data: { userId } }),
+    onSuccess: () => {
+      toast.success("Conta excluída.");
+      qc.invalidateQueries({ queryKey: ["admin-users"] });
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Falha ao excluir conta"),
+  });
+
   const rows = useMemo(() => {
     const q = search.trim().toLowerCase();
     if (!q) return data;
