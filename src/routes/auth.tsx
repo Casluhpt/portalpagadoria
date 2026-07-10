@@ -6,6 +6,7 @@ import { Loader2, LogIn, UserPlus, KeyRound } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -95,9 +96,8 @@ function SignInForm() {
             Esqueci minha senha
           </Link>
         </div>
-        <Input
+        <PasswordInput
           id="si-pw"
-          type="password"
           required
           autoComplete="current-password"
           value={password}
@@ -183,9 +183,8 @@ function SignUpForm() {
       </div>
       <div className="space-y-1.5">
         <Label htmlFor="su-pw">Senha (mín. 8)</Label>
-        <Input
+        <PasswordInput
           id="su-pw"
-          type="password"
           required
           minLength={8}
           autoComplete="new-password"

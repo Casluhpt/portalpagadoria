@@ -6,6 +6,7 @@ import { Loader2, KeyRound, CheckCircle2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import profarmaLogo from "@/assets/profarma-logo.png.asset.json";
@@ -67,9 +68,8 @@ function ResetPasswordPage() {
             <form onSubmit={submit} className="space-y-3">
               <div className="space-y-1.5">
                 <Label htmlFor="rp-pw">Nova senha (mín. 8)</Label>
-                <Input
+                <PasswordInput
                   id="rp-pw"
-                  type="password"
                   required
                   minLength={8}
                   autoComplete="new-password"
@@ -79,9 +79,8 @@ function ResetPasswordPage() {
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="rp-pw2">Confirmar nova senha</Label>
-                <Input
+                <PasswordInput
                   id="rp-pw2"
-                  type="password"
                   required
                   minLength={8}
                   autoComplete="new-password"
