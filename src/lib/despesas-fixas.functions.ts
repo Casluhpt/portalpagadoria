@@ -39,6 +39,8 @@ export type DespesaFixa = {
   empresa_codigo: string | null;
   empresa_nome: string | null;
   lancado: boolean;
+  nome_real: string | null;
+  notas: string | null;
   created_by: string | null;
   created_by_nome: string | null;
   created_at: string;
