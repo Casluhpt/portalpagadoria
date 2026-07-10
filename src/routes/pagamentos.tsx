@@ -40,6 +40,7 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
 import { useSession } from "@/hooks/use-session";
+import { supabase } from "@/integrations/supabase/client";
 import {
   createPagamento, createPagamentosBulk, deletePagamento,
   fetchPagamentos, pagamentosQueryKey, updatePagamento,
@@ -49,6 +50,7 @@ import {
   PAGAMENTO_CAMPOS, COMPETENCIAS, getDescricoesByCelula,
   type Pagamento,
 } from "@/lib/pagamentos-constants";
+
 
 const HIDDEN_COLUMN_KEYS = new Set<string>([
   "valor_bankmanager","status_bankmanager","diferenca_lg_finnet",
