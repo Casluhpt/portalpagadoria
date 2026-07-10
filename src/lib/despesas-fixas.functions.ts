@@ -5,6 +5,22 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 export const CATEGORIAS_DESPESAS = ["PJ", "Pensão", "Penhora", "Fornecedores"] as const;
 export type CategoriaDespesa = (typeof CATEGORIAS_DESPESAS)[number];
 
+export const GRUPOS_DESPESAS = ["PJ", "Penhora e Pensão", "Fornecedores"] as const;
+export type GrupoDespesa = (typeof GRUPOS_DESPESAS)[number];
+
+export const grupoDeCategoria = (c: CategoriaDespesa): GrupoDespesa =>
+  c === "PJ" ? "PJ" : c === "Fornecedores" ? "Fornecedores" : "Penhora e Pensão";
+
+export const EMPRESAS = [
+  { codigo: "5700", nome: "LOCAFARMA" },
+  { codigo: "2100", nome: "PROFARMA" },
+  { codigo: "6700", nome: "SPECIALTY" },
+  { codigo: "1000", nome: "TAMOIO" },
+  { codigo: "5000", nome: "CSB" },
+  { codigo: "8500", nome: "ROSÁRIO" },
+  { codigo: "2500", nome: "PROFARMA HB" },
+] as const;
+
 export type DespesaFixa = {
   id: string;
   categoria: CategoriaDespesa;
@@ -13,6 +29,16 @@ export type DespesaFixa = {
   mes: number;
   valor: number;
   observacao: string | null;
+  numero_pedido: string | null;
+  numero_nf: string | null;
+  tipo: "mensal" | "adiantamento";
+  data_lancamento: string | null;
+  data_vencimento: string | null;
+  conta: string | null;
+  centro_custo: string | null;
+  empresa_codigo: string | null;
+  empresa_nome: string | null;
+  lancado: boolean;
   created_by: string | null;
   created_by_nome: string | null;
   created_at: string;
@@ -31,7 +57,7 @@ export const listDespesasFixas = createServerFn({ method: "GET" })
       .order("descricao", { ascending: true })
       .order("mes", { ascending: true });
     if (error) throw error;
-    return (rows ?? []) as DespesaFixa[];
+    return (rows ?? []) as unknown as DespesaFixa[];
   });
 
 const upsertSchema = z.object({
@@ -42,6 +68,12 @@ const upsertSchema = z.object({
   mes: z.number().int().min(1).max(12),
   valor: z.number().finite(),
   observacao: z.string().max(500).nullable().optional(),
+  numero_pedido: z.string().max(60).nullable().optional(),
+  numero_nf: z.string().max(60).nullable().optional(),
+  tipo: z.enum(["mensal", "adiantamento"]).optional(),
+  data_lancamento: z.string().nullable().optional(),
+  data_vencimento: z.string().nullable().optional(),
+  lancado: z.boolean().optional(),
 });
 
 export const upsertDespesaFixa = createServerFn({ method: "POST" })
@@ -53,39 +85,39 @@ export const upsertDespesaFixa = createServerFn({ method: "POST" })
       (context.claims as any)?.email ??
       null;
 
+    const patch: Record<string, any> = {
+      categoria: data.categoria,
+      descricao: data.descricao,
+      ano: data.ano,
+      mes: data.mes,
+      valor: data.valor,
+      observacao: data.observacao ?? null,
+      numero_pedido: data.numero_pedido ?? null,
+      numero_nf: data.numero_nf ?? null,
+      tipo: data.tipo ?? "mensal",
+      data_lancamento: data.data_lancamento ?? null,
+      data_vencimento: data.data_vencimento ?? null,
+      lancado: data.lancado ?? false,
+    };
+
     if (data.id) {
-      const { data: row, error } = await context.supabase
+      const { data: row, error } = await (context.supabase as any)
         .from("despesas_fixas")
-        .update({
-          categoria: data.categoria,
-          descricao: data.descricao,
-          ano: data.ano,
-          mes: data.mes,
-          valor: data.valor,
-          observacao: data.observacao ?? null,
-        })
+        .update(patch)
         .eq("id", data.id)
         .select()
         .single();
       if (error) throw error;
-      return row as DespesaFixa;
+      return row as unknown as DespesaFixa;
     }
-    const { data: row, error } = await context.supabase
+    const { data: row, error } = await (context.supabase as any)
       .from("despesas_fixas")
-      .insert({
-        categoria: data.categoria,
-        descricao: data.descricao,
-        ano: data.ano,
-        mes: data.mes,
-        valor: data.valor,
-        observacao: data.observacao ?? null,
-        created_by: context.userId,
-        created_by_nome: nome,
-      })
+      .insert({ ...patch, created_by: context.userId, created_by_nome: nome })
       .select()
       .single();
+
     if (error) throw error;
-    return row as DespesaFixa;
+    return row as unknown as DespesaFixa;
   });
 
 export const deleteDespesaFixa = createServerFn({ method: "POST" })
@@ -93,6 +125,46 @@ export const deleteDespesaFixa = createServerFn({ method: "POST" })
   .inputValidator((d) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ context, data }) => {
     const { error } = await context.supabase.from("despesas_fixas").delete().eq("id", data.id);
+    if (error) throw error;
+    return { ok: true };
+  });
+
+/** Atualiza metadados de uma "descrição" (empresa, conta, centro de custo, pedido)
+ *  aplicando para todas as linhas com mesma categoria+descricao+ano. */
+export const updateDescricaoMeta = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) =>
+    z.object({
+      categoria: z.enum(CATEGORIAS_DESPESAS),
+      descricao: z.string().min(1).max(200),
+      ano: z.number().int().min(2000).max(2100),
+      empresa_codigo: z.string().max(20).nullable().optional(),
+      empresa_nome: z.string().max(120).nullable().optional(),
+      conta: z.string().max(120).nullable().optional(),
+      centro_custo: z.string().max(120).nullable().optional(),
+      numero_pedido: z.string().max(60).nullable().optional(),
+      nova_descricao: z.string().min(1).max(200).optional(),
+    }).parse(d),
+  )
+  .handler(async ({ context, data }) => {
+    const patch: Record<string, any> = {
+      empresa_codigo: data.empresa_codigo ?? null,
+      empresa_nome: data.empresa_nome ?? null,
+      conta: data.conta ?? null,
+      centro_custo: data.centro_custo ?? null,
+    };
+    if (data.numero_pedido !== undefined) patch.numero_pedido = data.numero_pedido ?? null;
+    if (data.nova_descricao && data.nova_descricao !== data.descricao) {
+      patch.descricao = data.nova_descricao;
+    }
+
+    const { error } = await (context.supabase as any)
+      .from("despesas_fixas")
+      .update(patch)
+      .eq("categoria", data.categoria)
+      .eq("descricao", data.descricao)
+      .eq("ano", data.ano);
+
     if (error) throw error;
     return { ok: true };
   });
