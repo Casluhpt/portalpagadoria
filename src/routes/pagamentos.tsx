@@ -132,6 +132,15 @@ function LancamentosTab({ colaboradorNome, userId }: { colaboradorNome: string; 
   const [sortKey, setSortKey] = useState<keyof Pagamento>("registrado_em");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
   const [pendingDelete, setPendingDelete] = useState<Pagamento | null>(null);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [highlights, setHighlights] = useState<Record<string, string>>(() => {
+    if (typeof window === "undefined") return {};
+    try { return JSON.parse(localStorage.getItem("pagamentos:highlights") || "{}"); } catch { return {}; }
+  });
+  useEffect(() => {
+    try { localStorage.setItem("pagamentos:highlights", JSON.stringify(highlights)); } catch { /* noop */ }
+  }, [highlights]);
+  const [bulkPendingDelete, setBulkPendingDelete] = useState(false);
 
   const invalidate = () => qc.invalidateQueries({ queryKey: pagamentosQueryKey });
 
@@ -155,6 +164,19 @@ function LancamentosTab({ colaboradorNome, userId }: { colaboradorNome: string; 
   const deleteMut = useMutation({
     mutationFn: (id: string) => deletePagamento(id),
     onSuccess: () => { invalidate(); toast.success("Registro excluído"); },
+    onError: (e: Error) => toast.error("Falha ao excluir: " + e.message),
+  });
+
+  const bulkDeleteMut = useMutation({
+    mutationFn: async (ids: string[]) => {
+      await Promise.all(ids.map((id) => deletePagamento(id)));
+      return ids.length;
+    },
+    onSuccess: (n) => {
+      invalidate();
+      setSelected(new Set());
+      toast.success(`${n} registro(s) excluído(s)`);
+    },
     onError: (e: Error) => toast.error("Falha ao excluir: " + e.message),
   });
 
