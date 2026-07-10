@@ -728,7 +728,7 @@ function LancamentosTab({ colaboradorNome, userId }: { colaboradorNome: string; 
   );
 }
 
-function EditableCell({
+const EditableCell = React.memo(function EditableCell({
   row, col, onSave,
 }: {
   row: Pagamento;
@@ -746,20 +746,22 @@ function EditableCell({
   })();
 
   const [editing, setEditing] = useState(false);
-  const initial = raw == null ? "" : String(raw);
-  const [value, setValue] = useState(initial);
+  const [value, setValue] = useState("");
 
-  const syncedStr = raw == null ? "" : String(raw);
-  if (!editing && value !== syncedStr) setValue(syncedStr);
+  const startEdit = () => {
+    setValue(raw == null ? "" : String(raw));
+    setEditing(true);
+  };
 
   const commit = () => {
     setEditing(false);
+    const syncedStr = raw == null ? "" : String(raw);
     if (value === syncedStr) return;
     let parsed: string | number | null;
     if (value === "") parsed = null;
     else if (col.kind === "number" || col.kind === "currency") {
       const n = Number(value.replace(/[R$\s.]/g, "").replace(",", "."));
-      if (Number.isNaN(n)) { setValue(syncedStr); return; }
+      if (Number.isNaN(n)) return;
       parsed = n;
     } else {
       parsed = value;
@@ -817,14 +819,14 @@ function EditableCell({
           onBlur={commit}
           onKeyDown={(e) => {
             if (e.key === "Enter") (e.target as HTMLInputElement).blur();
-            if (e.key === "Escape") { setValue(syncedStr); setEditing(false); }
+            if (e.key === "Escape") { setEditing(false); }
           }}
           className="w-full bg-background px-2 py-1.5 text-xs outline-none ring-2 ring-primary/60"
         />
       ) : (
         <button
           type="button"
-          onClick={() => setEditing(true)}
+          onClick={startEdit}
           className="block w-full truncate px-2 py-1.5 text-left text-xs hover:bg-muted/40"
           title={display || "—"}
         >
@@ -833,7 +835,18 @@ function EditableCell({
       )}
     </td>
   );
-}
+}, (prev, next) => {
+  // Só re-renderiza se o valor da célula ou a coluna mudar.
+  // Ignora mudanças em outras colunas da linha (que antes forçavam re-render
+  // de todas as ~19 células × N linhas a cada keystroke / refetch).
+  return (
+    prev.col === next.col &&
+    prev.onSave === next.onSave &&
+    prev.row[prev.col.key] === next.row[next.col.key] &&
+    (prev.col.key === "descricao_pagamento" ? prev.row.celula === next.row.celula : true)
+  );
+});
+
 
 /* ---------------- DASHBOARD ---------------- */
 
