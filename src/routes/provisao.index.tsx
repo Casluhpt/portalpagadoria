@@ -1,12 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { Building2, Calendar, Landmark, ListChecks, Wallet } from "lucide-react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Building2, Calendar, Landmark, ListChecks, Send, Wallet } from "lucide-react";
+import { toast } from "sonner";
 
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { fetchAllProvisao, provisaoQueryKey } from "@/lib/provisao";
+import { comunicadosQueryKey, publicarComunicado } from "@/lib/comunicados";
+import { useSession } from "@/hooks/use-session";
 import profarmaLogo from "@/assets/profarma-logo.png.asset.json";
 
 export const Route = createFileRoute("/provisao/")({
@@ -27,11 +31,29 @@ const fmtBR = (iso: string) =>
 function ProvisaoDashboard() {
   const [dateFrom, setDateFrom] = useState<string>(firstOfMonth());
   const [dateTo, setDateTo] = useState<string>(today());
+  const { user } = useSession();
+  const qc = useQueryClient();
 
   const { data, isLoading } = useQuery({
     queryKey: provisaoQueryKey,
     queryFn: fetchAllProvisao,
     staleTime: 30_000,
+  });
+
+  const notificar = useMutation({
+    mutationFn: () => {
+      if (!user) throw new Error("Usuário não autenticado");
+      return publicarComunicado(
+        "Provisão Diária",
+        "A Provisão Diaria foi enviada com sucesso.",
+        user.id,
+      );
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: comunicadosQueryKey });
+      toast.success("Notificação enviada a todos os colaboradores.");
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Falha ao notificar"),
   });
 
   const filtered = useMemo(
@@ -141,6 +163,14 @@ function ProvisaoDashboard() {
             <span className="rounded bg-emerald-50 px-2 py-1 text-sm font-semibold text-emerald-900">
               {rangeLabel}
             </span>
+            <Button
+              onClick={() => notificar.mutate()}
+              disabled={notificar.isPending || !user}
+              className="ml-2 h-9 gap-1.5 bg-white font-semibold text-emerald-800 hover:bg-emerald-50"
+            >
+              <Send className="h-4 w-4" />
+              {notificar.isPending ? "Enviando…" : "Notificar Envio"}
+            </Button>
           </div>
 
         </CardHeader>
