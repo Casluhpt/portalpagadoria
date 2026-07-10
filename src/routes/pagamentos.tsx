@@ -740,11 +740,12 @@ function LancamentosTab({ colaboradorNome, userId }: { colaboradorNome: string; 
 }
 
 const EditableCell = React.memo(function EditableCell({
-  row, col, onSave,
+  rowId, row, col, onSave,
 }: {
+  rowId: string;
   row: Pagamento;
   col: typeof PAGAMENTO_CAMPOS[number];
-  onSave: (patch: PagamentoInput) => void;
+  onSave: (id: string, patch: PagamentoInput) => void;
 }) {
   const raw = row[col.key];
   const editable = col.editable !== false && !col.computed;
