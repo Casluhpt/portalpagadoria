@@ -110,12 +110,12 @@ export function NotificationBell() {
           variant="ghost"
           size="icon"
           className="relative"
-          aria-label={`Notificações${naoLidos.length ? ` (${naoLidos.length} não lidas)` : ""}`}
+          aria-label={`Notificações${totalBadge ? ` (${totalBadge} não lidas)` : ""}`}
         >
           <Bell className="h-5 w-5 text-slate-600" />
-          {naoLidos.length > 0 && (
+          {totalBadge > 0 && (
             <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-semibold text-white ring-2 ring-white">
-              {naoLidos.length > 9 ? "9+" : naoLidos.length}
+              {totalBadge > 9 ? "9+" : totalBadge}
             </span>
           )}
         </Button>
