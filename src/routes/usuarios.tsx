@@ -188,19 +188,46 @@ function UsuariosTable() {
                 <td className="border-b border-border px-3 py-2">{u.nome ?? "—"}</td>
                 <td className="border-b border-border px-3 py-2 font-mono text-xs">{u.email ?? "—"}</td>
                 <td className="border-b border-border px-3 py-2">
-                  <div className="flex flex-wrap gap-1">
-                    {u.roles.length === 0 ? (
-                      <Badge variant="outline" className="gap-1">
-                        <Eye className="h-3 w-3" /> Sem perfil
-                      </Badge>
-                    ) : (
-                      u.roles.map((r) => (
-                        <Badge key={r} variant={roleVariant(r)} className="gap-1">
-                          {r === "administrador" && <ShieldCheck className="h-3 w-3" />}
-                          {roleLabel(r)}
-                        </Badge>
-                      ))
-                    )}
+                  <div className="flex flex-wrap items-center gap-2">
+                    {(() => {
+                      const current: "administrador" | "viewer" =
+                        u.roles.includes("administrador") ? "administrador" : "viewer";
+                      const isSelf = user?.id === u.id;
+                      const otherRoles = u.roles.filter((r) => r !== "administrador" && r !== "viewer");
+                      return (
+                        <>
+                          <Select
+                            value={current}
+                            disabled={roleMut.isPending || isSelf}
+                            onValueChange={(v) =>
+                              roleMut.mutate({ userId: u.id, role: v as "administrador" | "viewer" })
+                            }
+                          >
+                            <SelectTrigger className="h-8 w-[160px] text-xs">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="administrador">
+                                <span className="inline-flex items-center gap-1">
+                                  <ShieldCheck className="h-3 w-3" /> Administrador
+                                </span>
+                              </SelectItem>
+                              <SelectItem value="viewer">
+                                <span className="inline-flex items-center gap-1">
+                                  <Eye className="h-3 w-3" /> Viewer
+                                </span>
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                          {otherRoles.map((r) => (
+                            <Badge key={r} variant={roleVariant(r)}>{roleLabel(r)}</Badge>
+                          ))}
+                          {isSelf && (
+                            <span className="text-[10px] text-muted-foreground">(você)</span>
+                          )}
+                        </>
+                      );
+                    })()}
                   </div>
                 </td>
                 <td className="whitespace-nowrap border-b border-border px-3 py-2 text-xs text-muted-foreground">
