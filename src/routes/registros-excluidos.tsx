@@ -63,7 +63,17 @@ function Content() {
 function empresaOf(r: RegistroExcluido): string {
   const s = r.snapshot ?? {};
   const raw = (s.empresa ?? s.supplier ?? s.issuer ?? "SEM EMPRESA") as string;
-  return String(raw).trim() || "SEM EMPRESA";
+  const nome = String(raw).trim().toUpperCase() || "SEM EMPRESA";
+  if (/\bTAMOIO\b/.test(nome)) return "TAMOIO";
+  return nome;
+}
+
+function subEmpresaOf(r: RegistroExcluido): string {
+  const s = r.snapshot ?? {};
+  const raw = String((s.empresa ?? s.supplier ?? s.issuer ?? "") as string).trim();
+  if (!raw) return "tamoio";
+  const m = raw.match(/(\d+)/);
+  return m ? `tamoio ${m[1]}` : raw.toLowerCase();
 }
 
 function Board() {
