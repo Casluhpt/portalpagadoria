@@ -30,6 +30,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useRoles } from "@/hooks/use-roles";
 import { useSession } from "@/hooks/use-session";
+import { useProfile } from "@/hooks/use-profile";
 import { usePresence, type PresenceStatus } from "@/hooks/use-presence";
 
 import { NotificationBell } from "./notification-bell";
