@@ -175,15 +175,20 @@ function UsuariosTable() {
             {rows.map((u: AdminUserRow) => (
               <tr key={u.id} className="hover:bg-muted/40">
                 <td className="whitespace-nowrap border-b border-border px-3 py-2">
-                  <span className="inline-flex items-center gap-2">
-                    <span
-                      className={`h-2.5 w-2.5 rounded-full ${u.online ? "bg-emerald-500" : "bg-muted-foreground/40"}`}
-                      aria-hidden
-                    />
-                    <span className="text-xs text-muted-foreground">
-                      {u.online ? "Online" : "Offline"}
-                    </span>
-                  </span>
+                  {(() => {
+                    const map = {
+                      online: { label: "Online", color: "bg-emerald-500" },
+                      ausente: { label: "Ausente", color: "bg-amber-500" },
+                      offline: { label: "Offline", color: "bg-muted-foreground/40" },
+                    } as const;
+                    const m = map[u.presence];
+                    return (
+                      <span className="inline-flex items-center gap-2">
+                        <span className={`h-2.5 w-2.5 rounded-full ${m.color}`} aria-hidden />
+                        <span className="text-xs text-muted-foreground">{m.label}</span>
+                      </span>
+                    );
+                  })()}
                 </td>
                 <td className="border-b border-border px-3 py-2">{u.nome ?? "—"}</td>
                 <td className="border-b border-border px-3 py-2 font-mono text-xs">{u.email ?? "—"}</td>
