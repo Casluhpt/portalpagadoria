@@ -63,6 +63,8 @@ type LinhaAgrupada = {
     conta: string | null;
     centro_custo: string | null;
     numero_pedido: string | null;
+    nome_real: string | null;
+    notas: string | null;
   };
 };
 
@@ -119,16 +121,18 @@ function DespesasFixasPage() {
             conta: r.conta,
             centro_custo: r.centro_custo,
             numero_pedido: r.numero_pedido,
+            nome_real: (r as any).nome_real ?? null,
+            notas: (r as any).notas ?? null,
           },
         };
         map.set(key, l);
       }
-      l.registros[r.mes - 1] = r;
+      l!.registros[r.mes - 1] = r;
       const v = Number(r.valor) || 0;
-      l.totalPrevisto += v;
-      if (r.lancado) l.totalLancado += v;
+      l!.totalPrevisto += v;
+      if (r.lancado) l!.totalLancado += v;
       // meta: prefer non-null
-      (["empresa_codigo","empresa_nome","conta","centro_custo","numero_pedido"] as const).forEach((k) => {
+      (["empresa_codigo","empresa_nome","conta","centro_custo","numero_pedido","nome_real","notas"] as const).forEach((k) => {
         if (!l!.meta[k] && (r as any)[k]) l!.meta[k] = (r as any)[k];
       });
     });
@@ -151,15 +155,37 @@ function DespesasFixasPage() {
 
   const totaisGrupo = (g: GrupoDespesa) => {
     const arr = linhasPorGrupo(g);
-    const previsto = arr.reduce((a, l) => a + l.totalPrevisto, 0);
-    const lancado = arr.reduce((a, l) => a + l.totalLancado, 0);
-    return { previsto, lancado, pendente: previsto - lancado, quantidade: arr.length };
+    let previsto = 0, lancado = 0;
+    let previstoMensal = 0, lancadoMensal = 0;
+    let previstoAdto = 0, lancadoAdto = 0;
+    arr.forEach((l) =>
+      l.registros.forEach((r) => {
+        if (!r) return;
+        const v = Number(r.valor) || 0;
+        const isAdto = r.tipo === "adiantamento";
+        previsto += v;
+        if (isAdto) previstoAdto += v; else previstoMensal += v;
+        if (r.lancado) {
+          lancado += v;
+          if (isAdto) lancadoAdto += v; else lancadoMensal += v;
+        }
+      }),
+    );
+    return {
+      previsto, lancado, pendente: previsto - lancado, quantidade: arr.length,
+      previstoMensal, lancadoMensal, previstoAdto, lancadoAdto,
+    };
   };
 
   const dashboard = useMemo(() => {
     const grupos = GRUPOS_DESPESAS.map((g) => ({ grupo: g, ...totaisGrupo(g) }));
     const previsto = grupos.reduce((a, g) => a + g.previsto, 0);
     const lancado = grupos.reduce((a, g) => a + g.lancado, 0);
+    const previstoMensal = grupos.reduce((a, g) => a + g.previstoMensal, 0);
+    const previstoAdto = grupos.reduce((a, g) => a + g.previstoAdto, 0);
+    const lancadoMensal = grupos.reduce((a, g) => a + g.lancadoMensal, 0);
+    const lancadoAdto = grupos.reduce((a, g) => a + g.lancadoAdto, 0);
+    const totalPessoas = linhasFiltradas.length;
     const porMes = Array.from({ length: 12 }, () => ({ previsto: 0, lancado: 0 }));
     linhasFiltradas.forEach((l) =>
       l.registros.forEach((r, i) => {
@@ -169,7 +195,10 @@ function DespesasFixasPage() {
         if (r.lancado) porMes[i].lancado += v;
       }),
     );
-    return { grupos, previsto, lancado, pendente: previsto - lancado, porMes };
+    return {
+      grupos, previsto, lancado, pendente: previsto - lancado, porMes,
+      previstoMensal, previstoAdto, lancadoMensal, lancadoAdto, totalPessoas,
+    };
   }, [linhasFiltradas]);
 
   const criarNovaLinha = async () => {
@@ -268,10 +297,26 @@ function DespesasFixasPage() {
               ) : (
                 <>
                   <TabsContent value="dashboard" className="space-y-4">
-                    <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+                    <div className="grid grid-cols-1 gap-3 md:grid-cols-4">
+                      <StatCard title={`# Pessoas / Itens`} value={dashboard.totalPessoas} icon={<Building2 className="h-4 w-4" />} tone="slate" isCount />
                       <StatCard title="Saldo total previsto" value={dashboard.previsto} icon={<TrendingUp className="h-4 w-4" />} tone="slate" />
                       <StatCard title="Total lançado" value={dashboard.lancado} icon={<CheckCircle2 className="h-4 w-4" />} tone="emerald" />
                       <StatCard title="Pendente de lançar" value={dashboard.pendente} icon={<Clock className="h-4 w-4" />} tone="amber" />
+                    </div>
+
+                    <div className="grid gap-3 md:grid-cols-2">
+                      <div className="rounded-lg border border-slate-200 bg-white p-4">
+                        <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">Valor mensal</div>
+                        <div className="mt-1 text-2xl font-bold tabular-nums text-slate-800">{brl(dashboard.previstoMensal)}</div>
+                        <div className="mt-1 text-xs text-emerald-700">Lançado: <span className="font-semibold">{brl(dashboard.lancadoMensal)}</span></div>
+                      </div>
+                      {dashboard.previstoAdto > 0 && (
+                        <div className="rounded-lg border border-indigo-200 bg-indigo-50 p-4">
+                          <div className="text-xs font-semibold uppercase tracking-wide text-indigo-700">Adiantamento (adto)</div>
+                          <div className="mt-1 text-2xl font-bold tabular-nums text-indigo-900">{brl(dashboard.previstoAdto)}</div>
+                          <div className="mt-1 text-xs text-emerald-700">Lançado: <span className="font-semibold">{brl(dashboard.lancadoAdto)}</span></div>
+                        </div>
+                      )}
                     </div>
 
                     <div className="grid gap-3 md:grid-cols-3">
@@ -279,10 +324,18 @@ function DespesasFixasPage() {
                         <div key={g.grupo} className={`rounded-lg border p-4 ${chipGrupo[g.grupo]}`}>
                           <div className="flex items-center justify-between">
                             <div className="text-xs font-semibold uppercase tracking-wide opacity-80">{g.grupo}</div>
-                            <Badge variant="outline" className="bg-white/60">{g.quantidade} itens</Badge>
+                            <Badge variant="outline" className="bg-white/60">#{g.quantidade}</Badge>
                           </div>
                           <div className="mt-2 text-2xl font-bold">{brl(g.previsto)}</div>
                           <div className="mt-2 space-y-1 text-xs">
+                            <div className="flex items-center justify-between">
+                              <span>Mensal</span><span className="font-semibold">{brl(g.previstoMensal)}</span>
+                            </div>
+                            {g.previstoAdto > 0 && (
+                              <div className="flex items-center justify-between">
+                                <span>Adto</span><span className="font-semibold">{brl(g.previstoAdto)}</span>
+                              </div>
+                            )}
                             <div className="flex items-center justify-between">
                               <span>Lançado</span><span className="font-semibold">{brl(g.lancado)}</span>
                             </div>
@@ -294,6 +347,7 @@ function DespesasFixasPage() {
                         </div>
                       ))}
                     </div>
+
 
                     <div className="rounded-lg border border-border bg-card p-4">
                       <div className="mb-2 text-sm font-semibold text-slate-700">Evolução mensal</div>
@@ -401,7 +455,7 @@ function DespesasFixasPage() {
   );
 }
 
-function StatCard({ title, value, icon, tone }: { title: string; value: number; icon: React.ReactNode; tone: "slate" | "emerald" | "amber" }) {
+function StatCard({ title, value, icon, tone, isCount }: { title: string; value: number; icon: React.ReactNode; tone: "slate" | "emerald" | "amber"; isCount?: boolean }) {
   const toneMap = {
     slate: "bg-white border-slate-200 text-slate-800",
     emerald: "bg-emerald-50 border-emerald-200 text-emerald-800",
@@ -412,7 +466,7 @@ function StatCard({ title, value, icon, tone }: { title: string; value: number; 
       <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide opacity-80">
         {icon} {title}
       </div>
-      <div className="mt-2 text-2xl font-bold tabular-nums">{brl(value)}</div>
+      <div className="mt-2 text-2xl font-bold tabular-nums">{isCount ? `#${value}` : brl(value)}</div>
     </div>
   );
 }
@@ -457,6 +511,14 @@ function GrupoTabela({
                 >
                   <span className="font-medium text-slate-800 underline-offset-2 group-hover:underline">
                     {l.descricao}
+                    {l.meta.nome_real && l.meta.nome_real !== l.descricao ? (
+                      <span className="ml-1 text-xs font-normal text-slate-500">— {l.meta.nome_real}</span>
+                    ) : null}
+                    {l.meta.numero_pedido ? (
+                      <span className="ml-2 rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-semibold text-slate-600">
+                        Pedido {l.meta.numero_pedido}
+                      </span>
+                    ) : null}
                   </span>
                   <span className="mt-0.5 flex items-center gap-1 text-[11px] text-muted-foreground">
                     <Building2 className="h-3 w-3" />
@@ -623,10 +685,12 @@ function DescricaoDialog({
   onSave: (payload: any) => Promise<void>;
 }) {
   const [descricao, setDescricao] = useState(linha.descricao);
+  const [nomeReal, setNomeReal] = useState(linha.meta.nome_real ?? "");
   const [empresaCodigo, setEmpresaCodigo] = useState(linha.meta.empresa_codigo ?? "");
   const [conta, setConta] = useState(linha.meta.conta ?? "");
   const [centroCusto, setCentroCusto] = useState(linha.meta.centro_custo ?? "");
   const [numeroPedido, setNumeroPedido] = useState(linha.meta.numero_pedido ?? "");
+  const [notas, setNotas] = useState(linha.meta.notas ?? "");
   const [saving, setSaving] = useState(false);
 
   const submit = async () => {
@@ -641,6 +705,8 @@ function DescricaoDialog({
         conta: conta || null,
         centro_custo: centroCusto || null,
         numero_pedido: numeroPedido || null,
+        nome_real: nomeReal || null,
+        notas: notas || null,
       });
     } finally { setSaving(false); }
   };
@@ -649,17 +715,29 @@ function DescricaoDialog({
     <Dialog open onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-w-lg">
         <DialogHeader>
-          <DialogTitle>Informações da linha</DialogTitle>
+          <DialogTitle>Descrição de despesa</DialogTitle>
           <DialogDescription>
             Categoria <strong>{linha.categoria}</strong> · valores aplicados a todos os meses de {ano}.
           </DialogDescription>
         </DialogHeader>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-3 gap-3">
           <div className="col-span-2">
-            <Label>Descrição</Label>
+            <Label>Descrição / Nomenclatura</Label>
             <Input value={descricao} onChange={(e) => setDescricao(e.target.value)} />
           </div>
-          <div className="col-span-2">
+          <div>
+            <Label>Nº do pedido</Label>
+            <Input value={numeroPedido} onChange={(e) => setNumeroPedido(e.target.value)}
+              placeholder="ex.: 78910" />
+          </div>
+          {linha.categoria === "PJ" && (
+            <div className="col-span-3">
+              <Label>Nome real do PJ</Label>
+              <Input value={nomeReal} onChange={(e) => setNomeReal(e.target.value)}
+                placeholder="ex.: João da Silva Consultoria LTDA" />
+            </div>
+          )}
+          <div className="col-span-3">
             <Label>Empresa</Label>
             <Select value={empresaCodigo || "__none__"} onValueChange={(v) => setEmpresaCodigo(v === "__none__" ? "" : v)}>
               <SelectTrigger><SelectValue placeholder="Selecione…" /></SelectTrigger>
@@ -675,14 +753,19 @@ function DescricaoDialog({
             <Label>Conta</Label>
             <Input value={conta} onChange={(e) => setConta(e.target.value)} placeholder="ex.: 4.01.001" />
           </div>
-          <div>
+          <div className="col-span-2">
             <Label>Centro de custo</Label>
             <Input value={centroCusto} onChange={(e) => setCentroCusto(e.target.value)} placeholder="ex.: ADM" />
           </div>
-          <div className="col-span-2">
-            <Label>Pedido padrão</Label>
-            <Input value={numeroPedido} onChange={(e) => setNumeroPedido(e.target.value)}
-              placeholder="ex.: 78910 (usado como sugestão nos lançamentos)" />
+          <div className="col-span-3">
+            <Label>Bloco de notas</Label>
+            <textarea
+              value={notas}
+              onChange={(e) => setNotas(e.target.value)}
+              rows={4}
+              placeholder="Anotações livres sobre este PJ / fornecedor / lançamento…"
+              className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            />
           </div>
         </div>
         <DialogFooter>
@@ -696,3 +779,4 @@ function DescricaoDialog({
     </Dialog>
   );
 }
+
