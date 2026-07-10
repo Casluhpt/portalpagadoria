@@ -132,6 +132,18 @@ function UsuariosTable() {
     onError: (e: any) => toast.error(e?.message ?? "Falha ao atualizar perfil"),
   });
 
+  const inviteMut = useMutation({
+    mutationFn: (vars: { email: string; role: "administrador" | "viewer"; nome?: string }) =>
+      inviteFn({ data: { ...vars, redirectTo: `${window.location.origin}/reset-password` } }),
+    onSuccess: () => {
+      toast.success("Convite enviado com sucesso.");
+      qc.invalidateQueries({ queryKey: ["admin-users"] });
+      setInviteOpen(false);
+      setInviteEmail(""); setInviteNome(""); setInviteRole("viewer");
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Falha ao enviar convite"),
+  });
+
   const rows = useMemo(() => {
     const q = search.trim().toLowerCase();
     if (!q) return data;
@@ -161,11 +173,69 @@ function UsuariosTable() {
               className="h-9 w-72 pl-8"
             />
           </div>
+          <Button size="sm" onClick={() => setInviteOpen(true)}>
+            <UserPlus className="mr-1 h-4 w-4" /> Convidar usuário
+          </Button>
           <Button variant="outline" size="sm" onClick={() => refetch()} disabled={isFetching}>
             {isFetching ? <Loader2 className="h-4 w-4 animate-spin" /> : "Atualizar"}
           </Button>
         </div>
       </div>
+
+      <Dialog open={inviteOpen} onOpenChange={setInviteOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Convidar novo usuário</DialogTitle>
+            <DialogDescription>
+              Um email de convite será enviado com um link seguro para o novo usuário definir a senha.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div className="space-y-1">
+              <Label htmlFor="invite-email">Email</Label>
+              <Input
+                id="invite-email" type="email" autoComplete="email"
+                value={inviteEmail} onChange={(e) => setInviteEmail(e.target.value)}
+                placeholder="usuario@empresa.com"
+              />
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="invite-nome">Nome (opcional)</Label>
+              <Input
+                id="invite-nome" value={inviteNome}
+                onChange={(e) => setInviteNome(e.target.value)}
+                placeholder="Nome do usuário"
+              />
+            </div>
+            <div className="space-y-1">
+              <Label>Perfil</Label>
+              <Select value={inviteRole} onValueChange={(v) => setInviteRole(v as "administrador" | "viewer")}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="viewer">
+                    <span className="inline-flex items-center gap-1"><Eye className="h-3 w-3" /> Viewer</span>
+                  </SelectItem>
+                  <SelectItem value="administrador">
+                    <span className="inline-flex items-center gap-1"><ShieldCheck className="h-3 w-3" /> Administrador</span>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setInviteOpen(false)} disabled={inviteMut.isPending}>
+              Cancelar
+            </Button>
+            <Button
+              onClick={() => inviteMut.mutate({ email: inviteEmail, role: inviteRole, nome: inviteNome })}
+              disabled={inviteMut.isPending || !inviteEmail}
+            >
+              {inviteMut.isPending ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : <UserPlus className="mr-1 h-4 w-4" />}
+              Enviar convite
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <div className="relative flex-1 overflow-auto rounded-lg border border-border bg-card">
         <table className="min-w-full border-collapse text-sm">
