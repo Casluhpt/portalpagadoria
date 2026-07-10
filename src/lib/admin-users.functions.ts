@@ -1,12 +1,16 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
+export type PresenceStatus = "online" | "ausente" | "offline";
+
 export type AdminUserRow = {
   id: string;
   email: string | null;
   nome: string | null;
   created_at: string;
   last_sign_in_at: string | null;
+  last_seen_at: string | null;
+  presence: PresenceStatus;
   roles: string[];
   online: boolean;
 };
