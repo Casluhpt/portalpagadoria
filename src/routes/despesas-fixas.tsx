@@ -455,7 +455,7 @@ function DespesasFixasPage() {
   );
 }
 
-function StatCard({ title, value, icon, tone }: { title: string; value: number; icon: React.ReactNode; tone: "slate" | "emerald" | "amber" }) {
+function StatCard({ title, value, icon, tone, isCount }: { title: string; value: number; icon: React.ReactNode; tone: "slate" | "emerald" | "amber"; isCount?: boolean }) {
   const toneMap = {
     slate: "bg-white border-slate-200 text-slate-800",
     emerald: "bg-emerald-50 border-emerald-200 text-emerald-800",
@@ -466,7 +466,7 @@ function StatCard({ title, value, icon, tone }: { title: string; value: number; 
       <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide opacity-80">
         {icon} {title}
       </div>
-      <div className="mt-2 text-2xl font-bold tabular-nums">{brl(value)}</div>
+      <div className="mt-2 text-2xl font-bold tabular-nums">{isCount ? `#${value}` : brl(value)}</div>
     </div>
   );
 }
