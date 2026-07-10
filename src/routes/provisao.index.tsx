@@ -163,15 +163,8 @@ function ProvisaoDashboard() {
             <span className="rounded bg-emerald-50 px-2 py-1 text-sm font-semibold text-emerald-900">
               {rangeLabel}
             </span>
-            <Button
-              onClick={() => notificar.mutate()}
-              disabled={notificar.isPending || !user}
-              className="ml-2 h-9 gap-1.5 bg-white font-semibold text-emerald-800 hover:bg-emerald-50"
-            >
-              <Send className="h-4 w-4" />
-              {notificar.isPending ? "Enviando…" : "Notificar Envio"}
-            </Button>
           </div>
+
 
         </CardHeader>
         <CardContent className="p-0">
