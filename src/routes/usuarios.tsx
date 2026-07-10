@@ -275,6 +275,7 @@ function UsuariosTable() {
               <th className="border-b border-border px-3 py-2 text-left font-semibold">Nome</th>
               <th className="border-b border-border px-3 py-2 text-left font-semibold">Email</th>
               <th className="border-b border-border px-3 py-2 text-left font-semibold">Perfis</th>
+              <th className="border-b border-border px-3 py-2 text-left font-semibold">Setor</th>
               <th className="border-b border-border px-3 py-2 text-left font-semibold">Criado em</th>
               <th className="border-b border-border px-3 py-2 text-left font-semibold">Último acesso</th>
               <th className="border-b border-border px-3 py-2 text-right font-semibold">Ações</th>
