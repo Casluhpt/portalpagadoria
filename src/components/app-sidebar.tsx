@@ -34,6 +34,7 @@ import {
   Cog,
   Users,
   Lock,
+  Clock,
 } from "lucide-react";
 import { toast } from "sonner";
 import type { ComponentType } from "react";
@@ -183,6 +184,7 @@ export function AppSidebar() {
           <SidebarGroupContent>
             {user ? (
               <div className="space-y-2 px-2 pb-2 group-data-[collapsible=icon]:hidden">
+                <LiveClock />
                 <div className="rounded-md bg-sidebar-accent/40 px-2 py-1.5 text-xs text-sidebar-foreground">
                   <div className="flex items-center gap-2">
                     <User className="h-3.5 w-3.5" />
@@ -227,5 +229,21 @@ export function AppSidebar() {
         </AlertDialogContent>
       </AlertDialog>
     </Sidebar>
+  );
+}
+
+function LiveClock() {
+  const [now, setNow] = useState<Date>(() => new Date());
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(id);
+  }, []);
+  const data = now.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" });
+  const hora = now.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+  return (
+    <div className="flex items-center gap-2 rounded-md bg-sidebar-accent/40 px-2 py-1.5 text-xs text-sidebar-foreground">
+      <Clock className="h-3.5 w-3.5 shrink-0" />
+      <span className="tabular-nums">{data} · {hora}</span>
+    </div>
   );
 }
