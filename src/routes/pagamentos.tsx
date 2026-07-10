@@ -644,9 +644,10 @@ function LancamentosTab({ colaboradorNome, userId }: { colaboradorNome: string; 
                       {VISIBLE_CAMPOS.map((c) => (
                         <EditableCell
                           key={c.key}
+                          rowId={r.id}
                           row={r}
                           col={c}
-                          onSave={(patch) => updateMut.mutate({ id: r.id, patch })}
+                          onSave={stableCellSave}
                         />
                       ))}
                     </tr>
