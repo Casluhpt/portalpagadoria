@@ -1,5 +1,15 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import {
   LayoutDashboard,
   Database,
@@ -111,7 +121,9 @@ export function AppSidebar() {
     return true;
   };
 
+  const [confirmSignOut, setConfirmSignOut] = useState(false);
   const handleSignOut = async () => {
+    setConfirmSignOut(false);
     const { error } = await supabase.auth.signOut();
     if (error) toast.error(error.message);
     else toast.success("Sessão encerrada");
@@ -184,7 +196,7 @@ export function AppSidebar() {
                       : "Sem perfil atribuído"}
                   </div>
                 </div>
-                <Button variant="outline" size="sm" className="w-full" onClick={handleSignOut}>
+                <Button variant="outline" size="sm" className="w-full" onClick={() => setConfirmSignOut(true)}>
                   <LogOut className="mr-2 h-4 w-4" /> Sair
                 </Button>
               </div>
@@ -200,6 +212,20 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      <AlertDialog open={confirmSignOut} onOpenChange={setConfirmSignOut}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Encerrar sessão?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Você será desconectado e precisará entrar novamente para acessar o portal.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={handleSignOut}>Sair</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Sidebar>
   );
 }

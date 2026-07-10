@@ -1,6 +1,17 @@
 import { Link, useNavigate } from "@tanstack/react-router";
+import { useState } from "react";
 import { Circle, Cog, History, KeyRound, LogIn, LogOut, MinusCircle, Settings, User, Users, XCircle } from "lucide-react";
 import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -44,7 +55,9 @@ export function HeaderActions() {
   const navigate = useNavigate();
   const primary = roles[0];
 
+  const [confirmSignOut, setConfirmSignOut] = useState(false);
   const signOut = async () => {
+    setConfirmSignOut(false);
     const { error } = await supabase.auth.signOut();
     if (error) toast.error(error.message);
     else toast.success("Sessão encerrada");
@@ -164,11 +177,25 @@ export function HeaderActions() {
             </>
           )}
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={signOut}>
+          <DropdownMenuItem onSelect={(e) => { e.preventDefault(); setConfirmSignOut(true); }}>
             <LogOut className="mr-2 h-4 w-4" /> Sair
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
+      <AlertDialog open={confirmSignOut} onOpenChange={setConfirmSignOut}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Encerrar sessão?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Você será desconectado e precisará entrar novamente para acessar o portal.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={signOut}>Sair</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
