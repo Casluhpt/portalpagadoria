@@ -27,6 +27,11 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Label } from "@/components/ui/label";
+import { Calendar } from "@/components/ui/calendar";
+import { CalendarIcon } from "lucide-react";
+import { format, parseISO } from "date-fns";
+import type { DateRange } from "react-day-picker";
+import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
 import { useSession } from "@/hooks/use-session";
@@ -654,13 +659,55 @@ function DashboardTab() {
             <FilterSelect label="Banco" value={fBanco} onChange={setFBanco} options={opts.banco} />
             <FilterSelect label="Folha" value={fFolha} onChange={setFFolha} options={opts.folha} />
             <FilterSelect label="Colaborador" value={fColab} onChange={setFColab} options={opts.colab} />
-            <div>
-              <label className="mb-1 block text-xs text-muted-foreground">Data inicial</label>
-              <Input type="date" value={fDataIni} onChange={(e) => setFDataIni(e.target.value)} className="h-9" />
-            </div>
-            <div>
-              <label className="mb-1 block text-xs text-muted-foreground">Data final</label>
-              <Input type="date" value={fDataFim} onChange={(e) => setFDataFim(e.target.value)} className="h-9" />
+            <div className="md:col-span-2">
+              <label className="mb-1 block text-xs text-muted-foreground">Período</label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "h-9 w-full justify-start gap-2 text-left font-normal",
+                      !fDataIni && !fDataFim && "text-muted-foreground",
+                    )}
+                  >
+                    <CalendarIcon className="h-4 w-4" />
+                    {fDataIni || fDataFim ? (
+                      <span>
+                        {fDataIni ? format(parseISO(fDataIni), "dd.MM.yyyy") : "…"}
+                        {" a "}
+                        {fDataFim ? format(parseISO(fDataFim), "dd.MM.yyyy") : "…"}
+                      </span>
+                    ) : (
+                      <span>Selecione o período</span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent align="start" className="w-auto p-0">
+                  <Calendar
+                    mode="range"
+                    numberOfMonths={2}
+                    selected={{
+                      from: fDataIni ? parseISO(fDataIni) : undefined,
+                      to: fDataFim ? parseISO(fDataFim) : undefined,
+                    }}
+                    onSelect={(range: DateRange | undefined) => {
+                      setFDataIni(range?.from ? format(range.from, "yyyy-MM-dd") : "");
+                      setFDataFim(range?.to ? format(range.to, "yyyy-MM-dd") : "");
+                    }}
+                    initialFocus
+                    className={cn("p-3 pointer-events-auto")}
+                  />
+                  <div className="flex items-center justify-end gap-2 border-t border-border p-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => { setFDataIni(""); setFDataFim(""); }}
+                    >
+                      Limpar
+                    </Button>
+                  </div>
+                </PopoverContent>
+              </Popover>
             </div>
             <div className="flex items-end">
               <Button variant="outline" size="sm" onClick={clearFilters} className="w-full">Limpar filtros</Button>
