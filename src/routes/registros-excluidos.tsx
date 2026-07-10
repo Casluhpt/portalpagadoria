@@ -367,45 +367,63 @@ type SelectionProps = {
 
 
 function PastaEmpresa({
-  nome, registros, onOpen,
-}: { nome: string; registros: RegistroExcluido[]; onOpen: () => void }) {
+  nome, registros, onOpen, selected, toggle, dragProps,
+}: { nome: string; registros: RegistroExcluido[]; onOpen: () => void } & SelectionProps) {
   const qtd = registros.length;
   const ultimo = registros[0]?.created_at;
   const pag = registros.filter((r) => r.origem === "pagamento").length;
   const lanc = registros.filter((r) => r.origem === "lancamento").length;
+  const selCount = registros.filter((r) => selected.has(keyOf(r))).length;
+  const allSel = selCount > 0 && selCount === qtd;
 
   return (
-    <button
-      onClick={onOpen}
-      className="group relative flex flex-col items-start gap-2 rounded-lg border border-border bg-card p-4 text-left transition hover:border-primary/50 hover:shadow-md"
+    <div
+      {...dragProps(registros)}
+      className={`group relative flex cursor-grab flex-col items-start gap-2 rounded-lg border bg-card p-4 text-left shadow-sm transition hover:border-primary/50 hover:shadow-md active:cursor-grabbing ${
+        allSel ? "border-primary ring-2 ring-primary/30" : selCount > 0 ? "border-primary/60" : "border-border"
+      }`}
     >
-      {qtd > 0 && (
-        <span className="absolute -left-1 top-3 z-10 inline-flex items-center gap-1 rounded-r-full bg-destructive px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-destructive-foreground shadow">
-          <AlertCircle className="h-3 w-3" /> {qtd}
-        </span>
-      )}
-      <div className="flex w-full items-center justify-between">
-        <Folder className="h-8 w-8 text-amber-500 transition group-hover:hidden" />
-        <FolderOpen className="hidden h-8 w-8 text-amber-500 transition group-hover:block" />
-        <ChevronRight className="h-4 w-4 text-muted-foreground opacity-0 transition group-hover:opacity-100" />
+      {/* Checkbox à esquerda */}
+      <div className="absolute left-2 top-2 z-10" onClick={(e) => e.stopPropagation()}>
+        <Checkbox
+          checked={allSel ? true : selCount > 0 ? "indeterminate" : false}
+          onCheckedChange={(v) => toggle(registros, !!v)}
+          aria-label={`Selecionar pasta ${nome}`}
+        />
       </div>
-      <div className="w-full min-w-0">
-        <p className="truncate text-sm font-semibold">{nome}</p>
-        <p className="mt-0.5 truncate text-[11px] text-muted-foreground">
-          {ultimo ? `Último: ${format(new Date(ultimo), "dd/MM/yyyy HH:mm", { locale: ptBR })}` : "—"}
-        </p>
+      {/* Alça de arraste + badge à direita */}
+      <div className="absolute right-2 top-2 z-10 flex items-center gap-1">
+        {qtd > 0 && (
+          <span className="inline-flex items-center gap-1 rounded-full bg-destructive px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-destructive-foreground shadow">
+            <AlertCircle className="h-3 w-3" /> {qtd}
+          </span>
+        )}
+        <GripVertical className="h-4 w-4 text-muted-foreground opacity-40 group-hover:opacity-100" />
       </div>
-      <div className="flex flex-wrap gap-1">
-        {pag > 0 && <Badge variant="outline" className="gap-1 text-[10px]"><Receipt className="h-3 w-3" />{pag}</Badge>}
-        {lanc > 0 && <Badge variant="outline" className="gap-1 text-[10px]"><FileText className="h-3 w-3" />{lanc}</Badge>}
-      </div>
-    </button>
+
+      <button onClick={onOpen} className="flex w-full flex-col items-start gap-2 pt-6 text-left">
+        <div className="flex w-full items-center">
+          <Folder className="h-8 w-8 text-amber-500 transition group-hover:hidden" />
+          <FolderOpen className="hidden h-8 w-8 text-amber-500 transition group-hover:block" />
+        </div>
+        <div className="w-full min-w-0">
+          <p className="truncate text-sm font-semibold">{nome}</p>
+          <p className="mt-0.5 truncate text-[11px] text-muted-foreground">
+            {ultimo ? `Último: ${format(new Date(ultimo), "dd/MM/yyyy HH:mm", { locale: ptBR })}` : "—"}
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-1">
+          {pag > 0 && <Badge variant="outline" className="gap-1 text-[10px]"><Receipt className="h-3 w-3" />{pag}</Badge>}
+          {lanc > 0 && <Badge variant="outline" className="gap-1 text-[10px]"><FileText className="h-3 w-3" />{lanc}</Badge>}
+        </div>
+      </button>
+    </div>
   );
 }
 
 function EmpresaAberta({
-  nome, registros, onVoltar,
-}: { nome: string; registros: RegistroExcluido[]; onVoltar: () => void }) {
+  nome, registros, onVoltar, selected, toggle, dragProps,
+}: { nome: string; registros: RegistroExcluido[]; onVoltar: () => void } & SelectionProps) {
   const [subAberta, setSubAberta] = useState<string | null>(null);
 
   const subgrupos = useMemo(() => {
@@ -428,6 +446,9 @@ function EmpresaAberta({
     ? subgrupos.find(([k]) => k === subAberta)
     : null;
 
+  const visibleRegs = subSelecionado?.[1] ?? registros;
+  const allVisSel = visibleRegs.length > 0 && visibleRegs.every((r) => selected.has(keyOf(r)));
+
   return (
     <div className="space-y-3">
       <div className="flex items-center gap-2 text-sm">
@@ -443,40 +464,60 @@ function EmpresaAberta({
               <span className="font-semibold text-foreground">{subSelecionado[0]}</span>
             </>
           )}
-          <span>• {(subSelecionado?.[1] ?? registros).length} registro{(subSelecionado?.[1] ?? registros).length === 1 ? "" : "s"}</span>
+          <span>• {visibleRegs.length} registro{visibleRegs.length === 1 ? "" : "s"}</span>
         </div>
+        <Button variant="outline" size="sm" className="ml-auto" onClick={() => toggle(visibleRegs, !allVisSel)}>
+          {allVisSel ? <CheckSquare className="mr-1 h-3.5 w-3.5" /> : <Square className="mr-1 h-3.5 w-3.5" />}
+          {allVisSel ? "Desmarcar tudo" : "Selecionar tudo"}
+        </Button>
       </div>
 
       {subgrupos && !subSelecionado ? (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6">
-          {subgrupos.map(([k, itens]) => (
-            <button
-              key={k}
-              onClick={() => setSubAberta(k)}
-              className="group flex flex-col items-start gap-2 rounded-lg border border-border bg-card p-3 text-left transition hover:border-amber-400 hover:shadow-md"
-            >
-              <div className="flex w-full items-center justify-between">
-                <Folder className="h-6 w-6 text-amber-500 transition group-hover:hidden" />
-                <FolderOpen className="hidden h-6 w-6 text-amber-500 transition group-hover:block" />
-                <Badge variant="destructive" className="h-5 gap-1 px-1.5 text-[10px]">
+          {subgrupos.map(([k, itens]) => {
+            const selCount = itens.filter((r) => selected.has(keyOf(r))).length;
+            const allSel = selCount > 0 && selCount === itens.length;
+            return (
+              <div
+                key={k}
+                {...dragProps(itens)}
+                className={`group relative flex cursor-grab flex-col items-start gap-2 rounded-lg border bg-card p-3 text-left transition hover:border-amber-400 hover:shadow-md active:cursor-grabbing ${
+                  allSel ? "border-primary ring-2 ring-primary/30" : selCount > 0 ? "border-primary/60" : "border-border"
+                }`}
+              >
+                <div className="absolute left-1.5 top-1.5 z-10" onClick={(e) => e.stopPropagation()}>
+                  <Checkbox
+                    checked={allSel ? true : selCount > 0 ? "indeterminate" : false}
+                    onCheckedChange={(v) => toggle(itens, !!v)}
+                    aria-label={`Selecionar ${k}`}
+                  />
+                </div>
+                <span className="absolute right-1.5 top-1.5 z-10 inline-flex items-center gap-1 rounded-full bg-destructive px-1.5 py-0.5 text-[10px] font-semibold uppercase text-destructive-foreground shadow">
                   <AlertCircle className="h-3 w-3" />{itens.length}
-                </Badge>
+                </span>
+                <button onClick={() => setSubAberta(k)} className="flex w-full flex-col items-start gap-1 pt-5 text-left">
+                  <Folder className="h-6 w-6 text-amber-500 transition group-hover:hidden" />
+                  <FolderOpen className="hidden h-6 w-6 text-amber-500 transition group-hover:block" />
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-semibold capitalize text-foreground">{k}</p>
+                    <p className="text-[10px] text-muted-foreground">{itens.length} arquivo{itens.length === 1 ? "" : "s"}</p>
+                  </div>
+                </button>
               </div>
-              <div className="min-w-0">
-                <p className="truncate text-sm font-semibold capitalize text-foreground">{k}</p>
-                <p className="text-[10px] text-muted-foreground">{itens.length} arquivo{itens.length === 1 ? "" : "s"}</p>
-              </div>
-            </button>
-          ))}
+            );
+          })}
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
-          {(subSelecionado?.[1] ?? registros).map((r) => <RegistroCard key={r.id} row={r} />)}
+          {visibleRegs.map((r) => (
+            <RegistroCard key={r.id} row={r} selected={selected} toggle={toggle} dragProps={dragProps} />
+          ))}
         </div>
       )}
     </div>
   );
 }
+
 
 function fmtCurrency(v: any) {
   const n = typeof v === "number" ? v : parseFloat(v);
