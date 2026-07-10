@@ -352,21 +352,145 @@ function RegistroCard({ row }: { row: RegistroExcluido }) {
           </span>
         </div>
 
-        <Popover>
-          <PopoverTrigger asChild>
-            <button className="mt-1 inline-flex items-center gap-1 text-[11px] text-primary hover:underline">
-              <Trash2 className="h-3 w-3" /> Ver snapshot completo
-            </button>
-          </PopoverTrigger>
-          <PopoverContent side="bottom" align="start" className="w-96 p-0">
-            <ScrollArea className="h-72">
-              <pre className="whitespace-pre-wrap break-all p-3 text-[10px] leading-relaxed">
-                {JSON.stringify(row.snapshot ?? {}, null, 2)}
-              </pre>
-            </ScrollArea>
-          </PopoverContent>
-        </Popover>
+        <SnapshotViewer row={row} />
       </CardContent>
     </Card>
+  );
+}
+
+// ---------------- Snapshot viewer ----------------
+
+const LABELS: Record<string, string> = {
+  empresa: "Empresa",
+  banco: "Banco",
+  celula: "Célula",
+  arquivo_remessa: "Arquivo Remessa",
+  tipo_arquivo: "Tipo de Arquivo",
+  ev_saida_folha_mensal: "EV Saída Folha Mensal",
+  data_credito: "Data do Crédito",
+  descricao_pagamento: "Descrição do Pagamento",
+  natureza_pagamento: "Natureza do Pagamento",
+  valor_lg: "Valor LG",
+  competencia: "Competência",
+  folha: "Folha",
+  qtde_colaboradores: "Qtd. Colaboradores",
+  observacao: "Observação",
+  valor_bankmanager: "Valor BankManager",
+  status_bankmanager: "Status BankManager",
+  valor_itau: "Valor Itaú",
+  status_itau: "Status Itaú",
+  colaborador_nome: "Registrado por",
+  registrado_em: "Registrado em",
+  registrado_por: "Registrado por (ID)",
+  pre_pedido: "Pré-Pedido",
+  issuer: "Emissor",
+  supplier: "Fornecedor",
+  invoice_number: "Nota Fiscal",
+  account_group: "Grupo de Contas",
+  center: "Centro",
+  company: "Companhia",
+  due_date: "Vencimento",
+  gross_amount: "Valor Bruto",
+  register_date: "Data do Registro",
+  desc_status: "Status",
+  log: "Log",
+  text_field: "Observações",
+  action: "Ação",
+  id: "ID",
+  created_at: "Criado em",
+  updated_at: "Atualizado em",
+};
+
+const HIDDEN_KEYS = new Set(["id", "created_at", "updated_at"]);
+const MONEY_KEYS = new Set(["valor_lg", "valor_bankmanager", "valor_itau", "gross_amount"]);
+const DATE_KEYS = new Set(["data_credito", "due_date", "register_date", "registrado_em"]);
+
+function prettyLabel(k: string) {
+  return LABELS[k] ?? k.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+function formatValue(k: string, v: any): string {
+  if (v === null || v === undefined || v === "") return "—";
+  if (MONEY_KEYS.has(k)) {
+    const n = typeof v === "number" ? v : parseFloat(v);
+    if (Number.isFinite(n)) return n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+  }
+  if (DATE_KEYS.has(k)) {
+    const d = new Date(v);
+    if (!isNaN(d.getTime())) {
+      const withTime = String(v).includes("T") || String(v).includes(":");
+      return format(d, withTime ? "dd/MM/yyyy HH:mm" : "dd/MM/yyyy", { locale: ptBR });
+    }
+  }
+  if (typeof v === "object") return JSON.stringify(v);
+  return String(v);
+}
+
+function SnapshotViewer({ row }: { row: RegistroExcluido }) {
+  const [open, setOpen] = useState(false);
+  const s = row.snapshot ?? {};
+  const entries = Object.entries(s)
+    .filter(([k, v]) => !HIDDEN_KEYS.has(k) && v !== null && v !== undefined && v !== "")
+    .sort((a, b) => prettyLabel(a[0]).localeCompare(prettyLabel(b[0])));
+  const isPag = row.origem === "pagamento";
+
+  return (
+    <>
+      <button
+        onClick={() => setOpen(true)}
+        className="mt-1 inline-flex items-center gap-1 text-[11px] text-primary hover:underline"
+      >
+        <Trash2 className="h-3 w-3" /> Ver detalhes completos
+      </button>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="max-w-2xl overflow-hidden p-0">
+          <DialogHeader className="border-b border-border bg-muted/40 px-5 py-4">
+            <div className="flex items-center gap-2">
+              <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-destructive/15 text-destructive">
+                <AlertCircle className="h-3.5 w-3.5" />
+              </span>
+              <div className="min-w-0">
+                <DialogTitle className="truncate text-sm font-semibold">
+                  Snapshot do registro excluído
+                </DialogTitle>
+                <p className="mt-0.5 text-[11px] text-muted-foreground">
+                  {isPag ? "Resultados" : "Lançamentos"} • Excluído por{" "}
+                  <span className="text-foreground">{row.user_nome ?? "—"}</span> em{" "}
+                  {format(new Date(row.created_at), "dd/MM/yyyy HH:mm:ss", { locale: ptBR })}
+                </p>
+              </div>
+            </div>
+          </DialogHeader>
+          <ScrollArea className="max-h-[65vh]">
+            <dl className="divide-y divide-border">
+              {entries.length === 0 ? (
+                <div className="px-5 py-8 text-center text-xs text-muted-foreground">
+                  Snapshot vazio.
+                </div>
+              ) : (
+                entries.map(([k, v]) => {
+                  const label = prettyLabel(k);
+                  const value = formatValue(k, v);
+                  const long = value.length > 60;
+                  return (
+                    <div
+                      key={k}
+                      className={`grid gap-1 px-5 py-2.5 ${long ? "" : "grid-cols-[180px_1fr] items-baseline"}`}
+                    >
+                      <dt className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+                        {label}
+                      </dt>
+                      <dd className={`text-xs text-foreground ${long ? "whitespace-pre-wrap break-words" : "text-right"}`}>
+                        {value}
+                      </dd>
+                    </div>
+                  );
+                })
+              )}
+            </dl>
+          </ScrollArea>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
