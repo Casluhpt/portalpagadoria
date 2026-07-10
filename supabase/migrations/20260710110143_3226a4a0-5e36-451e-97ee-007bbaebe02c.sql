@@ -1,0 +1,1 @@
+CREATE POLICY "Authenticated write lancamentos" ON public.lancamentos FOR ALL TO authenticated USING (true) WITH CHECK (true);
