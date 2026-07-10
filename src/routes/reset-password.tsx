@@ -44,6 +44,8 @@ function ResetPasswordPage() {
       setLoading(false);
       return toast.error(error.message);
     }
+    // Marca a data da troca de senha para a política de expiração (60 dias)
+    try { await supabase.rpc("mark_password_changed" as never); } catch { /* ignore */ }
     await supabase.auth.signOut();
     setLoading(false);
     toast.success("Senha alterada com sucesso.");

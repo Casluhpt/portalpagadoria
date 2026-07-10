@@ -389,6 +389,27 @@ export type Database = {
         }
         Relationships: []
       }
+      user_password_metadata: {
+        Row: {
+          created_at: string
+          password_changed_at: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          password_changed_at?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          password_changed_at?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
@@ -420,6 +441,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      mark_password_changed: { Args: never; Returns: undefined }
     }
     Enums: {
       app_role:
