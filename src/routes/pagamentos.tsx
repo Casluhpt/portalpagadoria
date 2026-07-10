@@ -778,7 +778,7 @@ const EditableCell = React.memo(function EditableCell({
     } else {
       parsed = value;
     }
-    onSave({ [col.key]: parsed } as PagamentoInput);
+    onSave(rowId, { [col.key]: parsed } as PagamentoInput);
   };
 
   const width =
