@@ -320,28 +320,20 @@ function PortalPage() {
                   </Button>
                 </div>
 
-                <ol className="relative space-y-4 border-l-2 border-violet-100 pl-6">
-                  {visibleVersoes.slice(0, 1).map((v, idx) => {
+                <div className="relative overflow-hidden">
+                  {(() => {
+                    const v = visibleVersoes[carouselIdx];
+                    if (!v) return null;
                     const isLatest = latest?.versao === v.versao;
-                    const itens = Array.isArray(v.itens) ? (v.itens as Array<{ categoria: string; descricao: string }>) : [];
+                    const itens = Array.isArray(v.itens)
+                      ? (v.itens as Array<{ categoria: string; descricao: string }>)
+                      : [];
                     return (
-                      <li
-                        key={v.versao}
-                        className="relative animate-slide-in-left-slow"
-                        style={{ animationDelay: `${idx * 200}ms` }}
-                      >
-
-                        <span
-                          className={`absolute -left-[31px] top-1 grid h-5 w-5 place-items-center rounded-full ring-4 ring-white ${
-                            isLatest ? "bg-violet-600" : "bg-slate-300"
-                          }`}
-                        >
-                          <span className="h-1.5 w-1.5 rounded-full bg-white" />
-                        </span>
+                      <div key={`${v.versao}-${slideKey}`} className="animate-slide-in-right-slow">
                         <Card className={isLatest ? "border-violet-300 shadow-md" : "border-slate-200"}>
-                          <CardContent className="p-4">
+                          <CardContent className="p-5">
                             <div className="flex items-start justify-between gap-3">
-                              <div className="min-w-0">
+                              <div className="min-w-0 flex-1">
                                 <div className="flex flex-wrap items-center gap-2">
                                   <Badge className="bg-violet-100 text-violet-800 hover:bg-violet-100">
                                     v{v.versao}
@@ -359,7 +351,7 @@ function PortalPage() {
                                     })}
                                   </span>
                                 </div>
-                                <h3 className="mt-1 truncate text-base font-semibold text-slate-900">
+                                <h3 className="mt-1 text-base font-semibold text-slate-900">
                                   {v.titulo}
                                 </h3>
                                 {v.resumo && (
@@ -367,7 +359,7 @@ function PortalPage() {
                                 )}
                                 {itens.length > 0 && (
                                   <ul className="mt-2 space-y-1 text-sm text-slate-700">
-                                    {itens.slice(0, 4).map((it, idx) => {
+                                    {itens.slice(0, 4).map((it, i) => {
                                       const Icon =
                                         it.categoria === "novo"
                                           ? Sparkles
@@ -377,7 +369,7 @@ function PortalPage() {
                                               ? ShieldCheck
                                               : Wrench;
                                       return (
-                                        <li key={idx} className="flex items-start gap-2">
+                                        <li key={i} className="flex items-start gap-2">
                                           <Icon className="mt-0.5 h-3.5 w-3.5 shrink-0 text-violet-600" />
                                           <span>{it.descricao}</span>
                                         </li>
@@ -398,12 +390,48 @@ function PortalPage() {
                             </div>
                           </CardContent>
                         </Card>
-                      </li>
+                      </div>
                     );
-                  })}
-                </ol>
+                  })()}
+                </div>
+
+                {visibleVersoes.length > 1 && (
+                  <div className="mt-4 flex items-center justify-between gap-3">
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => goTo(carouselIdx - 1)}
+                      aria-label="Anterior"
+                      className="h-8 w-8"
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                    </Button>
+                    <div className="flex items-center gap-1.5">
+                      {visibleVersoes.map((v, i) => (
+                        <button
+                          key={v.versao}
+                          onClick={() => goTo(i)}
+                          aria-label={`Ir para v${v.versao}`}
+                          className={`h-2 rounded-full transition-all ${
+                            i === carouselIdx ? "w-6 bg-violet-600" : "w-2 bg-slate-300 hover:bg-slate-400"
+                          }`}
+                        />
+                      ))}
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => goTo(carouselIdx + 1)}
+                      aria-label="Próximo"
+                      className="h-8 w-8"
+                    >
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
+                  </div>
+                )}
               </section>
             )}
+
 
 
 
