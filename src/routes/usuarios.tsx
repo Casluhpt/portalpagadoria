@@ -25,7 +25,7 @@ import { toast } from "sonner";
 import { useRoles } from "@/hooks/use-roles";
 import { useSession } from "@/hooks/use-session";
 import { useQueryClient } from "@tanstack/react-query";
-import { listAdminUsers, resetUserPassword, setUserRole, inviteUser, type AdminUserRow } from "@/lib/admin-users.functions";
+import { listAdminUsers, resetUserPassword, setUserRole, setUserSetor, inviteUser, ALLOWED_SETORES, type AdminUserRow, type Setor } from "@/lib/admin-users.functions";
 import {
   Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
@@ -101,6 +101,7 @@ function UsuariosTable() {
   const listFn = useServerFn(listAdminUsers);
   const resetFn = useServerFn(resetUserPassword);
   const setRoleFn = useServerFn(setUserRole);
+  const setSetorFn = useServerFn(setUserSetor);
   const inviteFn = useServerFn(inviteUser);
   const qc = useQueryClient();
   const { user } = useSession();
@@ -149,6 +150,16 @@ function UsuariosTable() {
       qc.invalidateQueries({ queryKey: ["admin-users"] });
     },
     onError: (e: any) => toast.error(e?.message ?? "Falha ao atualizar perfil"),
+  });
+
+  const setorMut = useMutation({
+    mutationFn: (vars: { userId: string; setor: Setor | null }) =>
+      setSetorFn({ data: vars }),
+    onSuccess: () => {
+      toast.success("Setor atualizado.");
+      qc.invalidateQueries({ queryKey: ["admin-users"] });
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Falha ao atualizar setor"),
   });
 
   const inviteMut = useMutation({
@@ -264,6 +275,7 @@ function UsuariosTable() {
               <th className="border-b border-border px-3 py-2 text-left font-semibold">Nome</th>
               <th className="border-b border-border px-3 py-2 text-left font-semibold">Email</th>
               <th className="border-b border-border px-3 py-2 text-left font-semibold">Perfis</th>
+              <th className="border-b border-border px-3 py-2 text-left font-semibold">Setor</th>
               <th className="border-b border-border px-3 py-2 text-left font-semibold">Criado em</th>
               <th className="border-b border-border px-3 py-2 text-left font-semibold">Último acesso</th>
               <th className="border-b border-border px-3 py-2 text-right font-semibold">Ações</th>
@@ -332,6 +344,24 @@ function UsuariosTable() {
                       );
                     })()}
                   </div>
+                </td>
+                <td className="whitespace-nowrap border-b border-border px-3 py-2">
+                  <Select
+                    value={u.setor ?? ""}
+                    disabled={setorMut.isPending}
+                    onValueChange={(v) =>
+                      setorMut.mutate({ userId: u.id, setor: v as Setor })
+                    }
+                  >
+                    <SelectTrigger className="h-8 w-[160px] text-xs">
+                      <SelectValue placeholder="—" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {ALLOWED_SETORES.map((s) => (
+                        <SelectItem key={s} value={s} className="text-xs">{s}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </td>
                 <td className="whitespace-nowrap border-b border-border px-3 py-2 text-xs text-muted-foreground">
                   {u.created_at ? format(new Date(u.created_at), "dd/MM/yyyy HH:mm") : "—"}
