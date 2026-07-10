@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Building2, Calendar, Landmark, ListChecks, Send, Wallet } from "lucide-react";
+import { Building2, Calendar, Landmark, ListChecks, Lock, LockOpen, Send, Wallet } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -10,8 +10,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { fetchAllProvisao, provisaoQueryKey } from "@/lib/provisao";
 import { comunicadosQueryKey, publicarComunicado } from "@/lib/comunicados";
+import {
+  fetchFechamentoDia, fecharProvisaoDia, reabrirProvisaoDia,
+  provisaoFechamentosKey, todayISO,
+} from "@/lib/provisao-fechamento";
 import { useSession } from "@/hooks/use-session";
 import profarmaLogo from "@/assets/profarma-logo.png.asset.json";
+
 
 export const Route = createFileRoute("/provisao/")({
   component: ProvisaoDashboard,
@@ -40,21 +45,40 @@ function ProvisaoDashboard() {
     staleTime: 30_000,
   });
 
+  const hoje = todayISO();
+  const { data: fechamentoHoje } = useQuery({
+    queryKey: [...provisaoFechamentosKey, hoje],
+    queryFn: () => fetchFechamentoDia(hoje),
+    staleTime: 15_000,
+  });
+
   const notificar = useMutation({
-    mutationFn: () => {
+    mutationFn: async () => {
       if (!user) throw new Error("Usuário não autenticado");
-      return publicarComunicado(
+      await publicarComunicado(
         "Provisão Diária",
         "A Provisão Diaria foi enviada com sucesso.",
         user.id,
       );
+      await fecharProvisaoDia(hoje);
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: comunicadosQueryKey });
-      toast.success("Notificação enviada a todos os colaboradores.");
+      qc.invalidateQueries({ queryKey: provisaoFechamentosKey });
+      toast.success("Provisão do dia enviada e fechada para novos lançamentos.");
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Falha ao notificar"),
   });
+
+  const reabrir = useMutation({
+    mutationFn: () => reabrirProvisaoDia(hoje),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: provisaoFechamentosKey });
+      toast.success("Provisão do dia reaberta.");
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Falha ao reabrir"),
+  });
+
 
   const filtered = useMemo(
     () =>
@@ -231,7 +255,31 @@ function ProvisaoDashboard() {
       </Card>
 
       {/* Ação principal */}
-      <div className="flex justify-end">
+      <div className="flex flex-wrap items-center justify-end gap-3">
+        {fechamentoHoje ? (
+          <div className="flex items-center gap-2 rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+            <Lock className="h-4 w-4" />
+            <span>
+              Provisão de hoje <b>fechada</b>
+              {fechamentoHoje.fechada_por_nome ? ` por ${fechamentoHoje.fechada_por_nome}` : ""}
+              {fechamentoHoje.fechada_em ? ` às ${new Date(fechamentoHoje.fechada_em).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}` : ""}.
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              className="ml-2 gap-1 border-amber-400 text-amber-900 hover:bg-amber-100"
+              onClick={() => reabrir.mutate()}
+              disabled={reabrir.isPending}
+            >
+              <LockOpen className="h-3.5 w-3.5" /> Reabrir
+            </Button>
+          </div>
+        ) : (
+          <div className="flex items-center gap-2 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-800">
+            <LockOpen className="h-4 w-4" />
+            Provisão de hoje ainda aberta para lançamentos.
+          </div>
+        )}
         <Button
           onClick={() => notificar.mutate()}
           disabled={notificar.isPending || !user}
@@ -239,9 +287,10 @@ function ProvisaoDashboard() {
           className="gap-2 bg-emerald-700 font-semibold text-white shadow-sm hover:bg-emerald-800"
         >
           <Send className="h-4 w-4" />
-          {notificar.isPending ? "Enviando…" : "Notificar Envio"}
+          {notificar.isPending ? "Enviando…" : "Notificar Envio e Fechar Dia"}
         </Button>
       </div>
+
     </main>
 
   );

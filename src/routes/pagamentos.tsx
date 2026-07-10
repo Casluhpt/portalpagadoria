@@ -50,6 +50,15 @@ import {
   PAGAMENTO_CAMPOS, COMPETENCIAS, getDescricoesByCelula,
   type Pagamento,
 } from "@/lib/pagamentos-constants";
+import {
+  criarSolicitacaoProvisao, extractProvisaoFechadaDate,
+} from "@/lib/provisao-fechamento";
+import {
+  Dialog, DialogContent, DialogDescription, DialogFooter,
+  DialogHeader, DialogTitle,
+} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+
 
 
 const HIDDEN_COLUMN_KEYS = new Set<string>([
@@ -218,11 +227,60 @@ function LancamentosTab({ colaboradorNome, userId }: { colaboradorNome: string; 
   const [novoQty, setNovoQty] = useState<number>(1);
   const [novoOpen, setNovoOpen] = useState(false);
 
+  const [blocked, setBlocked] = useState<{
+    rowId: string;
+    dataCredito: string;
+    snapshot: Pagamento;
+    patch: PagamentoInput;
+  } | null>(null);
+  const [blockedMotivo, setBlockedMotivo] = useState("");
+
   const updateMut = useMutation({
     mutationFn: ({ id, patch }: { id: string; patch: PagamentoInput }) => updatePagamento(id, patch),
     onSuccess: () => invalidate(),
-    onError: (e: Error) => toast.error("Falha ao salvar: " + e.message),
+    onError: (e: Error, variables) => {
+      const dia = extractProvisaoFechadaDate(e.message);
+      if (dia && variables?.patch && "data_credito" in variables.patch) {
+        const row = data.find((r) => r.id === variables.id);
+        if (row) {
+          setBlocked({ rowId: variables.id, dataCredito: dia, snapshot: row, patch: variables.patch });
+          setBlockedMotivo("");
+          return;
+        }
+      }
+      toast.error("Falha ao salvar: " + e.message);
+    },
   });
+
+  const solicitacaoMut = useMutation({
+    mutationFn: async () => {
+      if (!blocked) throw new Error("Sem contexto");
+      if (!userId) throw new Error("Usuário não autenticado");
+      const src = { ...blocked.snapshot, ...blocked.patch } as Record<string, unknown>;
+      const keys = [
+        "celula","arquivo_remessa","tipo_arquivo","ev_saida_folha_mensal","banco","empresa",
+        "descricao_pagamento","valor_lg","competencia","folha","qtde_colaboradores","observacao",
+        "valor_bankmanager","status_bankmanager","valor_itau","status_itau","natureza_pagamento",
+      ] as const;
+      const payload: Record<string, unknown> = {};
+      for (const k of keys) if (src[k] != null && src[k] !== "") payload[k] = src[k];
+      await criarSolicitacaoProvisao({
+        solicitanteId: userId,
+        solicitanteNome: colaboradorNome,
+        dataCredito: blocked.dataCredito,
+        payload,
+        motivo: blockedMotivo.trim(),
+      });
+    },
+    onSuccess: () => {
+      toast.success("Solicitação enviada à Central de Divergências.");
+      setBlocked(null);
+      setBlockedMotivo("");
+    },
+    onError: (e: Error) => toast.error("Falha ao enviar solicitação: " + e.message),
+  });
+
+
 
 
   const bulkDeleteMut = useMutation({
@@ -623,6 +681,45 @@ function LancamentosTab({ colaboradorNome, userId }: { colaboradorNome: string; 
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <Dialog open={!!blocked} onOpenChange={(o) => { if (!o) { setBlocked(null); setBlockedMotivo(""); } }}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="text-amber-700">Provisão do dia já foi enviada</DialogTitle>
+            <DialogDescription>
+              A provisão diária de{" "}
+              <b>{blocked ? new Date(blocked.dataCredito + "T00:00:00").toLocaleDateString("pt-BR") : ""}</b>{" "}
+              já foi fechada. Novos lançamentos para esta data estão bloqueados.
+              <br /><br />
+              Se este pagamento realmente precisa entrar no dia, envie uma solicitação ao
+              administrador. Ela ficará registrada na <b>Central de Divergências</b> e o
+              administrador poderá liberar o lançamento.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2">
+            <Label htmlFor="motivo-solic">Justificativa (obrigatório)</Label>
+            <Textarea
+              id="motivo-solic"
+              rows={4}
+              placeholder="Explique por que este pagamento precisa ficar nesta data..."
+              value={blockedMotivo}
+              onChange={(e) => setBlockedMotivo(e.target.value)}
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => { setBlocked(null); setBlockedMotivo(""); }}>
+              Cancelar
+            </Button>
+            <Button
+              onClick={() => solicitacaoMut.mutate()}
+              disabled={solicitacaoMut.isPending || blockedMotivo.trim().length < 5}
+              className="bg-amber-600 text-white hover:bg-amber-700"
+            >
+              {solicitacaoMut.isPending ? "Enviando..." : "Enviar solicitação"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

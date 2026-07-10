@@ -166,6 +166,54 @@ export type Database = {
         }
         Relationships: []
       }
+      pagamento_solicitacoes: {
+        Row: {
+          criado_em: string
+          data_credito: string
+          decidido_em: string | null
+          decidido_por: string | null
+          decidido_por_nome: string | null
+          id: string
+          motivo: string | null
+          motivo_decisao: string | null
+          pagamento_id: string | null
+          payload: Json
+          solicitante_id: string | null
+          solicitante_nome: string | null
+          status: string
+        }
+        Insert: {
+          criado_em?: string
+          data_credito: string
+          decidido_em?: string | null
+          decidido_por?: string | null
+          decidido_por_nome?: string | null
+          id?: string
+          motivo?: string | null
+          motivo_decisao?: string | null
+          pagamento_id?: string | null
+          payload?: Json
+          solicitante_id?: string | null
+          solicitante_nome?: string | null
+          status?: string
+        }
+        Update: {
+          criado_em?: string
+          data_credito?: string
+          decidido_em?: string | null
+          decidido_por?: string | null
+          decidido_por_nome?: string | null
+          id?: string
+          motivo?: string | null
+          motivo_decisao?: string | null
+          pagamento_id?: string | null
+          payload?: Json
+          solicitante_id?: string | null
+          solicitante_nome?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
       pagamentos_audit: {
         Row: {
           acao: string
@@ -354,6 +402,27 @@ export type Database = {
           },
         ]
       }
+      provisao_fechamentos: {
+        Row: {
+          data: string
+          fechada_em: string
+          fechada_por: string | null
+          fechada_por_nome: string | null
+        }
+        Insert: {
+          data: string
+          fechada_em?: string
+          fechada_por?: string | null
+          fechada_por_nome?: string | null
+        }
+        Update: {
+          data?: string
+          fechada_em?: string
+          fechada_por?: string | null
+          fechada_por_nome?: string | null
+        }
+        Relationships: []
+      }
       solicitacao_updates: {
         Row: {
           autor_email: string | null
@@ -478,7 +547,26 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      aprovar_solicitacao_provisao: {
+        Args: { _id: string; _motivo?: string }
+        Returns: string
+      }
       ensure_viewer_role: { Args: never; Returns: undefined }
+      fechar_provisao_diaria: {
+        Args: { _data?: string }
+        Returns: {
+          data: string
+          fechada_em: string
+          fechada_por: string | null
+          fechada_por_nome: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "provisao_fechamentos"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -486,7 +574,13 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_provisao_fechada: { Args: { _data: string }; Returns: boolean }
       mark_password_changed: { Args: never; Returns: undefined }
+      reabrir_provisao_diaria: { Args: { _data: string }; Returns: undefined }
+      rejeitar_solicitacao_provisao: {
+        Args: { _id: string; _motivo?: string }
+        Returns: undefined
+      }
       set_presence: { Args: { _status: string }; Returns: undefined }
     }
     Enums: {
