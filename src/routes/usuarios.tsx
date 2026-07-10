@@ -103,6 +103,7 @@ function UsuariosTable() {
   const setRoleFn = useServerFn(setUserRole);
   const setSetorFn = useServerFn(setUserSetor);
   const inviteFn = useServerFn(inviteUser);
+  const deleteFn = useServerFn(deleteUser);
   const qc = useQueryClient();
   const { user } = useSession();
   const [search, setSearch] = useState("");
