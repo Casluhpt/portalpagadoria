@@ -31,11 +31,29 @@ const fmtBR = (iso: string) =>
 function ProvisaoDashboard() {
   const [dateFrom, setDateFrom] = useState<string>(firstOfMonth());
   const [dateTo, setDateTo] = useState<string>(today());
+  const { user } = useSession();
+  const qc = useQueryClient();
 
   const { data, isLoading } = useQuery({
     queryKey: provisaoQueryKey,
     queryFn: fetchAllProvisao,
     staleTime: 30_000,
+  });
+
+  const notificar = useMutation({
+    mutationFn: () => {
+      if (!user) throw new Error("Usuário não autenticado");
+      return publicarComunicado(
+        "Provisão Diária",
+        "A Provisão Diaria foi enviada com sucesso.",
+        user.id,
+      );
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: comunicadosQueryKey });
+      toast.success("Notificação enviada a todos os colaboradores.");
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Falha ao notificar"),
   });
 
   const filtered = useMemo(
