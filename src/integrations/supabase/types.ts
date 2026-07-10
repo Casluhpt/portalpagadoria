@@ -107,39 +107,69 @@ export type Database = {
         Row: {
           ano: number
           categoria: string
+          centro_custo: string | null
+          conta: string | null
           created_at: string
           created_by: string | null
           created_by_nome: string | null
+          data_lancamento: string | null
+          data_vencimento: string | null
           descricao: string
+          empresa_codigo: string | null
+          empresa_nome: string | null
           id: string
+          lancado: boolean
           mes: number
+          numero_nf: string | null
+          numero_pedido: string | null
           observacao: string | null
+          tipo: string
           updated_at: string
           valor: number
         }
         Insert: {
           ano?: number
           categoria: string
+          centro_custo?: string | null
+          conta?: string | null
           created_at?: string
           created_by?: string | null
           created_by_nome?: string | null
+          data_lancamento?: string | null
+          data_vencimento?: string | null
           descricao: string
+          empresa_codigo?: string | null
+          empresa_nome?: string | null
           id?: string
+          lancado?: boolean
           mes: number
+          numero_nf?: string | null
+          numero_pedido?: string | null
           observacao?: string | null
+          tipo?: string
           updated_at?: string
           valor?: number
         }
         Update: {
           ano?: number
           categoria?: string
+          centro_custo?: string | null
+          conta?: string | null
           created_at?: string
           created_by?: string | null
           created_by_nome?: string | null
+          data_lancamento?: string | null
+          data_vencimento?: string | null
           descricao?: string
+          empresa_codigo?: string | null
+          empresa_nome?: string | null
           id?: string
+          lancado?: boolean
           mes?: number
+          numero_nf?: string | null
+          numero_pedido?: string | null
           observacao?: string | null
+          tipo?: string
           updated_at?: string
           valor?: number
         }
