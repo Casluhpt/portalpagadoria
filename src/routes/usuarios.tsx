@@ -17,9 +17,14 @@ import {
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
 import { useRoles } from "@/hooks/use-roles";
-import { listAdminUsers, resetUserPassword, type AdminUserRow } from "@/lib/admin-users.functions";
+import { useSession } from "@/hooks/use-session";
+import { useQueryClient } from "@tanstack/react-query";
+import { listAdminUsers, resetUserPassword, setUserRole, type AdminUserRow } from "@/lib/admin-users.functions";
 
 export const Route = createFileRoute("/usuarios")({
   component: UsuariosPage,
