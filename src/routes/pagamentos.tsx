@@ -1024,12 +1024,12 @@ function DashboardTab() {
   );
 }
 
-function Kpi({ label, value }: { label: string; value: string }) {
+function Kpi({ label, value, title }: { label: string; value: string; title?: string }) {
   return (
     <Card>
       <CardContent className="p-4">
         <div className="text-[11px] uppercase text-muted-foreground">{label}</div>
-        <div className="mt-1 text-lg font-semibold text-foreground">{value}</div>
+        <div className="mt-1 text-lg font-semibold text-foreground" title={title ?? value}>{value}</div>
       </CardContent>
     </Card>
   );
