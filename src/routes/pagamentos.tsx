@@ -131,7 +131,6 @@ function LancamentosTab({ colaboradorNome, userId }: { colaboradorNome: string; 
   const [search, setSearch] = useState("");
   const [sortKey, setSortKey] = useState<keyof Pagamento>("registrado_em");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
-  const [pendingDelete, setPendingDelete] = useState<Pagamento | null>(null);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [highlights, setHighlights] = useState<Record<string, string>>(() => {
     if (typeof window === "undefined") return {};
