@@ -183,9 +183,8 @@ function SignUpForm() {
       </div>
       <div className="space-y-1.5">
         <Label htmlFor="su-pw">Senha (mín. 8)</Label>
-        <Input
+        <PasswordInput
           id="su-pw"
-          type="password"
           required
           minLength={8}
           autoComplete="new-password"
