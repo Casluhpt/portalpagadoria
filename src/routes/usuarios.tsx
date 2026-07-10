@@ -113,8 +113,9 @@ function UsuariosTable() {
   const { data = [], isLoading, error, refetch, isFetching } = useQuery({
     queryKey: ["admin-users"],
     queryFn: () => listFn({}),
-    refetchInterval: 30_000,
+    staleTime: 60_000,
   });
+
 
   useEffect(() => {
     const channel = supabase
