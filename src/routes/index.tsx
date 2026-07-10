@@ -297,7 +297,7 @@ function PortalPage() {
                 </div>
 
                 <ol className="relative space-y-4 border-l-2 border-violet-100 pl-6">
-                  {visibleVersoes.map((v, idx) => {
+                  {visibleVersoes.slice(0, 1).map((v, idx) => {
                     const isLatest = latest?.versao === v.versao;
                     const itens = Array.isArray(v.itens) ? (v.itens as Array<{ categoria: string; descricao: string }>) : [];
                     return (
