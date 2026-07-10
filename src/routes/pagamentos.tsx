@@ -34,7 +34,7 @@ import {
   type PagamentoInput,
 } from "@/lib/pagamentos";
 import {
-  PAGAMENTO_CAMPOS, COMPETENCIAS,
+  PAGAMENTO_CAMPOS, COMPETENCIAS, getDescricoesByCelula,
   type Pagamento,
 } from "@/lib/pagamentos-constants";
 
@@ -186,28 +186,65 @@ function LancamentosTab({ colaboradorNome, userId }: { colaboradorNome: string; 
     try {
       const buf = await f.arrayBuffer();
       const wb = XLSX.read(buf, { cellDates: true });
-      const ws = wb.Sheets[wb.SheetNames[0]];
+
+      // Normalize: strip accents, lowercase, collapse spaces, unify ×→x
+      const norm = (s: string) =>
+        s.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+         .replace(/×/g, "x").toLowerCase().replace(/\s+/g, " ").trim();
+
+      // Prefer the data sheet "PGTOS Diversos"; fallback to the largest sheet
+      const dataSheetName =
+        wb.SheetNames.find((n) => norm(n).includes("pgtos")) ??
+        wb.SheetNames.reduce((best, n) => {
+          const rows = XLSX.utils.decode_range(wb.Sheets[n]["!ref"] ?? "A1").e.r;
+          const bestRows = XLSX.utils.decode_range(wb.Sheets[best]["!ref"] ?? "A1").e.r;
+          return rows > bestRows ? n : best;
+        }, wb.SheetNames[0]);
+      const ws = wb.Sheets[dataSheetName];
       const raw = XLSX.utils.sheet_to_json<Record<string, unknown>>(ws, { defval: null });
       const parsed: PagamentoInput[] = [];
       const errors: string[] = [];
 
-      // map label → key for import
+      // Aliases (arquivo → app) — matched by normalized header
+      const aliases: Record<string, string> = {
+        "celula": "célula",
+        "ev. saida folha mensal": "ev. saída folha",
+        "ev saida folha mensal": "ev. saída folha",
+        "data de credito": "data de crédito",
+        "qtde colaboradores no arquivo": "qtde colab.",
+        "diferenca lg x finnet": "dif. lg x finnet",
+        "diferença lg x finnet": "dif. lg x finnet",
+        "status concluido itau": "status itaú",
+        "status concluído itau": "status itaú",
+        "status concluído itaú": "status itaú",
+        "diferenca bankmananger x itau": "dif. bank x itaú",
+        "diferença bankmananger x  itau": "dif. bank x itaú",
+        "diferença bankmanager x itau": "dif. bank x itaú",
+        "natureza do pagamento": "natureza",
+      };
+
+      // map normalized label → column
       const labelMap = new Map<string, typeof PAGAMENTO_CAMPOS[number]>();
       for (const c of PAGAMENTO_CAMPOS) {
         if (c.editable === false) continue;
-        labelMap.set(c.label.toLowerCase(), c);
+        labelMap.set(norm(c.label), c);
       }
 
       raw.forEach((row, i) => {
         const rec: Record<string, unknown> = {};
         for (const [rawKey, rawVal] of Object.entries(row)) {
-          const col = labelMap.get(String(rawKey).trim().toLowerCase());
+          const key = String(rawKey);
+          // skip xlsx auto-generated headers for blank columns (e.g. "__EMPTY")
+          if (key.startsWith("__EMPTY")) continue;
+          const n = norm(key);
+          const targetLabel = aliases[n] ?? n;
+          const col = labelMap.get(targetLabel);
           if (!col) continue;
           if (rawVal === null || rawVal === "") continue;
           if (col.kind === "number" || col.kind === "currency") {
-            const n = Number(String(rawVal).replace(/[R$\s.]/g, "").replace(",", "."));
-            if (Number.isNaN(n)) { errors.push(`Linha ${i+2}: ${col.label} inválido`); continue; }
-            rec[col.key] = n;
+            const num = Number(String(rawVal).replace(/[R$\s.]/g, "").replace(",", "."));
+            if (Number.isNaN(num)) { errors.push(`Linha ${i+2}: ${col.label} inválido`); continue; }
+            rec[col.key] = num;
           } else if (col.kind === "date") {
             const d = rawVal instanceof Date ? rawVal : new Date(String(rawVal));
             if (isNaN(d.getTime())) { errors.push(`Linha ${i+2}: ${col.label} data inválida`); continue; }
@@ -220,7 +257,8 @@ function LancamentosTab({ colaboradorNome, userId }: { colaboradorNome: string; 
       });
 
       if (errors.length) toast.warning(`${errors.length} aviso(s) na importação. ${errors.slice(0,3).join("; ")}${errors.length>3?"…":""}`);
-      if (!parsed.length) { toast.error("Nenhum registro válido encontrado"); return; }
+      if (!parsed.length) { toast.error(`Nenhum registro válido encontrado na aba "${dataSheetName}"`); return; }
+      toast.info(`Lendo aba "${dataSheetName}" — ${parsed.length} linha(s)…`);
       importMut.mutate(parsed);
     } catch (e) {
       toast.error("Erro ao ler o arquivo: " + (e as Error).message);
@@ -397,6 +435,10 @@ function EditableCell({
   }
 
   if (col.kind === "select" && col.options) {
+    const opts =
+      col.key === "descricao_pagamento"
+        ? getDescricoesByCelula(row.celula)
+        : col.options;
     return (
       <td style={{ minWidth: width }} className="border-b border-r border-border p-0">
         <Select
@@ -407,7 +449,7 @@ function EditableCell({
             <SelectValue placeholder="—" />
           </SelectTrigger>
           <SelectContent>
-            {col.options.map((o) => <SelectItem key={o} value={o}>{o}</SelectItem>)}
+            {opts.map((o: string) => <SelectItem key={o} value={o}>{o}</SelectItem>)}
           </SelectContent>
         </Select>
       </td>
