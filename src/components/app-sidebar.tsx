@@ -85,6 +85,7 @@ const roleLabel: Record<AppRole, string> = {
   operacional: "Operacional",
   consulta: "Consulta",
   auditor: "Auditor",
+  viewer: "Visualizador",
 };
 
 export function AppSidebar() {
