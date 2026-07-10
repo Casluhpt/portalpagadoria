@@ -155,15 +155,37 @@ function DespesasFixasPage() {
 
   const totaisGrupo = (g: GrupoDespesa) => {
     const arr = linhasPorGrupo(g);
-    const previsto = arr.reduce((a, l) => a + l.totalPrevisto, 0);
-    const lancado = arr.reduce((a, l) => a + l.totalLancado, 0);
-    return { previsto, lancado, pendente: previsto - lancado, quantidade: arr.length };
+    let previsto = 0, lancado = 0;
+    let previstoMensal = 0, lancadoMensal = 0;
+    let previstoAdto = 0, lancadoAdto = 0;
+    arr.forEach((l) =>
+      l.registros.forEach((r) => {
+        if (!r) return;
+        const v = Number(r.valor) || 0;
+        const isAdto = r.tipo === "adiantamento";
+        previsto += v;
+        if (isAdto) previstoAdto += v; else previstoMensal += v;
+        if (r.lancado) {
+          lancado += v;
+          if (isAdto) lancadoAdto += v; else lancadoMensal += v;
+        }
+      }),
+    );
+    return {
+      previsto, lancado, pendente: previsto - lancado, quantidade: arr.length,
+      previstoMensal, lancadoMensal, previstoAdto, lancadoAdto,
+    };
   };
 
   const dashboard = useMemo(() => {
     const grupos = GRUPOS_DESPESAS.map((g) => ({ grupo: g, ...totaisGrupo(g) }));
     const previsto = grupos.reduce((a, g) => a + g.previsto, 0);
     const lancado = grupos.reduce((a, g) => a + g.lancado, 0);
+    const previstoMensal = grupos.reduce((a, g) => a + g.previstoMensal, 0);
+    const previstoAdto = grupos.reduce((a, g) => a + g.previstoAdto, 0);
+    const lancadoMensal = grupos.reduce((a, g) => a + g.lancadoMensal, 0);
+    const lancadoAdto = grupos.reduce((a, g) => a + g.lancadoAdto, 0);
+    const totalPessoas = linhasFiltradas.length;
     const porMes = Array.from({ length: 12 }, () => ({ previsto: 0, lancado: 0 }));
     linhasFiltradas.forEach((l) =>
       l.registros.forEach((r, i) => {
@@ -173,7 +195,10 @@ function DespesasFixasPage() {
         if (r.lancado) porMes[i].lancado += v;
       }),
     );
-    return { grupos, previsto, lancado, pendente: previsto - lancado, porMes };
+    return {
+      grupos, previsto, lancado, pendente: previsto - lancado, porMes,
+      previstoMensal, previstoAdto, lancadoMensal, lancadoAdto, totalPessoas,
+    };
   }, [linhasFiltradas]);
 
   const criarNovaLinha = async () => {
