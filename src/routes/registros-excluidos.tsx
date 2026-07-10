@@ -482,7 +482,7 @@ function PastaEmpresa({
 }
 
 function EmpresaAberta({
-  nome, registros, onVoltar, selected, toggle, dragProps,
+  nome, registros, onVoltar, selected, toggle, pick, dragProps,
 }: { nome: string; registros: RegistroExcluido[]; onVoltar: () => void } & SelectionProps) {
   const [subAberta, setSubAberta] = useState<string | null>(null);
 
