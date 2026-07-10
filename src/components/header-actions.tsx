@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Circle, Cog, KeyRound, LogIn, LogOut, MinusCircle, Settings, User, Users, XCircle } from "lucide-react";
+import { Circle, Cog, History, KeyRound, LogIn, LogOut, MinusCircle, Settings, User, Users, XCircle } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
