@@ -136,7 +136,7 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader className="border-b border-sidebar-border">
-        <div className="flex items-center gap-2 px-2 py-3">
+        <Link to="/" className="flex items-center gap-2 px-2 py-3 rounded-md hover:bg-sidebar-accent/50 transition-colors">
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[image:var(--gradient-primary)] text-primary-foreground shadow-[var(--shadow-glow)]">
             <Sparkles className="h-5 w-5" />
           </div>
@@ -144,7 +144,7 @@ export function AppSidebar() {
             <span className="text-sm font-semibold text-sidebar-foreground">Pagadoria</span>
             <span className="text-xs text-muted-foreground">Portal Corporativo</span>
           </div>
-        </div>
+        </Link>
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
