@@ -120,6 +120,8 @@ export type Database = {
           id: string
           lancado: boolean
           mes: number
+          nome_real: string | null
+          notas: string | null
           numero_nf: string | null
           numero_pedido: string | null
           observacao: string | null
@@ -143,6 +145,8 @@ export type Database = {
           id?: string
           lancado?: boolean
           mes: number
+          nome_real?: string | null
+          notas?: string | null
           numero_nf?: string | null
           numero_pedido?: string | null
           observacao?: string | null
@@ -166,6 +170,8 @@ export type Database = {
           id?: string
           lancado?: boolean
           mes?: number
+          nome_real?: string | null
+          notas?: string | null
           numero_nf?: string | null
           numero_pedido?: string | null
           observacao?: string | null
