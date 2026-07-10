@@ -15,7 +15,10 @@ import {
   Sparkles,
   Wrench,
   Bug,
+  Users,
+  Wallet,
 } from "lucide-react";
+
 
 import { AppSidebar } from "@/components/app-sidebar";
 import { HeaderActions } from "@/components/header-actions";
