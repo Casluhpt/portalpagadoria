@@ -55,7 +55,9 @@ export function HeaderActions() {
   const navigate = useNavigate();
   const primary = roles[0];
 
+  const [confirmSignOut, setConfirmSignOut] = useState(false);
   const signOut = async () => {
+    setConfirmSignOut(false);
     const { error } = await supabase.auth.signOut();
     if (error) toast.error(error.message);
     else toast.success("Sessão encerrada");
