@@ -6,7 +6,7 @@ const TABLE = "pagamentos_diversos";
 // Fields the client is allowed to write (excludes generated + auto fields).
 const WRITABLE_KEYS = [
   "celula","arquivo_remessa","tipo_arquivo","ev_saida_folha_mensal","banco","empresa",
-  "data_credito","descricao_pagamento","valor_lg","competencia","competencia_ano","folha",
+  "data_credito","descricao_pagamento","valor_lg","competencia","folha",
   "qtde_colaboradores","observacao","valor_bankmanager","status_bankmanager","valor_itau",
   "status_itau","natureza_pagamento",
 ] as const;
