@@ -96,9 +96,8 @@ function SignInForm() {
             Esqueci minha senha
           </Link>
         </div>
-        <Input
+        <PasswordInput
           id="si-pw"
-          type="password"
           required
           autoComplete="current-password"
           value={password}
