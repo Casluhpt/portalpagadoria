@@ -20,7 +20,10 @@ import {
   Bug,
   Users,
   Wallet,
+  ShieldAlert,
 } from "lucide-react";
+
+import { useRoles } from "@/hooks/use-roles";
 
 
 import { AppSidebar } from "@/components/app-sidebar";
