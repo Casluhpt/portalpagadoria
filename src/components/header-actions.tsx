@@ -102,6 +102,20 @@ export function HeaderActions() {
             </span>
           </Button>
         </DropdownMenuTrigger>
+            <div className="relative">
+              <div className="grid h-7 w-7 place-items-center rounded-full bg-gradient-to-br from-violet-600 to-indigo-700 text-[11px] font-semibold text-white">
+                {initials || <User className="h-4 w-4" />}
+              </div>
+              <span
+                className={`absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-white ${meta.dot}`}
+                aria-label={meta.label}
+              />
+            </div>
+            <span className="hidden max-w-[140px] truncate text-xs font-medium text-slate-700 sm:inline">
+              {user.email}
+            </span>
+          </Button>
+        </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-64">
           <DropdownMenuLabel>
             <div className="flex flex-col">
