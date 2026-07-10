@@ -20,7 +20,10 @@ import {
   Bug,
   Users,
   Wallet,
+  ShieldAlert,
 } from "lucide-react";
+
+import { useRoles } from "@/hooks/use-roles";
 
 
 import { AppSidebar } from "@/components/app-sidebar";
@@ -146,6 +149,7 @@ function PortalPage() {
         "Comparativo mensal e anual",
       ],
       updated: "hoje",
+      adminOnly: true,
     },
     {
       key: "pagamentos",
@@ -500,10 +504,32 @@ type ModuleDef = {
   chip: string;
   bullets: readonly string[];
   updated: string;
+  adminOnly?: boolean;
 };
 
 function ModuleCard({ m }: { m: ModuleDef }) {
   const Icon = m.icon;
+  const { isAdmin, loading: rolesLoading } = useRoles();
+  const blocked = m.adminOnly && !rolesLoading && !isAdmin;
+
+  if (blocked) {
+    return (
+      <Card className="group relative overflow-hidden border-slate-200 shadow-sm">
+        <div className={`h-1.5 w-full bg-gradient-to-r ${m.accent}`} />
+        <CardContent className="flex flex-col items-center justify-center gap-3 p-10 text-center">
+          <div className="grid h-12 w-12 place-items-center rounded-full bg-amber-100 text-amber-600">
+            <ShieldAlert className="h-6 w-6" />
+          </div>
+          <h3 className="text-lg font-bold text-slate-900">Acesso restrito</h3>
+          <p className="max-w-sm text-sm text-slate-600">
+            {m.title} é visível apenas para colaboradores com perfil{" "}
+            <b>Administrador</b>.
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card className="group relative overflow-hidden border-slate-200 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-xl">
       <div className={`h-1.5 w-full bg-gradient-to-r ${m.accent}`} />
