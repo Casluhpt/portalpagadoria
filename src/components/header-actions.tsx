@@ -52,6 +52,7 @@ const presenceMeta: Record<PresenceStatus, { label: string; dot: string; Icon: t
 export function HeaderActions() {
   const { user } = useSession();
   const { roles, isAdmin } = useRoles();
+  const { setor } = useProfile();
   const { status, setStatus } = usePresence();
   const navigate = useNavigate();
   const primary = roles[0];
