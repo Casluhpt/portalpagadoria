@@ -25,6 +25,8 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 
 import { useSession } from "@/hooks/use-session";
@@ -123,10 +125,15 @@ function LancamentosTab({ colaboradorNome, userId }: { colaboradorNome: string; 
   const invalidate = () => qc.invalidateQueries({ queryKey: pagamentosQueryKey });
 
   const createMut = useMutation({
-    mutationFn: () => createPagamento({}, colaboradorNome, userId),
-    onSuccess: () => { invalidate(); toast.success("Novo lançamento adicionado"); },
+    mutationFn: (qty: number) =>
+      qty <= 1
+        ? createPagamento({}, colaboradorNome, userId).then(() => 1)
+        : createPagamentosBulk(Array.from({ length: qty }, () => ({})), colaboradorNome, userId),
+    onSuccess: (n) => { invalidate(); toast.success(`${n} lançamento(s) adicionado(s)`); },
     onError: (e: Error) => toast.error("Falha ao inserir: " + e.message),
   });
+  const [novoQty, setNovoQty] = useState<number>(1);
+  const [novoOpen, setNovoOpen] = useState(false);
 
   const updateMut = useMutation({
     mutationFn: ({ id, patch }: { id: string; patch: PagamentoInput }) => updatePagamento(id, patch),
@@ -301,9 +308,38 @@ function LancamentosTab({ colaboradorNome, userId }: { colaboradorNome: string; 
             <Download className="h-4 w-4" />
             Exportar Excel
           </Button>
-          <Button size="sm" className="gap-1" onClick={() => createMut.mutate()} disabled={createMut.isPending}>
-            <Plus className="h-4 w-4" /> Novo
-          </Button>
+          <Popover open={novoOpen} onOpenChange={setNovoOpen}>
+            <PopoverTrigger asChild>
+              <Button size="sm" className="gap-1" disabled={createMut.isPending}>
+                <Plus className="h-4 w-4" /> Novo
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent align="end" className="w-56 space-y-3">
+              <div className="space-y-1">
+                <Label htmlFor="novo-qty" className="text-xs">Quantidade de linhas</Label>
+                <Input
+                  id="novo-qty"
+                  type="number"
+                  min={1}
+                  max={100}
+                  value={novoQty}
+                  onChange={(e) => setNovoQty(Math.max(1, Math.min(100, Number(e.target.value) || 1)))}
+                  className="h-9"
+                />
+              </div>
+              <Button
+                size="sm"
+                className="w-full"
+                disabled={createMut.isPending}
+                onClick={() => {
+                  createMut.mutate(novoQty);
+                  setNovoOpen(false);
+                }}
+              >
+                {createMut.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : `Adicionar ${novoQty} ${novoQty === 1 ? "linha" : "linhas"}`}
+              </Button>
+            </PopoverContent>
+          </Popover>
         </div>
       </div>
 
