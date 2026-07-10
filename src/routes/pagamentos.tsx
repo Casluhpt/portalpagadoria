@@ -227,11 +227,60 @@ function LancamentosTab({ colaboradorNome, userId }: { colaboradorNome: string; 
   const [novoQty, setNovoQty] = useState<number>(1);
   const [novoOpen, setNovoOpen] = useState(false);
 
+  const [blocked, setBlocked] = useState<{
+    rowId: string;
+    dataCredito: string;
+    snapshot: Pagamento;
+    patch: PagamentoInput;
+  } | null>(null);
+  const [blockedMotivo, setBlockedMotivo] = useState("");
+
   const updateMut = useMutation({
     mutationFn: ({ id, patch }: { id: string; patch: PagamentoInput }) => updatePagamento(id, patch),
     onSuccess: () => invalidate(),
-    onError: (e: Error) => toast.error("Falha ao salvar: " + e.message),
+    onError: (e: Error, variables) => {
+      const dia = extractProvisaoFechadaDate(e.message);
+      if (dia && variables?.patch && "data_credito" in variables.patch) {
+        const row = data.find((r) => r.id === variables.id);
+        if (row) {
+          setBlocked({ rowId: variables.id, dataCredito: dia, snapshot: row, patch: variables.patch });
+          setBlockedMotivo("");
+          return;
+        }
+      }
+      toast.error("Falha ao salvar: " + e.message);
+    },
   });
+
+  const solicitacaoMut = useMutation({
+    mutationFn: async () => {
+      if (!blocked) throw new Error("Sem contexto");
+      if (!userId) throw new Error("Usuário não autenticado");
+      const src = { ...blocked.snapshot, ...blocked.patch } as Record<string, unknown>;
+      const keys = [
+        "celula","arquivo_remessa","tipo_arquivo","ev_saida_folha_mensal","banco","empresa",
+        "descricao_pagamento","valor_lg","competencia","folha","qtde_colaboradores","observacao",
+        "valor_bankmanager","status_bankmanager","valor_itau","status_itau","natureza_pagamento",
+      ] as const;
+      const payload: Record<string, unknown> = {};
+      for (const k of keys) if (src[k] != null && src[k] !== "") payload[k] = src[k];
+      await criarSolicitacaoProvisao({
+        solicitanteId: userId,
+        solicitanteNome: colaboradorNome,
+        dataCredito: blocked.dataCredito,
+        payload,
+        motivo: blockedMotivo.trim(),
+      });
+    },
+    onSuccess: () => {
+      toast.success("Solicitação enviada à Central de Divergências.");
+      setBlocked(null);
+      setBlockedMotivo("");
+    },
+    onError: (e: Error) => toast.error("Falha ao enviar solicitação: " + e.message),
+  });
+
+
 
 
   const bulkDeleteMut = useMutation({
