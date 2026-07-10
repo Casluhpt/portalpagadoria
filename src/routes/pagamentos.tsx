@@ -40,6 +40,7 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
 import { useSession } from "@/hooks/use-session";
+import { supabase } from "@/integrations/supabase/client";
 import {
   createPagamento, createPagamentosBulk, deletePagamento,
   fetchPagamentos, pagamentosQueryKey, updatePagamento,
@@ -49,6 +50,7 @@ import {
   PAGAMENTO_CAMPOS, COMPETENCIAS, getDescricoesByCelula,
   type Pagamento,
 } from "@/lib/pagamentos-constants";
+
 
 const HIDDEN_COLUMN_KEYS = new Set<string>([
   "valor_bankmanager","status_bankmanager","diferenca_lg_finnet",
@@ -141,7 +143,62 @@ function LancamentosTab({ colaboradorNome, userId }: { colaboradorNome: string; 
   }, [highlights]);
   const [bulkPendingDelete, setBulkPendingDelete] = useState(false);
 
+  // --- Presença por linha em tempo real ---
+  const [rowPresence, setRowPresence] = useState<Record<string, string[]>>({});
+  const presenceChannelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
+  const activeRowRef = useRef<string | null>(null);
+  const presenceKey = userId ?? `anon-${colaboradorNome}`;
+
+  useEffect(() => {
+    const channel = supabase.channel("pagamentos-row-presence", {
+      config: { presence: { key: presenceKey } },
+    });
+    presenceChannelRef.current = channel;
+
+    const recompute = () => {
+      const state = channel.presenceState() as Record<
+        string,
+        Array<{ nome?: string; rowId?: string | null }>
+      >;
+      const map: Record<string, Set<string>> = {};
+      for (const [key, metas] of Object.entries(state)) {
+        if (key === presenceKey) continue; // não mostrar a si mesmo
+        for (const m of metas) {
+          if (!m?.rowId || !m?.nome) continue;
+          (map[m.rowId] ??= new Set()).add(m.nome);
+        }
+      }
+      const out: Record<string, string[]> = {};
+      for (const [rid, set] of Object.entries(map)) out[rid] = Array.from(set);
+      setRowPresence(out);
+    };
+
+    channel
+      .on("presence", { event: "sync" }, recompute)
+      .on("presence", { event: "join" }, recompute)
+      .on("presence", { event: "leave" }, recompute)
+      .subscribe(async (status) => {
+        if (status === "SUBSCRIBED") {
+          await channel.track({ nome: colaboradorNome, rowId: null });
+        }
+      });
+
+    return () => {
+      supabase.removeChannel(channel);
+      presenceChannelRef.current = null;
+    };
+  }, [presenceKey, colaboradorNome]);
+
+  const setActiveRow = (rowId: string | null) => {
+    if (activeRowRef.current === rowId) return;
+    activeRowRef.current = rowId;
+    const ch = presenceChannelRef.current;
+    if (!ch) return;
+    void ch.track({ nome: colaboradorNome, rowId });
+  };
+
   const invalidate = () => qc.invalidateQueries({ queryKey: pagamentosQueryKey });
+
 
   const createMut = useMutation({
     mutationFn: (qty: number) =>
@@ -478,11 +535,18 @@ function LancamentosTab({ colaboradorNome, userId }: { colaboradorNome: string; 
                   ))}
                 </tr>
               </thead>
-              <tbody>
+              <tbody onMouseLeave={() => setActiveRow(null)}>
                 {rows.map((r, i) => {
                   const bg = colorBg(highlights[r.id]);
+                  const watchers = rowPresence[r.id] ?? [];
                   return (
-                    <tr key={r.id} className="group hover:bg-muted/40" style={bg ? { background: bg } : undefined}>
+                    <tr
+                      key={r.id}
+                      className="group hover:bg-muted/40"
+                      style={bg ? { background: bg } : undefined}
+                      onMouseEnter={() => setActiveRow(r.id)}
+                      onFocusCapture={() => setActiveRow(r.id)}
+                    >
                       <td className="border-b border-border px-2 py-1">
                         <Checkbox
                           checked={selected.has(r.id)}
@@ -490,7 +554,24 @@ function LancamentosTab({ colaboradorNome, userId }: { colaboradorNome: string; 
                           aria-label={`Selecionar linha ${i + 1}`}
                         />
                       </td>
-                      <td className="border-b border-border px-2 py-1 text-muted-foreground">{i + 1}</td>
+                      <td className="border-b border-border px-2 py-1 text-muted-foreground">
+                        <div className="flex items-center gap-1.5">
+                          <span>{i + 1}</span>
+                          {watchers.length > 0 && (
+                            <span
+                              title={`${watchers.join(", ")} ${watchers.length === 1 ? "está" : "estão"} nesta linha`}
+                              className="inline-flex items-center gap-1 rounded-full border border-violet-300 bg-violet-100 px-1.5 py-0.5 text-[10px] font-medium text-violet-800 dark:border-violet-700 dark:bg-violet-950 dark:text-violet-200"
+                            >
+                              <span className="relative flex h-1.5 w-1.5">
+                                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-violet-500 opacity-75" />
+                                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-violet-600" />
+                              </span>
+                              {watchers[0]}
+                              {watchers.length > 1 && ` +${watchers.length - 1}`}
+                            </span>
+                          )}
+                        </div>
+                      </td>
                       {VISIBLE_CAMPOS.map((c) => (
                         <EditableCell
                           key={c.key}
@@ -502,6 +583,7 @@ function LancamentosTab({ colaboradorNome, userId }: { colaboradorNome: string; 
                     </tr>
                   );
                 })}
+
                 {rows.length === 0 && (
                   <tr>
                     <td colSpan={VISIBLE_CAMPOS.length + 2} className="px-4 py-16 text-center text-sm text-muted-foreground">
