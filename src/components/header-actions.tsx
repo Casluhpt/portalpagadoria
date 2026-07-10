@@ -177,11 +177,25 @@ export function HeaderActions() {
             </>
           )}
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={signOut}>
+          <DropdownMenuItem onSelect={(e) => { e.preventDefault(); setConfirmSignOut(true); }}>
             <LogOut className="mr-2 h-4 w-4" /> Sair
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
+      <AlertDialog open={confirmSignOut} onOpenChange={setConfirmSignOut}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Encerrar sessão?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Você será desconectado e precisará entrar novamente para acessar o portal.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={signOut}>Sair</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
