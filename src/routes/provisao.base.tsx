@@ -235,7 +235,7 @@ function ProvisaoBasePage() {
 
   return (
     <main className="flex-1 p-4">
-      <div className="mb-3 flex flex-wrap items-center gap-3">
+      <div className="mb-3 flex flex-col gap-2">
         <div>
           <h2 className="text-lg font-semibold text-foreground">Base da Provisão</h2>
           <p className="text-xs text-muted-foreground">
@@ -246,49 +246,52 @@ function ProvisaoBasePage() {
                 : `${rows.length.toLocaleString("pt-BR")} registros`}
           </p>
         </div>
-        <div className="relative ml-auto w-64">
-          <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            placeholder="Pesquisar…"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pl-8"
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="relative w-64">
+            <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder="Pesquisar…"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pl-8"
+            />
+          </div>
+          <Button
+            size="sm"
+            variant="secondary"
+            onClick={() => createMut.mutate()}
+            disabled={createMut.isPending}
+            className="gap-1"
+          >
+            <Plus className="h-4 w-4" /> Nova
+          </Button>
+          <input
+            ref={fileRef}
+            type="file"
+            accept=".xlsx,.xls"
+            className="hidden"
+            onChange={onFileChange}
           />
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={onImportClick}
+            disabled={importMut.isPending}
+            className="gap-1"
+          >
+            {importMut.isPending ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Upload className="h-4 w-4" />
+            )}
+            Importar
+          </Button>
+          <Button size="sm" onClick={exportXlsx} className="gap-1">
+            <Download className="h-4 w-4" /> Exportar
+          </Button>
         </div>
-        <Button
-          size="sm"
-          variant="secondary"
-          onClick={() => createMut.mutate()}
-          disabled={createMut.isPending}
-          className="gap-1"
-        >
-          <Plus className="h-4 w-4" /> Nova
-        </Button>
-        <input
-          ref={fileRef}
-          type="file"
-          accept=".xlsx,.xls"
-          className="hidden"
-          onChange={onFileChange}
-        />
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={onImportClick}
-          disabled={importMut.isPending}
-          className="gap-1"
-        >
-          {importMut.isPending ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            <Upload className="h-4 w-4" />
-          )}
-          Importar
-        </Button>
-        <Button size="sm" onClick={exportXlsx} className="gap-1">
-          <Download className="h-4 w-4" /> Exportar
-        </Button>
       </div>
+
 
       <div className="relative h-[calc(100vh-11rem)] overflow-auto rounded-lg border border-border bg-card">
         {isLoading ? (
