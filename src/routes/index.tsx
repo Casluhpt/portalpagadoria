@@ -501,6 +501,7 @@ type ModuleDef = {
   chip: string;
   bullets: readonly string[];
   updated: string;
+  adminOnly?: boolean;
 };
 
 function ModuleCard({ m }: { m: ModuleDef }) {
