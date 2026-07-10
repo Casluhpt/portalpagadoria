@@ -102,20 +102,6 @@ export function HeaderActions() {
             </span>
           </Button>
         </DropdownMenuTrigger>
-            <div className="relative">
-              <div className="grid h-7 w-7 place-items-center rounded-full bg-gradient-to-br from-violet-600 to-indigo-700 text-[11px] font-semibold text-white">
-                {initials || <User className="h-4 w-4" />}
-              </div>
-              <span
-                className={`absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-white ${meta.dot}`}
-                aria-label={meta.label}
-              />
-            </div>
-            <span className="hidden max-w-[140px] truncate text-xs font-medium text-slate-700 sm:inline">
-              {user.email}
-            </span>
-          </Button>
-        </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-64">
           <DropdownMenuLabel>
             <div className="flex flex-col">
@@ -147,6 +133,33 @@ export function HeaderActions() {
               );
             })}
           </DropdownMenuRadioGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="icon" className="h-9 w-9" aria-label="Configurações">
+            <Settings className="h-4 w-4 text-slate-600" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-60">
+          <DropdownMenuLabel className="text-[10px] uppercase tracking-wide text-muted-foreground">
+            Configurações
+          </DropdownMenuLabel>
+          <DropdownMenuItem onClick={sendPasswordReset}>
+            <KeyRound className="mr-2 h-4 w-4" /> Redefinir senha
+          </DropdownMenuItem>
+          {isAdmin && (
+            <>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => navigate({ to: "/usuarios" })}>
+                <Users className="mr-2 h-4 w-4" /> Administração de usuários
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate({ to: "/configuracoes" })}>
+                <Cog className="mr-2 h-4 w-4" /> Configurações avançadas
+              </DropdownMenuItem>
+            </>
+          )}
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={signOut}>
             <LogOut className="mr-2 h-4 w-4" /> Sair
