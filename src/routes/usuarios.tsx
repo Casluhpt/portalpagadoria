@@ -5,7 +5,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { format, formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Loader2, KeyRound, ShieldAlert, Search, ShieldCheck, Eye, UserPlus } from "lucide-react";
+import { Loader2, KeyRound, ShieldAlert, Search, ShieldCheck, Eye, UserPlus, Trash2 } from "lucide-react";
 
 import { AppSidebar } from "@/components/app-sidebar";
 import { HeaderActions } from "@/components/header-actions";
@@ -25,7 +25,7 @@ import { toast } from "sonner";
 import { useRoles } from "@/hooks/use-roles";
 import { useSession } from "@/hooks/use-session";
 import { useQueryClient } from "@tanstack/react-query";
-import { listAdminUsers, resetUserPassword, setUserRole, setUserSetor, inviteUser, ALLOWED_SETORES, type AdminUserRow, type Setor } from "@/lib/admin-users.functions";
+import { listAdminUsers, resetUserPassword, setUserRole, setUserSetor, inviteUser, deleteUser, ALLOWED_SETORES, type AdminUserRow, type Setor } from "@/lib/admin-users.functions";
 import {
   Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
@@ -103,6 +103,7 @@ function UsuariosTable() {
   const setRoleFn = useServerFn(setUserRole);
   const setSetorFn = useServerFn(setUserSetor);
   const inviteFn = useServerFn(inviteUser);
+  const deleteFn = useServerFn(deleteUser);
   const qc = useQueryClient();
   const { user } = useSession();
   const [search, setSearch] = useState("");
@@ -172,6 +173,15 @@ function UsuariosTable() {
       setInviteEmail(""); setInviteNome(""); setInviteRole("viewer");
     },
     onError: (e: any) => toast.error(e?.message ?? "Falha ao enviar convite"),
+  });
+
+  const deleteMut = useMutation({
+    mutationFn: (userId: string) => deleteFn({ data: { userId } }),
+    onSuccess: () => {
+      toast.success("Conta excluída.");
+      qc.invalidateQueries({ queryKey: ["admin-users"] });
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Falha ao excluir conta"),
   });
 
   const rows = useMemo(() => {
@@ -374,30 +384,62 @@ function UsuariosTable() {
                   ) : "Nunca acessou"}
                 </td>
                 <td className="whitespace-nowrap border-b border-border px-3 py-2 text-right">
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button size="sm" variant="outline" disabled={!u.email}>
-                        <KeyRound className="mr-1 h-3.5 w-3.5" /> Resetar senha
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Enviar redefinição de senha?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          Um email será enviado para <strong>{u.email}</strong> com um link seguro para
-                          redefinição da senha.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                        <AlertDialogAction
-                          onClick={() => u.email && resetMut.mutate(u.email)}
+                  <div className="flex justify-end gap-2">
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button size="sm" variant="outline" disabled={!u.email}>
+                          <KeyRound className="mr-1 h-3.5 w-3.5" /> Resetar senha
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Enviar redefinição de senha?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Um email será enviado para <strong>{u.email}</strong> com um link seguro para
+                            redefinição da senha.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() => u.email && resetMut.mutate(u.email)}
+                          >
+                            Enviar
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          disabled={u.id === user?.id || deleteMut.isPending}
+                          title={u.id === user?.id ? "Você não pode excluir sua própria conta" : "Excluir conta"}
                         >
-                          Enviar
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
+                          <Trash2 className="mr-1 h-3.5 w-3.5" /> Excluir
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Excluir conta permanentemente?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            A conta de <strong>{u.nome ?? u.email}</strong> ({u.email}) será removida
+                            do sistema. Esta ação não pode ser desfeita.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() => deleteMut.mutate(u.id)}
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                          >
+                            Excluir conta
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
                 </td>
               </tr>
             ))}
