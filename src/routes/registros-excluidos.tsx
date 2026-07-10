@@ -21,6 +21,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useRoles } from "@/hooks/use-roles";
 import { listRegistrosExcluidos, type RegistroExcluido } from "@/lib/registros-excluidos.functions";
 
