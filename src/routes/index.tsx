@@ -146,6 +146,7 @@ function PortalPage() {
         "Comparativo mensal e anual",
       ],
       updated: "hoje",
+      adminOnly: true,
     },
     {
       key: "pagamentos",
