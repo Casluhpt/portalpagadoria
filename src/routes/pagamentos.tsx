@@ -535,11 +535,18 @@ function LancamentosTab({ colaboradorNome, userId }: { colaboradorNome: string; 
                   ))}
                 </tr>
               </thead>
-              <tbody>
+              <tbody onMouseLeave={() => setActiveRow(null)}>
                 {rows.map((r, i) => {
                   const bg = colorBg(highlights[r.id]);
+                  const watchers = rowPresence[r.id] ?? [];
                   return (
-                    <tr key={r.id} className="group hover:bg-muted/40" style={bg ? { background: bg } : undefined}>
+                    <tr
+                      key={r.id}
+                      className="group hover:bg-muted/40"
+                      style={bg ? { background: bg } : undefined}
+                      onMouseEnter={() => setActiveRow(r.id)}
+                      onFocusCapture={() => setActiveRow(r.id)}
+                    >
                       <td className="border-b border-border px-2 py-1">
                         <Checkbox
                           checked={selected.has(r.id)}
@@ -547,7 +554,24 @@ function LancamentosTab({ colaboradorNome, userId }: { colaboradorNome: string; 
                           aria-label={`Selecionar linha ${i + 1}`}
                         />
                       </td>
-                      <td className="border-b border-border px-2 py-1 text-muted-foreground">{i + 1}</td>
+                      <td className="border-b border-border px-2 py-1 text-muted-foreground">
+                        <div className="flex items-center gap-1.5">
+                          <span>{i + 1}</span>
+                          {watchers.length > 0 && (
+                            <span
+                              title={`${watchers.join(", ")} ${watchers.length === 1 ? "está" : "estão"} nesta linha`}
+                              className="inline-flex items-center gap-1 rounded-full border border-violet-300 bg-violet-100 px-1.5 py-0.5 text-[10px] font-medium text-violet-800 dark:border-violet-700 dark:bg-violet-950 dark:text-violet-200"
+                            >
+                              <span className="relative flex h-1.5 w-1.5">
+                                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-violet-500 opacity-75" />
+                                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-violet-600" />
+                              </span>
+                              {watchers[0]}
+                              {watchers.length > 1 && ` +${watchers.length - 1}`}
+                            </span>
+                          )}
+                        </div>
+                      </td>
                       {VISIBLE_CAMPOS.map((c) => (
                         <EditableCell
                           key={c.key}
@@ -559,6 +583,7 @@ function LancamentosTab({ colaboradorNome, userId }: { colaboradorNome: string; 
                     </tr>
                   );
                 })}
+
                 {rows.length === 0 && (
                   <tr>
                     <td colSpan={VISIBLE_CAMPOS.length + 2} className="px-4 py-16 text-center text-sm text-muted-foreground">
