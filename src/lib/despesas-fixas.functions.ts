@@ -101,7 +101,7 @@ export const upsertDespesaFixa = createServerFn({ method: "POST" })
     };
 
     if (data.id) {
-      const { data: row, error } = await context.supabase
+      const { data: row, error } = await (context.supabase as any)
         .from("despesas_fixas")
         .update(patch)
         .eq("id", data.id)
@@ -110,11 +110,12 @@ export const upsertDespesaFixa = createServerFn({ method: "POST" })
       if (error) throw error;
       return row as unknown as DespesaFixa;
     }
-    const { data: row, error } = await context.supabase
+    const { data: row, error } = await (context.supabase as any)
       .from("despesas_fixas")
       .insert({ ...patch, created_by: context.userId, created_by_nome: nome })
       .select()
       .single();
+
     if (error) throw error;
     return row as unknown as DespesaFixa;
   });
@@ -157,12 +158,13 @@ export const updateDescricaoMeta = createServerFn({ method: "POST" })
       patch.descricao = data.nova_descricao;
     }
 
-    const { error } = await context.supabase
+    const { error } = await (context.supabase as any)
       .from("despesas_fixas")
       .update(patch)
       .eq("categoria", data.categoria)
       .eq("descricao", data.descricao)
       .eq("ano", data.ano);
+
     if (error) throw error;
     return { ok: true };
   });
