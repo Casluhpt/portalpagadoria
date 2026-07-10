@@ -229,7 +229,21 @@ function ProvisaoDashboard() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Ação principal */}
+      <div className="flex justify-end">
+        <Button
+          onClick={() => notificar.mutate()}
+          disabled={notificar.isPending || !user}
+          size="lg"
+          className="gap-2 bg-emerald-700 font-semibold text-white shadow-sm hover:bg-emerald-800"
+        >
+          <Send className="h-4 w-4" />
+          {notificar.isPending ? "Enviando…" : "Notificar Envio"}
+        </Button>
+      </div>
     </main>
+
   );
 }
 
