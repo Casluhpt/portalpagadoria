@@ -95,6 +95,9 @@ function roleVariant(r: string): "default" | "secondary" | "outline" | "destruct
 function UsuariosTable() {
   const listFn = useServerFn(listAdminUsers);
   const resetFn = useServerFn(resetUserPassword);
+  const setRoleFn = useServerFn(setUserRole);
+  const qc = useQueryClient();
+  const { user } = useSession();
   const [search, setSearch] = useState("");
 
   const { data = [], isLoading, error, refetch, isFetching } = useQuery({
@@ -108,6 +111,16 @@ function UsuariosTable() {
       resetFn({ data: { email, redirectTo: `${window.location.origin}/reset-password` } }),
     onSuccess: () => toast.success("Email de redefinição enviado."),
     onError: (e: any) => toast.error(e?.message ?? "Falha ao enviar email"),
+  });
+
+  const roleMut = useMutation({
+    mutationFn: (vars: { userId: string; role: "administrador" | "viewer" }) =>
+      setRoleFn({ data: vars }),
+    onSuccess: () => {
+      toast.success("Perfil atualizado.");
+      qc.invalidateQueries({ queryKey: ["admin-users"] });
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Falha ao atualizar perfil"),
   });
 
   const rows = useMemo(() => {
