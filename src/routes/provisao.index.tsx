@@ -45,21 +45,40 @@ function ProvisaoDashboard() {
     staleTime: 30_000,
   });
 
+  const hoje = todayISO();
+  const { data: fechamentoHoje } = useQuery({
+    queryKey: [...provisaoFechamentosKey, hoje],
+    queryFn: () => fetchFechamentoDia(hoje),
+    staleTime: 15_000,
+  });
+
   const notificar = useMutation({
-    mutationFn: () => {
+    mutationFn: async () => {
       if (!user) throw new Error("Usuário não autenticado");
-      return publicarComunicado(
+      await publicarComunicado(
         "Provisão Diária",
         "A Provisão Diaria foi enviada com sucesso.",
         user.id,
       );
+      await fecharProvisaoDia(hoje);
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: comunicadosQueryKey });
-      toast.success("Notificação enviada a todos os colaboradores.");
+      qc.invalidateQueries({ queryKey: provisaoFechamentosKey });
+      toast.success("Provisão do dia enviada e fechada para novos lançamentos.");
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Falha ao notificar"),
   });
+
+  const reabrir = useMutation({
+    mutationFn: () => reabrirProvisaoDia(hoje),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: provisaoFechamentosKey });
+      toast.success("Provisão do dia reaberta.");
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Falha ao reabrir"),
+  });
+
 
   const filtered = useMemo(
     () =>
