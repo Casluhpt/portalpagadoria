@@ -101,6 +101,7 @@ export function AppSidebar() {
   const navigate = useNavigate();
   const { user } = useSession();
   const { roles, isAdmin, isViewer, hasAny, loading: rolesLoading } = useRoles();
+  const { setor } = useProfile();
 
   // Viewer users have access to a limited set of routes.
   const VIEWER_ALLOWED = ["/pagamentos", "/divergencias"];
