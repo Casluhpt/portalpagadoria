@@ -84,7 +84,7 @@ function DespesasFixasPage() {
   });
 
   const upsertMut = useMutation({
-    mutationFn: (input: Parameters<typeof upsertFn>[0]["data"]) => upsertFn({ data: input }),
+    mutationFn: (input: any) => upsertFn({ data: input }),
     onSuccess: () => qc.invalidateQueries({ queryKey }),
     onError: (e: any) => toast.error(e?.message ?? "Falha ao salvar"),
   });
