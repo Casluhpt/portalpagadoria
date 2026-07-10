@@ -61,3 +61,31 @@ export const listRegistrosExcluidos = createServerFn({ method: "GET" })
     }));
     return [...pag, ...lanc].sort((a, b) => b.created_at.localeCompare(a.created_at));
   });
+
+const deleteInput = z.object({
+  ids: z.array(z.object({
+    id: z.string().uuid(),
+    origem: z.enum(["pagamento", "lancamento"]),
+  })).min(1).max(500),
+});
+
+export const purgeRegistrosExcluidos = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) => deleteInput.parse(data))
+  .handler(async ({ data, context }): Promise<{ deleted: number }> => {
+    await assertAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    const pagIds = data.ids.filter((x) => x.origem === "pagamento").map((x) => x.id);
+    const lancIds = data.ids.filter((x) => x.origem === "lancamento").map((x) => x.id);
+
+    if (pagIds.length) {
+      const { error } = await supabaseAdmin.from("pagamentos_audit").delete().in("id", pagIds);
+      if (error) throw error;
+    }
+    if (lancIds.length) {
+      const { error } = await supabaseAdmin.from("lancamentos_audit").delete().in("id", lancIds);
+      if (error) throw error;
+    }
+    return { deleted: pagIds.length + lancIds.length };
+  });
