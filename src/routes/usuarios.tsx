@@ -384,30 +384,62 @@ function UsuariosTable() {
                   ) : "Nunca acessou"}
                 </td>
                 <td className="whitespace-nowrap border-b border-border px-3 py-2 text-right">
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button size="sm" variant="outline" disabled={!u.email}>
-                        <KeyRound className="mr-1 h-3.5 w-3.5" /> Resetar senha
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Enviar redefinição de senha?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          Um email será enviado para <strong>{u.email}</strong> com um link seguro para
-                          redefinição da senha.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                        <AlertDialogAction
-                          onClick={() => u.email && resetMut.mutate(u.email)}
+                  <div className="flex justify-end gap-2">
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button size="sm" variant="outline" disabled={!u.email}>
+                          <KeyRound className="mr-1 h-3.5 w-3.5" /> Resetar senha
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Enviar redefinição de senha?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Um email será enviado para <strong>{u.email}</strong> com um link seguro para
+                            redefinição da senha.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() => u.email && resetMut.mutate(u.email)}
+                          >
+                            Enviar
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          disabled={u.id === user?.id || deleteMut.isPending}
+                          title={u.id === user?.id ? "Você não pode excluir sua própria conta" : "Excluir conta"}
                         >
-                          Enviar
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
+                          <Trash2 className="mr-1 h-3.5 w-3.5" /> Excluir
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Excluir conta permanentemente?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            A conta de <strong>{u.nome ?? u.email}</strong> ({u.email}) será removida
+                            do sistema. Esta ação não pode ser desfeita.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() => deleteMut.mutate(u.id)}
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                          >
+                            Excluir conta
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
                 </td>
               </tr>
             ))}
