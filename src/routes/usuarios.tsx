@@ -152,6 +152,16 @@ function UsuariosTable() {
     onError: (e: any) => toast.error(e?.message ?? "Falha ao atualizar perfil"),
   });
 
+  const setorMut = useMutation({
+    mutationFn: (vars: { userId: string; setor: Setor | null }) =>
+      setSetorFn({ data: vars }),
+    onSuccess: () => {
+      toast.success("Setor atualizado.");
+      qc.invalidateQueries({ queryKey: ["admin-users"] });
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Falha ao atualizar setor"),
+  });
+
   const inviteMut = useMutation({
     mutationFn: (vars: { email: string; role: "administrador" | "viewer"; nome?: string }) =>
       inviteFn({ data: { ...vars, redirectTo: `${window.location.origin}/reset-password` } }),
