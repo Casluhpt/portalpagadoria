@@ -194,6 +194,19 @@ function SignUpForm() {
         />
       </div>
       <div className="space-y-1.5">
+        <Label htmlFor="su-setor">Setor</Label>
+        <Select value={setor} onValueChange={(v) => setSetor(v as Setor)}>
+          <SelectTrigger id="su-setor">
+            <SelectValue placeholder="Selecione o setor" />
+          </SelectTrigger>
+          <SelectContent>
+            {SETORES.map((s) => (
+              <SelectItem key={s} value={s}>{s}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+      <div className="space-y-1.5">
         <Label htmlFor="su-pw">Senha (mín. 8)</Label>
         <PasswordInput
           id="su-pw"
