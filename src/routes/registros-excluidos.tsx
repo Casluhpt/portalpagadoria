@@ -1,12 +1,13 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { toast } from "sonner";
 import {
   AlertCircle, Loader2, Search, ShieldAlert, Trash2, FileText, Receipt,
-  Folder, FolderOpen, ChevronRight, X,
+  Folder, FolderOpen, ChevronRight, X, CheckSquare, Square, GripVertical,
 } from "lucide-react";
 
 import { AppSidebar } from "@/components/app-sidebar";
@@ -15,6 +16,7 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -22,8 +24,14 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { useRoles } from "@/hooks/use-roles";
-import { listRegistrosExcluidos, type RegistroExcluido } from "@/lib/registros-excluidos.functions";
+import {
+  listRegistrosExcluidos, purgeRegistrosExcluidos, type RegistroExcluido,
+} from "@/lib/registros-excluidos.functions";
 
 export const Route = createFileRoute("/registros-excluidos")({
   beforeLoad: () => {
@@ -31,6 +39,9 @@ export const Route = createFileRoute("/registros-excluidos")({
   },
   component: () => null,
 });
+
+const keyOf = (r: RegistroExcluido) => `${r.origem}:${r.id}`;
+
 
 
 export function RegistrosExcluidosView() {
