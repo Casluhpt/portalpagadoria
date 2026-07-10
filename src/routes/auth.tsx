@@ -206,7 +206,7 @@ function SignUpForm() {
       },
     });
     setLoading(false);
-    if (error) return toast.error(error.message);
+    if (error) return toast.error(translateAuthError(error.message));
     toast.success("Conta criada — você já pode entrar.");
   };
 
