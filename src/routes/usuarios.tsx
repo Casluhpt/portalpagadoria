@@ -100,9 +100,14 @@ function UsuariosTable() {
   const listFn = useServerFn(listAdminUsers);
   const resetFn = useServerFn(resetUserPassword);
   const setRoleFn = useServerFn(setUserRole);
+  const inviteFn = useServerFn(inviteUser);
   const qc = useQueryClient();
   const { user } = useSession();
   const [search, setSearch] = useState("");
+  const [inviteOpen, setInviteOpen] = useState(false);
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [inviteNome, setInviteNome] = useState("");
+  const [inviteRole, setInviteRole] = useState<"administrador" | "viewer">("viewer");
 
   const { data = [], isLoading, error, refetch, isFetching } = useQuery({
     queryKey: ["admin-users"],
