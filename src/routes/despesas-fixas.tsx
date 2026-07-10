@@ -297,10 +297,26 @@ function DespesasFixasPage() {
               ) : (
                 <>
                   <TabsContent value="dashboard" className="space-y-4">
-                    <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+                    <div className="grid grid-cols-1 gap-3 md:grid-cols-4">
+                      <StatCard title={`# Pessoas / Itens`} value={dashboard.totalPessoas} icon={<Building2 className="h-4 w-4" />} tone="slate" isCount />
                       <StatCard title="Saldo total previsto" value={dashboard.previsto} icon={<TrendingUp className="h-4 w-4" />} tone="slate" />
                       <StatCard title="Total lançado" value={dashboard.lancado} icon={<CheckCircle2 className="h-4 w-4" />} tone="emerald" />
                       <StatCard title="Pendente de lançar" value={dashboard.pendente} icon={<Clock className="h-4 w-4" />} tone="amber" />
+                    </div>
+
+                    <div className="grid gap-3 md:grid-cols-2">
+                      <div className="rounded-lg border border-slate-200 bg-white p-4">
+                        <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">Valor mensal</div>
+                        <div className="mt-1 text-2xl font-bold tabular-nums text-slate-800">{brl(dashboard.previstoMensal)}</div>
+                        <div className="mt-1 text-xs text-emerald-700">Lançado: <span className="font-semibold">{brl(dashboard.lancadoMensal)}</span></div>
+                      </div>
+                      {dashboard.previstoAdto > 0 && (
+                        <div className="rounded-lg border border-indigo-200 bg-indigo-50 p-4">
+                          <div className="text-xs font-semibold uppercase tracking-wide text-indigo-700">Adiantamento (adto)</div>
+                          <div className="mt-1 text-2xl font-bold tabular-nums text-indigo-900">{brl(dashboard.previstoAdto)}</div>
+                          <div className="mt-1 text-xs text-emerald-700">Lançado: <span className="font-semibold">{brl(dashboard.lancadoAdto)}</span></div>
+                        </div>
+                      )}
                     </div>
 
                     <div className="grid gap-3 md:grid-cols-3">
@@ -308,10 +324,18 @@ function DespesasFixasPage() {
                         <div key={g.grupo} className={`rounded-lg border p-4 ${chipGrupo[g.grupo]}`}>
                           <div className="flex items-center justify-between">
                             <div className="text-xs font-semibold uppercase tracking-wide opacity-80">{g.grupo}</div>
-                            <Badge variant="outline" className="bg-white/60">{g.quantidade} itens</Badge>
+                            <Badge variant="outline" className="bg-white/60">#{g.quantidade}</Badge>
                           </div>
                           <div className="mt-2 text-2xl font-bold">{brl(g.previsto)}</div>
                           <div className="mt-2 space-y-1 text-xs">
+                            <div className="flex items-center justify-between">
+                              <span>Mensal</span><span className="font-semibold">{brl(g.previstoMensal)}</span>
+                            </div>
+                            {g.previstoAdto > 0 && (
+                              <div className="flex items-center justify-between">
+                                <span>Adto</span><span className="font-semibold">{brl(g.previstoAdto)}</span>
+                              </div>
+                            )}
                             <div className="flex items-center justify-between">
                               <span>Lançado</span><span className="font-semibold">{brl(g.lancado)}</span>
                             </div>
@@ -323,6 +347,7 @@ function DespesasFixasPage() {
                         </div>
                       ))}
                     </div>
+
 
                     <div className="rounded-lg border border-border bg-card p-4">
                       <div className="mb-2 text-sm font-semibold text-slate-700">Evolução mensal</div>
