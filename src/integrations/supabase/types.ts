@@ -53,6 +53,45 @@ export type Database = {
         }
         Relationships: []
       }
+      aprovacoes: {
+        Row: {
+          ano: number
+          created_at: string
+          empresa: string | null
+          id: string
+          ordem: number
+          ordem_pagamento: string | null
+          status: string
+          tipo: string
+          updated_at: string
+          valor: number
+        }
+        Insert: {
+          ano?: number
+          created_at?: string
+          empresa?: string | null
+          id?: string
+          ordem?: number
+          ordem_pagamento?: string | null
+          status?: string
+          tipo?: string
+          updated_at?: string
+          valor?: number
+        }
+        Update: {
+          ano?: number
+          created_at?: string
+          empresa?: string | null
+          id?: string
+          ordem?: number
+          ordem_pagamento?: string | null
+          status?: string
+          tipo?: string
+          updated_at?: string
+          valor?: number
+        }
+        Relationships: []
+      }
       comunicado_leituras: {
         Row: {
           comunicado_id: string

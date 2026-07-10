@@ -27,6 +27,7 @@ import { Route as ConciliacaoRouteImport } from './routes/conciliacao'
 import { Route as BaseRouteImport } from './routes/base'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuditoriaRouteImport } from './routes/auditoria'
+import { Route as AprovacaoRouteImport } from './routes/aprovacao'
 import { Route as AnexosRouteImport } from './routes/anexos'
 import { Route as AlertasRouteImport } from './routes/alertas'
 import { Route as AdministracaoRouteImport } from './routes/administracao'
@@ -124,6 +125,11 @@ const AuditoriaRoute = AuditoriaRouteImport.update({
   path: '/auditoria',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AprovacaoRoute = AprovacaoRouteImport.update({
+  id: '/aprovacao',
+  path: '/aprovacao',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AnexosRoute = AnexosRouteImport.update({
   id: '/anexos',
   path: '/anexos',
@@ -160,6 +166,7 @@ export interface FileRoutesByFullPath {
   '/administracao': typeof AdministracaoRoute
   '/alertas': typeof AlertasRoute
   '/anexos': typeof AnexosRoute
+  '/aprovacao': typeof AprovacaoRoute
   '/auditoria': typeof AuditoriaRoute
   '/auth': typeof AuthRoute
   '/base': typeof BaseRoute
@@ -186,6 +193,7 @@ export interface FileRoutesByTo {
   '/administracao': typeof AdministracaoRoute
   '/alertas': typeof AlertasRoute
   '/anexos': typeof AnexosRoute
+  '/aprovacao': typeof AprovacaoRoute
   '/auditoria': typeof AuditoriaRoute
   '/auth': typeof AuthRoute
   '/base': typeof BaseRoute
@@ -212,6 +220,7 @@ export interface FileRoutesById {
   '/administracao': typeof AdministracaoRoute
   '/alertas': typeof AlertasRoute
   '/anexos': typeof AnexosRoute
+  '/aprovacao': typeof AprovacaoRoute
   '/auditoria': typeof AuditoriaRoute
   '/auth': typeof AuthRoute
   '/base': typeof BaseRoute
@@ -240,6 +249,7 @@ export interface FileRouteTypes {
     | '/administracao'
     | '/alertas'
     | '/anexos'
+    | '/aprovacao'
     | '/auditoria'
     | '/auth'
     | '/base'
@@ -266,6 +276,7 @@ export interface FileRouteTypes {
     | '/administracao'
     | '/alertas'
     | '/anexos'
+    | '/aprovacao'
     | '/auditoria'
     | '/auth'
     | '/base'
@@ -291,6 +302,7 @@ export interface FileRouteTypes {
     | '/administracao'
     | '/alertas'
     | '/anexos'
+    | '/aprovacao'
     | '/auditoria'
     | '/auth'
     | '/base'
@@ -318,6 +330,7 @@ export interface RootRouteChildren {
   AdministracaoRoute: typeof AdministracaoRoute
   AlertasRoute: typeof AlertasRoute
   AnexosRoute: typeof AnexosRoute
+  AprovacaoRoute: typeof AprovacaoRoute
   AuditoriaRoute: typeof AuditoriaRoute
   AuthRoute: typeof AuthRoute
   BaseRoute: typeof BaseRoute
@@ -466,6 +479,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuditoriaRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/aprovacao': {
+      id: '/aprovacao'
+      path: '/aprovacao'
+      fullPath: '/aprovacao'
+      preLoaderRoute: typeof AprovacaoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/anexos': {
       id: '/anexos'
       path: '/anexos'
@@ -530,6 +550,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdministracaoRoute: AdministracaoRoute,
   AlertasRoute: AlertasRoute,
   AnexosRoute: AnexosRoute,
+  AprovacaoRoute: AprovacaoRoute,
   AuditoriaRoute: AuditoriaRoute,
   AuthRoute: AuthRoute,
   BaseRoute: BaseRoute,
