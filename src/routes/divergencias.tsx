@@ -45,15 +45,6 @@ function DivergenciasPage() {
     staleTime: 15_000,
   });
 
-  useEffect(() => {
-    const ch = supabase
-      .channel("solicitacoes-realtime")
-      .on("postgres_changes", { event: "*", schema: "public", table: "pagamento_solicitacoes" }, () => {
-        qc.invalidateQueries({ queryKey: solicitacoesKey });
-      })
-      .subscribe();
-    return () => { void supabase.removeChannel(ch); };
-  }, [qc]);
 
   const [tab, setTab] = useState<StatusSolicitacao>("pendente");
   const groups = useMemo(() => {

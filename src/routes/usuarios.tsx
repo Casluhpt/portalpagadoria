@@ -117,21 +117,6 @@ function UsuariosTable() {
   });
 
 
-  useEffect(() => {
-    const channel = supabase
-      .channel("admin-users-presence")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "profiles" },
-        () => {
-          qc.invalidateQueries({ queryKey: ["admin-users"] });
-        },
-      )
-      .subscribe();
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [qc]);
 
   const resetMut = useMutation({
     mutationFn: (email: string) =>
