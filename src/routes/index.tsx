@@ -55,6 +55,38 @@ function PortalPage() {
     staleTime: 60_000,
   });
 
+  const { data: versoes = [] } = useQuery({
+    queryKey: ["app_versions", "timeline"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("app_versions")
+        .select("versao, lancada_em, tipo, titulo, resumo, itens, destaque")
+        .order("lancada_em", { ascending: false })
+        .limit(4);
+      if (error) throw error;
+      return data ?? [];
+    },
+    staleTime: 5 * 60_000,
+  });
+
+  const latest = versoes[0];
+  const [dismissed, setDismissed] = useState<string[]>([]);
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("timeline_dismissed_versions");
+      if (raw) setDismissed(JSON.parse(raw));
+    } catch {}
+  }, []);
+  const dismissVersion = (v: string) => {
+    const next = Array.from(new Set([...dismissed, v]));
+    setDismissed(next);
+    try {
+      localStorage.setItem("timeline_dismissed_versions", JSON.stringify(next));
+    } catch {}
+  };
+  const visibleVersoes = versoes.filter((v) => !dismissed.includes(v.versao));
+
+
   const kpis = useMemo(() => {
     const mes = currentMonth();
     const doMes = lanc.filter((r) => (r.dueDate ?? "").startsWith(mes));
