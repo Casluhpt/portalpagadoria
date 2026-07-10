@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Check, ChevronDown, ChevronRight, Loader2, ShieldAlert, X } from "lucide-react";
 import { toast } from "sonner";
@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dialog";
 
 import { useRoles } from "@/hooks/use-roles";
-import { supabase } from "@/integrations/supabase/client";
+
 import {
   aprovarSolicitacao, fetchSolicitacoes, rejeitarSolicitacao, solicitacoesKey,
   type PagamentoSolicitacao, type StatusSolicitacao,
