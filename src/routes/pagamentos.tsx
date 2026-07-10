@@ -397,6 +397,10 @@ function EditableCell({
   }
 
   if (col.kind === "select" && col.options) {
+    const opts =
+      col.key === "descricao_pagamento"
+        ? getDescricoesByCelula(row.celula)
+        : col.options;
     return (
       <td style={{ minWidth: width }} className="border-b border-r border-border p-0">
         <Select
@@ -407,7 +411,7 @@ function EditableCell({
             <SelectValue placeholder="—" />
           </SelectTrigger>
           <SelectContent>
-            {col.options.map((o) => <SelectItem key={o} value={o}>{o}</SelectItem>)}
+            {opts.map((o) => <SelectItem key={o} value={o}>{o}</SelectItem>)}
           </SelectContent>
         </Select>
       </td>
