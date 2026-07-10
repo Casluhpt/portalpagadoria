@@ -89,12 +89,20 @@ function subEmpresaOf(r: RegistroExcluido): string {
 
 function Board() {
   const listFn = useServerFn(listRegistrosExcluidos);
+  const purgeFn = useServerFn(purgeRegistrosExcluidos);
+  const qc = useQueryClient();
 
   const [search, setSearch] = useState("");
   const [origem, setOrigem] = useState<"todos" | "pagamento" | "lancamento">("todos");
   const [usuario, setUsuario] = useState<string>("todos");
   const [periodo, setPeriodo] = useState<"todos" | "7" | "30" | "90">("todos");
   const [empresaAberta, setEmpresaAberta] = useState<string | null>(null);
+
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [dragging, setDragging] = useState(false);
+  const [dropHover, setDropHover] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState<null | RegistroExcluido[]>(null);
+  const [purging, setPurging] = useState(false);
 
   const { data = [], isLoading, error } = useQuery({
     queryKey: ["registros-excluidos"],
@@ -141,11 +149,61 @@ function Board() {
   };
   const filtrosAtivos = search || origem !== "todos" || usuario !== "todos" || periodo !== "todos";
 
+  const toggle = (rs: RegistroExcluido[], on?: boolean) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      const allOn = rs.every((r) => next.has(keyOf(r)));
+      const turnOn = on ?? !allOn;
+      rs.forEach((r) => {
+        if (turnOn) next.add(keyOf(r));
+        else next.delete(keyOf(r));
+      });
+      return next;
+    });
+  };
+
+  const selectedRegistros = useMemo(
+    () => filtered.filter((r) => selected.has(keyOf(r))),
+    [filtered, selected],
+  );
+
+  const doPurge = async (rs: RegistroExcluido[]) => {
+    if (!rs.length) return;
+    setPurging(true);
+    try {
+      const res = await purgeFn({ data: { ids: rs.map((r) => ({ id: r.id, origem: r.origem })) } });
+      toast.success(`${res.deleted} registro(s) apagado(s) definitivamente.`);
+      setSelected(new Set());
+      setConfirmOpen(null);
+      await qc.invalidateQueries({ queryKey: ["registros-excluidos"] });
+    } catch (e: any) {
+      toast.error(e?.message ?? "Falha ao apagar definitivamente.");
+    } finally {
+      setPurging(false);
+    }
+  };
+
+  const dragProps = (rs: RegistroExcluido[]) => ({
+    draggable: true,
+    onDragStart: (e: React.DragEvent) => {
+      const keys = rs.map(keyOf);
+      // Se o item arrastado não está selecionado, arrasta só ele
+      const finalKeys = keys.every((k) => selected.has(k)) && selected.size > 0
+        ? Array.from(selected)
+        : keys;
+      e.dataTransfer.effectAllowed = "move";
+      e.dataTransfer.setData("text/plain", finalKeys.join(","));
+      setDragging(true);
+    },
+    onDragEnd: () => { setDragging(false); setDropHover(false); },
+  });
+
   return (
-    <div className="flex-1 space-y-4 p-6">
+    <div className="flex-1 space-y-4 p-6 pb-32">
       <div>
         <p className="text-sm text-muted-foreground">
-          Área restrita ao Administrador — histórico dos registros apagados de Resultados e Lançamentos, organizados por empresa.
+          Área restrita ao Administrador — histórico dos registros apagados, organizados por empresa.
+          Arraste um cartão para a zona vermelha ou selecione múltiplos e clique em <strong>Apagar definitivamente</strong>.
         </p>
       </div>
 
@@ -211,6 +269,9 @@ function Board() {
           nome={empresaSelecionada[0]}
           registros={empresaSelecionada[1]}
           onVoltar={() => setEmpresaAberta(null)}
+          selected={selected}
+          toggle={toggle}
+          dragProps={dragProps}
         />
       ) : (
         <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
@@ -220,13 +281,90 @@ function Board() {
               nome={nome}
               registros={itens}
               onOpen={() => setEmpresaAberta(nome)}
+              selected={selected}
+              toggle={toggle}
+              dragProps={dragProps}
             />
           ))}
         </div>
       )}
+
+      {/* Barra flutuante de ações */}
+      {(selected.size > 0 || dragging) && (
+        <div className="fixed bottom-4 left-1/2 z-40 flex -translate-x-1/2 items-center gap-3 rounded-2xl border border-border bg-background/95 px-4 py-2.5 shadow-2xl backdrop-blur">
+          <Badge variant="secondary" className="gap-1">
+            <CheckSquare className="h-3.5 w-3.5" /> {selected.size} selecionado{selected.size === 1 ? "" : "s"}
+          </Badge>
+          <Button variant="ghost" size="sm" onClick={() => setSelected(new Set())} disabled={selected.size === 0}>
+            Limpar seleção
+          </Button>
+          <div
+            onDragOver={(e) => { e.preventDefault(); setDropHover(true); }}
+            onDragLeave={() => setDropHover(false)}
+            onDrop={(e) => {
+              e.preventDefault();
+              setDropHover(false); setDragging(false);
+              const keys = new Set((e.dataTransfer.getData("text/plain") || "").split(",").filter(Boolean));
+              const rs = filtered.filter((r) => keys.has(keyOf(r)));
+              if (rs.length) setConfirmOpen(rs);
+            }}
+            className={`flex items-center gap-2 rounded-xl border-2 border-dashed px-4 py-2 text-sm font-semibold transition ${
+              dropHover
+                ? "border-destructive bg-destructive/15 text-destructive scale-105"
+                : "border-destructive/50 bg-destructive/5 text-destructive"
+            }`}
+          >
+            <Trash2 className="h-4 w-4" />
+            {dragging ? "Solte aqui para apagar" : "Zona de exclusão definitiva"}
+          </div>
+          <Button
+            variant="destructive"
+            size="sm"
+            disabled={selected.size === 0}
+            onClick={() => setConfirmOpen(selectedRegistros)}
+          >
+            <Trash2 className="mr-1 h-4 w-4" /> Apagar definitivamente
+          </Button>
+        </div>
+      )}
+
+      <AlertDialog open={!!confirmOpen} onOpenChange={(v) => !v && setConfirmOpen(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Apagar definitivamente?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Você está prestes a remover <strong>{confirmOpen?.length ?? 0}</strong> registro(s) do
+              histórico de exclusões. Esta ação <strong>não pode ser desfeita</strong> e os dados
+              não poderão mais ser restaurados.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={purging}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={purging}
+              onClick={(e) => { e.preventDefault(); if (confirmOpen) doPurge(confirmOpen); }}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {purging ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Trash2 className="mr-2 h-4 w-4" />}
+              Apagar definitivamente
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
+
+type SelectionProps = {
+  selected: Set<string>;
+  toggle: (rs: RegistroExcluido[], on?: boolean) => void;
+  dragProps: (rs: RegistroExcluido[]) => {
+    draggable: true;
+    onDragStart: (e: React.DragEvent) => void;
+    onDragEnd: () => void;
+  };
+};
+
 
 function PastaEmpresa({
   nome, registros, onOpen,
