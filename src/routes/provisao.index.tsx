@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { fetchAllProvisao, provisaoQueryKey } from "@/lib/provisao";
 import { comunicadosQueryKey, publicarComunicado } from "@/lib/comunicados";
+import { createLancamento, lancamentosQueryKey } from "@/lib/lancamentos";
 import {
   fetchFechamentoDia, fecharProvisaoDia, reabrirProvisaoDia,
   provisaoFechamentosKey, todayISO,
