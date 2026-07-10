@@ -75,8 +75,6 @@ const advancedItems: MenuItem[] = [
   { title: "Histórico de Versões", url: "/historico", icon: History, match: (p) => p === "/historico" },
   { title: "Log de Auditoria", url: "/auditoria", icon: ScrollText, match: (p) => p === "/auditoria", allowedRoles: ["administrador", "auditor"] },
   { title: "Registros Excluídos", url: "/registros-excluidos", icon: Trash2, match: (p) => p === "/registros-excluidos", adminOnly: true },
-  { title: "Configurações", url: "/configuracoes", icon: Cog, match: (p) => p === "/configuracoes", adminOnly: true },
-  { title: "Administração de Usuários", url: "/usuarios", icon: Users, match: (p) => p === "/usuarios", adminOnly: true },
 ];
 
 const roleLabel: Record<AppRole, string> = {

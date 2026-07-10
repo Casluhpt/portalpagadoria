@@ -1,5 +1,5 @@
-import { Link } from "@tanstack/react-router";
-import { Circle, LogIn, LogOut, MinusCircle, User, XCircle } from "lucide-react";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { Circle, Cog, KeyRound, LogIn, LogOut, MinusCircle, Settings, User, Users, XCircle } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,9 @@ import {
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { supabase } from "@/integrations/supabase/client";
