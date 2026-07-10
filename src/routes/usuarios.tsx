@@ -101,6 +101,7 @@ function UsuariosTable() {
   const listFn = useServerFn(listAdminUsers);
   const resetFn = useServerFn(resetUserPassword);
   const setRoleFn = useServerFn(setUserRole);
+  const setSetorFn = useServerFn(setUserSetor);
   const inviteFn = useServerFn(inviteUser);
   const qc = useQueryClient();
   const { user } = useSession();
