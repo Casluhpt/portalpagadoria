@@ -1,5 +1,6 @@
-import { useMemo } from "react";
-import { Bell, CheckCheck, X } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Link } from "@tanstack/react-router";
+import { Bell, CheckCheck, Sparkles, X } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -8,6 +9,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useSession } from "@/hooks/use-session";
+import { supabase } from "@/integrations/supabase/client";
 import {
   comunicadosQueryKey,
   fetchComunicados,
@@ -15,6 +17,27 @@ import {
   marcarTodosLidos,
   type Comunicado,
 } from "@/lib/comunicados";
+
+type LatestVersion = {
+  versao: string;
+  titulo: string;
+  resumo: string | null;
+  lancada_em: string;
+  tipo: string;
+};
+
+async function fetchLatestVersion(): Promise<LatestVersion | null> {
+  const { data, error } = await supabase
+    .from("app_versions")
+    .select("versao, titulo, resumo, lancada_em, tipo")
+    .order("lancada_em", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (error) return null;
+  return (data as LatestVersion) ?? null;
+}
+
+const dismissKey = (userId: string, versao: string) => `version_notif_dismissed:${userId}:${versao}`;
 
 const rel = (iso: string) => {
   const diff = Date.now() - new Date(iso).getTime();
@@ -39,7 +62,31 @@ export function NotificationBell() {
     refetchOnWindowFocus: true,
   });
 
+  const { data: latestVersion } = useQuery({
+    queryKey: ["latest-app-version"],
+    queryFn: fetchLatestVersion,
+    enabled: !!user,
+    staleTime: 60_000,
+    refetchOnWindowFocus: true,
+  });
+
+  const [versionDismissed, setVersionDismissed] = useState(true);
+  useEffect(() => {
+    if (!user || !latestVersion) return;
+    const dismissed = typeof window !== "undefined"
+      && window.localStorage.getItem(dismissKey(user.id, latestVersion.versao)) === "1";
+    setVersionDismissed(dismissed);
+  }, [user, latestVersion]);
+
+  const dismissVersion = () => {
+    if (!user || !latestVersion) return;
+    window.localStorage.setItem(dismissKey(user.id, latestVersion.versao), "1");
+    setVersionDismissed(true);
+  };
+
+  const showVersionCard = !!latestVersion && !versionDismissed;
   const naoLidos = useMemo(() => items.filter((i) => !i.lido), [items]);
+  const totalBadge = naoLidos.length + (showVersionCard ? 1 : 0);
 
   const markOne = useMutation({
     mutationFn: (id: string) => marcarLido(id, user!.id),
@@ -63,12 +110,12 @@ export function NotificationBell() {
           variant="ghost"
           size="icon"
           className="relative"
-          aria-label={`Notificações${naoLidos.length ? ` (${naoLidos.length} não lidas)` : ""}`}
+          aria-label={`Notificações${totalBadge ? ` (${totalBadge} não lidas)` : ""}`}
         >
           <Bell className="h-5 w-5 text-slate-600" />
-          {naoLidos.length > 0 && (
+          {totalBadge > 0 && (
             <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-semibold text-white ring-2 ring-white">
-              {naoLidos.length > 9 ? "9+" : naoLidos.length}
+              {totalBadge > 9 ? "9+" : totalBadge}
             </span>
           )}
         </Button>
@@ -95,6 +142,42 @@ export function NotificationBell() {
             </Button>
           )}
         </div>
+        {showVersionCard && latestVersion && (
+          <div className="relative border-b border-violet-100 bg-gradient-to-r from-violet-50 to-indigo-50 px-4 py-3">
+            <button
+              onClick={dismissVersion}
+              aria-label="Dispensar novidade"
+              className="absolute right-2 top-2 rounded-full p-1 text-violet-500 hover:bg-violet-100"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+            <div className="flex items-start gap-2 pr-6">
+              <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-violet-600" />
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2">
+                  <span className="rounded-full bg-violet-600 px-1.5 py-0.5 text-[10px] font-bold text-white">
+                    {latestVersion.versao}
+                  </span>
+                  <span className="text-[10px] font-semibold uppercase tracking-wide text-violet-700">
+                    Nova versão
+                  </span>
+                </div>
+                <p className="mt-1 truncate text-sm font-semibold text-slate-900">
+                  {latestVersion.titulo}
+                </p>
+                {latestVersion.resumo && (
+                  <p className="mt-0.5 line-clamp-2 text-xs text-slate-600">{latestVersion.resumo}</p>
+                )}
+                <Link
+                  to="/historico"
+                  className="mt-1 inline-block text-[11px] font-medium text-violet-700 hover:underline"
+                >
+                  Ver histórico completo →
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
         <Tabs defaultValue="unread" className="w-full">
           <TabsList className="mx-4 mt-2 grid w-[calc(100%-2rem)] grid-cols-2">
             <TabsTrigger value="unread" className="text-xs">
