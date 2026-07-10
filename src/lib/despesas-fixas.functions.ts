@@ -19,6 +19,7 @@ export const EMPRESAS = [
   { codigo: "5000", nome: "CSB" },
   { codigo: "8500", nome: "ROSÁRIO" },
   { codigo: "2500", nome: "PROFARMA HB" },
+  { codigo: "5400", nome: "CSB HB" },
 ] as const;
 
 export type DespesaFixa = {
