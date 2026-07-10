@@ -66,6 +66,13 @@ const brl = (n: number | null | undefined) =>
   n == null ? "" : Number(n).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 const brlShort = (n: number) =>
   n.toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
+const brlCompact = (n: number) =>
+  n.toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+    notation: "compact",
+    maximumFractionDigits: 2,
+  });
 
 function fmtDateTime(iso: string | null | undefined) {
   if (!iso) return "";
@@ -911,12 +918,12 @@ function DashboardTab() {
       </Card>
 
       <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
-        <Kpi label="Valor Total" value={brlShort(kpis.total)} />
+        <Kpi label="Valor Total" value={brlCompact(kpis.total)} title={brl(kpis.total)} />
         <Kpi label="Lançamentos" value={kpis.lancamentos.toLocaleString("pt-BR")} />
         <Kpi label="Colaboradores" value={kpis.qtdColab.toLocaleString("pt-BR")} />
         <Kpi label="Empresas" value={String(kpis.empresas)} />
         <Kpi label="Tipos de Pagamento" value={String(kpis.descricoes)} />
-        <Kpi label="Média por Lançamento" value={brlShort(kpis.media)} />
+        <Kpi label="Média por Lançamento" value={brlCompact(kpis.media)} title={brl(kpis.media)} />
       </div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
@@ -1017,12 +1024,12 @@ function DashboardTab() {
   );
 }
 
-function Kpi({ label, value }: { label: string; value: string }) {
+function Kpi({ label, value, title }: { label: string; value: string; title?: string }) {
   return (
     <Card>
       <CardContent className="p-4">
         <div className="text-[11px] uppercase text-muted-foreground">{label}</div>
-        <div className="mt-1 text-lg font-semibold text-foreground">{value}</div>
+        <div className="mt-1 text-lg font-semibold text-foreground" title={title ?? value}>{value}</div>
       </CardContent>
     </Card>
   );
