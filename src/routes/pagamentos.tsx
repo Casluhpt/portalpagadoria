@@ -87,16 +87,17 @@ function PagamentosPage() {
               <HeaderActions />
             </div>
           </header>
-          <Tabs defaultValue="lancamentos" className="flex flex-1 flex-col">
+          <Tabs defaultValue="dashboard" className="flex flex-1 flex-col">
             <div className="border-b border-border bg-background px-4">
               <TabsList className="h-11 bg-transparent">
-                <TabsTrigger value="lancamentos" className="gap-2">
-                  <TableIcon className="h-4 w-4" /> Lançamentos
-                </TabsTrigger>
                 <TabsTrigger value="dashboard" className="gap-2">
                   <LayoutGrid className="h-4 w-4" /> Dashboard
                 </TabsTrigger>
+                <TabsTrigger value="lancamentos" className="gap-2">
+                  <TableIcon className="h-4 w-4" /> Lançamentos
+                </TabsTrigger>
               </TabsList>
+
             </div>
             <TabsContent value="lancamentos" className="flex-1 p-0 data-[state=inactive]:hidden">
               <LancamentosTab colaboradorNome={colaboradorNome} userId={user?.id ?? null} />
