@@ -160,6 +160,46 @@ function Board() {
       });
       return next;
     });
+    if (rs.length > 0) lastAnchorRef.current = keyOf(rs[rs.length - 1]);
+  };
+
+  const lastAnchorRef = useRef<string | null>(null);
+
+  /**
+   * Ctrl/Cmd + clique → alterna estes itens (multi-seleção).
+   * Shift + clique      → seleciona intervalo desde o último âncora até estes itens (usa listInOrder).
+   * Sem modificador     → false (deixa o clique original abrir a pasta/detalhe).
+   */
+  const pick = (
+    rs: RegistroExcluido[],
+    e: React.MouseEvent,
+    listInOrder?: RegistroExcluido[],
+  ): boolean => {
+    const isCtrl = e.ctrlKey || e.metaKey;
+    const isShift = e.shiftKey;
+    if (!isCtrl && !isShift) return false;
+    e.preventDefault();
+    e.stopPropagation();
+    if (isShift && listInOrder && listInOrder.length > 0 && lastAnchorRef.current) {
+      const keys = listInOrder.map(keyOf);
+      const target = keyOf(rs[rs.length - 1]);
+      const a = keys.indexOf(lastAnchorRef.current);
+      const b = keys.indexOf(target);
+      if (a >= 0 && b >= 0) {
+        const [i, j] = a < b ? [a, b] : [b, a];
+        const range = listInOrder.slice(i, j + 1);
+        setSelected((prev) => {
+          const next = new Set(prev);
+          range.forEach((r) => next.add(keyOf(r)));
+          return next;
+        });
+        lastAnchorRef.current = target;
+        return true;
+      }
+    }
+    // Ctrl/Cmd (ou shift sem âncora): alterna estes itens
+    toggle(rs);
+    return true;
   };
 
   const selectedRegistros = useMemo(
