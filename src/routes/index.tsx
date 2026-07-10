@@ -297,11 +297,16 @@ function PortalPage() {
                 </div>
 
                 <ol className="relative space-y-4 border-l-2 border-violet-100 pl-6">
-                  {visibleVersoes.map((v) => {
+                  {visibleVersoes.map((v, idx) => {
                     const isLatest = latest?.versao === v.versao;
                     const itens = Array.isArray(v.itens) ? (v.itens as Array<{ categoria: string; descricao: string }>) : [];
                     return (
-                      <li key={v.versao} className="relative">
+                      <li
+                        key={v.versao}
+                        className="relative animate-slide-in-left-slow"
+                        style={{ animationDelay: `${idx * 200}ms` }}
+                      >
+
                         <span
                           className={`absolute -left-[31px] top-1 grid h-5 w-5 place-items-center rounded-full ring-4 ring-white ${
                             isLatest ? "bg-violet-600" : "bg-slate-300"
