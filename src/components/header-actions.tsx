@@ -72,38 +72,13 @@ export function HeaderActions() {
     else toast.success("Enviamos um link de redefinição para seu email.");
   };
 
-  const goBack = () => {
-    if (typeof window !== "undefined" && window.history.length > 1) {
-      window.history.back();
-    } else {
-      navigate({ to: "/" });
-    }
-  };
-
-  const BackBtn = (
-    <Button
-      variant="outline"
-      size="sm"
-      onClick={goBack}
-      className="h-9 gap-1.5 border-slate-200 bg-white/70 text-slate-700 hover:bg-slate-100"
-      aria-label="Voltar para a tela anterior"
-      title="Voltar"
-    >
-      <ArrowLeft className="h-4 w-4" />
-      <span className="hidden sm:inline">Voltar</span>
-    </Button>
-  );
-
   if (!user) {
     return (
-      <div className="flex items-center gap-2">
-        {BackBtn}
-        <Button asChild size="sm" variant="default">
-          <Link to="/auth">
-            <LogIn className="mr-2 h-4 w-4" /> Entrar
-          </Link>
-        </Button>
-      </div>
+      <Button asChild size="sm" variant="default">
+        <Link to="/auth">
+          <LogIn className="mr-2 h-4 w-4" /> Entrar
+        </Link>
+      </Button>
     );
   }
 
@@ -118,7 +93,6 @@ export function HeaderActions() {
 
   return (
     <div className="flex items-center gap-1">
-      {BackBtn}
       <NotificationBell />
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
