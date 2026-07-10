@@ -28,7 +28,7 @@ export const Route = createFileRoute("/exportacao")({
 
 type Formato = "xlsx" | "csv" | "pdf";
 
-type BaseKey = "pagamentos_diversos" | "provisao_diaria" | "lancamentos" | "pagamentos_audit";
+type BaseKey = "pagamentos_diversos" | "provisao_diaria" | "pagamento_solicitacoes" | "pagamentos_audit";
 
 type BaseDef = {
   key: BaseKey;
@@ -60,13 +60,13 @@ const BASES: BaseDef[] = [
     orderColumn: "data",
   },
   {
-    key: "lancamentos",
-    titulo: "Lançamentos SAP",
-    descricao: "Notas, fornecedores e centros de custo integrados.",
+    key: "pagamento_solicitacoes",
+    titulo: "Solicitações de Divergência",
+    descricao: "Pedidos de inclusão/edição com status, solicitante e decisão.",
     icon: ClipboardList,
     cor: "from-amber-600 to-amber-800",
-    dateColumn: "due_date",
-    orderColumn: "register_date",
+    dateColumn: "criado_em",
+    orderColumn: "criado_em",
   },
   {
     key: "pagamentos_audit",
