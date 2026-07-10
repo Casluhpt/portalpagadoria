@@ -1,5 +1,5 @@
-import { Link } from "@tanstack/react-router";
-import { Circle, LogIn, LogOut, MinusCircle, User, XCircle } from "lucide-react";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { Circle, Cog, KeyRound, LogIn, LogOut, MinusCircle, Settings, User, Users, XCircle } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,9 @@ import {
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { supabase } from "@/integrations/supabase/client";
@@ -36,14 +39,24 @@ const presenceMeta: Record<PresenceStatus, { label: string; dot: string; Icon: t
 
 export function HeaderActions() {
   const { user } = useSession();
-  const { roles } = useRoles();
+  const { roles, isAdmin } = useRoles();
   const { status, setStatus } = usePresence();
+  const navigate = useNavigate();
   const primary = roles[0];
 
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) toast.error(error.message);
     else toast.success("Sessão encerrada");
+  };
+
+  const sendPasswordReset = async () => {
+    if (!user?.email) return;
+    const { error } = await supabase.auth.resetPasswordForEmail(user.email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    if (error) toast.error(error.message);
+    else toast.success("Enviamos um link de redefinição para seu email.");
   };
 
   if (!user) {
@@ -120,6 +133,33 @@ export function HeaderActions() {
               );
             })}
           </DropdownMenuRadioGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="icon" className="h-9 w-9" aria-label="Configurações">
+            <Settings className="h-4 w-4 text-slate-600" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-60">
+          <DropdownMenuLabel className="text-[10px] uppercase tracking-wide text-muted-foreground">
+            Configurações
+          </DropdownMenuLabel>
+          <DropdownMenuItem onClick={sendPasswordReset}>
+            <KeyRound className="mr-2 h-4 w-4" /> Redefinir senha
+          </DropdownMenuItem>
+          {isAdmin && (
+            <>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => navigate({ to: "/usuarios" })}>
+                <Users className="mr-2 h-4 w-4" /> Administração de usuários
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate({ to: "/configuracoes" })}>
+                <Cog className="mr-2 h-4 w-4" /> Configurações avançadas
+              </DropdownMenuItem>
+            </>
+          )}
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={signOut}>
             <LogOut className="mr-2 h-4 w-4" /> Sair
