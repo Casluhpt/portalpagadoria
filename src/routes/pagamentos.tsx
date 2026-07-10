@@ -50,6 +50,15 @@ import {
   PAGAMENTO_CAMPOS, COMPETENCIAS, getDescricoesByCelula,
   type Pagamento,
 } from "@/lib/pagamentos-constants";
+import {
+  criarSolicitacaoProvisao, extractProvisaoFechadaDate,
+} from "@/lib/provisao-fechamento";
+import {
+  Dialog, DialogContent, DialogDescription, DialogFooter,
+  DialogHeader, DialogTitle,
+} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+
 
 
 const HIDDEN_COLUMN_KEYS = new Set<string>([
