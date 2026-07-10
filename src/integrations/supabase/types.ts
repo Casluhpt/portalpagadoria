@@ -166,6 +166,36 @@ export type Database = {
         }
         Relationships: []
       }
+      lancamentos_audit: {
+        Row: {
+          acao: string
+          created_at: string
+          id: string
+          lancamento_id: string | null
+          snapshot: Json | null
+          user_id: string | null
+          user_nome: string | null
+        }
+        Insert: {
+          acao: string
+          created_at?: string
+          id?: string
+          lancamento_id?: string | null
+          snapshot?: Json | null
+          user_id?: string | null
+          user_nome?: string | null
+        }
+        Update: {
+          acao?: string
+          created_at?: string
+          id?: string
+          lancamento_id?: string | null
+          snapshot?: Json | null
+          user_id?: string | null
+          user_nome?: string | null
+        }
+        Relationships: []
+      }
       pagamento_solicitacoes: {
         Row: {
           criado_em: string
