@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Building2, Calendar, Landmark, ListChecks, Send, Wallet } from "lucide-react";
+import { Building2, Calendar, Landmark, ListChecks, Lock, LockOpen, Send, Wallet } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -10,8 +10,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { fetchAllProvisao, provisaoQueryKey } from "@/lib/provisao";
 import { comunicadosQueryKey, publicarComunicado } from "@/lib/comunicados";
+import {
+  fetchFechamentoDia, fecharProvisaoDia, reabrirProvisaoDia,
+  provisaoFechamentosKey, todayISO,
+} from "@/lib/provisao-fechamento";
 import { useSession } from "@/hooks/use-session";
 import profarmaLogo from "@/assets/profarma-logo.png.asset.json";
+
 
 export const Route = createFileRoute("/provisao/")({
   component: ProvisaoDashboard,
