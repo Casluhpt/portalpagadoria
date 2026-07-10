@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate, useRouterState, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Loader2, LogIn, UserPlus, KeyRound } from "lucide-react";
+import { Loader2, LogIn, UserPlus, KeyRound, AlertCircle } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
