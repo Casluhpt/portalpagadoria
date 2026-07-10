@@ -34,7 +34,7 @@ export function PasswordExpirationGuard() {
     if (!user?.id) { setChangedAt(null); return; }
     let cancel = false;
     (async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("user_password_metadata")
         .select("password_changed_at")
         .eq("user_id", user.id)
