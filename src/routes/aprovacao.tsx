@@ -429,7 +429,7 @@ function BaseView({ rows, ano, isLoading, onUpsert, onBulkInsert, onDelete }: Ba
           return null;
         };
         const empRaw = String(get(["Empresa", "empresa", "empresacodigo"]) ?? "").trim();
-        const empresa = empRaw ? (EMP_CODIGOS.includes(empRaw) ? empRaw : empRaw.split(/[\s—-]/)[0]) : null;
+        const empresa: string | null = empRaw ? ((EMP_CODIGOS as readonly string[]).includes(empRaw) ? empRaw : empRaw.split(/[\s—-]/)[0]) : null;
         const tipoRaw = String(get(["Tipo", "tipo"]) ?? "mensal").toLowerCase().trim();
         const tipo: AprovacaoTipo = (tipoRaw.startsWith("adt") ? "adto" : "mensal");
         const stRaw = String(get(["Status", "status"]) ?? "Pendente").trim();
