@@ -17,9 +17,16 @@ const brl = (n: number) =>
   n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 const today = () => new Date().toISOString().slice(0, 10);
+const firstOfMonth = () => {
+  const d = new Date();
+  return new Date(d.getFullYear(), d.getMonth(), 1).toISOString().slice(0, 10);
+};
+const fmtBR = (iso: string) =>
+  new Date(iso + "T00:00:00").toLocaleDateString("pt-BR");
 
 function ProvisaoDashboard() {
-  const [selectedDate, setSelectedDate] = useState<string>(today());
+  const [dateFrom, setDateFrom] = useState<string>(firstOfMonth());
+  const [dateTo, setDateTo] = useState<string>(today());
 
   const { data, isLoading } = useQuery({
     queryKey: provisaoQueryKey,
@@ -28,11 +35,14 @@ function ProvisaoDashboard() {
   });
 
   const filtered = useMemo(
-    () => (data ?? []).filter((r) => r.data === selectedDate),
-    [data, selectedDate],
+    () =>
+      (data ?? []).filter(
+        (r) => r.data != null && r.data >= dateFrom && r.data <= dateTo,
+      ),
+    [data, dateFrom, dateTo],
   );
 
-  // Group by empresa + banco
+  // Group by empresa + banco, sorted desc by valor
   const grouped = useMemo(() => {
     const map = new Map<string, { empresa: string; banco: string; valor: number }>();
     for (const r of filtered) {
@@ -43,9 +53,7 @@ function ProvisaoDashboard() {
       cur.valor += r.valor ?? 0;
       map.set(key, cur);
     }
-    return [...map.values()].sort((a, b) =>
-      a.empresa.localeCompare(b.empresa, "pt-BR"),
-    );
+    return [...map.values()].sort((a, b) => b.valor - a.valor);
   }, [filtered]);
 
   const totalGeral = grouped.reduce((s, r) => s + r.valor, 0);
@@ -62,7 +70,8 @@ function ProvisaoDashboard() {
     return top;
   }, [grouped]);
 
-  const dateLabel = new Date(selectedDate + "T00:00:00").toLocaleDateString("pt-BR");
+  const rangeLabel = `${fmtBR(dateFrom)} a ${fmtBR(dateTo)}`;
+
 
   return (
     <main className="flex-1 space-y-6 p-6">
