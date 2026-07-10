@@ -31,6 +31,8 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { ShieldAlert } from "lucide-react";
+import { useRoles } from "@/hooks/use-roles";
 
 import { fetchAllLancamentos, lancamentosQueryKey, type Lancamento } from "@/lib/lancamentos";
 import logoAsset from "@/assets/profarma-logo.png.asset.json";
