@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
-import { Loader2, Search, ShieldAlert } from "lucide-react";
+import { Loader2, Search, ShieldAlert, ScrollText, Trash2 } from "lucide-react";
 
 import { AppSidebar } from "@/components/app-sidebar";
 import { HeaderActions } from "@/components/header-actions";
@@ -14,12 +14,18 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { useRoles } from "@/hooks/use-roles";
+import { RegistrosExcluidosView } from "@/routes/registros-excluidos";
 
 export const Route = createFileRoute("/auditoria")({
+  validateSearch: (s: Record<string, unknown>) => ({
+    tab: (s.tab === "excluidos" ? "excluidos" : "log") as "log" | "excluidos",
+  }),
   component: AuditoriaPage,
 });
+
 
 type AuditRow = {
   id: string;
@@ -59,6 +65,8 @@ async function fetchAudit(): Promise<AuditRow[]> {
 }
 
 function AuditoriaPage() {
+  const { tab } = Route.useSearch();
+  const navigate = Route.useNavigate();
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full bg-background">
@@ -66,12 +74,33 @@ function AuditoriaPage() {
         <div className="flex flex-1 flex-col">
           <header className="sticky top-0 z-10 flex h-14 items-center gap-4 border-b border-border bg-background/80 px-4 backdrop-blur">
             <SidebarTrigger />
-            <h1 className="text-sm font-semibold text-foreground">Log de Auditoria</h1>
+            <h1 className="text-sm font-semibold text-foreground">Auditoria</h1>
             <div className="ml-auto">
               <HeaderActions />
             </div>
           </header>
-          <AuditoriaContent />
+          <Tabs
+            value={tab}
+            onValueChange={(v) => navigate({ search: { tab: v as "log" | "excluidos" }, replace: true })}
+            className="flex flex-1 flex-col"
+          >
+            <div className="border-b border-border bg-background px-4 pt-3">
+              <TabsList>
+                <TabsTrigger value="log" className="gap-1.5">
+                  <ScrollText className="h-3.5 w-3.5" /> Log de Auditoria
+                </TabsTrigger>
+                <TabsTrigger value="excluidos" className="gap-1.5">
+                  <Trash2 className="h-3.5 w-3.5" /> Registros Excluídos
+                </TabsTrigger>
+              </TabsList>
+            </div>
+            <TabsContent value="log" className="mt-0 flex-1">
+              <AuditoriaContent />
+            </TabsContent>
+            <TabsContent value="excluidos" className="mt-0 flex-1">
+              <RegistrosExcluidosView />
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     </SidebarProvider>
