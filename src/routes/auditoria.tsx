@@ -19,12 +19,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { useRoles } from "@/hooks/use-roles";
 import { RegistrosExcluidosView } from "@/routes/registros-excluidos";
 
-const searchSchema = z.object({
-  tab: fallback(z.string(), "log").default("log"),
-});
-
 export const Route = createFileRoute("/auditoria")({
-  validateSearch: zodValidator(searchSchema),
+  validateSearch: (s: Record<string, unknown>) => ({
+    tab: (s.tab === "excluidos" ? "excluidos" : "log") as "log" | "excluidos",
+  }),
   component: AuditoriaPage,
 });
 
