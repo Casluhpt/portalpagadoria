@@ -165,3 +165,23 @@ export const inviteUser = createServerFn({ method: "POST" })
 
     return { ok: true, userId: userId ?? null };
   });
+
+export const setUserSetor = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { userId: string; setor: Setor | null }) => {
+    if (!input?.userId) throw new Error("userId é obrigatório");
+    if (input.setor !== null && !(ALLOWED_SETORES as readonly string[]).includes(input.setor)) {
+      throw new Error("Setor inválido");
+    }
+    return input;
+  })
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin
+      .from("profiles")
+      .update({ setor: data.setor })
+      .eq("id", data.userId);
+    if (error) throw error;
+    return { ok: true };
+  });
