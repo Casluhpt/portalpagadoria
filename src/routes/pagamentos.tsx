@@ -34,7 +34,7 @@ import {
   type PagamentoInput,
 } from "@/lib/pagamentos";
 import {
-  PAGAMENTO_CAMPOS, COMPETENCIAS,
+  PAGAMENTO_CAMPOS, COMPETENCIAS, getDescricoesByCelula,
   type Pagamento,
 } from "@/lib/pagamentos-constants";
 
