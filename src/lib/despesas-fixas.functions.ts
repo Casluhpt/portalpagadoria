@@ -146,6 +146,8 @@ export const updateDescricaoMeta = createServerFn({ method: "POST" })
       centro_custo: z.string().max(120).nullable().optional(),
       numero_pedido: z.string().max(60).nullable().optional(),
       nova_descricao: z.string().min(1).max(200).optional(),
+      nome_real: z.string().max(200).nullable().optional(),
+      notas: z.string().max(2000).nullable().optional(),
     }).parse(d),
   )
   .handler(async ({ context, data }) => {
@@ -156,6 +158,8 @@ export const updateDescricaoMeta = createServerFn({ method: "POST" })
       centro_custo: data.centro_custo ?? null,
     };
     if (data.numero_pedido !== undefined) patch.numero_pedido = data.numero_pedido ?? null;
+    if (data.nome_real !== undefined) patch.nome_real = data.nome_real ?? null;
+    if (data.notas !== undefined) patch.notas = data.notas ?? null;
     if (data.nova_descricao && data.nova_descricao !== data.descricao) {
       patch.descricao = data.nova_descricao;
     }
