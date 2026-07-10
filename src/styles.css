@@ -149,3 +149,12 @@
     color: var(--color-foreground);
   }
 }
+
+@keyframes slide-in-left-slow {
+  0% { opacity: 0; transform: translateX(-40px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+
+.animate-slide-in-left-slow {
+  animation: slide-in-left-slow 1.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
