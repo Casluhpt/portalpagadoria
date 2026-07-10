@@ -57,11 +57,11 @@ type MenuItem = {
 
 const mainItems: MenuItem[] = [
   { title: "Início", url: "/", icon: Home, match: (p) => p === "/" },
-  { title: "Resultados Principais", url: "/principal", icon: LayoutDashboard, match: (p) => p === "/principal" },
+  { title: "Resultados Principais", url: "/principal", icon: LayoutDashboard, match: (p) => p === "/principal", restricted: true, adminOnly: true },
   { title: "Provisão Diária", url: "/provisao", icon: Wallet, match: (p) => p === "/provisao", restricted: true, adminOnly: true },
   { title: "Base de Provisão", url: "/provisao/base", icon: Database, match: (p) => p === "/provisao/base", restricted: true, adminOnly: true },
   { title: "Base de Anexos", url: "/anexos", icon: FileArchive, match: (p) => p.startsWith("/anexos") },
-  { title: "Conciliação Bancária", url: "/conciliacao", icon: ShieldCheck, match: (p) => p.startsWith("/conciliacao") },
+  { title: "Conciliação Bancária", url: "/conciliacao", icon: ShieldCheck, match: (p) => p.startsWith("/conciliacao"), restricted: true, adminOnly: true },
   { title: "Pagamentos Diversos", url: "/pagamentos", icon: Banknote, match: (p) => p.startsWith("/pagamentos") },
   { title: "Administração do Portal", url: "/administracao", icon: Settings, match: (p) => p.startsWith("/administracao"), adminOnly: true },
   { title: "Fechamento de Competência", url: "/fechamento", icon: FileCheck2, match: (p) => p.startsWith("/fechamento") },
