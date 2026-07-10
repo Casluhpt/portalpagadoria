@@ -65,22 +65,65 @@ function AuthPage() {
   );
 }
 
+function translateAuthError(msg: string): string {
+  const m = msg.toLowerCase();
+  if (m.includes("invalid login credentials") || m.includes("invalid_credentials"))
+    return "E-mail ou senha incorretos. Verifique os dados e tente novamente.";
+  if (m.includes("email not confirmed"))
+    return "E-mail ainda não confirmado. Verifique sua caixa de entrada.";
+  if (m.includes("user not found"))
+    return "Usuário não encontrado. Confira o e-mail digitado.";
+  if (m.includes("too many requests") || m.includes("rate limit"))
+    return "Muitas tentativas. Aguarde alguns minutos antes de tentar de novo.";
+  if (m.includes("network") || m.includes("failed to fetch"))
+    return "Sem conexão com o servidor. Verifique sua internet e tente novamente.";
+  if (m.includes("user already registered"))
+    return "Este e-mail já está cadastrado. Use a aba Entrar.";
+  if (m.includes("password should be") || m.includes("weak password"))
+    return "Senha muito fraca. Use ao menos 8 caracteres, com letras e números.";
+  return msg;
+}
+
 function SignInForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMsg(null);
+    if (!email.trim() || !password) {
+      setErrorMsg("Preencha e-mail e senha para entrar.");
+      return;
+    }
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { error } = await supabase.auth.signInWithPassword({
+      email: email.trim(),
+      password,
+    });
     setLoading(false);
-    if (error) return toast.error(error.message);
+    if (error) {
+      const msg = translateAuthError(error.message);
+      setErrorMsg(msg);
+      toast.error(msg);
+      return;
+    }
+    setErrorMsg(null);
     toast.success("Sessão iniciada");
   };
 
   return (
     <form onSubmit={submit} className="mt-4 space-y-3">
+      {errorMsg && (
+        <div
+          role="alert"
+          className="flex items-start gap-2 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800"
+        >
+          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+          <span>{errorMsg}</span>
+        </div>
+      )}
       <div className="space-y-1.5">
         <Label htmlFor="si-email">E-mail</Label>
         <Input
@@ -90,7 +133,10 @@ function SignInForm() {
           autoComplete="email"
           placeholder="usuario@profarma.com.br"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) => {
+            setEmail(e.target.value);
+            if (errorMsg) setErrorMsg(null);
+          }}
         />
       </div>
       <div className="space-y-1.5">
@@ -108,7 +154,10 @@ function SignInForm() {
           required
           autoComplete="current-password"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={(e) => {
+            setPassword(e.target.value);
+            if (errorMsg) setErrorMsg(null);
+          }}
         />
       </div>
       <Button type="submit" disabled={loading} className="w-full">
