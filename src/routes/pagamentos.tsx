@@ -918,12 +918,12 @@ function DashboardTab() {
       </Card>
 
       <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
-        <Kpi label="Valor Total" value={brlShort(kpis.total)} />
+        <Kpi label="Valor Total" value={brlCompact(kpis.total)} title={brl(kpis.total)} />
         <Kpi label="Lançamentos" value={kpis.lancamentos.toLocaleString("pt-BR")} />
         <Kpi label="Colaboradores" value={kpis.qtdColab.toLocaleString("pt-BR")} />
         <Kpi label="Empresas" value={String(kpis.empresas)} />
         <Kpi label="Tipos de Pagamento" value={String(kpis.descricoes)} />
-        <Kpi label="Média por Lançamento" value={brlShort(kpis.media)} />
+        <Kpi label="Média por Lançamento" value={brlCompact(kpis.media)} title={brl(kpis.media)} />
       </div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
