@@ -1,11 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import * as XLSX from "xlsx";
 import {
   Loader2, Plus, Search, Trash2, ArrowUpDown, ArrowUp, ArrowDown,
   Upload, Download, LayoutGrid, Table as TableIcon,
+  Scissors, Palette, X,
 } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   BarChart, Bar, LineChart as ReLineChart, Line, PieChart, Pie, Cell,
   ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, CartesianGrid,
