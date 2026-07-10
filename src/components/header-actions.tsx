@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { LogIn, LogOut, User } from "lucide-react";
+import { Circle, LogIn, LogOut, MinusCircle, User, XCircle } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -8,12 +8,15 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { supabase } from "@/integrations/supabase/client";
 import { useRoles } from "@/hooks/use-roles";
 import { useSession } from "@/hooks/use-session";
+import { usePresence, type PresenceStatus } from "@/hooks/use-presence";
 
 import { NotificationBell } from "./notification-bell";
 
