@@ -66,6 +66,13 @@ const brl = (n: number | null | undefined) =>
   n == null ? "" : Number(n).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 const brlShort = (n: number) =>
   n.toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
+const brlCompact = (n: number) =>
+  n.toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+    notation: "compact",
+    maximumFractionDigits: 2,
+  });
 
 function fmtDateTime(iso: string | null | undefined) {
   if (!iso) return "";
