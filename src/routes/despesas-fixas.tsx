@@ -121,6 +121,8 @@ function DespesasFixasPage() {
             conta: r.conta,
             centro_custo: r.centro_custo,
             numero_pedido: r.numero_pedido,
+            nome_real: (r as any).nome_real ?? null,
+            notas: (r as any).notas ?? null,
           },
         };
         map.set(key, l);
