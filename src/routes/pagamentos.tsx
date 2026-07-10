@@ -159,63 +159,6 @@ function LancamentosTab({ colaboradorNome, userId }: { colaboradorNome: string; 
   }, [highlights]);
   const [bulkPendingDelete, setBulkPendingDelete] = useState(false);
 
-  // --- Presença por linha em tempo real ---
-  const [rowPresence, setRowPresence] = useState<Record<string, string[]>>({});
-  const presenceChannelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
-  const activeRowRef = useRef<string | null>(null);
-  const presenceKey = userId ?? `anon-${colaboradorNome}`;
-  const nomeRef = useRef(colaboradorNome);
-  useEffect(() => { nomeRef.current = colaboradorNome; }, [colaboradorNome]);
-
-  useEffect(() => {
-    const channel = supabase.channel("pagamentos-row-presence", {
-      config: { presence: { key: presenceKey } },
-    });
-    presenceChannelRef.current = channel;
-
-    const recompute = () => {
-      const state = channel.presenceState() as Record<
-        string,
-        Array<{ nome?: string; rowId?: string | null }>
-      >;
-      const map: Record<string, Set<string>> = {};
-      for (const [key, metas] of Object.entries(state)) {
-        if (key === presenceKey) continue; // não mostrar a si mesmo
-        for (const m of metas) {
-          if (!m?.rowId || !m?.nome) continue;
-          (map[m.rowId] ??= new Set()).add(m.nome);
-        }
-      }
-      const out: Record<string, string[]> = {};
-      for (const [rid, set] of Object.entries(map)) out[rid] = Array.from(set);
-      setRowPresence(out);
-    };
-
-    channel
-      .on("presence", { event: "sync" }, recompute)
-      .on("presence", { event: "join" }, recompute)
-      .on("presence", { event: "leave" }, recompute)
-      .subscribe(async (status) => {
-        if (status === "SUBSCRIBED") {
-          await channel.track({ nome: nomeRef.current, rowId: null });
-        }
-      });
-
-    return () => {
-      supabase.removeChannel(channel);
-      presenceChannelRef.current = null;
-    };
-    // Depende só do userId estável — evita recriar o canal a cada refresh de token
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [presenceKey]);
-
-  const setActiveRow = (rowId: string | null) => {
-    if (activeRowRef.current === rowId) return;
-    activeRowRef.current = rowId;
-    const ch = presenceChannelRef.current;
-    if (!ch) return;
-    void ch.track({ nome: nomeRef.current, rowId });
-  };
 
   const invalidate = () => qc.invalidateQueries({ queryKey: pagamentosQueryKey });
 
@@ -614,17 +557,14 @@ function LancamentosTab({ colaboradorNome, userId }: { colaboradorNome: string; 
                   ))}
                 </tr>
               </thead>
-              <tbody onMouseLeave={() => setActiveRow(null)}>
+              <tbody>
                 {rows.map((r, i) => {
                   const bg = colorBg(highlights[r.id]);
-                  const watchers = rowPresence[r.id] ?? [];
                   return (
                     <tr
                       key={r.id}
                       className="group hover:bg-muted/40"
                       style={bg ? { background: bg } : undefined}
-                      onMouseEnter={() => setActiveRow(r.id)}
-                      onFocusCapture={() => setActiveRow(r.id)}
                     >
                       <td className="border-b border-border px-2 py-1">
                         <Checkbox
@@ -634,22 +574,7 @@ function LancamentosTab({ colaboradorNome, userId }: { colaboradorNome: string; 
                         />
                       </td>
                       <td className="border-b border-border px-2 py-1 text-muted-foreground">
-                        <div className="flex items-center gap-1.5">
-                          <span>{i + 1}</span>
-                          {watchers.length > 0 && (
-                            <span
-                              title={`${watchers.join(", ")} ${watchers.length === 1 ? "está" : "estão"} nesta linha`}
-                              className="inline-flex items-center gap-1 rounded-full border border-violet-300 bg-violet-100 px-1.5 py-0.5 text-[10px] font-medium text-violet-800 dark:border-violet-700 dark:bg-violet-950 dark:text-violet-200"
-                            >
-                              <span className="relative flex h-1.5 w-1.5">
-                                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-violet-500 opacity-75" />
-                                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-violet-600" />
-                              </span>
-                              {watchers[0]}
-                              {watchers.length > 1 && ` +${watchers.length - 1}`}
-                            </span>
-                          )}
-                        </div>
+                        {i + 1}
                       </td>
                       {VISIBLE_CAMPOS.map((c) => (
                         <EditableCell
