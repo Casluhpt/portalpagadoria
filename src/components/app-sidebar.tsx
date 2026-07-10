@@ -197,6 +197,9 @@ export function AppSidebar() {
                       : primaryRole
                       ? roleLabel[primaryRole]
                       : "Sem perfil atribuído"}
+                    {setor ? (
+                      <span className="ml-1 normal-case text-sidebar-foreground/70">· {setor}</span>
+                    ) : null}
                   </div>
                 </div>
                 <Button variant="outline" size="sm" className="w-full" onClick={() => setConfirmSignOut(true)}>
