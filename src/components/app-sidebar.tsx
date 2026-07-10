@@ -90,10 +90,20 @@ const roleLabel: Record<AppRole, string> = {
 
 export function AppSidebar() {
   const currentPath = useRouterState({ select: (r) => r.location.pathname });
+  const navigate = useNavigate();
   const { user } = useSession();
-  const { roles, isAdmin, hasAny, loading: rolesLoading } = useRoles();
+  const { roles, isAdmin, isViewer, hasAny, loading: rolesLoading } = useRoles();
+
+  // Viewer users are only allowed on /pagamentos — auto-redirect otherwise.
+  useEffect(() => {
+    if (rolesLoading) return;
+    if (isViewer && !currentPath.startsWith("/pagamentos") && currentPath !== "/auth") {
+      navigate({ to: "/pagamentos", replace: true });
+    }
+  }, [isViewer, rolesLoading, currentPath, navigate]);
 
   const canSee = (item: MenuItem): boolean => {
+    if (isViewer) return item.url.startsWith("/pagamentos");
     if (item.adminOnly) return isAdmin;
     if (item.allowedRoles && item.allowedRoles.length > 0) return hasAny(item.allowedRoles);
     return true;
