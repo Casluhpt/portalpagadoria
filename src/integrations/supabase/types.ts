@@ -164,7 +164,6 @@ export type Database = {
           celula: string | null
           colaborador_nome: string
           competencia: string | null
-          competencia_ano: number | null
           created_at: string
           data_credito: string | null
           descricao_pagamento: string | null
@@ -193,7 +192,6 @@ export type Database = {
           celula?: string | null
           colaborador_nome: string
           competencia?: string | null
-          competencia_ano?: number | null
           created_at?: string
           data_credito?: string | null
           descricao_pagamento?: string | null
@@ -222,7 +220,6 @@ export type Database = {
           celula?: string | null
           colaborador_nome?: string
           competencia?: string | null
-          competencia_ano?: number | null
           created_at?: string
           data_credito?: string | null
           descricao_pagamento?: string | null
