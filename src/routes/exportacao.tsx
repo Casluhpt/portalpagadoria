@@ -28,7 +28,7 @@ export const Route = createFileRoute("/exportacao")({
 
 type Formato = "xlsx" | "csv" | "pdf";
 
-type BaseKey = "pagamentos_diversos" | "provisao_diaria" | "lancamentos" | "pagamentos_audit";
+type BaseKey = "pagamentos_diversos" | "provisao_diaria" | "pagamento_solicitacoes" | "pagamentos_audit";
 
 type BaseDef = {
   key: BaseKey;
