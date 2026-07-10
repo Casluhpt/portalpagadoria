@@ -4,7 +4,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { format, formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Loader2, KeyRound, ShieldAlert, Search, ShieldCheck, Eye } from "lucide-react";
+import { Loader2, KeyRound, ShieldAlert, Search, ShieldCheck, Eye, UserPlus } from "lucide-react";
 
 import { AppSidebar } from "@/components/app-sidebar";
 import { HeaderActions } from "@/components/header-actions";
@@ -24,7 +24,11 @@ import { toast } from "sonner";
 import { useRoles } from "@/hooks/use-roles";
 import { useSession } from "@/hooks/use-session";
 import { useQueryClient } from "@tanstack/react-query";
-import { listAdminUsers, resetUserPassword, setUserRole, type AdminUserRow } from "@/lib/admin-users.functions";
+import { listAdminUsers, resetUserPassword, setUserRole, inviteUser, type AdminUserRow } from "@/lib/admin-users.functions";
+import {
+  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 
 export const Route = createFileRoute("/usuarios")({
   component: UsuariosPage,
