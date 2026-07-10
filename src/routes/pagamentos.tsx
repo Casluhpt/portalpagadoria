@@ -311,6 +311,61 @@ function LancamentosTab({ colaboradorNome, userId }: { colaboradorNome: string; 
     }
   };
 
+  const allSelected = rows.length > 0 && rows.every((r) => selected.has(r.id));
+  const someSelected = selected.size > 0 && !allSelected;
+  const toggleAll = () => {
+    if (allSelected) setSelected(new Set());
+    else setSelected(new Set(rows.map((r) => r.id)));
+  };
+  const toggleOne = (id: string) => {
+    setSelected((prev) => {
+      const n = new Set(prev);
+      if (n.has(id)) n.delete(id);
+      else n.add(id);
+      return n;
+    });
+  };
+  const setHighlightForSelected = (color: string | null) => {
+    setHighlights((prev) => {
+      const n = { ...prev };
+      for (const id of selected) {
+        if (color) n[id] = color;
+        else delete n[id];
+      }
+      return n;
+    });
+    toast.success(color ? "Destaque aplicado" : "Destaque removido");
+  };
+  const cutSelected = async () => {
+    const ids = Array.from(selected);
+    if (!ids.length) return;
+    const selectedRows = rows.filter((r) => ids.includes(r.id));
+    const header = VISIBLE_CAMPOS.map((c) => c.label).join("\t");
+    const body = selectedRows
+      .map((r) => VISIBLE_CAMPOS.map((c) => {
+        const v = r[c.key];
+        return v == null ? "" : String(v).replace(/\t|\n/g, " ");
+      }).join("\t"))
+      .join("\n");
+    try {
+      await navigator.clipboard.writeText(header + "\n" + body);
+      toast.success(`${ids.length} linha(s) copiada(s) para a área de transferência`);
+      bulkDeleteMut.mutate(ids);
+    } catch {
+      toast.error("Falha ao copiar para a área de transferência");
+    }
+  };
+
+  const HIGHLIGHT_COLORS: { name: string; label: string; bg: string; sw: string }[] = [
+    { name: "yellow", label: "Amarelo", bg: "rgba(250,204,21,0.28)", sw: "#facc15" },
+    { name: "green",  label: "Verde",   bg: "rgba(34,197,94,0.28)",  sw: "#22c55e" },
+    { name: "blue",   label: "Azul",    bg: "rgba(59,130,246,0.28)", sw: "#3b82f6" },
+    { name: "red",    label: "Vermelho",bg: "rgba(239,68,68,0.28)",  sw: "#ef4444" },
+    { name: "purple", label: "Roxo",    bg: "rgba(168,85,247,0.28)", sw: "#a855f7" },
+  ];
+  const colorBg = (name: string | undefined) =>
+    HIGHLIGHT_COLORS.find((c) => c.name === name)?.bg;
+
   return (
     <div className="flex flex-col">
       <div className="sticky top-14 z-[5] flex flex-wrap items-center gap-2 border-b border-border bg-background/80 px-4 py-2 backdrop-blur">
@@ -353,6 +408,48 @@ function LancamentosTab({ colaboradorNome, userId }: { colaboradorNome: string; 
         </div>
       </div>
 
+      {selected.size > 0 && (
+        <div className="sticky top-[6.25rem] z-[5] flex flex-wrap items-center gap-2 border-b border-border bg-primary/5 px-4 py-2 backdrop-blur">
+          <span className="text-xs font-medium text-foreground">
+            {selected.size} selecionada(s)
+          </span>
+          <Button size="sm" variant="outline" className="gap-1" onClick={cutSelected} disabled={bulkDeleteMut.isPending}>
+            <Scissors className="h-4 w-4" /> Recortar
+          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button size="sm" variant="outline" className="gap-1">
+                <Palette className="h-4 w-4" /> Destacar
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start">
+              {HIGHLIGHT_COLORS.map((c) => (
+                <DropdownMenuItem key={c.name} onClick={() => setHighlightForSelected(c.name)}>
+                  <span className="mr-2 inline-block h-3 w-3 rounded-sm border border-border" style={{ background: c.sw }} />
+                  {c.label}
+                </DropdownMenuItem>
+              ))}
+              <DropdownMenuItem onClick={() => setHighlightForSelected(null)}>
+                <X className="mr-2 h-3 w-3" /> Remover destaque
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <Button
+            size="sm"
+            variant="destructive"
+            className="gap-1"
+            onClick={() => setBulkPendingDelete(true)}
+            disabled={bulkDeleteMut.isPending}
+          >
+            {bulkDeleteMut.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+            Excluir
+          </Button>
+          <Button size="sm" variant="ghost" className="gap-1 ml-auto" onClick={() => setSelected(new Set())}>
+            <X className="h-4 w-4" /> Limpar seleção
+          </Button>
+        </div>
+      )}
+
       <div className="p-4">
         <div className="relative max-h-[calc(100vh-11rem)] overflow-auto rounded-lg border border-border bg-card">
           {isLoading ? (
@@ -363,6 +460,13 @@ function LancamentosTab({ colaboradorNome, userId }: { colaboradorNome: string; 
             <table className="min-w-full border-collapse text-xs">
               <thead className="sticky top-0 z-10 bg-muted/95 backdrop-blur">
                 <tr>
+                  <th className="w-8 border-b border-border px-2 py-2 text-left">
+                    <Checkbox
+                      checked={allSelected ? true : someSelected ? "indeterminate" : false}
+                      onCheckedChange={toggleAll}
+                      aria-label="Selecionar todas"
+                    />
+                  </th>
                   <th className="w-10 border-b border-border px-2 py-2 text-left font-semibold text-muted-foreground">#</th>
                   {VISIBLE_CAMPOS.map((c) => (
                     <th
@@ -378,28 +482,32 @@ function LancamentosTab({ colaboradorNome, userId }: { colaboradorNome: string; 
                       </div>
                     </th>
                   ))}
-                  <th className="sticky right-0 z-10 w-10 border-b border-border bg-muted/95 px-2 py-2" />
                 </tr>
               </thead>
               <tbody>
-                {rows.map((r, i) => (
-                  <tr key={r.id} className="group hover:bg-muted/40">
-                    <td className="border-b border-border px-2 py-1 text-muted-foreground">{i + 1}</td>
-                    {VISIBLE_CAMPOS.map((c) => (
-                      <EditableCell
-                        key={c.key}
-                        row={r}
-                        col={c}
-                        onSave={(patch) => updateMut.mutate({ id: r.id, patch })}
-                      />
-                    ))}
-                    <td className="sticky right-0 z-0 border-b border-border bg-card px-1 py-1 group-hover:bg-muted/40">
-                      <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-destructive" onClick={() => setPendingDelete(r)}>
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
+                {rows.map((r, i) => {
+                  const bg = colorBg(highlights[r.id]);
+                  return (
+                    <tr key={r.id} className="group hover:bg-muted/40" style={bg ? { background: bg } : undefined}>
+                      <td className="border-b border-border px-2 py-1">
+                        <Checkbox
+                          checked={selected.has(r.id)}
+                          onCheckedChange={() => toggleOne(r.id)}
+                          aria-label={`Selecionar linha ${i + 1}`}
+                        />
+                      </td>
+                      <td className="border-b border-border px-2 py-1 text-muted-foreground">{i + 1}</td>
+                      {VISIBLE_CAMPOS.map((c) => (
+                        <EditableCell
+                          key={c.key}
+                          row={r}
+                          col={c}
+                          onSave={(patch) => updateMut.mutate({ id: r.id, patch })}
+                        />
+                      ))}
+                    </tr>
+                  );
+                })}
                 {rows.length === 0 && (
                   <tr>
                     <td colSpan={VISIBLE_CAMPOS.length + 2} className="px-4 py-16 text-center text-sm text-muted-foreground">
@@ -413,15 +521,20 @@ function LancamentosTab({ colaboradorNome, userId }: { colaboradorNome: string; 
         </div>
       </div>
 
-      <AlertDialog open={!!pendingDelete} onOpenChange={(o) => !o && setPendingDelete(null)}>
+      <AlertDialog open={bulkPendingDelete} onOpenChange={setBulkPendingDelete}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Excluir lançamento?</AlertDialogTitle>
+            <AlertDialogTitle>Excluir {selected.size} lançamento(s)?</AlertDialogTitle>
             <AlertDialogDescription>Essa ação é permanente e ficará registrada na auditoria.</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={() => { if (pendingDelete) deleteMut.mutate(pendingDelete.id); setPendingDelete(null); }}>
+            <AlertDialogAction
+              onClick={() => {
+                bulkDeleteMut.mutate(Array.from(selected));
+                setBulkPendingDelete(false);
+              }}
+            >
               Excluir
             </AlertDialogAction>
           </AlertDialogFooter>
