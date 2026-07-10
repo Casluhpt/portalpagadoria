@@ -12,8 +12,9 @@ import {
   ScrollText,
   ShieldCheck,
   TrendingUp,
-  Users,
-  Wallet,
+  Sparkles,
+  Wrench,
+  Bug,
 } from "lucide-react";
 
 import { AppSidebar } from "@/components/app-sidebar";
@@ -25,6 +26,9 @@ import { Badge } from "@/components/ui/badge";
 import profarmaLogo from "@/assets/profarma-logo.png.asset.json";
 import { fetchAllLancamentos, lancamentosQueryKey } from "@/lib/lancamentos";
 import { fetchAllProvisao, provisaoQueryKey } from "@/lib/provisao";
+import { supabase } from "@/integrations/supabase/client";
+import { useEffect, useState } from "react";
+
 
 export const Route = createFileRoute("/")({
   component: PortalPage,
