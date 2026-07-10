@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Circle, Cog, KeyRound, LogIn, LogOut, MinusCircle, Settings, User, Users, XCircle } from "lucide-react";
+import { Circle, Cog, History, KeyRound, LogIn, LogOut, MinusCircle, Settings, User, Users, XCircle } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -154,6 +154,9 @@ export function HeaderActions() {
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => navigate({ to: "/usuarios" })}>
                 <Users className="mr-2 h-4 w-4" /> Administração de usuários
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate({ to: "/historico" })}>
+                <History className="mr-2 h-4 w-4" /> Histórico de versões
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => navigate({ to: "/configuracoes" })}>
                 <Cog className="mr-2 h-4 w-4" /> Configurações avançadas
