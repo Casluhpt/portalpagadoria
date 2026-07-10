@@ -416,8 +416,13 @@ type SelectionProps = {
 
 
 function PastaEmpresa({
-  nome, registros, onOpen, selected, toggle, dragProps,
-}: { nome: string; registros: RegistroExcluido[]; onOpen: () => void } & SelectionProps) {
+  nome, registros, onOpen, selected, toggle, pick, pastasEmOrdem, dragProps,
+}: {
+  nome: string;
+  registros: RegistroExcluido[];
+  onOpen: () => void;
+  pastasEmOrdem?: Array<[string, RegistroExcluido[]]>;
+} & SelectionProps) {
   const qtd = registros.length;
   const ultimo = registros[0]?.created_at;
   const pag = registros.filter((r) => r.origem === "pagamento").length;
@@ -425,9 +430,15 @@ function PastaEmpresa({
   const selCount = registros.filter((r) => selected.has(keyOf(r))).length;
   const allSel = selCount > 0 && selCount === qtd;
 
+  // Para shift-range em pastas: usamos o primeiro registro de cada pasta
+  // como âncora representativa daquela pasta na lista ordenada.
+  const listInOrder = pastasEmOrdem?.map(([, itens]) => itens[0]).filter(Boolean);
+
   return (
     <div
       {...dragProps(registros)}
+      onClickCapture={(e) => { if (pick([registros[0]], e, listInOrder)) return; }}
+      title="Ctrl/Cmd + clique para selecionar várias · Shift + clique para intervalo"
       className={`group relative flex cursor-grab flex-col items-start gap-2 rounded-lg border bg-card p-4 text-left shadow-sm transition hover:border-primary/50 hover:shadow-md active:cursor-grabbing ${
         allSel ? "border-primary ring-2 ring-primary/30" : selCount > 0 ? "border-primary/60" : "border-border"
       }`}
