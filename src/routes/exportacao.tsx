@@ -96,7 +96,7 @@ async function fetchAll(base: BaseDef, de: string, ate: string): Promise<Record<
     const { data, error } = await q;
     if (error) throw error;
     if (!data || data.length === 0) break;
-    all.push(...(data as Record<string, unknown>[]));
+    all.push(...(data as unknown as Record<string, unknown>[]));
     if (data.length < PAGE) break;
     from += PAGE;
   }
