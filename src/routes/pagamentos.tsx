@@ -256,6 +256,16 @@ function LancamentosTab({ colaboradorNome, userId }: { colaboradorNome: string; 
     },
   });
 
+  // Referência estável para o save de célula — evita quebrar o React.memo
+  // de EditableCell (uma nova arrow por linha invalidaria memoização).
+  const updateMutRef = useRef(updateMut);
+  useEffect(() => { updateMutRef.current = updateMut; }, [updateMut]);
+  const stableCellSave = React.useCallback(
+    (id: string, patch: PagamentoInput) => updateMutRef.current.mutate({ id, patch }),
+    [],
+  );
+
+
   const solicitacaoMut = useMutation({
     mutationFn: async () => {
       if (!blocked) throw new Error("Sem contexto");
