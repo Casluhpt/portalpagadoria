@@ -114,24 +114,35 @@ function ProvisaoDashboard() {
               ADP - PAGADORIA
             </CardTitle>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             <Label
-              htmlFor="prov-date"
+              htmlFor="prov-from"
               className="flex items-center gap-1.5 text-sm font-medium text-emerald-50"
             >
-              <Calendar className="h-4 w-4" /> DATA
+              <Calendar className="h-4 w-4" /> PERÍODO
             </Label>
             <Input
-              id="prov-date"
+              id="prov-from"
               type="date"
-              value={selectedDate}
-              onChange={(e) => setSelectedDate(e.target.value)}
-              className="h-9 w-[170px] border-emerald-300 bg-white text-sm text-slate-900"
+              value={dateFrom}
+              max={dateTo}
+              onChange={(e) => setDateFrom(e.target.value)}
+              className="h-9 w-[160px] border-emerald-300 bg-white text-sm text-slate-900"
+            />
+            <span className="text-sm text-emerald-50">a</span>
+            <Input
+              id="prov-to"
+              type="date"
+              value={dateTo}
+              min={dateFrom}
+              onChange={(e) => setDateTo(e.target.value)}
+              className="h-9 w-[160px] border-emerald-300 bg-white text-sm text-slate-900"
             />
             <span className="rounded bg-emerald-50 px-2 py-1 text-sm font-semibold text-emerald-900">
-              {dateLabel}
+              {rangeLabel}
             </span>
           </div>
+
         </CardHeader>
         <CardContent className="p-0">
           <div className="overflow-x-auto">
