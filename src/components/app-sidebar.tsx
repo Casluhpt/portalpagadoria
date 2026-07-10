@@ -91,16 +91,21 @@ export function AppSidebar() {
   const { user } = useSession();
   const { roles, isAdmin, isViewer, hasAny, loading: rolesLoading } = useRoles();
 
-  // Viewer users are only allowed on /pagamentos — auto-redirect otherwise.
+  // Viewer users have access to a limited set of routes.
+  const VIEWER_ALLOWED = ["/pagamentos", "/dashboard-gerencial", "/divergencias"];
+  const isViewerAllowed = (path: string) =>
+    VIEWER_ALLOWED.some((p) => path === p || path.startsWith(p + "/"));
+
   useEffect(() => {
     if (rolesLoading) return;
-    if (isViewer && !currentPath.startsWith("/pagamentos") && currentPath !== "/auth") {
+    if (isViewer && !isViewerAllowed(currentPath) && currentPath !== "/auth") {
       navigate({ to: "/pagamentos", replace: true });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isViewer, rolesLoading, currentPath, navigate]);
 
   const canSee = (item: MenuItem): boolean => {
-    if (isViewer) return item.url.startsWith("/pagamentos");
+    if (isViewer) return isViewerAllowed(item.url);
     if (item.adminOnly) return isAdmin;
     if (item.allowedRoles && item.allowedRoles.length > 0) return hasAny(item.allowedRoles);
     return true;
