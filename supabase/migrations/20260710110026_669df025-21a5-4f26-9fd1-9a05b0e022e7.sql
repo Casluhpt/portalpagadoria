@@ -1,0 +1,1 @@
+CREATE POLICY "Authenticated write provisao" ON public.provisao_diaria FOR ALL TO authenticated USING (true) WITH CHECK (true);
