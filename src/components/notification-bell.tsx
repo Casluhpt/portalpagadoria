@@ -1,5 +1,6 @@
-import { useMemo } from "react";
-import { Bell, CheckCheck, X } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Link } from "@tanstack/react-router";
+import { Bell, CheckCheck, Sparkles, X } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -8,6 +9,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useSession } from "@/hooks/use-session";
+import { supabase } from "@/integrations/supabase/client";
 import {
   comunicadosQueryKey,
   fetchComunicados,
@@ -15,6 +17,27 @@ import {
   marcarTodosLidos,
   type Comunicado,
 } from "@/lib/comunicados";
+
+type LatestVersion = {
+  versao: string;
+  titulo: string;
+  resumo: string | null;
+  lancada_em: string;
+  tipo: string;
+};
+
+async function fetchLatestVersion(): Promise<LatestVersion | null> {
+  const { data, error } = await supabase
+    .from("app_versions")
+    .select("versao, titulo, resumo, lancada_em, tipo")
+    .order("lancada_em", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (error) return null;
+  return (data as LatestVersion) ?? null;
+}
+
+const dismissKey = (userId: string, versao: string) => `version_notif_dismissed:${userId}:${versao}`;
 
 const rel = (iso: string) => {
   const diff = Date.now() - new Date(iso).getTime();
