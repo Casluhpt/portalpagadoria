@@ -294,7 +294,7 @@ function LancamentosTab({ colaboradorNome, userId }: { colaboradorNome: string; 
           <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input placeholder="Pesquisar…" value={search} onChange={(e) => setSearch(e.target.value)} className="pl-8 h-9" />
         </div>
-        <div className="ml-auto flex items-center gap-2">
+        <div className="flex items-center gap-2">
           <input
             ref={fileRef}
             type="file"
