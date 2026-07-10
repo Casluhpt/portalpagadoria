@@ -20,6 +20,8 @@ import {
   Bug,
   Users,
   Wallet,
+  Landmark,
+  FileSpreadsheet,
 } from "lucide-react";
 
 
