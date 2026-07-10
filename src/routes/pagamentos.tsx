@@ -164,6 +164,8 @@ function LancamentosTab({ colaboradorNome, userId }: { colaboradorNome: string; 
   const presenceChannelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
   const activeRowRef = useRef<string | null>(null);
   const presenceKey = userId ?? `anon-${colaboradorNome}`;
+  const nomeRef = useRef(colaboradorNome);
+  useEffect(() => { nomeRef.current = colaboradorNome; }, [colaboradorNome]);
 
   useEffect(() => {
     const channel = supabase.channel("pagamentos-row-presence", {
@@ -195,7 +197,7 @@ function LancamentosTab({ colaboradorNome, userId }: { colaboradorNome: string; 
       .on("presence", { event: "leave" }, recompute)
       .subscribe(async (status) => {
         if (status === "SUBSCRIBED") {
-          await channel.track({ nome: colaboradorNome, rowId: null });
+          await channel.track({ nome: nomeRef.current, rowId: null });
         }
       });
 
@@ -203,14 +205,16 @@ function LancamentosTab({ colaboradorNome, userId }: { colaboradorNome: string; 
       supabase.removeChannel(channel);
       presenceChannelRef.current = null;
     };
-  }, [presenceKey, colaboradorNome]);
+    // Depende só do userId estável — evita recriar o canal a cada refresh de token
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [presenceKey]);
 
   const setActiveRow = (rowId: string | null) => {
     if (activeRowRef.current === rowId) return;
     activeRowRef.current = rowId;
     const ch = presenceChannelRef.current;
     if (!ch) return;
-    void ch.track({ nome: colaboradorNome, rowId });
+    void ch.track({ nome: nomeRef.current, rowId });
   };
 
   const invalidate = () => qc.invalidateQueries({ queryKey: pagamentosQueryKey });
