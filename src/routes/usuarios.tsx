@@ -284,7 +284,7 @@ function UsuariosTable() {
         </table>
       </div>
       <p className="text-[11px] text-muted-foreground">
-        * "Online" considera último acesso nos últimos 5 minutos (aproximação por último login).
+        * Status em tempo real: presença é atualizada enquanto o usuário mantém a aba aberta.
       </p>
     </div>
   );
