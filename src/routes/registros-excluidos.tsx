@@ -26,26 +26,12 @@ import { useRoles } from "@/hooks/use-roles";
 import { listRegistrosExcluidos, type RegistroExcluido } from "@/lib/registros-excluidos.functions";
 
 export const Route = createFileRoute("/registros-excluidos")({
-  component: RegistrosExcluidosPage,
+  beforeLoad: () => {
+    throw redirect({ to: "/auditoria", search: { tab: "excluidos" } });
+  },
+  component: () => null,
 });
 
-function RegistrosExcluidosPage() {
-  return (
-    <SidebarProvider>
-      <div className="flex min-h-screen w-full bg-background">
-        <AppSidebar />
-        <div className="flex flex-1 flex-col">
-          <header className="sticky top-0 z-10 flex h-14 items-center gap-4 border-b border-border bg-background/80 px-4 backdrop-blur">
-            <SidebarTrigger />
-            <h1 className="text-sm font-semibold text-foreground">Registros Excluídos</h1>
-            <div className="ml-auto"><HeaderActions /></div>
-          </header>
-          <Content />
-        </div>
-      </div>
-    </SidebarProvider>
-  );
-}
 
 export function RegistrosExcluidosView() {
   return <Content />;
