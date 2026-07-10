@@ -526,7 +526,7 @@ function fmtCurrency(v: any) {
   return n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
 
-function RegistroCard({ row }: { row: RegistroExcluido }) {
+function RegistroCard({ row, selected, toggle, dragProps }: { row: RegistroExcluido } & SelectionProps) {
   const s = row.snapshot ?? {};
   const isPag = row.origem === "pagamento";
   const titulo = isPag
@@ -537,20 +537,38 @@ function RegistroCard({ row }: { row: RegistroExcluido }) {
     : (s.supplier ?? s.issuer ?? "—");
   const valor = isPag ? fmtCurrency(s.valor_lg) : fmtCurrency(s.gross_amount);
   const data = isPag ? s.data_credito : (s.due_date ?? s.register_date);
+  const isSel = selected.has(keyOf(row));
 
   return (
-    <Card className="relative overflow-hidden">
+    <Card
+      {...dragProps([row])}
+      className={`group relative cursor-grab overflow-hidden active:cursor-grabbing ${
+        isSel ? "border-primary ring-2 ring-primary/30" : ""
+      }`}
+    >
       <div className="absolute left-0 top-0 flex h-full w-1.5 bg-destructive" aria-hidden />
+
+      {/* Checkbox à esquerda */}
+      <div className="absolute left-2 top-2 z-10" onClick={(e) => e.stopPropagation()}>
+        <Checkbox
+          checked={isSel}
+          onCheckedChange={(v) => toggle([row], !!v)}
+          aria-label="Selecionar registro"
+        />
+      </div>
+
+      {/* Badge à direita */}
       <Popover>
         <PopoverTrigger asChild>
           <button
-            className="absolute -left-1 top-3 z-10 inline-flex items-center gap-1 rounded-r-full bg-destructive px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-destructive-foreground shadow hover:brightness-110"
+            className="absolute right-2 top-2 z-10 inline-flex items-center gap-1 rounded-full bg-destructive px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-destructive-foreground shadow hover:brightness-110"
             aria-label="Registro apagado — ver detalhes"
           >
             <AlertCircle className="h-3 w-3" /> Apagado
+            <GripVertical className="ml-0.5 h-3 w-3 opacity-70" />
           </button>
         </PopoverTrigger>
-        <PopoverContent side="right" align="start" className="w-80 p-3 text-xs">
+        <PopoverContent side="left" align="start" className="w-80 p-3 text-xs">
           <p className="mb-2 font-semibold text-foreground">Registro apagado permanentemente</p>
           <p className="text-muted-foreground">
             Este item foi removido de <strong>{isPag ? "Resultados" : "Lançamentos"}</strong> por{" "}
@@ -558,12 +576,12 @@ function RegistroCard({ row }: { row: RegistroExcluido }) {
             {format(new Date(row.created_at), "dd/MM/yyyy HH:mm:ss", { locale: ptBR })}.
           </p>
           <p className="mt-2 text-muted-foreground">
-            Restauração exclusiva do Administrador — solicite via chamado.
+            Arraste para a zona vermelha ou selecione para apagar definitivamente.
           </p>
         </PopoverContent>
       </Popover>
 
-      <CardHeader className="pb-2 pl-6">
+      <CardHeader className="pb-2 pl-10 pt-10">
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
             <CardTitle className="truncate text-sm font-semibold">{titulo}</CardTitle>
@@ -575,6 +593,7 @@ function RegistroCard({ row }: { row: RegistroExcluido }) {
           </Badge>
         </div>
       </CardHeader>
+
       <CardContent className="space-y-2 pl-6 text-xs">
         <div className="flex items-center justify-between">
           <span className="text-muted-foreground">Valor</span>
