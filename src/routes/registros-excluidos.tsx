@@ -587,7 +587,7 @@ function fmtCurrency(v: any) {
   return n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
 
-function RegistroCard({ row, selected, toggle, dragProps }: { row: RegistroExcluido } & SelectionProps) {
+function RegistroCard({ row, listInOrder, selected, toggle, pick, dragProps }: { row: RegistroExcluido; listInOrder?: RegistroExcluido[] } & SelectionProps) {
   const s = row.snapshot ?? {};
   const isPag = row.origem === "pagamento";
   const titulo = isPag
@@ -603,6 +603,8 @@ function RegistroCard({ row, selected, toggle, dragProps }: { row: RegistroExclu
   return (
     <Card
       {...dragProps([row])}
+      onClickCapture={(e) => { if (pick([row], e, listInOrder)) return; }}
+      title="Ctrl/Cmd + clique para selecionar vários · Shift + clique para intervalo"
       className={`group relative cursor-grab overflow-hidden active:cursor-grabbing ${
         isSel ? "border-primary ring-2 ring-primary/30" : ""
       }`}
