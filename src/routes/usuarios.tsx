@@ -1,7 +1,25 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useMemo, useState } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { format, formatDistanceToNow } from "date-fns";
+import { ptBR } from "date-fns/locale";
+import { Loader2, KeyRound, ShieldAlert, Search, ShieldCheck, Eye } from "lucide-react";
+
 import { AppSidebar } from "@/components/app-sidebar";
+import { HeaderActions } from "@/components/header-actions";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { ModuleStub } from "@/components/module-stub";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
+import { useRoles } from "@/hooks/use-roles";
+import { listAdminUsers, resetUserPassword, type AdminUserRow } from "@/lib/admin-users.functions";
 
 export const Route = createFileRoute("/usuarios")({
   component: UsuariosPage,
@@ -15,16 +33,209 @@ function UsuariosPage() {
         <div className="flex flex-1 flex-col">
           <header className="sticky top-0 z-10 flex h-14 items-center gap-4 border-b border-border bg-background/80 px-4 backdrop-blur">
             <SidebarTrigger />
-            <h1 className="text-sm font-semibold text-slate-700">Administração de Usuários</h1>
+            <h1 className="text-sm font-semibold text-foreground">Administração de Usuários</h1>
+            <div className="ml-auto">
+              <HeaderActions />
+            </div>
           </header>
-          <ModuleStub
-            title="Administração de Usuários"
-            description="Cadastro, perfis, permissões, bloqueios e reset de senha de usuários do portal."
-            phase="Fase 5"
-            adminOnly
-          />
+          <UsuariosContent />
         </div>
       </div>
     </SidebarProvider>
+  );
+}
+
+function UsuariosContent() {
+  const { isAdmin, loading } = useRoles();
+  if (loading) {
+    return (
+      <div className="flex flex-1 items-center justify-center">
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+  if (!isAdmin) {
+    return (
+      <div className="flex flex-1 flex-col items-center justify-center gap-3 p-8 text-center">
+        <ShieldAlert className="h-10 w-10 text-muted-foreground" />
+        <h2 className="text-lg font-semibold">Acesso restrito</h2>
+        <p className="max-w-md text-sm text-muted-foreground">
+          Somente administradores podem gerenciar usuários.
+        </p>
+      </div>
+    );
+  }
+  return <UsuariosTable />;
+}
+
+function roleLabel(r: string) {
+  switch (r) {
+    case "administrador": return "Administrador";
+    case "auditor": return "Auditor";
+    case "operacional": return "Operacional";
+    case "criador_competencia": return "Criador de Competência";
+    case "consulta": return "Consulta";
+    case "viewer": return "Viewer";
+    default: return r;
+  }
+}
+
+function roleVariant(r: string): "default" | "secondary" | "outline" | "destructive" {
+  if (r === "administrador") return "destructive";
+  if (r === "auditor") return "default";
+  if (r === "viewer") return "outline";
+  return "secondary";
+}
+
+function UsuariosTable() {
+  const listFn = useServerFn(listAdminUsers);
+  const resetFn = useServerFn(resetUserPassword);
+  const [search, setSearch] = useState("");
+
+  const { data = [], isLoading, error, refetch, isFetching } = useQuery({
+    queryKey: ["admin-users"],
+    queryFn: () => listFn({}),
+    refetchInterval: 60_000,
+  });
+
+  const resetMut = useMutation({
+    mutationFn: (email: string) =>
+      resetFn({ data: { email, redirectTo: `${window.location.origin}/reset-password` } }),
+    onSuccess: () => toast.success("Email de redefinição enviado."),
+    onError: (e: any) => toast.error(e?.message ?? "Falha ao enviar email"),
+  });
+
+  const rows = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return data;
+    return data.filter((u) =>
+      [u.email, u.nome, ...u.roles].filter(Boolean).join(" ").toLowerCase().includes(q),
+    );
+  }, [data, search]);
+
+  const onlineCount = data.filter((u) => u.online).length;
+
+  return (
+    <div className="flex flex-1 flex-col gap-3 p-4">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <p className="text-xs text-muted-foreground">
+            {isLoading ? "Carregando…" : error ? "Erro ao carregar." :
+              `${data.length} usuário(s) • ${onlineCount} online agora`}
+          </p>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="relative">
+            <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Buscar por nome, email, perfil…"
+              className="h-9 w-72 pl-8"
+            />
+          </div>
+          <Button variant="outline" size="sm" onClick={() => refetch()} disabled={isFetching}>
+            {isFetching ? <Loader2 className="h-4 w-4 animate-spin" /> : "Atualizar"}
+          </Button>
+        </div>
+      </div>
+
+      <div className="relative flex-1 overflow-auto rounded-lg border border-border bg-card">
+        <table className="min-w-full border-collapse text-sm">
+          <thead className="sticky top-0 z-10 bg-muted/95 backdrop-blur">
+            <tr>
+              <th className="border-b border-border px-3 py-2 text-left font-semibold">Status</th>
+              <th className="border-b border-border px-3 py-2 text-left font-semibold">Nome</th>
+              <th className="border-b border-border px-3 py-2 text-left font-semibold">Email</th>
+              <th className="border-b border-border px-3 py-2 text-left font-semibold">Perfis</th>
+              <th className="border-b border-border px-3 py-2 text-left font-semibold">Criado em</th>
+              <th className="border-b border-border px-3 py-2 text-left font-semibold">Último acesso</th>
+              <th className="border-b border-border px-3 py-2 text-right font-semibold">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((u: AdminUserRow) => (
+              <tr key={u.id} className="hover:bg-muted/40">
+                <td className="whitespace-nowrap border-b border-border px-3 py-2">
+                  <span className="inline-flex items-center gap-2">
+                    <span
+                      className={`h-2.5 w-2.5 rounded-full ${u.online ? "bg-emerald-500" : "bg-muted-foreground/40"}`}
+                      aria-hidden
+                    />
+                    <span className="text-xs text-muted-foreground">
+                      {u.online ? "Online" : "Offline"}
+                    </span>
+                  </span>
+                </td>
+                <td className="border-b border-border px-3 py-2">{u.nome ?? "—"}</td>
+                <td className="border-b border-border px-3 py-2 font-mono text-xs">{u.email ?? "—"}</td>
+                <td className="border-b border-border px-3 py-2">
+                  <div className="flex flex-wrap gap-1">
+                    {u.roles.length === 0 ? (
+                      <Badge variant="outline" className="gap-1">
+                        <Eye className="h-3 w-3" /> Sem perfil
+                      </Badge>
+                    ) : (
+                      u.roles.map((r) => (
+                        <Badge key={r} variant={roleVariant(r)} className="gap-1">
+                          {r === "administrador" && <ShieldCheck className="h-3 w-3" />}
+                          {roleLabel(r)}
+                        </Badge>
+                      ))
+                    )}
+                  </div>
+                </td>
+                <td className="whitespace-nowrap border-b border-border px-3 py-2 text-xs text-muted-foreground">
+                  {u.created_at ? format(new Date(u.created_at), "dd/MM/yyyy HH:mm") : "—"}
+                </td>
+                <td className="whitespace-nowrap border-b border-border px-3 py-2 text-xs text-muted-foreground">
+                  {u.last_sign_in_at ? (
+                    <span title={format(new Date(u.last_sign_in_at), "dd/MM/yyyy HH:mm:ss")}>
+                      {formatDistanceToNow(new Date(u.last_sign_in_at), { addSuffix: true, locale: ptBR })}
+                    </span>
+                  ) : "Nunca acessou"}
+                </td>
+                <td className="whitespace-nowrap border-b border-border px-3 py-2 text-right">
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button size="sm" variant="outline" disabled={!u.email}>
+                        <KeyRound className="mr-1 h-3.5 w-3.5" /> Resetar senha
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Enviar redefinição de senha?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Um email será enviado para <strong>{u.email}</strong> com um link seguro para
+                          redefinição da senha.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={() => u.email && resetMut.mutate(u.email)}
+                        >
+                          Enviar
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </td>
+              </tr>
+            ))}
+            {!isLoading && rows.length === 0 && (
+              <tr>
+                <td colSpan={7} className="px-4 py-16 text-center text-sm text-muted-foreground">
+                  Nenhum usuário encontrado.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+      <p className="text-[11px] text-muted-foreground">
+        * "Online" considera último acesso nos últimos 5 minutos (aproximação por último login).
+      </p>
+    </div>
   );
 }
