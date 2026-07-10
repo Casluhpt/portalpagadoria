@@ -11,6 +11,7 @@ export const Route = createFileRoute("/conciliacao")({
 });
 
 function ConciliacaoPage() {
+  const { isAdmin, loading } = useRoles();
   const kpis = [
     { label: "Total conciliado", value: "—", icon: CheckCircle2, tone: "text-emerald-600" },
     { label: "Total pendente", value: "—", icon: Clock, tone: "text-amber-600" },
