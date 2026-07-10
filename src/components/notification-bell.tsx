@@ -6,12 +6,14 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useSession } from "@/hooks/use-session";
 import {
   comunicadosQueryKey,
   fetchComunicados,
   marcarLido,
   marcarTodosLidos,
+  type Comunicado,
 } from "@/lib/comunicados";
 
 const rel = (iso: string) => {
@@ -93,47 +95,69 @@ export function NotificationBell() {
             </Button>
           )}
         </div>
-        <ScrollArea className="max-h-96">
-          {items.length === 0 ? (
-            <div className="px-4 py-8 text-center text-xs text-slate-500">
-              Nenhum comunicado por aqui ainda.
-            </div>
-          ) : (
-            <ul className="divide-y divide-slate-100">
-              {items.map((c) => (
-                <li
-                  key={c.id}
-                  className={`flex gap-3 px-4 py-3 text-sm ${
-                    c.lido ? "bg-white" : "bg-violet-50/60"
-                  }`}
-                >
-                  <span
-                    className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${
-                      c.lido ? "bg-slate-300" : "bg-violet-600"
-                    }`}
-                  />
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-start justify-between gap-2">
-                      <p className="truncate font-semibold text-slate-900">{c.titulo}</p>
-                      <span className="shrink-0 text-[10px] text-slate-400">{rel(c.criado_em)}</span>
-                    </div>
-                    <p className="mt-0.5 whitespace-pre-wrap text-xs text-slate-600">{c.mensagem}</p>
-                    {!c.lido && (
-                      <button
-                        className="mt-1 text-[11px] font-medium text-violet-700 hover:underline"
-                        onClick={() => markOne.mutate(c.id)}
-                        disabled={markOne.isPending}
-                      >
-                        Marcar como lida
-                      </button>
-                    )}
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
-        </ScrollArea>
+        <Tabs defaultValue="unread" className="w-full">
+          <TabsList className="mx-4 mt-2 grid w-[calc(100%-2rem)] grid-cols-2">
+            <TabsTrigger value="unread" className="text-xs">
+              Não lidas{naoLidos.length > 0 ? ` (${naoLidos.length})` : ""}
+            </TabsTrigger>
+            <TabsTrigger value="history" className="text-xs">
+              Histórico
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="unread" className="mt-2">
+            <NotifList items={naoLidos} emptyLabel="Nenhum comunicado não lido." onMark={(id) => markOne.mutate(id)} />
+          </TabsContent>
+          <TabsContent value="history" className="mt-2">
+            <NotifList items={items} emptyLabel="Nenhum comunicado no histórico." onMark={(id) => markOne.mutate(id)} />
+          </TabsContent>
+        </Tabs>
       </PopoverContent>
     </Popover>
+  );
+}
+
+function NotifList({
+  items,
+  emptyLabel,
+  onMark,
+}: {
+  items: Comunicado[];
+  emptyLabel: string;
+  onMark: (id: string) => void;
+}) {
+  return (
+    <ScrollArea className="max-h-96">
+      {items.length === 0 ? (
+        <div className="px-4 py-8 text-center text-xs text-slate-500">{emptyLabel}</div>
+      ) : (
+        <ul className="divide-y divide-slate-100">
+          {items.map((c) => (
+            <li
+              key={c.id}
+              className={`flex gap-3 px-4 py-3 text-sm ${c.lido ? "bg-white" : "bg-violet-50/60"}`}
+            >
+              <span
+                className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${c.lido ? "bg-slate-300" : "bg-violet-600"}`}
+              />
+              <div className="min-w-0 flex-1">
+                <div className="flex items-start justify-between gap-2">
+                  <p className="truncate font-semibold text-slate-900">{c.titulo}</p>
+                  <span className="shrink-0 text-[10px] text-slate-400">{rel(c.criado_em)}</span>
+                </div>
+                <p className="mt-0.5 whitespace-pre-wrap text-xs text-slate-600">{c.mensagem}</p>
+                {!c.lido && (
+                  <button
+                    className="mt-1 text-[11px] font-medium text-violet-700 hover:underline"
+                    onClick={() => onMark(c.id)}
+                  >
+                    Marcar como lida
+                  </button>
+                )}
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+    </ScrollArea>
   );
 }
