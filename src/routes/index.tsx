@@ -277,6 +277,107 @@ function PortalPage() {
               />
             </section>
 
+            {visibleVersoes.length > 0 && (
+              <section className="rounded-2xl border border-violet-200 bg-white/70 p-6 shadow-sm backdrop-blur">
+                <div className="mb-4 flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-3">
+                    <div className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-violet-600 to-indigo-700 text-white shadow-md">
+                      <Sparkles className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <h2 className="text-lg font-bold text-slate-900">Novidades do Portal</h2>
+                      <p className="text-xs text-slate-500">
+                        Acompanhe as melhorias mais recentes. Feche uma atualização quando não quiser mais vê-la.
+                      </p>
+                    </div>
+                  </div>
+                  <Button asChild variant="outline" size="sm">
+                    <Link to="/historico">Ver histórico completo</Link>
+                  </Button>
+                </div>
+
+                <ol className="relative space-y-4 border-l-2 border-violet-100 pl-6">
+                  {visibleVersoes.map((v) => {
+                    const isLatest = latest?.versao === v.versao;
+                    const itens = Array.isArray(v.itens) ? (v.itens as Array<{ categoria: string; descricao: string }>) : [];
+                    return (
+                      <li key={v.versao} className="relative">
+                        <span
+                          className={`absolute -left-[31px] top-1 grid h-5 w-5 place-items-center rounded-full ring-4 ring-white ${
+                            isLatest ? "bg-violet-600" : "bg-slate-300"
+                          }`}
+                        >
+                          <span className="h-1.5 w-1.5 rounded-full bg-white" />
+                        </span>
+                        <Card className={isLatest ? "border-violet-300 shadow-md" : "border-slate-200"}>
+                          <CardContent className="p-4">
+                            <div className="flex items-start justify-between gap-3">
+                              <div className="min-w-0">
+                                <div className="flex flex-wrap items-center gap-2">
+                                  <Badge className="bg-violet-100 text-violet-800 hover:bg-violet-100">
+                                    v{v.versao}
+                                  </Badge>
+                                  {isLatest && (
+                                    <Badge className="bg-emerald-100 text-emerald-800 hover:bg-emerald-100">
+                                      Nova versão
+                                    </Badge>
+                                  )}
+                                  <span className="text-xs text-slate-500">
+                                    {new Date(v.lancada_em).toLocaleDateString("pt-BR", {
+                                      day: "2-digit",
+                                      month: "short",
+                                      year: "numeric",
+                                    })}
+                                  </span>
+                                </div>
+                                <h3 className="mt-1 truncate text-base font-semibold text-slate-900">
+                                  {v.titulo}
+                                </h3>
+                                {v.resumo && (
+                                  <p className="mt-0.5 text-sm text-slate-600">{v.resumo}</p>
+                                )}
+                                {itens.length > 0 && (
+                                  <ul className="mt-2 space-y-1 text-sm text-slate-700">
+                                    {itens.slice(0, 4).map((it, idx) => {
+                                      const Icon =
+                                        it.categoria === "novo"
+                                          ? Sparkles
+                                          : it.categoria === "correção" || it.categoria === "correcao"
+                                            ? Bug
+                                            : it.categoria === "seguranca" || it.categoria === "segurança"
+                                              ? ShieldCheck
+                                              : Wrench;
+                                      return (
+                                        <li key={idx} className="flex items-start gap-2">
+                                          <Icon className="mt-0.5 h-3.5 w-3.5 shrink-0 text-violet-600" />
+                                          <span>{it.descricao}</span>
+                                        </li>
+                                      );
+                                    })}
+                                  </ul>
+                                )}
+                              </div>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => dismissVersion(v.versao)}
+                                aria-label="Fechar atualização"
+                                className="shrink-0 text-slate-400 hover:text-slate-700"
+                              >
+                                ×
+                              </Button>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </li>
+                    );
+                  })}
+                </ol>
+              </section>
+            )}
+
+
+
             <section className="grid gap-6 md:grid-cols-2">
               {modules.map((m) => (
                 <ModuleCard key={m.key} m={m} />
