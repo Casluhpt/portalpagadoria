@@ -685,10 +685,12 @@ function DescricaoDialog({
   onSave: (payload: any) => Promise<void>;
 }) {
   const [descricao, setDescricao] = useState(linha.descricao);
+  const [nomeReal, setNomeReal] = useState(linha.meta.nome_real ?? "");
   const [empresaCodigo, setEmpresaCodigo] = useState(linha.meta.empresa_codigo ?? "");
   const [conta, setConta] = useState(linha.meta.conta ?? "");
   const [centroCusto, setCentroCusto] = useState(linha.meta.centro_custo ?? "");
   const [numeroPedido, setNumeroPedido] = useState(linha.meta.numero_pedido ?? "");
+  const [notas, setNotas] = useState(linha.meta.notas ?? "");
   const [saving, setSaving] = useState(false);
 
   const submit = async () => {
@@ -703,6 +705,8 @@ function DescricaoDialog({
         conta: conta || null,
         centro_custo: centroCusto || null,
         numero_pedido: numeroPedido || null,
+        nome_real: nomeReal || null,
+        notas: notas || null,
       });
     } finally { setSaving(false); }
   };
@@ -711,17 +715,29 @@ function DescricaoDialog({
     <Dialog open onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-w-lg">
         <DialogHeader>
-          <DialogTitle>Informações da linha</DialogTitle>
+          <DialogTitle>Descrição de despesa</DialogTitle>
           <DialogDescription>
             Categoria <strong>{linha.categoria}</strong> · valores aplicados a todos os meses de {ano}.
           </DialogDescription>
         </DialogHeader>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-3 gap-3">
           <div className="col-span-2">
-            <Label>Descrição</Label>
+            <Label>Descrição / Nomenclatura</Label>
             <Input value={descricao} onChange={(e) => setDescricao(e.target.value)} />
           </div>
-          <div className="col-span-2">
+          <div>
+            <Label>Nº do pedido</Label>
+            <Input value={numeroPedido} onChange={(e) => setNumeroPedido(e.target.value)}
+              placeholder="ex.: 78910" />
+          </div>
+          {linha.categoria === "PJ" && (
+            <div className="col-span-3">
+              <Label>Nome real do PJ</Label>
+              <Input value={nomeReal} onChange={(e) => setNomeReal(e.target.value)}
+                placeholder="ex.: João da Silva Consultoria LTDA" />
+            </div>
+          )}
+          <div className="col-span-3">
             <Label>Empresa</Label>
             <Select value={empresaCodigo || "__none__"} onValueChange={(v) => setEmpresaCodigo(v === "__none__" ? "" : v)}>
               <SelectTrigger><SelectValue placeholder="Selecione…" /></SelectTrigger>
@@ -737,14 +753,19 @@ function DescricaoDialog({
             <Label>Conta</Label>
             <Input value={conta} onChange={(e) => setConta(e.target.value)} placeholder="ex.: 4.01.001" />
           </div>
-          <div>
+          <div className="col-span-2">
             <Label>Centro de custo</Label>
             <Input value={centroCusto} onChange={(e) => setCentroCusto(e.target.value)} placeholder="ex.: ADM" />
           </div>
-          <div className="col-span-2">
-            <Label>Pedido padrão</Label>
-            <Input value={numeroPedido} onChange={(e) => setNumeroPedido(e.target.value)}
-              placeholder="ex.: 78910 (usado como sugestão nos lançamentos)" />
+          <div className="col-span-3">
+            <Label>Bloco de notas</Label>
+            <textarea
+              value={notas}
+              onChange={(e) => setNotas(e.target.value)}
+              rows={4}
+              placeholder="Anotações livres sobre este PJ / fornecedor / lançamento…"
+              className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            />
           </div>
         </div>
         <DialogFooter>
@@ -758,3 +779,4 @@ function DescricaoDialog({
     </Dialog>
   );
 }
+
