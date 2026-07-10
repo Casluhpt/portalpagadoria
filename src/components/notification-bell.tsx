@@ -142,6 +142,42 @@ export function NotificationBell() {
             </Button>
           )}
         </div>
+        {showVersionCard && latestVersion && (
+          <div className="relative border-b border-violet-100 bg-gradient-to-r from-violet-50 to-indigo-50 px-4 py-3">
+            <button
+              onClick={dismissVersion}
+              aria-label="Dispensar novidade"
+              className="absolute right-2 top-2 rounded-full p-1 text-violet-500 hover:bg-violet-100"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+            <div className="flex items-start gap-2 pr-6">
+              <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-violet-600" />
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2">
+                  <span className="rounded-full bg-violet-600 px-1.5 py-0.5 text-[10px] font-bold text-white">
+                    {latestVersion.versao}
+                  </span>
+                  <span className="text-[10px] font-semibold uppercase tracking-wide text-violet-700">
+                    Nova versão
+                  </span>
+                </div>
+                <p className="mt-1 truncate text-sm font-semibold text-slate-900">
+                  {latestVersion.titulo}
+                </p>
+                {latestVersion.resumo && (
+                  <p className="mt-0.5 line-clamp-2 text-xs text-slate-600">{latestVersion.resumo}</p>
+                )}
+                <Link
+                  to="/historico"
+                  className="mt-1 inline-block text-[11px] font-medium text-violet-700 hover:underline"
+                >
+                  Ver histórico completo →
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
         <Tabs defaultValue="unread" className="w-full">
           <TabsList className="mx-4 mt-2 grid w-[calc(100%-2rem)] grid-cols-2">
             <TabsTrigger value="unread" className="text-xs">
