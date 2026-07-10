@@ -1,5 +1,5 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { format } from "date-fns";
@@ -160,6 +160,46 @@ function Board() {
       });
       return next;
     });
+    if (rs.length > 0) lastAnchorRef.current = keyOf(rs[rs.length - 1]);
+  };
+
+  const lastAnchorRef = useRef<string | null>(null);
+
+  /**
+   * Ctrl/Cmd + clique → alterna estes itens (multi-seleção).
+   * Shift + clique      → seleciona intervalo desde o último âncora até estes itens (usa listInOrder).
+   * Sem modificador     → false (deixa o clique original abrir a pasta/detalhe).
+   */
+  const pick = (
+    rs: RegistroExcluido[],
+    e: React.MouseEvent,
+    listInOrder?: RegistroExcluido[],
+  ): boolean => {
+    const isCtrl = e.ctrlKey || e.metaKey;
+    const isShift = e.shiftKey;
+    if (!isCtrl && !isShift) return false;
+    e.preventDefault();
+    e.stopPropagation();
+    if (isShift && listInOrder && listInOrder.length > 0 && lastAnchorRef.current) {
+      const keys = listInOrder.map(keyOf);
+      const target = keyOf(rs[rs.length - 1]);
+      const a = keys.indexOf(lastAnchorRef.current);
+      const b = keys.indexOf(target);
+      if (a >= 0 && b >= 0) {
+        const [i, j] = a < b ? [a, b] : [b, a];
+        const range = listInOrder.slice(i, j + 1);
+        setSelected((prev) => {
+          const next = new Set(prev);
+          range.forEach((r) => next.add(keyOf(r)));
+          return next;
+        });
+        lastAnchorRef.current = target;
+        return true;
+      }
+    }
+    // Ctrl/Cmd (ou shift sem âncora): alterna estes itens
+    toggle(rs);
+    return true;
   };
 
   const selectedRegistros = useMemo(
@@ -271,6 +311,7 @@ function Board() {
           onVoltar={() => setEmpresaAberta(null)}
           selected={selected}
           toggle={toggle}
+          pick={pick}
           dragProps={dragProps}
         />
       ) : (
@@ -283,6 +324,8 @@ function Board() {
               onOpen={() => setEmpresaAberta(nome)}
               selected={selected}
               toggle={toggle}
+              pick={pick}
+              pastasEmOrdem={grouped}
               dragProps={dragProps}
             />
           ))}
@@ -358,6 +401,11 @@ function Board() {
 type SelectionProps = {
   selected: Set<string>;
   toggle: (rs: RegistroExcluido[], on?: boolean) => void;
+  pick: (
+    rs: RegistroExcluido[],
+    e: React.MouseEvent,
+    listInOrder?: RegistroExcluido[],
+  ) => boolean;
   dragProps: (rs: RegistroExcluido[]) => {
     draggable: boolean;
     onDragStart: (e: React.DragEvent) => void;
@@ -368,8 +416,13 @@ type SelectionProps = {
 
 
 function PastaEmpresa({
-  nome, registros, onOpen, selected, toggle, dragProps,
-}: { nome: string; registros: RegistroExcluido[]; onOpen: () => void } & SelectionProps) {
+  nome, registros, onOpen, selected, toggle, pick, pastasEmOrdem, dragProps,
+}: {
+  nome: string;
+  registros: RegistroExcluido[];
+  onOpen: () => void;
+  pastasEmOrdem?: Array<[string, RegistroExcluido[]]>;
+} & SelectionProps) {
   const qtd = registros.length;
   const ultimo = registros[0]?.created_at;
   const pag = registros.filter((r) => r.origem === "pagamento").length;
@@ -377,9 +430,15 @@ function PastaEmpresa({
   const selCount = registros.filter((r) => selected.has(keyOf(r))).length;
   const allSel = selCount > 0 && selCount === qtd;
 
+  // Para shift-range em pastas: usamos o primeiro registro de cada pasta
+  // como âncora representativa daquela pasta na lista ordenada.
+  const listInOrder = pastasEmOrdem?.map(([, itens]) => itens[0]).filter(Boolean);
+
   return (
     <div
       {...dragProps(registros)}
+      onClickCapture={(e) => { if (pick([registros[0]], e, listInOrder)) return; }}
+      title="Ctrl/Cmd + clique para selecionar várias · Shift + clique para intervalo"
       className={`group relative flex cursor-grab flex-col items-start gap-2 rounded-lg border bg-card p-4 text-left shadow-sm transition hover:border-primary/50 hover:shadow-md active:cursor-grabbing ${
         allSel ? "border-primary ring-2 ring-primary/30" : selCount > 0 ? "border-primary/60" : "border-border"
       }`}
@@ -423,7 +482,7 @@ function PastaEmpresa({
 }
 
 function EmpresaAberta({
-  nome, registros, onVoltar, selected, toggle, dragProps,
+  nome, registros, onVoltar, selected, toggle, pick, dragProps,
 }: { nome: string; registros: RegistroExcluido[]; onVoltar: () => void } & SelectionProps) {
   const [subAberta, setSubAberta] = useState<string | null>(null);
 
@@ -482,6 +541,8 @@ function EmpresaAberta({
               <div
                 key={k}
                 {...dragProps(itens)}
+                onClickCapture={(e) => { if (pick([itens[0]], e, subgrupos!.map(([, i]) => i[0]))) return; }}
+                title="Ctrl/Cmd + clique para selecionar várias · Shift + clique para intervalo"
                 className={`group relative flex cursor-grab flex-col items-start gap-2 rounded-lg border bg-card p-3 text-left transition hover:border-amber-400 hover:shadow-md active:cursor-grabbing ${
                   allSel ? "border-primary ring-2 ring-primary/30" : selCount > 0 ? "border-primary/60" : "border-border"
                 }`}
@@ -511,7 +572,7 @@ function EmpresaAberta({
       ) : (
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
           {visibleRegs.map((r) => (
-            <RegistroCard key={r.id} row={r} selected={selected} toggle={toggle} dragProps={dragProps} />
+            <RegistroCard key={r.id} row={r} listInOrder={visibleRegs} selected={selected} toggle={toggle} pick={pick} dragProps={dragProps} />
           ))}
         </div>
       )}
@@ -526,7 +587,7 @@ function fmtCurrency(v: any) {
   return n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
 
-function RegistroCard({ row, selected, toggle, dragProps }: { row: RegistroExcluido } & SelectionProps) {
+function RegistroCard({ row, listInOrder, selected, toggle, pick, dragProps }: { row: RegistroExcluido; listInOrder?: RegistroExcluido[] } & SelectionProps) {
   const s = row.snapshot ?? {};
   const isPag = row.origem === "pagamento";
   const titulo = isPag
@@ -542,6 +603,8 @@ function RegistroCard({ row, selected, toggle, dragProps }: { row: RegistroExclu
   return (
     <Card
       {...dragProps([row])}
+      onClickCapture={(e) => { if (pick([row], e, listInOrder)) return; }}
+      title="Ctrl/Cmd + clique para selecionar vários · Shift + clique para intervalo"
       className={`group relative cursor-grab overflow-hidden active:cursor-grabbing ${
         isSel ? "border-primary ring-2 ring-primary/30" : ""
       }`}
