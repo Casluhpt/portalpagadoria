@@ -39,14 +39,24 @@ const presenceMeta: Record<PresenceStatus, { label: string; dot: string; Icon: t
 
 export function HeaderActions() {
   const { user } = useSession();
-  const { roles } = useRoles();
+  const { roles, isAdmin } = useRoles();
   const { status, setStatus } = usePresence();
+  const navigate = useNavigate();
   const primary = roles[0];
 
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) toast.error(error.message);
     else toast.success("Sessão encerrada");
+  };
+
+  const sendPasswordReset = async () => {
+    if (!user?.email) return;
+    const { error } = await supabase.auth.resetPasswordForEmail(user.email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    if (error) toast.error(error.message);
+    else toast.success("Enviamos um link de redefinição para seu email.");
   };
 
   if (!user) {
