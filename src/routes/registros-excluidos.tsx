@@ -541,6 +541,8 @@ function EmpresaAberta({
               <div
                 key={k}
                 {...dragProps(itens)}
+                onClickCapture={(e) => { if (pick([itens[0]], e, subgrupos!.map(([, i]) => i[0]))) return; }}
+                title="Ctrl/Cmd + clique para selecionar várias · Shift + clique para intervalo"
                 className={`group relative flex cursor-grab flex-col items-start gap-2 rounded-lg border bg-card p-3 text-left transition hover:border-amber-400 hover:shadow-md active:cursor-grabbing ${
                   allSel ? "border-primary ring-2 ring-primary/30" : selCount > 0 ? "border-primary/60" : "border-border"
                 }`}
