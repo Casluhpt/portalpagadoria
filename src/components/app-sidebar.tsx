@@ -42,6 +42,7 @@ import type { ComponentType } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/hooks/use-session";
 import { useRoles, type AppRole } from "@/hooks/use-roles";
+import { useProfile } from "@/hooks/use-profile";
 import { Button } from "@/components/ui/button";
 
 import {
