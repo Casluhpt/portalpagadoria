@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Check, ChevronDown, ChevronRight, Loader2, ShieldAlert, X } from "lucide-react";
 import { toast } from "sonner";
@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dialog";
 
 import { useRoles } from "@/hooks/use-roles";
-import { supabase } from "@/integrations/supabase/client";
+
 import {
   aprovarSolicitacao, fetchSolicitacoes, rejeitarSolicitacao, solicitacoesKey,
   type PagamentoSolicitacao, type StatusSolicitacao,
@@ -45,15 +45,6 @@ function DivergenciasPage() {
     staleTime: 15_000,
   });
 
-  useEffect(() => {
-    const ch = supabase
-      .channel("solicitacoes-realtime")
-      .on("postgres_changes", { event: "*", schema: "public", table: "pagamento_solicitacoes" }, () => {
-        qc.invalidateQueries({ queryKey: solicitacoesKey });
-      })
-      .subscribe();
-    return () => { void supabase.removeChannel(ch); };
-  }, [qc]);
 
   const [tab, setTab] = useState<StatusSolicitacao>("pendente");
   const groups = useMemo(() => {
