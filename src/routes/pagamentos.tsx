@@ -681,6 +681,45 @@ function LancamentosTab({ colaboradorNome, userId }: { colaboradorNome: string; 
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <Dialog open={!!blocked} onOpenChange={(o) => { if (!o) { setBlocked(null); setBlockedMotivo(""); } }}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="text-amber-700">Provisão do dia já foi enviada</DialogTitle>
+            <DialogDescription>
+              A provisão diária de{" "}
+              <b>{blocked ? new Date(blocked.dataCredito + "T00:00:00").toLocaleDateString("pt-BR") : ""}</b>{" "}
+              já foi fechada. Novos lançamentos para esta data estão bloqueados.
+              <br /><br />
+              Se este pagamento realmente precisa entrar no dia, envie uma solicitação ao
+              administrador. Ela ficará registrada na <b>Central de Divergências</b> e o
+              administrador poderá liberar o lançamento.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2">
+            <Label htmlFor="motivo-solic">Justificativa (obrigatório)</Label>
+            <Textarea
+              id="motivo-solic"
+              rows={4}
+              placeholder="Explique por que este pagamento precisa ficar nesta data..."
+              value={blockedMotivo}
+              onChange={(e) => setBlockedMotivo(e.target.value)}
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => { setBlocked(null); setBlockedMotivo(""); }}>
+              Cancelar
+            </Button>
+            <Button
+              onClick={() => solicitacaoMut.mutate()}
+              disabled={solicitacaoMut.isPending || blockedMotivo.trim().length < 5}
+              className="bg-amber-600 text-white hover:bg-amber-700"
+            >
+              {solicitacaoMut.isPending ? "Enviando..." : "Enviar solicitação"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
