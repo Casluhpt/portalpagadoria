@@ -13,6 +13,9 @@ import {
   ShieldCheck,
   TrendingUp,
   Sparkles,
+  ChevronLeft,
+  ChevronRight,
+
   Wrench,
   Bug,
   Users,
