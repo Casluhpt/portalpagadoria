@@ -3,13 +3,15 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ShieldCheck, ArrowLeft, CheckCircle2, AlertTriangle, Percent, Clock } from "lucide-react";
+import { ShieldCheck, ArrowLeft, CheckCircle2, AlertTriangle, Percent, Clock, ShieldAlert } from "lucide-react";
+import { useRoles } from "@/hooks/use-roles";
 
 export const Route = createFileRoute("/conciliacao")({
   component: ConciliacaoPage,
 });
 
 function ConciliacaoPage() {
+  const { isAdmin, loading } = useRoles();
   const kpis = [
     { label: "Total conciliado", value: "—", icon: CheckCircle2, tone: "text-emerald-600" },
     { label: "Total pendente", value: "—", icon: Clock, tone: "text-amber-600" },
@@ -28,6 +30,22 @@ function ConciliacaoPage() {
             </Button>
             <h1 className="ml-2 font-semibold text-slate-800">Conciliação Bancária</h1>
           </header>
+          {loading ? (
+            <div className="flex flex-1 items-center justify-center text-sm text-muted-foreground">
+              Carregando…
+            </div>
+          ) : !isAdmin ? (
+            <div className="flex flex-1 items-center justify-center p-6">
+              <div className="max-w-md rounded-lg border border-border bg-card p-8 text-center shadow-sm">
+                <ShieldAlert className="mx-auto h-10 w-10 text-amber-600" />
+                <h2 className="mt-3 text-lg font-semibold text-foreground">Acesso restrito</h2>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  A Conciliação Bancária é visível apenas para colaboradores com perfil{" "}
+                  <strong>Administrador</strong>.
+                </p>
+              </div>
+            </div>
+          ) : (
           <main className="flex-1 space-y-6 p-6">
             <Card className="border-slate-200">
               <CardContent className="flex items-center gap-4 p-6">
@@ -69,6 +87,7 @@ function ConciliacaoPage() {
               </CardContent>
             </Card>
           </main>
+          )}
         </div>
       </div>
     </SidebarProvider>
