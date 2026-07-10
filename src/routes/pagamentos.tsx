@@ -314,38 +314,15 @@ function LancamentosTab({ colaboradorNome, userId }: { colaboradorNome: string; 
             <Download className="h-4 w-4" />
             Exportar Excel
           </Button>
-          <Popover open={novoOpen} onOpenChange={setNovoOpen}>
-            <PopoverTrigger asChild>
-              <Button size="sm" className="gap-1" disabled={createMut.isPending}>
-                <Plus className="h-4 w-4" /> Novo
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent align="end" className="w-56 space-y-3">
-              <div className="space-y-1">
-                <Label htmlFor="novo-qty" className="text-xs">Quantidade de linhas</Label>
-                <Input
-                  id="novo-qty"
-                  type="number"
-                  min={1}
-                  max={100}
-                  value={novoQty}
-                  onChange={(e) => setNovoQty(Math.max(1, Math.min(100, Number(e.target.value) || 1)))}
-                  className="h-9"
-                />
-              </div>
-              <Button
-                size="sm"
-                className="w-full"
-                disabled={createMut.isPending}
-                onClick={() => {
-                  createMut.mutate(novoQty);
-                  setNovoOpen(false);
-                }}
-              >
-                {createMut.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : `Adicionar ${novoQty} ${novoQty === 1 ? "linha" : "linhas"}`}
-              </Button>
-            </PopoverContent>
-          </Popover>
+          <Button
+            size="sm"
+            className="gap-1"
+            disabled={createMut.isPending}
+            onClick={() => createMut.mutate(1)}
+          >
+            {createMut.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+            Novo
+          </Button>
         </div>
       </div>
 
