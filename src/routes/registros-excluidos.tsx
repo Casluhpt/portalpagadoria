@@ -311,6 +311,7 @@ function Board() {
           onVoltar={() => setEmpresaAberta(null)}
           selected={selected}
           toggle={toggle}
+          pick={pick}
           dragProps={dragProps}
         />
       ) : (
@@ -323,6 +324,8 @@ function Board() {
               onOpen={() => setEmpresaAberta(nome)}
               selected={selected}
               toggle={toggle}
+              pick={pick}
+              pastasEmOrdem={grouped}
               dragProps={dragProps}
             />
           ))}
