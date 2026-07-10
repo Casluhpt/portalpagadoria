@@ -500,7 +500,7 @@ function DashboardTab() {
   const [fEmpresa, setFEmpresa] = useState<string>("");
   const [fCelula, setFCelula] = useState<string>("");
   const [fCompetencia, setFCompetencia] = useState<string>("");
-  const [fAno, setFAno] = useState<string>("");
+  
   const [fBanco, setFBanco] = useState<string>("");
   const [fFolha, setFFolha] = useState<string>("");
   const [fDataIni, setFDataIni] = useState<string>("");
@@ -516,7 +516,7 @@ function DashboardTab() {
       banco: uniq("banco"),
       folha: uniq("folha"),
       colab: uniq("colaborador_nome"),
-      ano: Array.from(new Set(data.map((r) => r.competencia_ano).filter((v) => v != null))).sort() as number[],
+      
     };
   }, [data]);
 
@@ -525,7 +525,7 @@ function DashboardTab() {
       if (fEmpresa && r.empresa !== fEmpresa) return false;
       if (fCelula && r.celula !== fCelula) return false;
       if (fCompetencia && r.competencia !== fCompetencia) return false;
-      if (fAno && String(r.competencia_ano) !== fAno) return false;
+      
       if (fBanco && r.banco !== fBanco) return false;
       if (fFolha && r.folha !== fFolha) return false;
       if (fColab && r.colaborador_nome !== fColab) return false;
@@ -533,7 +533,7 @@ function DashboardTab() {
       if (fDataFim && (r.data_credito ?? "") > fDataFim) return false;
       return true;
     });
-  }, [data, fEmpresa, fCelula, fCompetencia, fAno, fBanco, fFolha, fColab, fDataIni, fDataFim]);
+  }, [data, fEmpresa, fCelula, fCompetencia, fBanco, fFolha, fColab, fDataIni, fDataFim]);
 
   const kpis = useMemo(() => {
     const total = filtered.reduce((s, r) => s + (Number(r.valor_lg) || 0), 0);
@@ -589,7 +589,7 @@ function DashboardTab() {
   );
 
   const clearFilters = () => {
-    setFEmpresa(""); setFCelula(""); setFCompetencia(""); setFAno("");
+    setFEmpresa(""); setFCelula(""); setFCompetencia("");
     setFBanco(""); setFFolha(""); setFColab(""); setFDataIni(""); setFDataFim("");
   };
 
@@ -608,7 +608,7 @@ function DashboardTab() {
             <FilterSelect label="Empresa" value={fEmpresa} onChange={setFEmpresa} options={opts.empresa} />
             <FilterSelect label="Célula" value={fCelula} onChange={setFCelula} options={opts.celula} />
             <FilterSelect label="Competência" value={fCompetencia} onChange={setFCompetencia} options={[...COMPETENCIAS]} />
-            <FilterSelect label="Ano" value={fAno} onChange={setFAno} options={opts.ano.map(String)} />
+            
             <FilterSelect label="Banco" value={fBanco} onChange={setFBanco} options={opts.banco} />
             <FilterSelect label="Folha" value={fFolha} onChange={setFFolha} options={opts.folha} />
             <FilterSelect label="Colaborador" value={fColab} onChange={setFColab} options={opts.colab} />

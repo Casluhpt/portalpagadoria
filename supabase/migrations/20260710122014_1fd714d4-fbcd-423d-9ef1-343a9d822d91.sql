@@ -1,0 +1,1 @@
+ALTER TABLE public.pagamentos_diversos DROP COLUMN IF EXISTS competencia_ano;

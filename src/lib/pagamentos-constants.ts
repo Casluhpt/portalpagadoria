@@ -72,7 +72,7 @@ export type Pagamento = {
   descricao_pagamento: string | null;
   valor_lg: number | null;
   competencia: string | null;
-  competencia_ano: number | null;
+  
   folha: string | null;
   qtde_colaboradores: number | null;
   observacao: string | null;
@@ -105,7 +105,7 @@ export const PAGAMENTO_CAMPOS: {
   { key: "descricao_pagamento", label: "Descrição do Pagamento", kind: "select", options: DESCRICOES_PAGAMENTO },
   { key: "valor_lg", label: "Valor LG", kind: "currency" },
   { key: "competencia", label: "Competência", kind: "select", options: COMPETENCIAS },
-  { key: "competencia_ano", label: "Ano", kind: "number" },
+  
   { key: "folha", label: "Folha", kind: "select", options: FOLHAS },
   { key: "qtde_colaboradores", label: "Qtde Colab.", kind: "number" },
   { key: "observacao", label: "Observação", kind: "text" },
