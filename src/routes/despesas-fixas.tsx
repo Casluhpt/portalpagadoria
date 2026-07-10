@@ -511,6 +511,14 @@ function GrupoTabela({
                 >
                   <span className="font-medium text-slate-800 underline-offset-2 group-hover:underline">
                     {l.descricao}
+                    {l.meta.nome_real && l.meta.nome_real !== l.descricao ? (
+                      <span className="ml-1 text-xs font-normal text-slate-500">— {l.meta.nome_real}</span>
+                    ) : null}
+                    {l.meta.numero_pedido ? (
+                      <span className="ml-2 rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-semibold text-slate-600">
+                        Pedido {l.meta.numero_pedido}
+                      </span>
+                    ) : null}
                   </span>
                   <span className="mt-0.5 flex items-center gap-1 text-[11px] text-muted-foreground">
                     <Building2 className="h-3 w-3" />
