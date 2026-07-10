@@ -14,6 +14,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { PasswordExpirationGuard } from "@/components/password-expiration-guard";
 import { PresenceHeartbeat } from "@/components/presence-heartbeat";
+import { BackButton } from "@/components/back-button";
 
 function NotFoundComponent() {
   return (
@@ -123,6 +124,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <PasswordExpirationGuard />
       <PresenceHeartbeat />
+      <BackButton />
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
       <Toaster position="top-right" richColors closeButton />
