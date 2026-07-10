@@ -359,11 +359,12 @@ type SelectionProps = {
   selected: Set<string>;
   toggle: (rs: RegistroExcluido[], on?: boolean) => void;
   dragProps: (rs: RegistroExcluido[]) => {
-    draggable: true;
+    draggable: boolean;
     onDragStart: (e: React.DragEvent) => void;
     onDragEnd: () => void;
   };
 };
+
 
 
 function PastaEmpresa({
