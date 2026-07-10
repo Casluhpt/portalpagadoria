@@ -123,7 +123,7 @@ export function HeaderActions() {
               <span className="truncate text-sm font-semibold">{user.email}</span>
               <span className="text-[10px] uppercase tracking-wide text-muted-foreground">
                 {primary ? roleLabel[primary] : "Sem perfil atribuído"}
-                {setor ? <span className="ml-1 normal-case text-slate-500">· {setor}</span> : null}
+                {setor ? <span className="ml-1 font-semibold text-primary">| {setor}</span> : null}
               </span>
               <span className="mt-1 inline-flex items-center gap-1.5 text-[11px] text-muted-foreground">
                 <span className={`h-2 w-2 rounded-full ${meta.dot}`} aria-hidden />

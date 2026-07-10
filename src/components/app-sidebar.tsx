@@ -198,7 +198,7 @@ export function AppSidebar() {
                       ? roleLabel[primaryRole]
                       : "Sem perfil atribuído"}
                     {setor ? (
-                      <span className="ml-1 normal-case text-sidebar-foreground/70">· {setor}</span>
+                      <span className="ml-1 font-semibold text-sidebar-primary">| {setor}</span>
                     ) : null}
                   </div>
                 </div>
