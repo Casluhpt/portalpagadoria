@@ -401,6 +401,11 @@ function Board() {
 type SelectionProps = {
   selected: Set<string>;
   toggle: (rs: RegistroExcluido[], on?: boolean) => void;
+  pick: (
+    rs: RegistroExcluido[],
+    e: React.MouseEvent,
+    listInOrder?: RegistroExcluido[],
+  ) => boolean;
   dragProps: (rs: RegistroExcluido[]) => {
     draggable: boolean;
     onDragStart: (e: React.DragEvent) => void;
