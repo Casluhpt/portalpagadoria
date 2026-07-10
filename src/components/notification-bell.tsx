@@ -62,7 +62,31 @@ export function NotificationBell() {
     refetchOnWindowFocus: true,
   });
 
+  const { data: latestVersion } = useQuery({
+    queryKey: ["latest-app-version"],
+    queryFn: fetchLatestVersion,
+    enabled: !!user,
+    staleTime: 60_000,
+    refetchOnWindowFocus: true,
+  });
+
+  const [versionDismissed, setVersionDismissed] = useState(true);
+  useEffect(() => {
+    if (!user || !latestVersion) return;
+    const dismissed = typeof window !== "undefined"
+      && window.localStorage.getItem(dismissKey(user.id, latestVersion.versao)) === "1";
+    setVersionDismissed(dismissed);
+  }, [user, latestVersion]);
+
+  const dismissVersion = () => {
+    if (!user || !latestVersion) return;
+    window.localStorage.setItem(dismissKey(user.id, latestVersion.versao), "1");
+    setVersionDismissed(true);
+  };
+
+  const showVersionCard = !!latestVersion && !versionDismissed;
   const naoLidos = useMemo(() => items.filter((i) => !i.lido), [items]);
+  const totalBadge = naoLidos.length + (showVersionCard ? 1 : 0);
 
   const markOne = useMutation({
     mutationFn: (id: string) => marcarLido(id, user!.id),
