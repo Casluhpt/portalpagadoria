@@ -14,7 +14,12 @@ export function useRoles() {
     enabled: !!userId,
     queryFn: async (): Promise<AppRole[]> => {
       // Ensure a signed-in user has at least the viewer role.
-      await supabase.rpc("ensure_viewer_role").catch(() => {});
+      try {
+        // @ts-expect-error - RPC name may not yet be in generated types
+        await supabase.rpc("ensure_viewer_role");
+      } catch {
+        /* ignore */
+      }
       const { data, error } = await supabase
         .from("user_roles")
         .select("role")
