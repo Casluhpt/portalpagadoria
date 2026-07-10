@@ -25,7 +25,7 @@ import { toast } from "sonner";
 import { useRoles } from "@/hooks/use-roles";
 import { useSession } from "@/hooks/use-session";
 import { useQueryClient } from "@tanstack/react-query";
-import { listAdminUsers, resetUserPassword, setUserRole, setUserSetor, inviteUser, ALLOWED_SETORES, type AdminUserRow, type Setor } from "@/lib/admin-users.functions";
+import { listAdminUsers, resetUserPassword, setUserRole, setUserSetor, inviteUser, deleteUser, ALLOWED_SETORES, type AdminUserRow, type Setor } from "@/lib/admin-users.functions";
 import {
   Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
