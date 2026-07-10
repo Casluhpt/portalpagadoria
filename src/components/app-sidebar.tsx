@@ -196,7 +196,7 @@ export function AppSidebar() {
                       : "Sem perfil atribuído"}
                   </div>
                 </div>
-                <Button variant="outline" size="sm" className="w-full" onClick={handleSignOut}>
+                <Button variant="outline" size="sm" className="w-full" onClick={() => setConfirmSignOut(true)}>
                   <LogOut className="mr-2 h-4 w-4" /> Sair
                 </Button>
               </div>
