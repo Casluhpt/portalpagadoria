@@ -44,12 +44,16 @@ export const listAdminUsers = createServerFn({ method: "GET" })
 
     const ids = users.map((u) => u.id);
     const [{ data: profiles }, { data: roles }] = await Promise.all([
-      supabaseAdmin.from("profiles").select("id, nome").in("id", ids.length ? ids : ["00000000-0000-0000-0000-000000000000"]),
+      supabaseAdmin.from("profiles").select("id, nome, presence_status, last_seen_at").in("id", ids.length ? ids : ["00000000-0000-0000-0000-000000000000"]),
       supabaseAdmin.from("user_roles").select("user_id, role").in("user_id", ids.length ? ids : ["00000000-0000-0000-0000-000000000000"]),
     ]);
 
-    const nomeById = new Map<string, string | null>();
-    (profiles ?? []).forEach((p: any) => nomeById.set(p.id, p.nome ?? null));
+    const profileById = new Map<string, { nome: string | null; presence: PresenceStatus; last_seen_at: string | null }>();
+    (profiles ?? []).forEach((p: any) => profileById.set(p.id, {
+      nome: p.nome ?? null,
+      presence: (p.presence_status as PresenceStatus) ?? "offline",
+      last_seen_at: p.last_seen_at ?? null,
+    }));
     const rolesById = new Map<string, string[]>();
     (roles ?? []).forEach((r: any) => {
       const arr = rolesById.get(r.user_id) ?? [];
@@ -59,16 +63,22 @@ export const listAdminUsers = createServerFn({ method: "GET" })
 
     const now = Date.now();
     return users.map((u) => {
-      const last = u.last_sign_in_at ? new Date(u.last_sign_in_at).getTime() : null;
-      const online = last != null && now - last < 5 * 60 * 1000;
+      const prof = profileById.get(u.id);
+      const lastSeen = prof?.last_seen_at ? new Date(prof.last_seen_at).getTime() : null;
+      const fresh = lastSeen != null && now - lastSeen < 2 * 60 * 1000;
+      // Consider stale "online" as ausente
+      let presence: PresenceStatus = prof?.presence ?? "offline";
+      if (presence === "online" && !fresh) presence = lastSeen != null ? "ausente" : "offline";
       return {
         id: u.id,
         email: u.email ?? null,
-        nome: nomeById.get(u.id) ?? (u.user_metadata?.nome as string | undefined) ?? null,
+        nome: prof?.nome ?? (u.user_metadata?.nome as string | undefined) ?? null,
         created_at: u.created_at,
         last_sign_in_at: u.last_sign_in_at ?? null,
+        last_seen_at: prof?.last_seen_at ?? null,
+        presence,
         roles: rolesById.get(u.id) ?? [],
-        online,
+        online: presence === "online",
       };
     }).sort((a, b) => (b.created_at ?? "").localeCompare(a.created_at ?? ""));
   });
