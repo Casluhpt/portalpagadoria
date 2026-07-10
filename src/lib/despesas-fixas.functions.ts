@@ -42,6 +42,7 @@ export type DespesaFixa = {
   lancado: boolean;
   nome_real: string | null;
   notas: string | null;
+  ordem: number;
   created_by: string | null;
   created_by_nome: string | null;
   created_at: string;
@@ -57,6 +58,7 @@ export const listDespesasFixas = createServerFn({ method: "GET" })
       .select("*")
       .eq("ano", data.ano)
       .order("categoria", { ascending: true })
+      .order("ordem", { ascending: true })
       .order("descricao", { ascending: true })
       .order("mes", { ascending: true });
     if (error) throw error;
