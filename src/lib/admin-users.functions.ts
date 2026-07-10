@@ -104,7 +104,7 @@ export const setUserRole = createServerFn({ method: "POST" })
       .from("user_roles")
       .delete()
       .eq("user_id", data.userId)
-      .in("role", ALLOWED_ROLES as unknown as string[]);
+      .in("role", [...ALLOWED_ROLES]);
     if (delErr) throw delErr;
     const { error: insErr } = await supabaseAdmin
       .from("user_roles")
