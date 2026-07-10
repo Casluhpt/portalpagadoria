@@ -572,7 +572,7 @@ function EmpresaAberta({
       ) : (
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
           {visibleRegs.map((r) => (
-            <RegistroCard key={r.id} row={r} selected={selected} toggle={toggle} dragProps={dragProps} />
+            <RegistroCard key={r.id} row={r} listInOrder={visibleRegs} selected={selected} toggle={toggle} pick={pick} dragProps={dragProps} />
           ))}
         </div>
       )}
