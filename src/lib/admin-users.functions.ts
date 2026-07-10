@@ -48,13 +48,14 @@ export const listAdminUsers = createServerFn({ method: "GET" })
 
     const ids = users.map((u) => u.id);
     const [{ data: profiles }, { data: roles }] = await Promise.all([
-      supabaseAdmin.from("profiles").select("id, nome, presence_status, last_seen_at").in("id", ids.length ? ids : ["00000000-0000-0000-0000-000000000000"]),
+      supabaseAdmin.from("profiles").select("id, nome, setor, presence_status, last_seen_at").in("id", ids.length ? ids : ["00000000-0000-0000-0000-000000000000"]),
       supabaseAdmin.from("user_roles").select("user_id, role").in("user_id", ids.length ? ids : ["00000000-0000-0000-0000-000000000000"]),
     ]);
 
-    const profileById = new Map<string, { nome: string | null; presence: PresenceStatus; last_seen_at: string | null }>();
+    const profileById = new Map<string, { nome: string | null; setor: Setor | null; presence: PresenceStatus; last_seen_at: string | null }>();
     (profiles ?? []).forEach((p: any) => profileById.set(p.id, {
       nome: p.nome ?? null,
+      setor: (ALLOWED_SETORES as readonly string[]).includes(p.setor) ? (p.setor as Setor) : null,
       presence: (p.presence_status as PresenceStatus) ?? "offline",
       last_seen_at: p.last_seen_at ?? null,
     }));
@@ -77,6 +78,7 @@ export const listAdminUsers = createServerFn({ method: "GET" })
         id: u.id,
         email: u.email ?? null,
         nome: prof?.nome ?? (u.user_metadata?.nome as string | undefined) ?? null,
+        setor: prof?.setor ?? null,
         created_at: u.created_at,
         last_sign_in_at: u.last_sign_in_at ?? null,
         last_seen_at: prof?.last_seen_at ?? null,
