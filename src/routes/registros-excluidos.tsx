@@ -47,6 +47,10 @@ function RegistrosExcluidosPage() {
   );
 }
 
+export function RegistrosExcluidosView() {
+  return <Content />;
+}
+
 function Content() {
   const { isAdmin, loading } = useRoles();
   if (loading) {
