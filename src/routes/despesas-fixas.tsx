@@ -63,6 +63,8 @@ type LinhaAgrupada = {
     conta: string | null;
     centro_custo: string | null;
     numero_pedido: string | null;
+    nome_real: string | null;
+    notas: string | null;
   };
 };
 
