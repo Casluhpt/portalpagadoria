@@ -30,6 +30,22 @@ function ConciliacaoPage() {
             </Button>
             <h1 className="ml-2 font-semibold text-slate-800">Conciliação Bancária</h1>
           </header>
+          {loading ? (
+            <div className="flex flex-1 items-center justify-center text-sm text-muted-foreground">
+              Carregando…
+            </div>
+          ) : !isAdmin ? (
+            <div className="flex flex-1 items-center justify-center p-6">
+              <div className="max-w-md rounded-lg border border-border bg-card p-8 text-center shadow-sm">
+                <ShieldAlert className="mx-auto h-10 w-10 text-amber-600" />
+                <h2 className="mt-3 text-lg font-semibold text-foreground">Acesso restrito</h2>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  A Conciliação Bancária é visível apenas para colaboradores com perfil{" "}
+                  <strong>Administrador</strong>.
+                </p>
+              </div>
+            </div>
+          ) : (
           <main className="flex-1 space-y-6 p-6">
             <Card className="border-slate-200">
               <CardContent className="flex items-center gap-4 p-6">
