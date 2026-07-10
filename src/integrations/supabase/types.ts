@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      app_versions: {
+        Row: {
+          autor: string | null
+          created_at: string
+          destaque: boolean
+          itens: Json
+          lancada_em: string
+          resumo: string | null
+          tipo: Database["public"]["Enums"]["app_version_tipo"]
+          titulo: string
+          updated_at: string
+          versao: string
+        }
+        Insert: {
+          autor?: string | null
+          created_at?: string
+          destaque?: boolean
+          itens?: Json
+          lancada_em?: string
+          resumo?: string | null
+          tipo?: Database["public"]["Enums"]["app_version_tipo"]
+          titulo: string
+          updated_at?: string
+          versao: string
+        }
+        Update: {
+          autor?: string | null
+          created_at?: string
+          destaque?: boolean
+          itens?: Json
+          lancada_em?: string
+          resumo?: string | null
+          tipo?: Database["public"]["Enums"]["app_version_tipo"]
+          titulo?: string
+          updated_at?: string
+          versao?: string
+        }
+        Relationships: []
+      }
       comunicado_leituras: {
         Row: {
           comunicado_id: string
@@ -458,6 +497,7 @@ export type Database = {
         | "consulta"
         | "auditor"
         | "viewer"
+      app_version_tipo: "major" | "minor" | "patch" | "hotfix"
       solicitacao_status:
         | "aberta"
         | "em_analise"
@@ -606,6 +646,7 @@ export const Constants = {
         "auditor",
         "viewer",
       ],
+      app_version_tipo: ["major", "minor", "patch", "hotfix"],
       solicitacao_status: [
         "aberta",
         "em_analise",
