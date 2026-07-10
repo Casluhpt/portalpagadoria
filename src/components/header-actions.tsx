@@ -155,6 +155,9 @@ export function HeaderActions() {
               <DropdownMenuItem onClick={() => navigate({ to: "/usuarios" })}>
                 <Users className="mr-2 h-4 w-4" /> Administração de usuários
               </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate({ to: "/historico" })}>
+                <History className="mr-2 h-4 w-4" /> Histórico de versões
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={() => navigate({ to: "/configuracoes" })}>
                 <Cog className="mr-2 h-4 w-4" /> Configurações avançadas
               </DropdownMenuItem>
