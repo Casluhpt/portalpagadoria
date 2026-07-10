@@ -255,7 +255,31 @@ function ProvisaoDashboard() {
       </Card>
 
       {/* Ação principal */}
-      <div className="flex justify-end">
+      <div className="flex flex-wrap items-center justify-end gap-3">
+        {fechamentoHoje ? (
+          <div className="flex items-center gap-2 rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+            <Lock className="h-4 w-4" />
+            <span>
+              Provisão de hoje <b>fechada</b>
+              {fechamentoHoje.fechada_por_nome ? ` por ${fechamentoHoje.fechada_por_nome}` : ""}
+              {fechamentoHoje.fechada_em ? ` às ${new Date(fechamentoHoje.fechada_em).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}` : ""}.
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              className="ml-2 gap-1 border-amber-400 text-amber-900 hover:bg-amber-100"
+              onClick={() => reabrir.mutate()}
+              disabled={reabrir.isPending}
+            >
+              <LockOpen className="h-3.5 w-3.5" /> Reabrir
+            </Button>
+          </div>
+        ) : (
+          <div className="flex items-center gap-2 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-800">
+            <LockOpen className="h-4 w-4" />
+            Provisão de hoje ainda aberta para lançamentos.
+          </div>
+        )}
         <Button
           onClick={() => notificar.mutate()}
           disabled={notificar.isPending || !user}
@@ -263,9 +287,10 @@ function ProvisaoDashboard() {
           className="gap-2 bg-emerald-700 font-semibold text-white shadow-sm hover:bg-emerald-800"
         >
           <Send className="h-4 w-4" />
-          {notificar.isPending ? "Enviando…" : "Notificar Envio"}
+          {notificar.isPending ? "Enviando…" : "Notificar Envio e Fechar Dia"}
         </Button>
       </div>
+
     </main>
 
   );
