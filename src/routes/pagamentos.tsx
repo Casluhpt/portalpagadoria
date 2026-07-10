@@ -160,11 +160,6 @@ function LancamentosTab({ colaboradorNome, userId }: { colaboradorNome: string; 
     onError: (e: Error) => toast.error("Falha ao salvar: " + e.message),
   });
 
-  const deleteMut = useMutation({
-    mutationFn: (id: string) => deletePagamento(id),
-    onSuccess: () => { invalidate(); toast.success("Registro excluído"); },
-    onError: (e: Error) => toast.error("Falha ao excluir: " + e.message),
-  });
 
   const bulkDeleteMut = useMutation({
     mutationFn: async (ids: string[]) => {
