@@ -4,17 +4,23 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { AlertCircle, Loader2, Search, ShieldAlert, Trash2, FileText, Receipt } from "lucide-react";
+import {
+  AlertCircle, Loader2, Search, ShieldAlert, Trash2, FileText, Receipt,
+  Folder, FolderOpen, ChevronRight, X,
+} from "lucide-react";
 
 import { AppSidebar } from "@/components/app-sidebar";
 import { HeaderActions } from "@/components/header-actions";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
 import { useRoles } from "@/hooks/use-roles";
 import { listRegistrosExcluidos, type RegistroExcluido } from "@/lib/registros-excluidos.functions";
 
@@ -63,10 +69,20 @@ function Content() {
   return <Board />;
 }
 
+function empresaOf(r: RegistroExcluido): string {
+  const s = r.snapshot ?? {};
+  const raw = (s.empresa ?? s.supplier ?? s.issuer ?? "SEM EMPRESA") as string;
+  return String(raw).trim() || "SEM EMPRESA";
+}
+
 function Board() {
   const listFn = useServerFn(listRegistrosExcluidos);
+
   const [search, setSearch] = useState("");
-  const [tab, setTab] = useState<"todos" | "pagamento" | "lancamento">("todos");
+  const [origem, setOrigem] = useState<"todos" | "pagamento" | "lancamento">("todos");
+  const [usuario, setUsuario] = useState<string>("todos");
+  const [periodo, setPeriodo] = useState<"todos" | "7" | "30" | "90">("todos");
+  const [empresaAberta, setEmpresaAberta] = useState<string | null>(null);
 
   const { data = [], isLoading, error } = useQuery({
     queryKey: ["registros-excluidos"],
@@ -74,67 +90,187 @@ function Board() {
     staleTime: 30_000,
   });
 
+  const usuarios = useMemo(() => {
+    const set = new Set<string>();
+    data.forEach((r) => r.user_nome && set.add(r.user_nome));
+    return Array.from(set).sort();
+  }, [data]);
+
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
+    const cutoff = periodo === "todos" ? 0 : Date.now() - Number(periodo) * 24 * 60 * 60 * 1000;
     return data.filter((r) => {
-      if (tab !== "todos" && r.origem !== tab) return false;
+      if (origem !== "todos" && r.origem !== origem) return false;
+      if (usuario !== "todos" && r.user_nome !== usuario) return false;
+      if (cutoff && new Date(r.created_at).getTime() < cutoff) return false;
       if (!q) return true;
       const s = JSON.stringify(r.snapshot ?? {}).toLowerCase();
       return s.includes(q) || (r.user_nome ?? "").toLowerCase().includes(q);
     });
-  }, [data, search, tab]);
+  }, [data, search, origem, usuario, periodo]);
 
-  const totalPag = data.filter((r) => r.origem === "pagamento").length;
-  const totalLanc = data.filter((r) => r.origem === "lancamento").length;
+  const grouped = useMemo(() => {
+    const map = new Map<string, RegistroExcluido[]>();
+    filtered.forEach((r) => {
+      const key = empresaOf(r);
+      const arr = map.get(key) ?? [];
+      arr.push(r);
+      map.set(key, arr);
+    });
+    return Array.from(map.entries()).sort((a, b) => a[0].localeCompare(b[0]));
+  }, [filtered]);
+
+  const empresaSelecionada = empresaAberta
+    ? grouped.find(([nome]) => nome === empresaAberta)
+    : undefined;
+
+  const clearFilters = () => {
+    setSearch(""); setOrigem("todos"); setUsuario("todos"); setPeriodo("todos");
+  };
+  const filtrosAtivos = search || origem !== "todos" || usuario !== "todos" || periodo !== "todos";
 
   return (
     <div className="flex-1 space-y-4 p-6">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <p className="text-sm text-muted-foreground">
-            Área restrita ao Administrador — histórico dos registros apagados de Resultados e Lançamentos.
-          </p>
+      <div>
+        <p className="text-sm text-muted-foreground">
+          Área restrita ao Administrador — histórico dos registros apagados de Resultados e Lançamentos, organizados por empresa.
+        </p>
+      </div>
+
+      {/* Filtros */}
+      <div className="flex flex-wrap items-center gap-2 rounded-md border border-border bg-card p-3">
+        <div className="relative">
+          <Search className="pointer-events-none absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            placeholder="Buscar por descrição, usuário, valor…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-72 pl-8"
+          />
         </div>
-        <div className="flex items-center gap-2">
-          <div className="relative">
-            <Search className="pointer-events-none absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              placeholder="Buscar por empresa, usuário, valor…"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-72 pl-8"
-            />
-          </div>
+        <Select value={origem} onValueChange={(v) => setOrigem(v as any)}>
+          <SelectTrigger className="w-40"><SelectValue placeholder="Origem" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="todos">Todas as origens</SelectItem>
+            <SelectItem value="pagamento">Resultados</SelectItem>
+            <SelectItem value="lancamento">Lançamentos</SelectItem>
+          </SelectContent>
+        </Select>
+        <Select value={usuario} onValueChange={setUsuario}>
+          <SelectTrigger className="w-52"><SelectValue placeholder="Usuário" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="todos">Todos os usuários</SelectItem>
+            {usuarios.map((u) => <SelectItem key={u} value={u}>{u}</SelectItem>)}
+          </SelectContent>
+        </Select>
+        <Select value={periodo} onValueChange={(v) => setPeriodo(v as any)}>
+          <SelectTrigger className="w-44"><SelectValue placeholder="Período" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="todos">Todo o período</SelectItem>
+            <SelectItem value="7">Últimos 7 dias</SelectItem>
+            <SelectItem value="30">Últimos 30 dias</SelectItem>
+            <SelectItem value="90">Últimos 90 dias</SelectItem>
+          </SelectContent>
+        </Select>
+        {filtrosAtivos && (
+          <Button variant="ghost" size="sm" onClick={clearFilters}>
+            <X className="mr-1 h-3.5 w-3.5" /> Limpar
+          </Button>
+        )}
+        <div className="ml-auto text-xs text-muted-foreground">
+          {filtered.length} registro{filtered.length === 1 ? "" : "s"} • {grouped.length} empresa{grouped.length === 1 ? "" : "s"}
         </div>
       </div>
 
-      <Tabs value={tab} onValueChange={(v) => setTab(v as any)}>
-        <TabsList>
-          <TabsTrigger value="todos">Todos <Badge variant="secondary" className="ml-2">{data.length}</Badge></TabsTrigger>
-          <TabsTrigger value="pagamento">Resultados <Badge variant="secondary" className="ml-2">{totalPag}</Badge></TabsTrigger>
-          <TabsTrigger value="lancamento">Lançamentos <Badge variant="secondary" className="ml-2">{totalLanc}</Badge></TabsTrigger>
-        </TabsList>
+      {isLoading ? (
+        <div className="flex items-center justify-center py-16">
+          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+        </div>
+      ) : error ? (
+        <div className="rounded-md border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
+          {(error as any)?.message ?? "Falha ao carregar registros excluídos."}
+        </div>
+      ) : grouped.length === 0 ? (
+        <div className="rounded-md border border-dashed border-border p-12 text-center text-sm text-muted-foreground">
+          Nenhum registro excluído encontrado com os filtros atuais.
+        </div>
+      ) : empresaSelecionada ? (
+        <EmpresaAberta
+          nome={empresaSelecionada[0]}
+          registros={empresaSelecionada[1]}
+          onVoltar={() => setEmpresaAberta(null)}
+        />
+      ) : (
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+          {grouped.map(([nome, itens]) => (
+            <PastaEmpresa
+              key={nome}
+              nome={nome}
+              registros={itens}
+              onOpen={() => setEmpresaAberta(nome)}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
-        <TabsContent value={tab} className="mt-4">
-          {isLoading ? (
-            <div className="flex items-center justify-center py-16">
-              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-            </div>
-          ) : error ? (
-            <div className="rounded-md border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
-              {(error as any)?.message ?? "Falha ao carregar registros excluídos."}
-            </div>
-          ) : filtered.length === 0 ? (
-            <div className="rounded-md border border-dashed border-border p-12 text-center text-sm text-muted-foreground">
-              Nenhum registro excluído encontrado.
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
-              {filtered.map((r) => <RegistroCard key={r.id} row={r} />)}
-            </div>
-          )}
-        </TabsContent>
-      </Tabs>
+function PastaEmpresa({
+  nome, registros, onOpen,
+}: { nome: string; registros: RegistroExcluido[]; onOpen: () => void }) {
+  const qtd = registros.length;
+  const ultimo = registros[0]?.created_at;
+  const pag = registros.filter((r) => r.origem === "pagamento").length;
+  const lanc = registros.filter((r) => r.origem === "lancamento").length;
+
+  return (
+    <button
+      onClick={onOpen}
+      className="group relative flex flex-col items-start gap-2 rounded-lg border border-border bg-card p-4 text-left transition hover:border-primary/50 hover:shadow-md"
+    >
+      {qtd > 0 && (
+        <span className="absolute -left-1 top-3 z-10 inline-flex items-center gap-1 rounded-r-full bg-destructive px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-destructive-foreground shadow">
+          <AlertCircle className="h-3 w-3" /> {qtd}
+        </span>
+      )}
+      <div className="flex w-full items-center justify-between">
+        <Folder className="h-8 w-8 text-amber-500 transition group-hover:hidden" />
+        <FolderOpen className="hidden h-8 w-8 text-amber-500 transition group-hover:block" />
+        <ChevronRight className="h-4 w-4 text-muted-foreground opacity-0 transition group-hover:opacity-100" />
+      </div>
+      <div className="w-full min-w-0">
+        <p className="truncate text-sm font-semibold">{nome}</p>
+        <p className="mt-0.5 truncate text-[11px] text-muted-foreground">
+          {ultimo ? `Último: ${format(new Date(ultimo), "dd/MM/yyyy HH:mm", { locale: ptBR })}` : "—"}
+        </p>
+      </div>
+      <div className="flex flex-wrap gap-1">
+        {pag > 0 && <Badge variant="outline" className="gap-1 text-[10px]"><Receipt className="h-3 w-3" />{pag}</Badge>}
+        {lanc > 0 && <Badge variant="outline" className="gap-1 text-[10px]"><FileText className="h-3 w-3" />{lanc}</Badge>}
+      </div>
+    </button>
+  );
+}
+
+function EmpresaAberta({
+  nome, registros, onVoltar,
+}: { nome: string; registros: RegistroExcluido[]; onVoltar: () => void }) {
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center gap-2 text-sm">
+        <Button variant="ghost" size="sm" onClick={onVoltar}>
+          ← Voltar às pastas
+        </Button>
+        <div className="flex items-center gap-2 text-muted-foreground">
+          <FolderOpen className="h-4 w-4 text-amber-500" />
+          <span className="font-semibold text-foreground">{nome}</span>
+          <span>• {registros.length} registro{registros.length === 1 ? "" : "s"}</span>
+        </div>
+      </div>
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
+        {registros.map((r) => <RegistroCard key={r.id} row={r} />)}
+      </div>
     </div>
   );
 }
@@ -149,17 +285,16 @@ function RegistroCard({ row }: { row: RegistroExcluido }) {
   const s = row.snapshot ?? {};
   const isPag = row.origem === "pagamento";
   const titulo = isPag
-    ? (s.empresa ?? "Pagamento")
-    : (s.supplier ?? s.issuer ?? s.empresa ?? "Lançamento");
+    ? (s.descricao_pagamento ?? s.natureza_pagamento ?? "Pagamento")
+    : (s.invoice_number ? `NF ${s.invoice_number}` : (s.desc_status ?? "Lançamento"));
   const subtitulo = isPag
-    ? (s.descricao_pagamento ?? s.natureza_pagamento ?? "—")
-    : (s.invoice_number ? `NF ${s.invoice_number}` : (s.desc_status ?? "—"));
+    ? (s.banco ?? s.natureza_pagamento ?? "—")
+    : (s.supplier ?? s.issuer ?? "—");
   const valor = isPag ? fmtCurrency(s.valor_lg) : fmtCurrency(s.gross_amount);
   const data = isPag ? s.data_credito : (s.due_date ?? s.register_date);
 
   return (
     <Card className="relative overflow-hidden">
-      {/* Popup lateral esquerdo: só aparece quando há registro efetivamente apagado */}
       <div className="absolute left-0 top-0 flex h-full w-1.5 bg-destructive" aria-hidden />
       <Popover>
         <PopoverTrigger asChild>
