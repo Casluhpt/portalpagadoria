@@ -257,21 +257,74 @@ function PastaEmpresa({
 function EmpresaAberta({
   nome, registros, onVoltar,
 }: { nome: string; registros: RegistroExcluido[]; onVoltar: () => void }) {
+  const [subAberta, setSubAberta] = useState<string | null>(null);
+
+  const subgrupos = useMemo(() => {
+    if (nome !== "TAMOIO") return null;
+    const map = new Map<string, RegistroExcluido[]>();
+    registros.forEach((r) => {
+      const k = subEmpresaOf(r);
+      const arr = map.get(k) ?? [];
+      arr.push(r);
+      map.set(k, arr);
+    });
+    return Array.from(map.entries()).sort((a, b) => {
+      const na = Number(a[0].replace(/\D/g, "")) || 0;
+      const nb = Number(b[0].replace(/\D/g, "")) || 0;
+      return na - nb || a[0].localeCompare(b[0]);
+    });
+  }, [nome, registros]);
+
+  const subSelecionado = subAberta && subgrupos
+    ? subgrupos.find(([k]) => k === subAberta)
+    : null;
+
   return (
     <div className="space-y-3">
       <div className="flex items-center gap-2 text-sm">
-        <Button variant="ghost" size="sm" onClick={onVoltar}>
-          ← Voltar às pastas
+        <Button variant="ghost" size="sm" onClick={subSelecionado ? () => setSubAberta(null) : onVoltar}>
+          ← {subSelecionado ? `Voltar a ${nome}` : "Voltar às pastas"}
         </Button>
         <div className="flex items-center gap-2 text-muted-foreground">
           <FolderOpen className="h-4 w-4 text-amber-500" />
           <span className="font-semibold text-foreground">{nome}</span>
-          <span>• {registros.length} registro{registros.length === 1 ? "" : "s"}</span>
+          {subSelecionado && (
+            <>
+              <ChevronRight className="h-3 w-3" />
+              <span className="font-semibold text-foreground">{subSelecionado[0]}</span>
+            </>
+          )}
+          <span>• {(subSelecionado?.[1] ?? registros).length} registro{(subSelecionado?.[1] ?? registros).length === 1 ? "" : "s"}</span>
         </div>
       </div>
-      <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
-        {registros.map((r) => <RegistroCard key={r.id} row={r} />)}
-      </div>
+
+      {subgrupos && !subSelecionado ? (
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6">
+          {subgrupos.map(([k, itens]) => (
+            <button
+              key={k}
+              onClick={() => setSubAberta(k)}
+              className="group flex flex-col items-start gap-2 rounded-lg border border-border bg-card p-3 text-left transition hover:border-amber-400 hover:shadow-md"
+            >
+              <div className="flex w-full items-center justify-between">
+                <Folder className="h-6 w-6 text-amber-500 transition group-hover:hidden" />
+                <FolderOpen className="hidden h-6 w-6 text-amber-500 transition group-hover:block" />
+                <Badge variant="destructive" className="h-5 gap-1 px-1.5 text-[10px]">
+                  <AlertCircle className="h-3 w-3" />{itens.length}
+                </Badge>
+              </div>
+              <div className="min-w-0">
+                <p className="truncate text-sm font-semibold capitalize text-foreground">{k}</p>
+                <p className="text-[10px] text-muted-foreground">{itens.length} arquivo{itens.length === 1 ? "" : "s"}</p>
+              </div>
+            </button>
+          ))}
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
+          {(subSelecionado?.[1] ?? registros).map((r) => <RegistroCard key={r.id} row={r} />)}
+        </div>
+      )}
     </div>
   );
 }
