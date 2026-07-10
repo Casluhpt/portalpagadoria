@@ -184,6 +184,7 @@ export function AppSidebar() {
           <SidebarGroupContent>
             {user ? (
               <div className="space-y-2 px-2 pb-2 group-data-[collapsible=icon]:hidden">
+                <LiveClock />
                 <div className="rounded-md bg-sidebar-accent/40 px-2 py-1.5 text-xs text-sidebar-foreground">
                   <div className="flex items-center gap-2">
                     <User className="h-3.5 w-3.5" />
