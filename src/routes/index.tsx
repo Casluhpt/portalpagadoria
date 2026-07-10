@@ -249,6 +249,26 @@ function PortalPage() {
       ],
       updated: "em breve",
     },
+    {
+      key: "despesas-fixas",
+      title: "Despesas Fixas",
+      subtitle: "Lançamentos mensais de PJs, Pensão, Penhora e Fornecedores.",
+      objetivo: "Base de valores lançados de janeiro a dezembro por categoria de despesa fixa.",
+      base: "Base Despesas Fixas 2026",
+      baseTo: "/despesas-fixas",
+      to: "/despesas-fixas",
+      cta: "Acessar Despesas Fixas",
+      icon: Wallet,
+      accent: "from-emerald-600 to-teal-800",
+      chip: "bg-emerald-100 text-emerald-800",
+      bullets: [
+        "PJs, Pensão, Penhora e Fornecedores",
+        "Valores por mês (Jan–Dez)",
+        "Totais por categoria e mês",
+        "Edição inline e histórico",
+      ],
+      updated: "mensalmente",
+    },
   ];
 
   return (
