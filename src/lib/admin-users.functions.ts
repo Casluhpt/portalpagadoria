@@ -126,3 +126,36 @@ export const setUserRole = createServerFn({ method: "POST" })
     if (insErr) throw insErr;
     return { ok: true };
   });
+
+export const inviteUser = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { email: string; role: "administrador" | "viewer"; nome?: string; redirectTo?: string }) => {
+    const email = (input?.email ?? "").trim().toLowerCase();
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error("Email inválido");
+    if (!ALLOWED_ROLES.includes(input.role)) throw new Error("Perfil inválido");
+    return { email, role: input.role, nome: input.nome?.trim() || undefined, redirectTo: input.redirectTo };
+  })
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    const { data: invited, error } = await supabaseAdmin.auth.admin.inviteUserByEmail(data.email, {
+      redirectTo: data.redirectTo,
+      data: data.nome ? { nome: data.nome } : undefined,
+    });
+    if (error) throw error;
+
+    const userId = invited?.user?.id;
+    if (userId) {
+      await supabaseAdmin.from("user_roles")
+        .delete()
+        .eq("user_id", userId)
+        .in("role", [...ALLOWED_ROLES]);
+      const { error: insErr } = await supabaseAdmin
+        .from("user_roles")
+        .insert({ user_id: userId, role: data.role });
+      if (insErr) throw insErr;
+    }
+
+    return { ok: true, userId: userId ?? null };
+  });
