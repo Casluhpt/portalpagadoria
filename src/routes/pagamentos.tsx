@@ -35,17 +35,14 @@ import {
 } from "@/lib/pagamentos";
 import {
   PAGAMENTO_CAMPOS, COMPETENCIAS, getDescricoesByCelula,
+  type Pagamento,
 } from "@/lib/pagamentos-constants";
 
-const HIDDEN_COLUMN_KEYS = new Set([
+const HIDDEN_COLUMN_KEYS = new Set<string>([
   "valor_bankmanager","status_bankmanager","diferenca_lg_finnet",
   "valor_itau","status_itau","diferenca_bank_itau","natureza_pagamento",
 ]);
 const VISIBLE_CAMPOS = PAGAMENTO_CAMPOS.filter((c) => !HIDDEN_COLUMN_KEYS.has(c.key));
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const _dummy = () => {
-  type Pagamento,
-} from "@/lib/pagamentos-constants";
 
 export const Route = createFileRoute("/pagamentos")({
   component: PagamentosPage,
