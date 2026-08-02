@@ -9,13 +9,14 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { HelpCircle, Bug, AlertCircle, MessageSquare, Send, CheckCircle2 } from "lucide-react";
-import { useState } from "react";
+import { HelpCircle, Bug, AlertCircle, MessageSquare, Send, CheckCircle2, Paperclip, X, Loader2 } from "lucide-react";
+import { useState, useRef } from "react";
 import { useSession } from "@/hooks/use-session";
 import { useMutation } from "@tanstack/react-query";
 import { sendSupportRequest } from "@/lib/suporte.functions";
 import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/configuracoes")({
   component: ConfiguracoesPage,
@@ -60,18 +61,53 @@ function SupportForm() {
   const { user } = useSession();
   const sendFn = useServerFn(sendSupportRequest);
   const [success, setSuccess] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [file, setFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [formData, setFormData] = useState({
     assunto: "" as "Bug e Correção" | "Erro" | "Melhoria",
     comentario: "",
     anexo_url: "",
   });
 
+  const uploadFile = async (file: File) => {
+    try {
+      setUploading(true);
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
+      const filePath = `${user?.id}/${fileName}`;
+
+      const { data, error } = await supabase.storage
+        .from('suporte_anexos')
+        .upload(filePath, file);
+
+      if (error) throw error;
+
+      // Get signed URL since bucket is private
+      const { data: urlData, error: urlError } = await supabase.storage
+        .from('suporte_anexos')
+        .createSignedUrl(filePath, 60 * 60 * 24 * 365); // 1 year expiry
+
+      if (urlError) throw urlError;
+      return urlData.signedUrl;
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const sendMut = useMutation({
     mutationFn: async () => {
       if (!user) throw new Error("Usuário não autenticado");
+      
+      let finalAnexoUrl = formData.anexo_url;
+      if (file) {
+        finalAnexoUrl = await uploadFile(file);
+      }
+
       return sendFn({
         data: {
           ...formData,
+          anexo_url: finalAnexoUrl,
           user_id: user.id,
           user_nome: (user.user_metadata?.nome || user.user_metadata?.full_name || "Usuário"),
           user_email: user.email!,
@@ -82,6 +118,7 @@ function SupportForm() {
       setSuccess(true);
       setTimeout(() => setSuccess(false), 5000);
       setFormData({ assunto: "" as any, comentario: "", anexo_url: "" });
+      setFile(null);
     },
     onError: (e: Error) => toast.error("Erro ao enviar: " + e.message),
   });
@@ -143,14 +180,53 @@ function SupportForm() {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="anexo">Anexo (Opcional - Link da imagem/screenshot)</Label>
-          <Input 
-            id="anexo" 
-            placeholder="https://..." 
-            value={formData.anexo_url}
-            onChange={(e) => setFormData(prev => ({ ...prev, anexo_url: e.target.value }))}
-          />
-          <p className="text-[10px] text-muted-foreground">Em breve habilitaremos o upload direto de arquivos.</p>
+          <Label htmlFor="anexo">Anexo (Opcional - Imagem ou Screenshot)</Label>
+          <div className="flex flex-col gap-2">
+            {!file ? (
+              <Button 
+                variant="outline" 
+                type="button"
+                className="w-full border-dashed border-slate-300 h-20 flex flex-col items-center justify-center gap-1 hover:border-indigo-400 hover:bg-indigo-50/50 transition-colors"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <Paperclip className="h-5 w-5 text-slate-400" />
+                <span className="text-xs text-slate-500">Clique para selecionar um arquivo</span>
+              </Button>
+            ) : (
+              <div className="flex items-center justify-between p-3 border rounded-lg bg-slate-50 border-slate-200">
+                <div className="flex items-center gap-2 overflow-hidden">
+                  <Paperclip className="h-4 w-4 text-indigo-600 shrink-0" />
+                  <span className="text-sm truncate text-slate-700">{file.name}</span>
+                  <span className="text-[10px] text-slate-400">({(file.size / 1024 / 1024).toFixed(2)} MB)</span>
+                </div>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="h-8 w-8 text-slate-400 hover:text-destructive"
+                  onClick={() => setFile(null)}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
+            <input 
+              ref={fileInputRef}
+              type="file" 
+              className="hidden" 
+              accept="image/*,.pdf,.doc,.docx"
+              onChange={(e) => {
+                const selectedFile = e.target.files?.[0];
+                if (selectedFile) {
+                  if (selectedFile.size > 5 * 1024 * 1024) {
+                    toast.error("Arquivo muito grande. O limite é 5MB.");
+                    return;
+                  }
+                  setFile(selectedFile);
+                }
+              }}
+            />
+            <p className="text-[10px] text-muted-foreground">Arraste ou selecione um arquivo de até 5MB.</p>
+          </div>
         </div>
 
         <div className="space-y-2">
@@ -166,11 +242,14 @@ function SupportForm() {
 
         <Button 
           className="w-full bg-indigo-600 hover:bg-indigo-700" 
-          disabled={!formData.assunto || sendMut.isPending}
+          disabled={!formData.assunto || sendMut.isPending || uploading}
           onClick={() => sendMut.mutate()}
         >
-          {sendMut.isPending ? (
-            <>Enviando...</>
+          {sendMut.isPending || uploading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              {uploading ? "Fazendo upload do anexo..." : "Enviando..."}
+            </>
           ) : (
             <>
               <Send className="mr-2 h-4 w-4" /> Enviar para Suporte
