@@ -194,8 +194,7 @@ export function GlobalSearch({ variant = "compact" }: { variant?: "compact" | "h
       >
         <Search className="h-5 w-5 shrink-0 text-violet-600" />
         <span className="flex-1 truncate text-sm text-muted-foreground">
-          Central de busca total: matrícula, usuário, empresa, colaborador, fornecedor, competência,
-          cards…
+          Matrícula, usuário, empresa, colaborador, fornecedor, competência, cards…
         </span>
         <span className="hidden items-center gap-1 rounded-full bg-violet-100 px-2.5 py-1 text-[10px] font-semibold text-violet-700 sm:flex dark:bg-violet-900/40 dark:text-violet-300">
           <Sparkles className="h-3 w-3" /> IA Assistente
@@ -213,7 +212,7 @@ export function GlobalSearch({ variant = "compact" }: { variant?: "compact" | "h
       >
         <Search className="h-4 w-4 text-violet-600 xl:mr-2" />
         <span className="hidden text-xs font-medium text-muted-foreground xl:inline-flex">
-          Busca total + IA…
+          Busca + IA…
         </span>
         <kbd className="pointer-events-none absolute right-1.5 top-2 hidden h-6 select-none items-center rounded border bg-muted px-1.5 font-mono text-[10px] xl:flex">
           ⌘K
@@ -399,7 +398,7 @@ export function GlobalSearch({ variant = "compact" }: { variant?: "compact" | "h
             </span>
           </div>
           <div className="flex items-center gap-1 font-medium text-violet-600">
-            <Sparkles className="h-3 w-3" /> Busca total + IA da Pagadoria
+            <Sparkles className="h-3 w-3" /> IA da Pagadoria
           </div>
         </div>
       </CommandDialog>
