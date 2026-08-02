@@ -64,11 +64,11 @@ function UsuariosPage() {
   );
 }
 
+import { UsuariosTableWrapper as UsuariosTable } from "@/components/admin/usuarios-table";
+
 function UsuariosContent() {
   return (
-    <RestrictedArea area="Administração de Usuários" role="administrador">
-      <UsuariosTable />
-    </RestrictedArea>
+    <UsuariosTable />
   );
 }
 
