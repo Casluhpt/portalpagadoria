@@ -275,7 +275,7 @@ export function GlobalSearch({ variant = "compact" }: { variant?: "compact" | "h
           {isAiMode && (
             <CommandGroup>
               <div className="px-2 py-3">
-                <div className="flex flex-col gap-4 rounded-lg border border-violet-100 bg-violet-50/80 p-4 dark:border-violet-800 dark:bg-violet-900/20">
+                <div className="flex flex-col gap-4 rounded-lg border-none bg-violet-50/80 p-4 dark:bg-violet-900/20">
                   <div className="flex items-start gap-3">
                     <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-violet-600 text-white shadow-sm">
                       <Bot className="h-5 w-5" />
@@ -285,7 +285,7 @@ export function GlobalSearch({ variant = "compact" }: { variant?: "compact" | "h
                     </div>
                   </div>
 
-                  <div className="flex items-start gap-3 border-t border-violet-200/30 pt-4 dark:border-violet-700/30">
+                  <div className="flex items-start gap-3 border-none pt-4">
                     <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-violet-100 text-violet-600 shadow-sm dark:bg-violet-900/40">
                       <Sparkles className="h-5 w-5" />
                     </div>
@@ -304,7 +304,7 @@ export function GlobalSearch({ variant = "compact" }: { variant?: "compact" | "h
                   </div>
 
                   {!isAiLoading && (
-                    <div className="mt-2 flex flex-wrap gap-2 border-t border-violet-200/50 pt-3 dark:border-violet-700/50">
+                    <div className="mt-2 flex flex-wrap gap-2 border-none pt-3">
                       <Button
                         size="sm"
                         className="h-7 gap-1.5 bg-violet-600 text-[10px] hover:bg-violet-700"
@@ -413,7 +413,7 @@ export function GlobalSearch({ variant = "compact" }: { variant?: "compact" | "h
           )}
         </CommandList>
 
-        <div className="flex items-center justify-end border-t bg-muted/50 px-4 py-1.5" />
+        <div className="flex items-center justify-end border-none bg-muted/50 px-4 py-1.5" />
       </CommandDialog>
     </>
   );
