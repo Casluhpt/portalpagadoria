@@ -698,6 +698,9 @@ function DescricaoDialog({
   const [conta, setConta] = useState(linha.meta.conta ?? "");
   const [centroCusto, setCentroCusto] = useState(linha.meta.centro_custo ?? "");
   const [numeroPedido, setNumeroPedido] = useState(linha.meta.numero_pedido ?? "");
+  const [sapCode, setSapCode] = useState(linha.meta.sap_code ?? "");
+  const [valorPrevistoAnual, setValorPrevistoAnual] = useState(linha.meta.valor_previsto_anual ?? 0);
+  const [saldoInicialPedido, setSaldoInicialPedido] = useState(linha.meta.saldo_inicial_pedido ?? 0);
   const [notas, setNotas] = useState(linha.meta.notas ?? "");
   const [saving, setSaving] = useState(false);
 
@@ -713,6 +716,9 @@ function DescricaoDialog({
         conta: conta || null,
         centro_custo: centroCusto || null,
         numero_pedido: numeroPedido || null,
+        sap_code: sapCode || null,
+        valor_previsto_anual: valorPrevistoAnual || null,
+        saldo_inicial_pedido: saldoInicialPedido || null,
         nome_real: nomeReal || null,
         notas: notas || null,
       });
