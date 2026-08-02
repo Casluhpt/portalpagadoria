@@ -64,26 +64,24 @@ type MenuItem = {
   icon: ComponentType<{ className?: string }>;
   match: (p: string) => boolean;
   adminOnly?: boolean;
-  restricted?: boolean; // shows lock icon; admin-only in practice
-  allowedRoles?: AppRole[]; // if set, only these roles see it
+  restricted?: boolean;
+  allowedRoles?: AppRole[];
+  action?: "search";
 };
 
 const mainItems: MenuItem[] = [
   { title: "Início", url: "/", icon: Home, match: (p) => p === "/" },
   { title: "Resultados Principais", url: "/principal", icon: LayoutDashboard, match: (p) => p === "/principal", restricted: true, adminOnly: true },
   { title: "Provisão Diária", url: "/provisao", icon: Wallet, match: (p) => p === "/provisao", restricted: true, adminOnly: true },
-  
   { title: "Base de Anexos", url: "/anexos", icon: FileArchive, match: (p) => p.startsWith("/anexos") },
   { title: "Conciliação Bancária", url: "/conciliacao", icon: ShieldCheck, match: (p) => p.startsWith("/conciliacao"), restricted: true, adminOnly: true },
   { title: "Pagamentos Diversos", url: "/pagamentos", icon: Banknote, match: (p) => p.startsWith("/pagamentos") },
   { title: "Administração de Comunicados", url: "/administracao", icon: Settings, match: (p) => p.startsWith("/administracao"), adminOnly: true },
   { title: "Fechamento de Competência", url: "/fechamento", icon: FileCheck2, match: (p) => p.startsWith("/fechamento") },
   { title: "Central de Divergências", url: "/divergencias", icon: AlertTriangle, match: (p) => p.startsWith("/divergencias") },
-  
   { title: "Despesas Fixas", url: "/despesas-fixas", icon: Wallet, match: (p) => p.startsWith("/despesas-fixas") },
   { title: "Exportação de Relatórios", url: "/exportacao", icon: Download, match: (p) => p.startsWith("/exportacao") },
   { title: "Busca Global", url: "#", icon: Search, match: () => false, action: "search" },
-];
 ];
 
 const advancedItems: MenuItem[] = [
