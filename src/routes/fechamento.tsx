@@ -2,6 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { ModuleStub } from "@/components/module-stub";
+import { AlertTriangle } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/fechamento")({
   component: FechamentoPage,
