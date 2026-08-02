@@ -6,7 +6,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { format, formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Loader2, KeyRound, ShieldAlert, Search, ShieldCheck, Eye, UserPlus, Trash2, List, LayoutGrid } from "lucide-react";
+import { Loader2, KeyRound, Search, ShieldCheck, Eye, UserPlus, Trash2, List, LayoutGrid } from "lucide-react";
 
 import { AppSidebar } from "@/components/app-sidebar";
 import { HeaderActions } from "@/components/header-actions";
@@ -23,9 +23,8 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import { useRoles } from "@/hooks/use-roles";
 import { RestrictedArea } from "@/components/role-gate";
-import { logAcaoCritica, ACOES_CRITICAS } from "@/lib/audit-critico";
+import { logAcaoCritica } from "@/lib/audit-critico";
 import { useSession } from "@/hooks/use-session";
 import { useQueryClient } from "@tanstack/react-query";
 import { listAdminUsers, resetUserPassword, setUserRole, setUserSetor, inviteUser, deleteUser, ALLOWED_SETORES, type AdminUserRow, type Setor } from "@/lib/admin-users.functions";
