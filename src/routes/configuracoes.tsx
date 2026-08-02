@@ -242,11 +242,14 @@ function SupportForm() {
 
         <Button 
           className="w-full bg-indigo-600 hover:bg-indigo-700" 
-          disabled={!formData.assunto || sendMut.isPending}
+          disabled={!formData.assunto || sendMut.isPending || uploading}
           onClick={() => sendMut.mutate()}
         >
-          {sendMut.isPending ? (
-            <>Enviando...</>
+          {sendMut.isPending || uploading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              {uploading ? "Fazendo upload do anexo..." : "Enviando..."}
+            </>
           ) : (
             <>
               <Send className="mr-2 h-4 w-4" /> Enviar para Suporte
