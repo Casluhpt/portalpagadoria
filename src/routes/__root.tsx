@@ -15,6 +15,8 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { PasswordExpirationGuard } from "@/components/password-expiration-guard";
 import { PresenceHeartbeat } from "@/components/presence-heartbeat";
 import { BackButton } from "@/components/back-button";
+import { AuthGate } from "@/components/auth-gate";
+
 
 function NotFoundComponent() {
   return (
