@@ -30,7 +30,7 @@ export const perguntarIa = createServerFn({ method: "POST" })
         "X-Lovable-AIG-SDK": "fetch",
       },
       body: JSON.stringify({
-        model: "openai/gpt-5.6-sol",
+        model: "openai/gpt-4o",
         stream: true,
         input: [
           { role: "system", content: SYSTEM },
