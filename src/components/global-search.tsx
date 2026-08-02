@@ -261,20 +261,9 @@ export function GlobalSearch({ variant = "compact" }: { variant?: "compact" | "h
           )}
         </div>
 
-        <CommandList className="max-h-[460px]">
-          <CommandEmpty>
-            <div className="flex flex-col items-center justify-center py-6 text-center">
-              <Bot className="mb-2 h-10 w-10 text-violet-300" />
-              <p className="text-sm font-medium">Nenhum resultado direto no portal.</p>
-              <Button variant="link" className="text-xs text-violet-600" onClick={askAi}>
-                Perguntar à IA Assistente da Pagadoria
-              </Button>
-            </div>
-          </CommandEmpty>
-
-          {isAiMode && (
-            <CommandGroup>
-              <div className="px-2 py-3">
+        {isAiMode && (
+          <div className="max-h-[460px] overflow-y-auto">
+            <div className="px-2 py-3">
                 <div className="flex flex-col gap-4 rounded-lg border-none bg-violet-50/80 p-4 dark:bg-violet-900/20">
                   <div className="flex items-start gap-3">
                     <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-violet-600 text-white shadow-sm">
@@ -334,12 +323,30 @@ export function GlobalSearch({ variant = "compact" }: { variant?: "compact" | "h
                       </Button>
                     </div>
                   )}
-                </div>
               </div>
-            </CommandGroup>
-          )}
+            </div>
+          </div>
+        )}
 
-          {!isAiMode && (
+
+        {!isAiMode && (
+          <CommandList className="max-h-[460px]">
+            <CommandEmpty>
+              <div className="flex flex-col items-center justify-center gap-1 py-6 text-center">
+                <Bot className="mb-2 h-10 w-10 text-violet-300" />
+                <p className="text-sm font-medium">Nenhum resultado direto no portal.</p>
+                <button
+                  type="button"
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    void askAi();
+                  }}
+                  className="pointer-events-auto cursor-pointer rounded-md px-2 py-1 text-xs font-medium text-violet-600 underline-offset-2 transition-colors hover:bg-violet-100 hover:underline dark:text-violet-300 dark:hover:bg-violet-900/40"
+                >
+                  Perguntar à IA Assistente da Pagadoria
+                </button>
+              </div>
+            </CommandEmpty>
             <>
               {history.length > 0 && !search && (
                 <CommandGroup
@@ -410,8 +417,9 @@ export function GlobalSearch({ variant = "compact" }: { variant?: "compact" | "h
                 ))}
               </CommandGroup>
             </>
-          )}
-        </CommandList>
+          </CommandList>
+        )}
+
 
         <div className="flex items-center justify-end border-none bg-transparent px-4 py-1.5" />
       </CommandDialog>
