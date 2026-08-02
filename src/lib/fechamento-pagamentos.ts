@@ -48,6 +48,14 @@ export async function fecharCompetenciaPagamentos(nome: string, usuarioId: strin
     });
   if (insertError) throw insertError;
 
+  // 3. Notificar o sino sobre o fechamento e exportação do arquivo
+  const { notificarArquivoPronto } = await import("./notificacoes-arquivos");
+  await notificarArquivoPronto(
+    `Fechamento Concluído: ${nome}`,
+    `O fechamento da competência ${mes} foi realizado. O arquivo Excel está disponível para download.`,
+    usuarioId
+  );
+
   // 3. Clear the main table
   // Note: We use the Table name from src/lib/pagamentos.ts which is 'pagamentos_diversos'
   const { error: deleteError } = await supabase
