@@ -131,11 +131,23 @@ function ResetPasswordPage() {
           <p className="text-sm text-muted-foreground">Defina uma nova senha para acessar o portal.</p>
         </CardHeader>
         <CardContent>
-          {!ready ? (
+          {linkError ? (
+            <div className="space-y-3 py-2 text-center">
+              <p className="text-sm text-destructive">{linkError}</p>
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={() => navigate({ to: "/forgot-password", replace: true })}
+              >
+                Solicitar novo link
+              </Button>
+            </div>
+          ) : !ready ? (
             <div className="flex flex-col items-center gap-2 py-6 text-sm text-muted-foreground">
               <Loader2 className="h-5 w-5 animate-spin" />
               Validando link de recuperação…
             </div>
+
           ) : (
             <form onSubmit={submit} className="space-y-3">
               <div className="space-y-1.5">
