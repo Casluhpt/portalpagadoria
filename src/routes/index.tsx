@@ -338,16 +338,6 @@ function PortalPage() {
                       <LineChart className="mr-2 h-4 w-4" /> Resultados Principais
                     </Link>
                   </Button>
-                  <Button
-                    asChild
-                    size="lg"
-                    variant="outline"
-                    className="border-white/30 bg-transparent text-white hover:bg-white/10"
-                  >
-                    <Link to="/pagamentos">
-                      <Banknote className="mr-2 h-4 w-4" /> Pagamentos Diversos
-                    </Link>
-                  </Button>
                 </div>
               </div>
             </section>
