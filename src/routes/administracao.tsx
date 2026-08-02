@@ -53,6 +53,8 @@ function ComunicadosPanel() {
   const qc = useQueryClient();
   const [titulo, setTitulo] = useState("");
   const [mensagem, setMensagem] = useState("");
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [canal, setCanal] = useState<"portal" | "email" | "ambos">("portal");
 
   const { data: items = [] } = useQuery({
     queryKey: [...comunicadosQueryKey, "admin"],
@@ -61,9 +63,9 @@ function ComunicadosPanel() {
   });
 
   const publish = useMutation({
-    mutationFn: () => publicarComunicado(titulo.trim(), mensagem.trim(), user!.id),
+    mutationFn: () => publicarComunicado(titulo.trim(), mensagem.trim(), user!.id, canal),
     onSuccess: () => {
-      toast.success("Comunicado publicado para todos os colaboradores");
+      toast.success("Comunicado publicado com sucesso");
       setTitulo("");
       setMensagem("");
       qc.invalidateQueries({ queryKey: comunicadosQueryKey });
@@ -71,13 +73,14 @@ function ComunicadosPanel() {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const remove = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase.from("comunicados").delete().eq("id", id);
+  const removeBulk = useMutation({
+    mutationFn: async (ids: string[]) => {
+      const { error } = await supabase.from("comunicados").delete().in("id", ids);
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Comunicado removido");
+      toast.success("Comunicados removidos");
+      setSelectedIds(new Set());
       qc.invalidateQueries({ queryKey: comunicadosQueryKey });
     },
     onError: (e: Error) => toast.error(e.message),
