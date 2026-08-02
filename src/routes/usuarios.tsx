@@ -419,6 +419,49 @@ function UserTableRow({ u, user, roleMut, setorMut, deleteMut, resetMut, compact
                     </SelectItem>
                   </SelectContent>
                 </Select>
+                <AlertDialog open={!!pendingRole} onOpenChange={(o) => !o && setPendingRole(null)}>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Alterar permissão</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Ação administrativa crítica. Informe a justificativa — ela será registrada
+                        na trilha de auditoria com data, hora e usuário responsável.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <div className="space-y-1.5">
+                      <Label htmlFor={`just-${u.id}`} className="text-xs">Justificativa</Label>
+                      <Input
+                        id={`just-${u.id}`}
+                        value={justificativa}
+                        onChange={(e) => setJustificativa(e.target.value)}
+                        placeholder={`De ${roleLabel(current)} para ${pendingRole ? roleLabel(pendingRole) : ""}`}
+                      />
+                    </div>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                      <AlertDialogAction
+                        disabled={justificativa.trim().length < 5}
+                        onClick={() => {
+                          const novo = pendingRole!;
+                          roleMut.mutate({ userId: u.id, role: novo });
+                          void logAcaoCritica({
+                            acao: "alteracao_permissao",
+                            modulo: "Administração de Usuários",
+                            tabela: "user_roles",
+                            registro_id: u.id,
+                            descricao: `Permissão de ${u.email ?? u.id} alterada de ${roleLabel(current)} para ${roleLabel(novo)}`,
+                            justificativa: justificativa.trim(),
+                            metadata: { anterior: current, novo },
+                            severidade: "critico",
+                          });
+                          setPendingRole(null);
+                        }}
+                      >
+                        Confirmar alteração
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
                 {otherRoles.map((r: any) => (
                   <Badge key={r} variant={roleVariant(r)}>{roleLabel(r)}</Badge>
                 ))}
