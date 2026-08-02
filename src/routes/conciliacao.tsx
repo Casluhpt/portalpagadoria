@@ -7,6 +7,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { LayoutDashboard, ShieldCheck, History, AlertTriangle } from "lucide-react";
 
 export const Route = createFileRoute('/conciliacao')({
+  beforeLoad: async () => {
+    const { supabase } = await import("@/integrations/supabase/client");
+    const { data } = await supabase.auth.getSession();
+    if (!data.session) {
+      throw redirect({ to: "/auth", search: { returnTo: "/conciliacao" } });
+    }
+  },
   component: BankReconciliationPage
 });
 
