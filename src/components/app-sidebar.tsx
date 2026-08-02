@@ -1,5 +1,6 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState, useMemo } from "react";
+import logoPagadoria from "@/assets/logo-pagadoria.png.asset.json";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -264,8 +265,8 @@ export function AppSidebar() {
     <Sidebar collapsible="icon">
       <SidebarHeader className="border-b border-sidebar-border">
         <Link to="/" className="flex items-center gap-2 px-2 py-3 rounded-md hover:bg-sidebar-accent/50 transition-colors">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[image:var(--gradient-primary)] text-primary-foreground shadow-[var(--shadow-glow)]">
-            <Sparkles className="h-5 w-5" />
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-card/50 overflow-hidden shadow-sm border border-border">
+            <img src={logoPagadoria.url} alt="Pagadoria" className="h-6 w-6 object-contain" />
           </div>
           <div className="flex flex-col leading-tight group-data-[collapsible=icon]:hidden">
             <span className="text-sm font-semibold text-sidebar-foreground">Pagadoria</span>
