@@ -560,7 +560,18 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
             {importMut.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
             Importar Excel
           </Button>
-          <Button size="sm" variant="outline" className="gap-1" onClick={handleExport} disabled={!rows.length}>
+          <Button size="sm" variant="outline" className="gap-1" onClick={() => {
+            handleExport();
+            if (userId) {
+              import("@/lib/notificacoes-arquivos").then(m => {
+                m.notificarArquivoPronto(
+                  "Exportação Concluída",
+                  `Seu arquivo Excel de pagamentos foi gerado com sucesso em ${new Date().toLocaleTimeString()}.`,
+                  userId
+                );
+              });
+            }
+          }} disabled={!rows.length}>
             <Download className="h-4 w-4" />
             Exportar Excel
           </Button>

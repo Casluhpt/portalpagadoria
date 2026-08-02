@@ -15,6 +15,7 @@ import {
   LifeBuoy,
   ShieldCheck,
   Star,
+  Keyboard,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -489,8 +490,54 @@ function MaterialApoioPage() {
               )}
             </Card>
 
+            <section id="atalhos" className="rounded-xl border border-blue-100 bg-blue-50/30 p-5">
+              <div className="flex items-center gap-2 mb-4">
+                <Keyboard className="h-5 w-5 text-blue-600" />
+                <h3 className="text-sm font-bold text-blue-900">Atalhos Globais (Ctrl + Tecla)</h3>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+                {[
+                  { key: 'H', label: 'Início / Home' },
+                  { key: 'P', label: 'Pagamentos' },
+                  { key: 'C', label: 'Conciliação' },
+                  { key: 'M', label: 'Material Apoio' },
+                  { key: 'A', label: 'Base Anexos' },
+                  { key: 'F', label: 'Fechamento' },
+                ].map(s => (
+                  <div key={s.key} className="flex flex-col items-center justify-center p-3 bg-white rounded-lg border border-blue-100 shadow-sm text-center">
+                    <kbd className="mb-1 rounded bg-slate-100 px-2 py-0.5 font-mono text-xs font-bold border border-slate-300">Ctrl + {s.key}</kbd>
+                    <span className="text-[9px] text-slate-500 uppercase font-bold tracking-tighter">{s.label}</span>
+                  </div>
+                ))}
+              </div>
+            </section>
+
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="flex flex-wrap items-center gap-2">
+                <Button
+                  size="sm"
+                  variant={categoria === null && !somenteFavoritos ? "default" : "outline"}
+                  className={categoria === null && !somenteFavoritos ? "bg-violet-600 hover:bg-violet-700" : ""}
+                  onClick={() => {
+                    setCategoria(null);
+                    setSomenteFavoritos(false);
+                  }}
+                >
+                  Todos os Conteúdos
+                </Button>
+                <Button
+                  size="sm"
+                  variant={somenteFavoritos ? "default" : "outline"}
+                  className={somenteFavoritos ? "bg-amber-500 hover:bg-amber-600 text-white" : ""}
+                  onClick={() => {
+                    setSomenteFavoritos(true);
+                    setCategoria(null);
+                  }}
+                >
+                  <Star className={`mr-2 h-4 w-4 ${somenteFavoritos ? "fill-white" : "text-amber-500"}`} />
+                  Favoritos
+                </Button>
+                <div className="h-6 w-[1px] bg-slate-200 mx-1 hidden sm:block" />
                 <Button
                   size="sm"
                   variant={categoria === null && !somenteFavoritos ? "default" : "outline"}

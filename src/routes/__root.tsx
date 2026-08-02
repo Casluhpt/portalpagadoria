@@ -17,6 +17,7 @@ import { PresenceHeartbeat } from "@/components/presence-heartbeat";
 import { BackButton } from "@/components/back-button";
 import { AuthGate } from "@/components/auth-gate";
 import { ThemeProvider } from "@/components/theme-provider";
+import { GlobalShortcutManager } from "@/hooks/use-global-shortcuts";
 
 
 function NotFoundComponent() {
@@ -136,6 +137,7 @@ function RootComponent() {
       <AuthGate>
         <PasswordExpirationGuard />
         <PresenceHeartbeat />
+        <GlobalShortcutManager />
         <BackButton />
         {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
         <Outlet />

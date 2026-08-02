@@ -17,6 +17,7 @@ function AnexosPage() {
     "Layouts",
     "Documentações",
     "Evidências operacionais",
+    "Conciliação bancaria",
   ];
   return (
     <SidebarProvider>
