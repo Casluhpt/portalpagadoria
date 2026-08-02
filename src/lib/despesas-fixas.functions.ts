@@ -73,7 +73,7 @@ export type DespesaFixa = {
 
 export const listDespesasFixas = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d) => z.object({ ano: z.number().int().min(2000).max(2100).default(2026) }).parse(d))
+  .validator((d) => z.object({ ano: z.number().int().min(2000).max(2100).default(2026) }).parse(d))
   .handler(async ({ context, data }): Promise<DespesaFixa[]> => {
     const { data: rows, error } = await context.supabase
       .from("despesas_fixas")
@@ -109,7 +109,7 @@ const upsertSchema = z.object({
 
 export const upsertDespesaFixa = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d) => upsertSchema.parse(d))
+  .validator((d) => upsertSchema.parse(d))
   .handler(async ({ context, data }): Promise<DespesaFixa> => {
     const nome =
       (context.claims as any)?.user_metadata?.nome ??
@@ -157,7 +157,7 @@ export const upsertDespesaFixa = createServerFn({ method: "POST" })
 
 export const deleteDespesaFixa = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d) => z.object({ id: z.string().uuid() }).parse(d))
+  .validator((d) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ context, data }) => {
     const { error } = await context.supabase.from("despesas_fixas").delete().eq("id", data.id);
     if (error) throw error;
@@ -168,7 +168,7 @@ export const deleteDespesaFixa = createServerFn({ method: "POST" })
  *  aplicando para todas as linhas com mesma categoria+descricao+ano. */
 export const updateDescricaoMeta = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d) =>
+  .validator((d) =>
     z.object({
       categoria: z.enum(CATEGORIAS_DESPESAS),
       descricao: z.string().min(1).max(200),
@@ -224,7 +224,7 @@ export const updateDescricaoMeta = createServerFn({ method: "POST" })
 
 export const getPedidoOrcamentoStatus = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d) => z.object({ numero_pedido: z.string() }).parse(d))
+  .validator((d) => z.object({ numero_pedido: z.string() }).parse(d))
   .handler(async ({ context, data }) => {
     // 1. Get initial budget
     const { data: pedido } = await context.supabase
@@ -255,7 +255,7 @@ export const getPedidoOrcamentoStatus = createServerFn({ method: "GET" })
 
 export const updatePedidoOrcamento = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d) => z.object({
+  .validator((d) => z.object({
     numero_pedido: z.string(),
     saldo_inicial: z.number().optional(),
     descricao: z.string().optional(),

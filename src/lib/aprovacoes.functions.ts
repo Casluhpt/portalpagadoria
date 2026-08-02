@@ -23,7 +23,7 @@ export type Aprovacao = {
 
 export const listAprovacoes = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d) => z.object({ ano: z.number().int().min(2000).max(2100).default(2026) }).parse(d))
+  .validator((d) => z.object({ ano: z.number().int().min(2000).max(2100).default(2026) }).parse(d))
   .handler(async ({ context, data }): Promise<Aprovacao[]> => {
     const { data: rows, error } = await (context.supabase as any)
       .from("aprovacoes")
@@ -48,7 +48,7 @@ const rowSchema = z.object({
 
 export const upsertAprovacao = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d) => rowSchema.parse(d))
+  .validator((d) => rowSchema.parse(d))
   .handler(async ({ context, data }): Promise<Aprovacao> => {
     const patch = {
       empresa: data.empresa ?? null,
@@ -73,7 +73,7 @@ export const upsertAprovacao = createServerFn({ method: "POST" })
 
 export const bulkInsertAprovacoes = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d) => z.object({ 
+  .validator((d) => z.object({ 
     rows: z.array(rowSchema).min(1).max(5000),
     replaceAll: z.boolean().default(false)
   }).parse(d))
@@ -105,7 +105,7 @@ export const bulkInsertAprovacoes = createServerFn({ method: "POST" })
 
 export const deleteAprovacoes = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d) => z.object({ ids: z.array(z.string().uuid()).min(1) }).parse(d))
+  .validator((d) => z.object({ ids: z.array(z.string().uuid()).min(1) }).parse(d))
   .handler(async ({ context, data }) => {
     const { error } = await (context.supabase as any).from("aprovacoes").delete().in("id", data.ids);
     if (error) throw error;

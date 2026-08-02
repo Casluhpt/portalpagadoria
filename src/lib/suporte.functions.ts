@@ -3,7 +3,7 @@ import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 
 export const sendSupportRequest = createServerFn({ method: "POST" })
-  .inputValidator((data) => z.object({
+  .validator((data) => z.object({
     assunto: z.enum(['Bug e Correção', 'Erro', 'Melhoria']),
     anexo_url: z.string().optional(),
     comentario: z.string().optional(),

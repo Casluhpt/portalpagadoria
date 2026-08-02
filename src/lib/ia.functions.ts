@@ -15,7 +15,7 @@ Regras obrigatórias:
 - Sempre que possível indique o módulo do portal onde a ação é feita (ex.: Pagamentos Diversos, Provisão Diária, Conciliação Bancária).`;
 
 export const perguntarIa = createServerFn({ method: "POST" })
-  .inputValidator((data: unknown) => AskInput.parse(data))
+  .validator((data: unknown) => AskInput.parse(data))
   .handler(async ({ data }) => {
     const key = process.env["LOVABLE_API_KEY"];
     if (!key) {
