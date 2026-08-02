@@ -734,6 +734,8 @@ function DescricaoDialog({
   const [sapCode, setSapCode] = useState(linha.meta.sap_code ?? "");
   const [valorPrevistoAnual, setValorPrevistoAnual] = useState(linha.meta.valor_previsto_anual ?? 0);
   const [saldoInicialPedido, setSaldoInicialPedido] = useState(linha.meta.saldo_inicial_pedido ?? 0);
+  const [suspensa, setSuspensa] = useState(linha.meta.suspensa);
+  const [motivoSuspensao, setMotivoSuspensao] = useState(linha.meta.motivo_suspensao ?? "");
   const [notas, setNotas] = useState(linha.meta.notas ?? "");
   const [saving, setSaving] = useState(false);
 
@@ -753,6 +755,8 @@ function DescricaoDialog({
         valor_previsto_anual: valorPrevistoAnual || null,
         saldo_inicial_pedido: saldoInicialPedido || null,
         nome_real: nomeReal || null,
+        suspensa,
+        motivo_suspensao: suspensa ? motivoSuspensao || null : null,
         notas: notas || null,
       });
     } finally { setSaving(false); }
@@ -821,10 +825,22 @@ function DescricaoDialog({
             <textarea
               value={notas}
               onChange={(e) => setNotas(e.target.value)}
-              rows={4}
+              rows={3}
               placeholder="Anotações livres sobre este PJ / fornecedor / lançamento…"
               className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             />
+          </div>
+          <div className="col-span-3 space-y-3 rounded-md border border-red-100 bg-red-50/50 p-3">
+            <div className="flex items-center gap-2">
+              <Checkbox id="suspensa-meta" checked={suspensa} onCheckedChange={(v) => setSuspensa(!!v)} />
+              <Label htmlFor="suspensa-meta" className="cursor-pointer font-semibold text-red-800">Suspender registro</Label>
+            </div>
+            {suspensa && (
+              <div className="space-y-1">
+                <Label className="text-xs text-red-700">Motivo da suspensão (Obrigatório)</Label>
+                <Input value={motivoSuspensao} onChange={(e) => setMotivoSuspensao(e.target.value)} placeholder="Descreva o motivo..." className="border-red-200" />
+              </div>
+            )}
           </div>
         </div>
         <DialogFooter>
