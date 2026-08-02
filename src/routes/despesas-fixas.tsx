@@ -503,6 +503,28 @@ function GrupoTabela({
   onOpenDescricao: (l: LinhaAgrupada) => void;
   onExcluir: (l: LinhaAgrupada) => void;
 }) {
+  const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
+
+  const toggleSelect = (key: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const newSelected = new Set(selectedKeys);
+    if (e.ctrlKey || e.metaKey) {
+      if (newSelected.has(key)) newSelected.delete(key); else newSelected.add(key);
+    } else {
+      newSelected.clear();
+      newSelected.add(key);
+    }
+    setSelectedKeys(newSelected);
+  };
+
+  const allSelected = linhas.length > 0 && selectedKeys.size === linhas.length;
+  const someSelected = selectedKeys.size > 0 && selectedKeys.size < linhas.length;
+
+  const toggleAll = () => {
+    if (allSelected) setSelectedKeys(new Set());
+    else setSelectedKeys(new Set(linhas.map(l => l.key)));
+  };
+
   if (linhas.length === 0) {
     return (
       <div className="rounded-md border border-dashed border-border p-12 text-center text-sm text-muted-foreground">
@@ -515,6 +537,9 @@ function GrupoTabela({
       <table className="w-full min-w-[1200px] border-collapse text-sm">
         <thead className="sticky top-0 bg-slate-50">
           <tr>
+            <th className="w-8 border-b border-border px-2 py-2">
+              <Checkbox checked={allSelected ? true : someSelected ? "indeterminate" : false} onCheckedChange={toggleAll} />
+            </th>
             <th className="border-b border-border px-3 py-2 text-left font-semibold">Descrição / Empresa</th>
             {MESES.map((m) => (
               <th key={m} className="border-b border-border px-2 py-2 text-right font-semibold">{m}</th>
@@ -526,7 +551,18 @@ function GrupoTabela({
         </thead>
         <tbody>
           {linhas.map((l) => (
-            <tr key={l.key} className={cn("hover:bg-slate-50/60", l.meta.suspensa && "opacity-50 grayscale bg-slate-100/50")}>
+            <tr 
+              key={l.key} 
+              className={cn(
+                "hover:bg-slate-50/60 cursor-pointer", 
+                l.meta.suspensa && "opacity-50 grayscale bg-slate-100/50",
+                selectedKeys.has(l.key) && "bg-blue-50"
+              )}
+              onClick={(e) => toggleSelect(l.key, e)}
+            >
+              <td className="border-b border-border px-2 py-1">
+                <Checkbox checked={selectedKeys.has(l.key)} onCheckedChange={() => {}} onClick={(e) => e.stopPropagation()} />
+              </td>
               <td className="border-b border-border px-3 py-2">
                 <button
                   className="group flex flex-col items-start text-left"
