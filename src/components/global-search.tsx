@@ -212,7 +212,7 @@ export function GlobalSearch({ variant = "compact" }: { variant?: "compact" | "h
       >
         <Search className="h-4 w-4 text-violet-600 xl:mr-2" />
         <span className="hidden text-xs font-medium text-muted-foreground xl:inline-flex">
-          Busca total + IA…
+          Busca + IA…
         </span>
         <kbd className="pointer-events-none absolute right-1.5 top-2 hidden h-6 select-none items-center rounded border bg-muted px-1.5 font-mono text-[10px] xl:flex">
           ⌘K
