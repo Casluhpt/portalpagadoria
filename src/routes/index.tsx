@@ -275,7 +275,7 @@ function PortalPage() {
 
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen w-full bg-gradient-to-br from-slate-50 via-slate-100 to-violet-50">
+      <div className="flex min-h-screen w-full bg-[#F8FAFC] dark:bg-background transition-colors duration-300">
         <AppSidebar />
         <div className="flex flex-1 flex-col">
           <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-slate-200 bg-white/80 px-4 backdrop-blur">
@@ -295,21 +295,28 @@ function PortalPage() {
                   year: "numeric",
                 })}
               </div>
+              <div className="hidden h-8 w-[1px] bg-slate-200 md:block" />
               <HeaderActions />
             </div>
           </header>
 
-          <main className="flex-1 space-y-8 p-6 lg:p-8">
-            <section className="mx-auto w-full max-w-3xl">
-              <div className="mb-2 flex items-center justify-center gap-2 text-center text-xs font-medium text-muted-foreground">
-                <Search className="h-3.5 w-3.5 text-violet-600" />
-                Central de busca total do Portal da Pagadoria
+          <main className="flex-1 space-y-12 p-6 lg:p-10 max-w-[1600px] mx-auto w-full">
+            <section className="mx-auto w-full max-w-4xl space-y-8 py-4">
+              <div className="flex flex-col items-center justify-center text-center">
+                <Badge variant="outline" className="mb-4 border-violet-200 bg-violet-50/50 px-4 py-1 text-violet-700 dark:bg-violet-900/20 dark:text-violet-300">
+                  Central de Busca Total
+                </Badge>
+                <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl dark:text-white">
+                  O que você deseja encontrar hoje?
+                </h2>
+                <p className="mt-3 text-base text-slate-500 max-w-lg">
+                  Pesquise matrículas, colaboradores, empresas ou tire dúvidas sobre processos corporativos com nossa IA Assistente.
+                </p>
               </div>
-              <GlobalSearch variant="hero" />
-              <p className="mt-2 text-center text-[11px] text-muted-foreground">
-                Pesquise matrícula, usuário, empresa, colaborador, fornecedor, competência e cards —
-                ou pergunte à IA Assistente da Pagadoria.
-              </p>
+              <div className="relative transform transition-all duration-500 hover:scale-[1.01]">
+                <div className="absolute -inset-2 rounded-3xl bg-gradient-to-r from-violet-600/10 to-indigo-600/10 blur-2xl opacity-75" />
+                <GlobalSearch variant="hero" />
+              </div>
             </section>
 
             <section className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-indigo-900 via-violet-800 to-purple-900 p-8 text-white shadow-xl">
@@ -321,9 +328,8 @@ function PortalPage() {
                     Portal Corporativo
                   </Badge>
                   <h1 className="text-3xl font-bold tracking-tight md:text-4xl">Pagadoria</h1>
-                  <p className="mt-2 text-base text-white/80 md:text-lg">
-                    Central de inteligência da Pagadoria com foco em resultados, pagamentos,
-                    provisões e conciliações financeiras.
+                  <p className="mt-2 text-base text-white/80 md:text-lg max-w-xl">
+                    Central de inteligência da Pagadoria com foco em resultados, pagamentos e provisões, garantindo a governança e a fluidez de seus processos financeiros.
                   </p>
                 </div>
                 <div className="flex gap-2">
@@ -346,7 +352,7 @@ function PortalPage() {
               </div>
             </section>
 
-            <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
               <KpiCard
                 label="Total pago no mês"
                 value={brl(kpis.totalMes)}

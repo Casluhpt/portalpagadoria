@@ -98,8 +98,10 @@ export function HeaderActions() {
   const meta = presenceMeta[status];
 
   return (
-    <div className="flex items-center gap-1">
-      <GlobalSearch />
+    <div className="flex items-center gap-1.5">
+      <div className="hidden xl:block">
+        <GlobalSearch />
+      </div>
       <NotificationBell />
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
