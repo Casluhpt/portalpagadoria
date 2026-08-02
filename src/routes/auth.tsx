@@ -32,15 +32,20 @@ function AuthPage() {
   const navigate = useNavigate();
   const { session } = useSession();
   const search = useRouterState({ select: (s) => s.location.search }) as {
+    returnTo?: string;
     redirect?: string;
   };
 
   useEffect(() => {
     if (session) {
-      const target = typeof search.redirect === "string" ? search.redirect : "/";
+      const raw = search.returnTo ?? search.redirect;
+      // Só aceita caminhos internos, nunca URLs externas.
+      const target =
+        typeof raw === "string" && raw.startsWith("/") && !raw.startsWith("//") ? raw : "/";
       navigate({ to: target, replace: true });
     }
-  }, [session, navigate, search.redirect]);
+  }, [session, navigate, search.returnTo, search.redirect]);
+
 
   return (
     <div className="grid min-h-dvh place-items-center bg-gradient-to-br from-slate-100 via-slate-100 to-violet-100 p-4">
