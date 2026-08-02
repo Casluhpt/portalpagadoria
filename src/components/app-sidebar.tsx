@@ -1,16 +1,7 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState, useMemo } from "react";
 import logoPagadoria from "@/assets/logo-pagadoria.png.asset.json";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { AppLogo } from "./app-logo";
 import {
   LayoutDashboard,
   Database,
@@ -266,7 +257,7 @@ export function AppSidebar() {
       <SidebarHeader className="border-b border-sidebar-border">
         <Link to="/" className="flex items-center gap-2 px-2 py-3 rounded-md hover:bg-sidebar-accent/50 transition-colors">
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-card/50 overflow-hidden shadow-sm border border-border">
-            <img src={logoPagadoria.url} alt="Pagadoria" className="h-6 w-6 object-contain" />
+            <AppLogo className="h-7 w-7" />
           </div>
           <div className="flex flex-col leading-tight group-data-[collapsible=icon]:hidden">
             <span className="text-sm font-semibold text-sidebar-foreground">Pagadoria</span>
