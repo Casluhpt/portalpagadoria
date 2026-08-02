@@ -70,11 +70,26 @@ function BankReconciliationPage() {
                 <div className="rounded-xl border bg-card p-8 text-center">
                   <p className="text-muted-foreground">Módulo de Conciliação Bancária v1.9.0 em implementação.</p>
                   <div className="mt-4 text-left max-w-2xl mx-auto space-y-4">
-                    <p className="text-sm text-muted-foreground font-medium border-b pb-2">Próximos Passos:</p>
-                    <ul className="text-sm text-muted-foreground list-disc pl-5 space-y-2">
-                      <li>Implementar a lógica de análise de correspondência (5 níveis) no conciliacao.tsx.</li>
-                      <li>Conectar a importação de planilhas (Varejo/Distribuição) com as novas regras de validação.</li>
-                      <li>Configurar o feedback de status por tooltip, conforme os requisitos de visualização dinâmica.</li>
+                    <p className="text-sm text-indigo-600 font-bold border-b border-indigo-100 pb-2 flex items-center gap-2">
+                      <Sparkles className="h-4 w-4" /> Próximos Passos (Engine de Conciliação):
+                    </p>
+                    <ul className="text-sm text-muted-foreground space-y-3">
+                      <li className="flex gap-3">
+                        <div className="h-5 w-5 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">✓</div>
+                        <span><b>Níveis 1 e 2:</b> Correspondência exata e por data próxima (+/- 2 dias) implementadas.</span>
+                      </li>
+                      <li className="flex gap-3">
+                        <div className="h-5 w-5 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">✓</div>
+                        <span><b>Nível 3:</b> Lógica de Soma (SubSet Sum) para agrupar múltiplos títulos bancários integrada.</span>
+                      </li>
+                      <li className="flex gap-3">
+                        <div className="h-5 w-5 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">→</div>
+                        <span><b>Nível 4 (Ajuste de Tarifa):</b> Configurar tolerância de centavos para conciliação automática de tarifas bancárias.</span>
+                      </li>
+                      <li className="flex gap-3">
+                        <div className="h-5 w-5 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">!</div>
+                        <span><b>Interface Dinâmica:</b> Adicionar tooltips detalhados para exibir quais IDs compõem a sugestão do Nível 3.</span>
+                      </li>
                     </ul>
                   </div>
                 </div>
