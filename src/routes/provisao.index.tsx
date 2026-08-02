@@ -346,7 +346,7 @@ function FechamentoCompetenciaButton() {
       const now = new Date();
       const mes = format(now, "yyyy-MM");
       const ano = format(now, "yyyy");
-      return fecharFn({ data: { nome, mes, ano, usuarioId: user!.id } });
+      return fecharFn({ nome, mes, ano, usuarioId: user!.id });
     },
     onSuccess: () => {
       toast.success("Competência fechada com sucesso.");
