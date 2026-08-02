@@ -110,9 +110,12 @@ function PortalPage() {
   useEffect(() => {
     if (visibleVersoes.length <= 1) return;
     const t = setInterval(() => {
-      setCarouselIdx((i) => (i + 1) % visibleVersoes.length);
+      setCarouselIdx((i) => {
+        const next = (i + 1) % visibleVersoes.length;
+        return next;
+      });
       setSlideKey((k) => k + 1);
-    }, 7000);
+    }, 5000);
     return () => clearInterval(t);
   }, [visibleVersoes.length]);
   const goTo = (i: number) => {
@@ -391,7 +394,7 @@ function PortalPage() {
                 <div className="relative overflow-hidden">
                   {(() => {
                     const v = visibleVersoes[carouselIdx];
-                    if (!v || !isAdmin) return null;
+                    if (!v) return null;
                     const isLatest = latest?.versao === v.versao;
                     const itens = Array.isArray(v.itens)
                       ? (v.itens as Array<{ categoria: string; descricao: string }>)
