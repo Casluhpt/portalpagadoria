@@ -18,21 +18,91 @@ export const Route = createFileRoute("/reset-password")({
 function ResetPasswordPage() {
   const navigate = useNavigate();
   const [ready, setReady] = useState(false);
+  const [linkError, setLinkError] = useState<string | null>(null);
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // Supabase envia o token de recovery no hash da URL; o client processa
-    // automaticamente e dispara PASSWORD_RECOVERY.
+    let cancelled = false;
+
     const { data: sub } = supabase.auth.onAuthStateChange((event) => {
-      if (event === "PASSWORD_RECOVERY" || event === "SIGNED_IN") setReady(true);
+      if (event === "PASSWORD_RECOVERY" || event === "SIGNED_IN" || event === "USER_UPDATED") {
+        setReady(true);
+        setLinkError(null);
+      }
     });
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) setReady(true);
-    });
-    return () => sub.subscription.unsubscribe();
+
+    const validate = async () => {
+      const url = new URL(window.location.href);
+      const hash = new URLSearchParams(url.hash.replace(/^#/, ""));
+
+      // Erro devolvido pelo próprio link (expirado / já utilizado)
+      const errDesc = url.searchParams.get("error_description") ?? hash.get("error_description");
+      if (errDesc) {
+        if (!cancelled) setLinkError(decodeURIComponent(errDesc));
+        return;
+      }
+
+      // 1) Sessão já existente (link em hash processado pelo client)
+      const { data: current } = await supabase.auth.getSession();
+      if (current.session) {
+        if (!cancelled) setReady(true);
+        return;
+      }
+
+      // 2) Fluxo PKCE: ?code=...
+      const code = url.searchParams.get("code");
+      if (code) {
+        const { error } = await supabase.auth.exchangeCodeForSession(code);
+        if (!cancelled) {
+          if (error) setLinkError(error.message);
+          else setReady(true);
+        }
+        return;
+      }
+
+      // 3) Fluxo token_hash: ?token_hash=...&type=recovery
+      const tokenHash = url.searchParams.get("token_hash") ?? url.searchParams.get("token");
+      const type = (url.searchParams.get("type") ?? "recovery") as "recovery" | "email";
+      if (tokenHash) {
+        const { error } = await supabase.auth.verifyOtp({ token_hash: tokenHash, type });
+        if (!cancelled) {
+          if (error) setLinkError(error.message);
+          else setReady(true);
+        }
+        return;
+      }
+
+      // 4) Tokens no hash (#access_token=...&refresh_token=...)
+      const accessToken = hash.get("access_token");
+      const refreshToken = hash.get("refresh_token");
+      if (accessToken && refreshToken) {
+        const { error } = await supabase.auth.setSession({
+          access_token: accessToken,
+          refresh_token: refreshToken,
+        });
+        if (!cancelled) {
+          if (error) setLinkError(error.message);
+          else setReady(true);
+        }
+        return;
+      }
+
+      if (!cancelled) {
+        setLinkError(
+          "Link de recuperação inválido ou expirado. Solicite um novo email de redefinição.",
+        );
+      }
+    };
+
+    void validate();
+    return () => {
+      cancelled = true;
+      sub.subscription.unsubscribe();
+    };
   }, []);
+
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,11 +131,23 @@ function ResetPasswordPage() {
           <p className="text-sm text-muted-foreground">Defina uma nova senha para acessar o portal.</p>
         </CardHeader>
         <CardContent>
-          {!ready ? (
+          {linkError ? (
+            <div className="space-y-3 py-2 text-center">
+              <p className="text-sm text-destructive">{linkError}</p>
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={() => navigate({ to: "/forgot-password", replace: true })}
+              >
+                Solicitar novo link
+              </Button>
+            </div>
+          ) : !ready ? (
             <div className="flex flex-col items-center gap-2 py-6 text-sm text-muted-foreground">
               <Loader2 className="h-5 w-5 animate-spin" />
               Validando link de recuperação…
             </div>
+
           ) : (
             <form onSubmit={submit} className="space-y-3">
               <div className="space-y-1.5">
