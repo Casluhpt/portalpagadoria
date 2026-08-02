@@ -116,6 +116,11 @@ function PagamentosPage() {
           </header>
           <Tabs defaultValue="dashboard" className="flex flex-1 flex-col">
             <div className="border-b border-border bg-background px-4">
+              <div className="mt-2 rounded-lg bg-indigo-50/50 p-3 border border-indigo-100 dark:bg-indigo-900/10 dark:border-indigo-900/30">
+                <p className="text-[11px] leading-relaxed text-indigo-800 dark:text-indigo-300">
+                  preciso que o administrador tenha uma visão geral aonde e quem podera ter visualização, não poderar ver, e podera editar pelo site, definido pela as opções, administração, viewer e visitante
+                </p>
+              </div>
               <TabsList className="h-11 bg-transparent">
                 <TabsTrigger value="dashboard" className="gap-2">
                   <LayoutGrid className="h-4 w-4" /> Dashboard
