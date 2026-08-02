@@ -611,11 +611,13 @@ function RegistroDialog({
   const [valor, setValor] = useState<string>(
     existente?.valor ? String(existente.valor).replace(".", ",") : "",
   );
-  const [tipo, setTipo] = useState<"mensal" | "adiantamento">((existente?.tipo as any) ?? "mensal");
+  const [tipo, setTipo] = useState<"mensal" | "adiantamento" | "antecipação" | "ppr">((existente?.tipo as any) ?? "mensal");
   const [numeroPedido, setNumeroPedido] = useState(existente?.numero_pedido ?? linha.meta.numero_pedido ?? "");
   const [numeroNf, setNumeroNf] = useState(existente?.numero_nf ?? "");
-  const [dataLanc, setDataLanc] = useState(existente?.data_lancamento ?? "");
+  const [dataLanc, setDataLanc] = useState(existente?.data_lancamento ?? format(new Date(), "yyyy-MM-dd"));
   const [dataVenc, setDataVenc] = useState(existente?.data_vencimento ?? "");
+  const [dataEmissao, setDataEmissao] = useState((existente as any)?.data_emissao ?? "");
+  const [competencia, setCompetencia] = useState((existente as any)?.competencia ?? (mes > 1 ? MESES[mes - 2] : MESES[11]));
   const [lancado, setLancado] = useState(!!existente?.lancado);
   const [saving, setSaving] = useState(false);
 
@@ -632,6 +634,8 @@ function RegistroDialog({
         numero_nf: numeroNf || null,
         data_lancamento: dataLanc || null,
         data_vencimento: dataVenc || null,
+        data_emissao: dataEmissao || null,
+        competencia: competencia || null,
         lancado,
       });
     } finally { setSaving(false); }
@@ -658,6 +662,8 @@ function RegistroDialog({
               <SelectContent>
                 <SelectItem value="mensal">Mensal</SelectItem>
                 <SelectItem value="adiantamento">Adiantamento</SelectItem>
+                <SelectItem value="antecipação">Antecipação</SelectItem>
+                <SelectItem value="ppr">PPR</SelectItem>
               </SelectContent>
             </Select>
           </div>
