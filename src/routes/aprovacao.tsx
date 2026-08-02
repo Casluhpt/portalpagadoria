@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { AppLogo } from "@/components/app-logo";
 import { useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -86,7 +87,7 @@ function AprovacaoPage() {
         <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b bg-background/95 px-4 backdrop-blur">
           <SidebarTrigger />
           <Link to="/" className="flex flex-1 items-center gap-2 hover:opacity-80 transition-opacity">
-            <img src="/profarma.png" alt="Profarma" className="h-7 object-contain" />
+            <AppLogo className="h-7 w-auto" />
             <div>
               <h1 className="text-sm font-semibold text-foreground">Processo de Aprovação</h1>
               <p className="text-[10px] text-muted-foreground">Evidências de agendamento bancário</p>

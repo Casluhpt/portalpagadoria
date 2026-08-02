@@ -270,14 +270,10 @@ export function AppSidebar() {
           to="/" 
           className="flex items-center gap-2 px-2 py-3 rounded-md hover:bg-sidebar-accent/50 transition-colors"
         >
-          <img 
-            src="/profarma.png" 
-            alt="Logo" 
-            className="h-10 w-10 object-contain" 
-          />
+          <AppLogo className="h-10 w-10" />
           <div className="flex flex-col leading-tight group-data-[collapsible=icon]:hidden">
-            <span className="text-sm font-semibold text-sidebar-foreground">Pagadoria</span>
-            <span className="text-xs text-muted-foreground">Portal Corporativo</span>
+            <span className="text-sm font-semibold text-sidebar-foreground">Portal Pagadoria</span>
+            <span className="text-[10px] text-muted-foreground">Central de inteligência financeira</span>
           </div>
         </Link>
       </SidebarHeader>

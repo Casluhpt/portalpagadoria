@@ -1,12 +1,11 @@
 import React from 'react';
-// Logo imported directly from public for reliability
+import logoAsset from "@/assets/profarma-logo.png.asset.json";
 
 export function AppLogo({ className }: { className?: string }) {
-  // We use the cleaned image asset which has a transparent background and high quality
   return (
     <img 
-      src="/profarma.png" 
-      alt="Pagadoria Logo" 
+      src={logoAsset.url} 
+      alt="Grupo Profarma 65 anos" 
       className={className} 
       style={{ objectFit: 'contain' }}
     />

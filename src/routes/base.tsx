@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useRef, useState } from "react";
+import { AppLogo } from "@/components/app-logo";
 import * as XLSX from "xlsx";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Loader2, Plus, Search, Trash2, ArrowUpDown, ArrowUp, ArrowDown, Upload, Download, FileSpreadsheet } from "lucide-react";
@@ -226,7 +227,7 @@ function BasePage() {
           <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-border bg-background/80 px-4 backdrop-blur">
             <SidebarTrigger />
             <Link to="/" className="flex flex-1 items-center gap-2 hover:opacity-80 transition-opacity">
-              <img src="/profarma.png" alt="Profarma" className="h-7 object-contain" />
+              <AppLogo className="h-7 w-auto" />
               <div>
                 <h1 className="text-sm font-semibold text-foreground">Base de Resultados Principais</h1>
                 <p className="text-[10px] text-muted-foreground">

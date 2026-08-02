@@ -290,10 +290,10 @@ function PortalPage() {
           <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-border bg-card/90 px-4 backdrop-blur">
             <SidebarTrigger />
             <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-              <img src="/profarma.png" alt="Profarma" className="h-7 object-contain" />
+              <AppLogo className="h-7 w-auto" />
               <div className="ml-2 hidden flex-col leading-tight sm:flex">
                 <span className="text-sm font-semibold text-foreground">Portal Pagadoria</span>
-                <span className="text-[11px] text-muted-foreground">Central de inteligência financeira</span>
+                <span className="text-[10px] text-muted-foreground">Central de inteligência financeira</span>
               </div>
             </Link>
             <div className="ml-auto flex items-center gap-3">
