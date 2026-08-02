@@ -289,8 +289,8 @@ function DespesasFixasPage() {
             <SidebarTrigger />
             <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
               <AppLogo className="h-6 w-auto shrink-0 sm:h-7" />
-              <div className="flex items-center gap-2">
-                <h1 className="text-sm font-semibold text-foreground">Despesas Fixas</h1>
+              <div className="flex min-w-0 items-center gap-2">
+                <h1 className="truncate text-sm font-semibold text-foreground">Despesas Fixas</h1>
                 <Badge variant="secondary">Ano {ano}</Badge>
               </div>
             </Link>

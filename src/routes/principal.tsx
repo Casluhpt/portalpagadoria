@@ -224,8 +224,8 @@ function DashboardConteudo() {
             <Link to="/" className="flex flex-1 items-center gap-2 hover:opacity-80 transition-opacity">
               <img src="/profarma.png" alt="Profarma" className="h-7 object-contain" />
               <div>
-                <h1 className="text-sm font-semibold text-foreground">Principal</h1>
-                <p className="text-[10px] text-muted-foreground">
+                <h1 className="truncate text-sm font-semibold text-foreground">Principal</h1>
+                <p className="hidden truncate text-[10px] text-muted-foreground sm:block">
                   {isLoading
                     ? "Carregando lançamentos…"
                     : error

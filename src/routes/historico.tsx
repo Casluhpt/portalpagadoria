@@ -86,7 +86,7 @@ function HistoricoPage() {
         <div className="flex flex-1 flex-col">
           <header className="sticky top-0 z-10 flex h-14 items-center gap-4 border-b border-border bg-background/80 px-4 backdrop-blur">
             <SidebarTrigger />
-            <h1 className="text-sm font-semibold text-foreground">Histórico de Versões</h1>
+            <h1 className="truncate text-sm font-semibold text-foreground">Histórico de Versões</h1>
             <div className="ml-auto"><HeaderActions /></div>
           </header>
           <Content />
@@ -218,9 +218,9 @@ function Content() {
         <SidebarTrigger />
         <Link to="/" className="flex flex-1 items-center gap-2 hover:opacity-80 transition-opacity">
           <AppLogo className="h-6 w-auto shrink-0 sm:h-7" />
-          <div>
-            <h1 className="text-sm font-semibold text-foreground">Histórico de Versões</h1>
-            <p className="text-[10px] text-muted-foreground">Linha do tempo e novidades</p>
+          <div className="min-w-0">
+            <h1 className="truncate text-sm font-semibold text-foreground">Histórico de Versões</h1>
+            <p className="hidden truncate text-[10px] text-muted-foreground sm:block">Linha do tempo e novidades</p>
           </div>
         </Link>
         <div className="ml-auto">

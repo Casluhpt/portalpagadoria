@@ -228,9 +228,9 @@ function BasePage() {
             <SidebarTrigger />
             <Link to="/" className="flex flex-1 items-center gap-2 hover:opacity-80 transition-opacity">
               <AppLogo className="h-6 w-auto shrink-0 sm:h-7" />
-              <div>
-                <h1 className="text-sm font-semibold text-foreground">Base de Resultados Principais</h1>
-                <p className="text-[10px] text-muted-foreground">
+              <div className="min-w-0">
+                <h1 className="truncate text-sm font-semibold text-foreground">Base de Resultados Principais</h1>
+                <p className="hidden truncate text-[10px] text-muted-foreground sm:block">
                   {isLoading
                     ? "Carregando…"
                     : error
