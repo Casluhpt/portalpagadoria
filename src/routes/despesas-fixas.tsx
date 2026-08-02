@@ -87,6 +87,8 @@ function DespesasFixasPage() {
   const [showSuspended, setShowSuspended] = useState(false);
   const [showClosedMonths, setShowClosedMonths] = useState(false);
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
+  const [novoQty, setNovoQty] = useState(1);
+  const [novoOpen, setNovoOpen] = useState(false);
   const [novaLinha, setNovaLinha] = useState<{ categoria: CategoriaDespesa; descricao: string } | null>(null);
   const [confirmDel, setConfirmDel] = useState<LinhaAgrupada | null>(null);
   const [editandoRegistro, setEditandoRegistro] = useState<{
@@ -229,12 +231,17 @@ function DespesasFixasPage() {
   const criarNovaLinha = async () => {
     if (!novaLinha) return;
     if (!novaLinha.descricao.trim()) { toast.error("Informe uma descrição"); return; }
-    await upsertMut.mutateAsync({
-      categoria: novaLinha.categoria, descricao: novaLinha.descricao.trim(),
-      ano, mes: 1, valor: 0, lancado: false,
-    });
-    toast.success("Linha adicionada — clique em uma célula para lançar.");
+    const qty = Math.min(50, Math.max(1, novoQty));
+    for (let i = 0; i < qty; i++) {
+      await upsertMut.mutateAsync({
+        categoria: novaLinha.categoria, 
+        descricao: qty > 1 ? `${novaLinha.descricao.trim()} (${i + 1})` : novaLinha.descricao.trim(),
+        ano, mes: 1, valor: 0, lancado: false,
+      });
+    }
+    toast.success(`${qty} linha(s) adicionada(s) — clique em uma célula para lançar.`);
     setNovaLinha(null);
+    setNovoOpen(false);
   };
 
   const excluirLinhaCompleta = async (linha: LinhaAgrupada) => {
@@ -324,13 +331,44 @@ function DespesasFixasPage() {
                 </div>
               )}
               {tab !== "dashboard" && (
-                <Button size="sm" className="ml-auto bg-indigo-600 hover:bg-indigo-700"
-                  onClick={() => setNovaLinha({
-                    categoria: tab === "PJ" ? "PJ" : tab === "Fornecedores" ? "Fornecedores" : "Pensão",
-                    descricao: "",
-                  })}>
-                  <Plus className="mr-1 h-4 w-4" /> Nova linha
-                </Button>
+                <Dialog open={novoOpen} onOpenChange={setNovoOpen}>
+                  <DialogTrigger asChild>
+                    <Button size="sm" className="ml-auto bg-indigo-600 hover:bg-indigo-700">
+                      <Plus className="mr-1 h-4 w-4" /> Nova linha
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-sm">
+                    <DialogHeader>
+                      <DialogTitle>Adicionar novas linhas</DialogTitle>
+                      <DialogDescription>
+                        Selecione a quantidade de linhas que deseja adicionar (limite de 50 por vez).
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 py-2">
+                      <div className="space-y-2">
+                        <Label>Quantidade</Label>
+                        <Input 
+                          type="number" 
+                          min={1} 
+                          max={50} 
+                          value={novoQty} 
+                          onChange={(e) => setNovoQty(Math.min(50, Math.max(1, Number(e.target.value) || 1)))} 
+                        />
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <Button variant="outline" onClick={() => setNovoOpen(false)}>Cancelar</Button>
+                      <Button onClick={() => {
+                        setNovaLinha({
+                          categoria: tab === "PJ" ? "PJ" : tab === "Fornecedores" ? "Fornecedores" : "Pensão",
+                          descricao: "",
+                        });
+                      }}>
+                        Prosseguir
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
               )}
             </div>
 
