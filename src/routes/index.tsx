@@ -269,6 +269,26 @@ function PortalPage() {
       ],
       updated: "mensalmente",
     },
+    {
+      key: "busca",
+      title: "Busca Global",
+      subtitle: "Pesquisa centralizada em todo o Portal Pagadoria.",
+      objetivo: "Localizar rapidamente páginas, registros e ações através de pesquisa parcial ou exata.",
+      base: "Configuração de Busca",
+      baseTo: "#",
+      to: "#",
+      cta: "Atalhar: Ctrl+K",
+      icon: Search,
+      accent: "from-slate-700 to-slate-900",
+      chip: "bg-slate-100 text-slate-800",
+      bullets: [
+        "Pesquisa por número exato ou parcial",
+        "Resultados agrupados por módulo",
+        "Histórico de buscas recentes",
+        "Filtros avançados e permissões",
+      ],
+      updated: "v1.6.0",
+    },
   ];
 
   return (
