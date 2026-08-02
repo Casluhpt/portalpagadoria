@@ -79,6 +79,7 @@ function DespesasFixasPage() {
   const [ano, setAno] = useState<number>(2026);
   const [tab, setTab] = useState<"dashboard" | GrupoDespesa>("dashboard");
   const [busca, setBusca] = useState("");
+  const [showSuspended, setShowSuspended] = useState(false);
   const [novaLinha, setNovaLinha] = useState<{ categoria: CategoriaDespesa; descricao: string } | null>(null);
   const [confirmDel, setConfirmDel] = useState<LinhaAgrupada | null>(null);
   const [editandoRegistro, setEditandoRegistro] = useState<{
@@ -155,11 +156,14 @@ function DespesasFixasPage() {
 
   const linhasFiltradas = useMemo(() => {
     const q = busca.trim().toLowerCase();
-    if (!q) return linhas;
-    return linhas.filter((l) =>
+    const lins = showSuspended ? linhas : linhas.filter(l => !l.meta.suspensa);
+    if (!q) return lins;
+    return lins.filter((l) =>
       l.descricao.toLowerCase().includes(q) ||
       (l.meta.empresa_nome ?? "").toLowerCase().includes(q) ||
-      (l.meta.empresa_codigo ?? "").includes(q),
+      (l.meta.empresa_codigo ?? "").includes(q) ||
+      (l.meta.numero_pedido ?? "").includes(q) ||
+      (l.meta.sap_code ?? "").includes(q)
     );
   }, [linhas, busca]);
 
@@ -521,7 +525,7 @@ function GrupoTabela({
         </thead>
         <tbody>
           {linhas.map((l) => (
-            <tr key={l.key} className="hover:bg-slate-50/60">
+            <tr key={l.key} className={cn("hover:bg-slate-50/60", l.meta.suspensa && "opacity-50 grayscale bg-slate-100/50")}>
               <td className="border-b border-border px-3 py-2">
                 <button
                   className="group flex flex-col items-start text-left"
