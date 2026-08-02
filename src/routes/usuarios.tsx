@@ -380,7 +380,7 @@ function UserTableRow({ u, user, roleMut, setorMut, deleteMut, resetMut, compact
               ausente: { label: "Ausente", color: "bg-amber-500" },
               offline: { label: "Offline", color: "bg-muted-foreground/40" },
             } as const;
-            const m = map[u.presence];
+            const m = map[u.presence as keyof typeof map] || map.offline;
             return (
               <span className="inline-flex items-center gap-2">
                 <span className={`h-2.5 w-2.5 rounded-full ${m.color}`} aria-hidden />
