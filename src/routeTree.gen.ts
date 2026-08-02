@@ -19,6 +19,7 @@ import { Route as HistoricoRouteImport } from './routes/historico'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as FechamentoRouteImport } from './routes/fechamento'
 import { Route as ExportacaoRouteImport } from './routes/exportacao'
+import { Route as EsocialRouteImport } from './routes/esocial'
 import { Route as DivergenciasRouteImport } from './routes/divergencias'
 import { Route as DespesasFixasRouteImport } from './routes/despesas-fixas'
 import { Route as DashboardGerencialRouteImport } from './routes/dashboard-gerencial'
@@ -83,6 +84,11 @@ const FechamentoRoute = FechamentoRouteImport.update({
 const ExportacaoRoute = ExportacaoRouteImport.update({
   id: '/exportacao',
   path: '/exportacao',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EsocialRoute = EsocialRouteImport.update({
+  id: '/esocial',
+  path: '/esocial',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DivergenciasRoute = DivergenciasRouteImport.update({
@@ -175,6 +181,7 @@ export interface FileRoutesByFullPath {
   '/dashboard-gerencial': typeof DashboardGerencialRoute
   '/despesas-fixas': typeof DespesasFixasRoute
   '/divergencias': typeof DivergenciasRoute
+  '/esocial': typeof EsocialRoute
   '/exportacao': typeof ExportacaoRoute
   '/fechamento': typeof FechamentoRoute
   '/forgot-password': typeof ForgotPasswordRoute
@@ -202,6 +209,7 @@ export interface FileRoutesByTo {
   '/dashboard-gerencial': typeof DashboardGerencialRoute
   '/despesas-fixas': typeof DespesasFixasRoute
   '/divergencias': typeof DivergenciasRoute
+  '/esocial': typeof EsocialRoute
   '/exportacao': typeof ExportacaoRoute
   '/fechamento': typeof FechamentoRoute
   '/forgot-password': typeof ForgotPasswordRoute
@@ -229,6 +237,7 @@ export interface FileRoutesById {
   '/dashboard-gerencial': typeof DashboardGerencialRoute
   '/despesas-fixas': typeof DespesasFixasRoute
   '/divergencias': typeof DivergenciasRoute
+  '/esocial': typeof EsocialRoute
   '/exportacao': typeof ExportacaoRoute
   '/fechamento': typeof FechamentoRoute
   '/forgot-password': typeof ForgotPasswordRoute
@@ -258,6 +267,7 @@ export interface FileRouteTypes {
     | '/dashboard-gerencial'
     | '/despesas-fixas'
     | '/divergencias'
+    | '/esocial'
     | '/exportacao'
     | '/fechamento'
     | '/forgot-password'
@@ -285,6 +295,7 @@ export interface FileRouteTypes {
     | '/dashboard-gerencial'
     | '/despesas-fixas'
     | '/divergencias'
+    | '/esocial'
     | '/exportacao'
     | '/fechamento'
     | '/forgot-password'
@@ -311,6 +322,7 @@ export interface FileRouteTypes {
     | '/dashboard-gerencial'
     | '/despesas-fixas'
     | '/divergencias'
+    | '/esocial'
     | '/exportacao'
     | '/fechamento'
     | '/forgot-password'
@@ -339,6 +351,7 @@ export interface RootRouteChildren {
   DashboardGerencialRoute: typeof DashboardGerencialRoute
   DespesasFixasRoute: typeof DespesasFixasRoute
   DivergenciasRoute: typeof DivergenciasRoute
+  EsocialRoute: typeof EsocialRoute
   ExportacaoRoute: typeof ExportacaoRoute
   FechamentoRoute: typeof FechamentoRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
@@ -421,6 +434,13 @@ declare module '@tanstack/react-router' {
       path: '/exportacao'
       fullPath: '/exportacao'
       preLoaderRoute: typeof ExportacaoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/esocial': {
+      id: '/esocial'
+      path: '/esocial'
+      fullPath: '/esocial'
+      preLoaderRoute: typeof EsocialRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/divergencias': {
@@ -559,6 +579,7 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardGerencialRoute: DashboardGerencialRoute,
   DespesasFixasRoute: DespesasFixasRoute,
   DivergenciasRoute: DivergenciasRoute,
+  EsocialRoute: EsocialRoute,
   ExportacaoRoute: ExportacaoRoute,
   FechamentoRoute: FechamentoRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
