@@ -180,14 +180,53 @@ function SupportForm() {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="anexo">Anexo (Opcional - Link da imagem/screenshot)</Label>
-          <Input 
-            id="anexo" 
-            placeholder="https://..." 
-            value={formData.anexo_url}
-            onChange={(e) => setFormData(prev => ({ ...prev, anexo_url: e.target.value }))}
-          />
-          <p className="text-[10px] text-muted-foreground">Em breve habilitaremos o upload direto de arquivos.</p>
+          <Label htmlFor="anexo">Anexo (Opcional - Imagem ou Screenshot)</Label>
+          <div className="flex flex-col gap-2">
+            {!file ? (
+              <Button 
+                variant="outline" 
+                type="button"
+                className="w-full border-dashed border-slate-300 h-20 flex flex-col items-center justify-center gap-1 hover:border-indigo-400 hover:bg-indigo-50/50 transition-colors"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <Paperclip className="h-5 w-5 text-slate-400" />
+                <span className="text-xs text-slate-500">Clique para selecionar um arquivo</span>
+              </Button>
+            ) : (
+              <div className="flex items-center justify-between p-3 border rounded-lg bg-slate-50 border-slate-200">
+                <div className="flex items-center gap-2 overflow-hidden">
+                  <Paperclip className="h-4 w-4 text-indigo-600 shrink-0" />
+                  <span className="text-sm truncate text-slate-700">{file.name}</span>
+                  <span className="text-[10px] text-slate-400">({(file.size / 1024 / 1024).toFixed(2)} MB)</span>
+                </div>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="h-8 w-8 text-slate-400 hover:text-destructive"
+                  onClick={() => setFile(null)}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
+            <input 
+              ref={fileInputRef}
+              type="file" 
+              className="hidden" 
+              accept="image/*,.pdf,.doc,.docx"
+              onChange={(e) => {
+                const selectedFile = e.target.files?.[0];
+                if (selectedFile) {
+                  if (selectedFile.size > 5 * 1024 * 1024) {
+                    toast.error("Arquivo muito grande. O limite é 5MB.");
+                    return;
+                  }
+                  setFile(selectedFile);
+                }
+              }}
+            />
+            <p className="text-[10px] text-muted-foreground">Arraste ou selecione um arquivo de até 5MB.</p>
+          </div>
         </div>
 
         <div className="space-y-2">
