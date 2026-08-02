@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import {
   Download, FileSpreadsheet, FileText, FileType, Loader2,
@@ -21,6 +22,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { useSession } from "@/hooks/use-session";
 
 export const Route = createFileRoute("/exportacao")({
   component: ExportacaoPage,
@@ -202,12 +204,21 @@ function ExportacaoPage() {
 }
 
 function ExportacaoContent() {
+  const { user } = useSession();
   const hoje = format(new Date(), "yyyy-MM-dd");
   const primeiroDoMes = format(new Date(new Date().getFullYear(), new Date().getMonth(), 1), "yyyy-MM-dd");
   const [dataDe, setDataDe] = useState(primeiroDoMes);
   const [dataAte, setDataAte] = useState(hoje);
   const [formato, setFormato] = useState<Formato>("xlsx");
   const [loadingKey, setLoadingKey] = useState<BaseKey | null>(null);
+
+  const { data: checkSession } = useQuery({
+    queryKey: ["session-check"],
+    queryFn: () => supabase.auth.getSession(),
+    staleTime: Infinity,
+  });
+
+  if (!user) return null;
 
   async function handleExport(base: BaseDef) {
     setLoadingKey(base.key);

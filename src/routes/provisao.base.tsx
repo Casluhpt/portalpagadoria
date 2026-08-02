@@ -44,6 +44,7 @@ import {
   updateProvisao,
   type Provisao,
 } from "@/lib/provisao";
+import { useSession } from "@/hooks/use-session";
 
 export const Route = createFileRoute("/provisao/base")({
   component: ProvisaoBasePage,
@@ -113,9 +114,11 @@ function ProvisaoBasePage() {
   const qc = useQueryClient();
   const fileRef = useRef<HTMLInputElement>(null);
 
+  const { user } = useSession();
   const { data, isLoading, error } = useQuery({
     queryKey: provisaoQueryKey,
     queryFn: fetchAllProvisao,
+    enabled: !!user,
     staleTime: 30_000,
   });
 
