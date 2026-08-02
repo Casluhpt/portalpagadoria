@@ -220,10 +220,11 @@ function DashboardConteudo() {
         <div className="flex flex-1 flex-col">
           <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-border bg-background/80 px-4 backdrop-blur">
             <SidebarTrigger />
-            <div className="flex flex-1 items-center gap-3">
+            <Link to="/" className="flex flex-1 items-center gap-2 hover:opacity-80 transition-opacity">
+              <img src="/profarma.png" alt="Profarma" className="h-7 object-contain" />
               <div>
                 <h1 className="text-sm font-semibold text-foreground">Principal</h1>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-[10px] text-muted-foreground">
                   {isLoading
                     ? "Carregando lançamentos…"
                     : error
@@ -231,8 +232,8 @@ function DashboardConteudo() {
                       : `${total.toLocaleString("pt-BR")} lançamentos · ${brl(valorTotal)}`}
                 </p>
               </div>
-              {isLoading && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
-            </div>
+            </Link>
+            {isLoading && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
             <Button asChild size="sm" variant="default" className="gap-1.5">
               <Link to="/base">
                 <Database className="h-3.5 w-3.5" /> Base de Resultados
