@@ -35,6 +35,7 @@ import {
   Lock,
   Clock,
   Search,
+  BookOpen,
   ChevronRight,
 } from "lucide-react";
 import { toast } from "sonner";
