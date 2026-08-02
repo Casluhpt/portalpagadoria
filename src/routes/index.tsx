@@ -29,6 +29,7 @@ import {
 import { AppSidebar } from "@/components/app-sidebar";
 import { HeaderActions } from "@/components/header-actions";
 import { useRoles } from "@/hooks/use-roles";
+import logoPagadoria from "@/assets/logo-pagadoria.png.asset.json";
 import { GlobalSearch } from "@/components/global-search";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { Card, CardContent } from "@/components/ui/card";
@@ -379,8 +380,8 @@ function PortalPage() {
               <section className="rounded-2xl border border-violet-200 bg-card/90 p-6 shadow-sm backdrop-blur">
                 <div className="mb-4 flex items-center justify-between gap-4">
                   <div className="flex items-center gap-3">
-                    <div className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-violet-600 to-indigo-700 text-white shadow-md">
-                      <Sparkles className="h-5 w-5" />
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-card/50 overflow-hidden shadow-sm border border-border">
+                      <img src={logoPagadoria.url} alt="Pagadoria" className="h-6 w-6 object-contain" />
                     </div>
                     <div>
                       <h2 className="text-lg font-bold text-foreground">Novidades do Portal</h2>
