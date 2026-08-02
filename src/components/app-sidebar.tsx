@@ -94,7 +94,7 @@ const navigationGroups = [
 ];
 
 const mainItems: MenuItem[] = [
-  { title: "Início", url: "/", icon: Home, match: (p) => p === "/", group: "geral" },
+  { title: "Início", url: "/", icon: Home, match: (p: string) => p === "/", group: "geral" },
   
   { title: "Resultados Principais", url: "/principal", icon: LayoutDashboard, match: (p: string) => p === "/principal", restricted: true, adminOnly: true, group: "operacao" },
   { title: "Base de Resultados", url: "/base", icon: Database, match: (p: string) => p === "/base", restricted: true, adminOnly: true, group: "operacao" },
@@ -112,18 +112,18 @@ const mainItems: MenuItem[] = [
   { title: "Fechamento de Competência", url: "/fechamento", icon: FileCheck2, match: (p: string) => p.startsWith("/fechamento"), group: "geral" },
   { title: "Central de Divergências", url: "/divergencias", icon: AlertTriangle, match: (p: string) => p.startsWith("/divergencias"), group: "geral" },
 
-  { title: "Material de Apoio", url: "/material-apoio", icon: BookOpen, match: (p) => p.startsWith("/material-apoio"), group: "apoio" },
-  { title: "Busca Inteligente (IA)", url: "#", icon: Search, match: () => false, action: "search", group: "apoio" },
+  { title: "Material de Apoio", url: "/material-apoio", icon: BookOpen, match: (p: string) => p.startsWith("/material-apoio"), group: "apoio" },
+  { title: "IA da Pagadoria", url: "#", icon: Sparkles, match: (p: string) => false, action: "search", group: "apoio" },
 ];
 
 const advancedItems: MenuItem[] = [
-  { title: "Auditoria", url: "/auditoria", icon: ScrollText, match: (p) => p === "/auditoria" || p === "/registros-excluidos", allowedRoles: ["administrador", "auditor"] },
+  { title: "Auditoria", url: "/auditoria", icon: ScrollText, match: (p: string) => p === "/auditoria" || p === "/registros-excluidos", allowedRoles: ["administrador", "auditor"] },
 ];
 
 const settingItems: MenuItem[] = [
-  { title: "Administração de usuários", url: "/usuarios", icon: Users, match: (p) => p === "/usuarios", adminOnly: true },
-  { title: "Histórico de versões", url: "/historico", icon: History, match: (p) => p === "/historico", adminOnly: true },
-  { title: "Configurações Técnicas", url: "/configuracoes", icon: Cog, match: (p) => p === "/configuracoes", adminOnly: true },
+  { title: "Administração de usuários", url: "/usuarios", icon: Users, match: (p: string) => p === "/usuarios", adminOnly: true },
+  { title: "Histórico de versões", url: "/historico", icon: History, match: (p: string) => p === "/historico", adminOnly: true },
+  { title: "Configurações Técnicas", url: "/configuracoes", icon: Cog, match: (p: string) => p === "/configuracoes", adminOnly: true },
 ];
 
 const roleLabel: Record<AppRole, string> = {
