@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Megaphone, Trash2, ShieldAlert } from "lucide-react";
+import { Megaphone, Trash2, ShieldAlert, Checkbox as CheckboxIcon } from "lucide-react";
 import { toast } from "sonner";
 
 import { AppSidebar } from "@/components/app-sidebar";
@@ -15,6 +15,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/hooks/use-session";
 import { useRoles } from "@/hooks/use-roles";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   comunicadosQueryKey,
   fetchComunicados,
@@ -53,6 +54,9 @@ function ComunicadosPanel() {
   const qc = useQueryClient();
   const [titulo, setTitulo] = useState("");
   const [mensagem, setMensagem] = useState("");
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [sendEmail, setSendEmail] = useState(false);
+  const [sendPortal, setSendPortal] = useState(true);
 
   const { data: items = [] } = useQuery({
     queryKey: [...comunicadosQueryKey, "admin"],
@@ -71,17 +75,25 @@ function ComunicadosPanel() {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const remove = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase.from("comunicados").delete().eq("id", id);
+  const removeBulk = useMutation({
+    mutationFn: async (ids: string[]) => {
+      const { error } = await supabase.from("comunicados").delete().in("id", ids);
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Comunicado removido");
+      toast.success("Comunicados removidos com sucesso");
+      setSelectedIds(new Set());
       qc.invalidateQueries({ queryKey: comunicadosQueryKey });
     },
     onError: (e: Error) => toast.error(e.message),
   });
+
+  const toggleSelection = (id: string) => {
+    const next = new Set(selectedIds);
+    if (next.has(id)) next.delete(id);
+    else next.add(id);
+    setSelectedIds(next);
+  };
 
   if (loading) return null;
 
