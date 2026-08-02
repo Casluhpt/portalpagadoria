@@ -16,6 +16,7 @@ import { PasswordExpirationGuard } from "@/components/password-expiration-guard"
 import { PresenceHeartbeat } from "@/components/presence-heartbeat";
 import { BackButton } from "@/components/back-button";
 import { AuthGate } from "@/components/auth-gate";
+import { ThemeProvider } from "@/components/theme-provider";
 
 
 function NotFoundComponent() {
@@ -131,6 +132,7 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <ThemeProvider>
       <AuthGate>
         <PasswordExpirationGuard />
         <PresenceHeartbeat />
@@ -139,6 +141,7 @@ function RootComponent() {
         <Outlet />
       </AuthGate>
       <Toaster position="top-right" richColors closeButton />
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }
