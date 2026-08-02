@@ -3,7 +3,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 export type PresenceStatus = "online" | "ausente" | "offline";
 
-export const ALLOWED_SETORES = ["FOLHA/FÉRIAS", "RESCISÃO", "BENEFICIOS", "VISITANTE"] as const;
+export const ALLOWED_SETORES = ["FOLHA/FÉRIAS", "RESCISÃO", "BENEFICIOS", "GERÊNCIA/VISITANTE", "PAGADORIA"] as const;
 export type Setor = (typeof ALLOWED_SETORES)[number];
 
 export type AdminUserRow = {
