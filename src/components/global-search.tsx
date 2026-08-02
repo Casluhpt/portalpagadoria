@@ -419,11 +419,7 @@ export function GlobalSearch({ variant = "compact" }: { variant?: "compact" | "h
           )}
         </CommandList>
 
-        <div className="flex items-center justify-end border-t bg-muted/50 px-4 py-2 text-[10px] text-muted-foreground">
-          <div className="flex items-center gap-1 font-medium text-violet-600">
-            <Sparkles className="h-3 w-3" /> IA da Pagadoria
-          </div>
-        </div>
+        <div className="flex items-center justify-end border-t bg-muted/50 px-4 py-1.5" />
       </CommandDialog>
     </>
   );
