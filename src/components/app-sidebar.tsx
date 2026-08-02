@@ -35,6 +35,7 @@ import {
   Users,
   Lock,
   Clock,
+  Search,
 } from "lucide-react";
 import { toast } from "sonner";
 import type { ComponentType } from "react";
