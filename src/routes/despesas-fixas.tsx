@@ -7,7 +7,7 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import {
   Loader2, Plus, Trash2, Wallet, Filter, LayoutDashboard, Table2,
-  Building2, CalendarClock, CheckCircle2, Clock, TrendingUp,
+  Building2, CalendarClock, CheckCircle2, Clock, TrendingUp, Search
 } from "lucide-react";
 
 import { AppSidebar } from "@/components/app-sidebar";
