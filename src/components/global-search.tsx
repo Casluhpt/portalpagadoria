@@ -199,9 +199,6 @@ export function GlobalSearch({ variant = "compact" }: { variant?: "compact" | "h
         <span className="hidden items-center gap-1 rounded-full bg-violet-100 px-2.5 py-1 text-[10px] font-semibold text-violet-700 sm:flex dark:bg-violet-900/40 dark:text-violet-300">
           <Sparkles className="h-3 w-3" /> IA Assistente
         </span>
-        <kbd className="hidden rounded border bg-muted px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground md:inline">
-          ⌘K
-        </kbd>
       </button>
     ) : (
       <Button
