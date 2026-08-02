@@ -153,10 +153,14 @@ function LancamentosTab({ colaboradorNome, userId }: { colaboradorNome: string; 
   const entrarFilaFn = useServerFn(entrarFila);
   const sairFilaFn = useServerFn(sairFila);
 
-  const currentUserQueue = queue.find(q => q.user_id === userId);
+  const currentUserQueue = userId ? queue.find(q => q.user_id === userId) : undefined;
   const activeUser = queue.find(q => q.status === 'ativo');
-  const isEditingEnabled = activeUser?.user_id === userId;
-  const nextUser = queue.filter(q => q.status === 'aguardando').sort((a, b) => new Date(a.entrou_em).getTime() - new Date(b.entrou_em).getTime())[0];
+  const isEditingEnabled = !!userId && activeUser?.user_id === userId;
+  const nextUser = queue.filter(q => q.status === 'aguardando').sort((a, b) => {
+    const da = a.entrou_em ? new Date(a.entrou_em).getTime() : 0;
+    const db = b.entrou_em ? new Date(b.entrou_em).getTime() : 0;
+    return da - db;
+  })[0];
 
   const entrarMut = useMutation({
     mutationFn: () => entrarFilaFn({ data: { userId: userId as string, userNome: colaboradorNome, modulo: 'pagamentos_diversos' } }),

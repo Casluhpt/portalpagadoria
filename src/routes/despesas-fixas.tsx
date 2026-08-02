@@ -73,6 +73,7 @@ type LinhaAgrupada = {
     notas: string | null;
     suspensa: boolean;
     motivo_suspensao: string | null;
+    pedidos_vinculados?: string[]; // Para lançamentos múltiplos
   };
 };
 
@@ -609,13 +610,24 @@ function GrupoTabela({
               <td className="border-b border-border px-3 py-2 text-right tabular-nums">
                 <div className="flex flex-col items-end">
                   <span className="font-semibold text-slate-700">{brl(l.meta.valor_previsto_anual || 0)}</span>
-                  <span className="text-[10px] text-muted-foreground">Saldo {brl((l.meta.valor_previsto_anual || 0) - l.totalLancado)}</span>
+                  <div className="flex items-center gap-1">
+                    <Progress value={Math.min(100, (l.totalLancado / (l.meta.valor_previsto_anual || 1)) * 100)} className="h-1 w-12" />
+                    <span className={cn(
+                      "text-[10px] font-medium",
+                      l.totalLancado > (l.meta.valor_previsto_anual || 0) ? "text-rose-600" : "text-muted-foreground"
+                    )}>
+                      Saldo {brl((l.meta.valor_previsto_anual || 0) - l.totalLancado)}
+                    </span>
+                  </div>
                 </div>
               </td>
               <td className="border-b border-border px-3 py-2 text-right tabular-nums">
                 <div className="flex flex-col items-end">
                   <span className="font-semibold text-slate-700">{brl(l.totalPrevisto)}</span>
-                  <span className="text-[10px] text-emerald-700 font-medium">{brl(l.totalLancado)}</span>
+                  <span className={cn(
+                    "text-[10px] font-medium",
+                    l.totalLancado > 0 ? "text-emerald-700" : "text-slate-400"
+                  )}>{brl(l.totalLancado)}</span>
                 </div>
               </td>
               <td className="border-b border-border px-2 py-1 text-right">
@@ -661,8 +673,10 @@ function RegistroDialog({
   onDelete: (id: string) => Promise<void>;
 }) {
   const existente = linha.registros[mes - 1];
-  const [valor, setValor] = useState<string>(
-    existente?.valor ? String(existente.valor).replace(".", ",") : "",
+  
+  // Suporte a múltiplos lançamentos (NF com vários pedidos)
+  const [lancamentos, setLancamentos] = useState<any[]>(
+    existente ? [existente] : [{ valor: "", numero_pedido: linha.meta.numero_pedido ?? "" }]
   );
   const [tipo, setTipo] = useState<"mensal" | "adiantamento" | "antecipação" | "ppr">((existente?.tipo as any) ?? "mensal");
   const [numeroPedido, setNumeroPedido] = useState(existente?.numero_pedido ?? linha.meta.numero_pedido ?? "");
