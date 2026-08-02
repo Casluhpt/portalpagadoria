@@ -1,5 +1,5 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -38,6 +38,11 @@ import {
   BookOpen,
   ChevronRight,
   FileSpreadsheet,
+  MessageSquare,
+  Bot,
+  X,
+  Send,
+  Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
 import type { ComponentType } from "react";
@@ -46,7 +51,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/hooks/use-session";
 import { useRoles, type AppRole } from "@/hooks/use-roles";
 import { useProfile } from "@/hooks/use-profile";
+import { useQuery } from "@tanstack/react-query";
+import { fetchMateriais, materialApoioQueryKey } from "@/lib/material-apoio";
+import { perguntarIa } from "@/lib/ia.functions";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 import {
   Sidebar,
@@ -85,36 +94,36 @@ const navigationGroups = [
 ];
 
 const mainItems: MenuItem[] = [
-  { title: "Início", url: "/", icon: Home, match: (p) => p === "/", group: "geral" },
+  { title: "Início", url: "/", icon: Home, match: (p: string) => p === "/", group: "geral" },
   
-  { title: "Resultados Principais", url: "/principal", icon: LayoutDashboard, match: (p) => p === "/principal", restricted: true, adminOnly: true, group: "operacao" },
-  { title: "Base de Resultados", url: "/base", icon: Database, match: (p) => p === "/base", restricted: true, adminOnly: true, group: "operacao" },
-  { title: "Provisão Diária", url: "/provisao", icon: Wallet, match: (p) => p === "/provisao", restricted: true, adminOnly: true, group: "operacao" },
+  { title: "Resultados Principais", url: "/principal", icon: LayoutDashboard, match: (p: string) => p === "/principal", restricted: true, adminOnly: true, group: "operacao" },
+  { title: "Base de Resultados", url: "/base", icon: Database, match: (p: string) => p === "/base", restricted: true, adminOnly: true, group: "operacao" },
+  { title: "Provisão Diária", url: "/provisao", icon: Wallet, match: (p: string) => p === "/provisao", restricted: true, adminOnly: true, group: "operacao" },
   
-  { title: "Conciliação Bancária", url: "/conciliacao", icon: ShieldCheck, match: (p) => p.startsWith("/conciliacao"), restricted: true, adminOnly: true, group: "financeiro" },
-  { title: "Pagamentos Diversos", url: "/pagamentos", icon: Banknote, match: (p) => p.startsWith("/pagamentos"), group: "financeiro" },
-  { title: "Despesas Fixas", url: "/despesas-fixas", icon: Wallet, match: (p) => p.startsWith("/despesas-fixas"), group: "financeiro" },
-  { title: "Controle E-Social", url: "/esocial", icon: FileSpreadsheet, match: (p) => p.startsWith("/esocial"), group: "financeiro" },
+  { title: "Conciliação Bancária", url: "/conciliacao", icon: ShieldCheck, match: (p: string) => p.startsWith("/conciliacao"), restricted: true, adminOnly: true, group: "financeiro" },
+  { title: "Pagamentos Diversos", url: "/pagamentos", icon: Banknote, match: (p: string) => p.startsWith("/pagamentos"), group: "financeiro" },
+  { title: "Despesas Fixas", url: "/despesas-fixas", icon: Wallet, match: (p: string) => p.startsWith("/despesas-fixas"), group: "financeiro" },
+  { title: "Controle E-Social", url: "/esocial", icon: FileSpreadsheet, match: (p: string) => p.startsWith("/esocial"), group: "financeiro" },
 
-  { title: "[anexo]", url: "/anexos", icon: FileArchive, match: (p) => p.startsWith("/anexos"), group: "base_anexos" },
-  { title: "Exportação de Relatórios", url: "/exportacao", icon: Download, match: (p) => p.startsWith("/exportacao"), group: "base_anexos" },
+  { title: "[anexo]", url: "/anexos", icon: FileArchive, match: (p: string) => p.startsWith("/anexos"), group: "base_anexos" },
+  { title: "Exportação de Relatórios", url: "/exportacao", icon: Download, match: (p: string) => p.startsWith("/exportacao"), group: "base_anexos" },
 
-  { title: "Administração de Comunicados", url: "/administracao", icon: Settings, match: (p) => p.startsWith("/administracao"), adminOnly: true, group: "geral" },
-  { title: "Fechamento de Competência", url: "/fechamento", icon: FileCheck2, match: (p) => p.startsWith("/fechamento"), group: "geral" },
-  { title: "Central de Divergências", url: "/divergencias", icon: AlertTriangle, match: (p) => p.startsWith("/divergencias"), group: "geral" },
+  { title: "Administração de Comunicados", url: "/administracao", icon: Settings, match: (p: string) => p.startsWith("/administracao"), adminOnly: true, group: "geral" },
+  { title: "Fechamento de Competência", url: "/fechamento", icon: FileCheck2, match: (p: string) => p.startsWith("/fechamento"), group: "geral" },
+  { title: "Central de Divergências", url: "/divergencias", icon: AlertTriangle, match: (p: string) => p.startsWith("/divergencias"), group: "geral" },
 
-  { title: "Material de Apoio", url: "/material-apoio", icon: BookOpen, match: (p) => p.startsWith("/material-apoio"), group: "apoio" },
-  { title: "Busca Inteligente (IA)", url: "#", icon: Search, match: () => false, action: "search", group: "apoio" },
+  { title: "Material de Apoio", url: "/material-apoio", icon: BookOpen, match: (p: string) => p.startsWith("/material-apoio"), group: "apoio" },
+  { title: "IA da Pagadoria", url: "#", icon: Sparkles, match: (p: string) => false, action: "search", group: "apoio" },
 ];
 
 const advancedItems: MenuItem[] = [
-  { title: "Auditoria", url: "/auditoria", icon: ScrollText, match: (p) => p === "/auditoria" || p === "/registros-excluidos", allowedRoles: ["administrador", "auditor"] },
+  { title: "Auditoria", url: "/auditoria", icon: ScrollText, match: (p: string) => p === "/auditoria" || p === "/registros-excluidos", allowedRoles: ["administrador", "auditor"] },
 ];
 
 const settingItems: MenuItem[] = [
-  { title: "Administração de usuários", url: "/usuarios", icon: Users, match: (p) => p === "/usuarios", adminOnly: true },
-  { title: "Histórico de versões", url: "/historico", icon: History, match: (p) => p === "/historico", adminOnly: true },
-  { title: "Configurações Técnicas", url: "/configuracoes", icon: Cog, match: (p) => p === "/configuracoes", adminOnly: true },
+  { title: "Administração de usuários", url: "/usuarios", icon: Users, match: (p: string) => p === "/usuarios", adminOnly: true },
+  { title: "Histórico de versões", url: "/historico", icon: History, match: (p: string) => p === "/historico", adminOnly: true },
+  { title: "Configurações Técnicas", url: "/configuracoes", icon: Cog, match: (p: string) => p === "/configuracoes", adminOnly: true },
 ];
 
 const roleLabel: Record<AppRole, string> = {
@@ -133,6 +142,67 @@ export function AppSidebar() {
   const { user } = useSession();
   const { roles, isAdmin, isViewer, hasAny, loading: rolesLoading } = useRoles();
   const { setor } = useProfile();
+  const { data: materiais = [] } = useQuery({
+    queryKey: materialApoioQueryKey,
+    queryFn: fetchMateriais,
+    staleTime: 5 * 60_000,
+  });
+
+  const [chatOpen, setChatOpen] = useState(false);
+  const [chatMessages, setChatMessages] = useState<{ role: "user" | "assistant"; content: string }[]>([]);
+  const [chatInput, setChatInput] = useState("");
+  const [isTyping, setIsTyping] = useState(false);
+
+  const pages = useMemo(() => {
+    const all = [
+      { title: "Início", url: "/" },
+      { title: "Material de Apoio", url: "/material-apoio" },
+      { title: "Resultados Principais", url: "/principal" },
+      { title: "Provisão Diária", url: "/provisao" },
+      { title: "[anexo]", url: "/anexos" },
+      { title: "Conciliação Bancária", url: "/conciliacao" },
+      { title: "Pagamentos Diversos", url: "/pagamentos" },
+      { title: "Administração de Comunicados", url: "/administracao" },
+      { title: "Fechamento de Competência", url: "/fechamento" },
+      { title: "Central de Divergências", url: "/divergencias" },
+      { title: "Despesas Fixas", url: "/despesas-fixas" },
+      { title: "Exportação de Relatórios", url: "/exportacao" },
+    ];
+    return all;
+  }, []);
+
+  const handleSendMessage = async () => {
+    if (!chatInput.trim() || isTyping) return;
+
+    const userMsg = chatInput.trim();
+    setChatInput("");
+    setChatMessages((prev) => [...prev, { role: "user", content: userMsg }]);
+    setIsTyping(true);
+
+    const contexto = [
+      "MÓDULOS DO PORTAL: " + pages.map((p) => p.title).join("; "),
+      ...materiais
+        .filter((m) => m.publicado)
+        .map((m) => `### ${m.titulo} (${m.categoria})\n${m.conteudo}`),
+    ]
+      .join("\n\n")
+      .slice(0, 50_000);
+
+    try {
+      const r = await perguntarIa({ data: { pergunta: userMsg, contexto } });
+      setChatMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: r.resposta ?? r.erro ?? "Não foi possível processar." },
+      ]);
+    } catch {
+      setChatMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: "Erro na conexão com a IA." },
+      ]);
+    } finally {
+      setIsTyping(false);
+    }
+  };
 
   // Viewer users have access to a limited set of routes.
   const VIEWER_ALLOWED = ["/pagamentos", "/divergencias"];
@@ -171,17 +241,14 @@ export function AppSidebar() {
         isActive={item.match(currentPath)} 
         tooltip={item.title}
         onClick={item.action === "search" ? () => {
-          const event = new KeyboardEvent("keydown", { key: "k", metaKey: true, ctrlKey: true });
-          document.dispatchEvent(event);
+          setChatOpen(true);
         } : undefined}
       >
         {item.action === "search" ? (
           <div className="flex items-center gap-2 cursor-pointer w-full">
             <item.icon className="h-4 w-4 shrink-0" />
             <span className="truncate">{item.title}</span>
-            <kbd className="ml-auto pointer-events-none hidden h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 xl:flex">
-              ⌘K
-            </kbd>
+            <Sparkles className="ml-auto h-3 w-3 text-violet-500" />
           </div>
         ) : (
           <Link to={item.url} className="flex items-center gap-2">
@@ -296,6 +363,74 @@ export function AppSidebar() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Floating IA Chat */}
+      {chatOpen && (
+        <div className="fixed bottom-4 right-4 z-50 flex h-[500px] w-[350px] flex-col overflow-hidden rounded-2xl border border-violet-200 bg-card shadow-2xl animate-in slide-in-from-bottom-4">
+          <div className="flex items-center justify-between bg-gradient-to-r from-violet-600 to-indigo-700 p-4 text-white">
+            <div className="flex items-center gap-2">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/20">
+                <Bot className="h-5 w-5" />
+              </div>
+              <div>
+                <h3 className="text-sm font-bold">IA Pagadoria</h3>
+                <span className="text-[10px] text-white/70">Online</span>
+              </div>
+            </div>
+            <Button variant="ghost" size="icon" className="h-8 w-8 text-white hover:bg-white/20" onClick={() => setChatOpen(false)}>
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+          
+          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            {chatMessages.length === 0 && (
+              <div className="flex flex-col items-center justify-center h-full text-center space-y-2 opacity-60">
+                <Sparkles className="h-8 w-8 text-violet-400" />
+                <p className="text-xs">Olá! Sou sua assistente. Como posso ajudar com o portal hoje?</p>
+              </div>
+            )}
+            {chatMessages.map((msg, i) => (
+              <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
+                <div className={`max-w-[85%] rounded-2xl px-4 py-2 text-xs ${
+                  msg.role === "user" 
+                    ? "bg-violet-600 text-white rounded-tr-none" 
+                    : "bg-muted text-foreground rounded-tl-none border border-border"
+                }`}>
+                  {msg.content}
+                </div>
+              </div>
+            ))}
+            {isTyping && (
+              <div className="flex justify-start">
+                <div className="max-w-[85%] rounded-2xl px-4 py-2 text-xs bg-muted text-foreground rounded-tl-none border border-border flex items-center gap-2">
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                  <span>Digitando...</span>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="border-t p-3 bg-muted/30">
+            <form 
+              className="flex gap-2" 
+              onSubmit={(e: React.FormEvent) => {
+                e.preventDefault();
+                handleSendMessage();
+              }}
+            >
+              <Input 
+                placeholder="Sua dúvida..." 
+                className="h-9 text-xs" 
+                value={chatInput} 
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setChatInput(e.target.value)}
+              />
+              <Button type="submit" size="icon" className="h-9 w-9 shrink-0 bg-violet-600 hover:bg-violet-700" disabled={isTyping}>
+                <Send className="h-4 w-4" />
+              </Button>
+            </form>
+          </div>
+        </div>
+      )}
     </Sidebar>
   );
 }
