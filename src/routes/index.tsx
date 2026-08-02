@@ -300,21 +300,21 @@ function PortalPage() {
             </div>
           </header>
 
-          <main className="flex-1 space-y-8 p-6 lg:p-8">
-            <section className="mx-auto w-full max-w-4xl space-y-6">
+          <main className="flex-1 space-y-12 p-6 lg:p-10 max-w-[1600px] mx-auto w-full">
+            <section className="mx-auto w-full max-w-4xl space-y-8 py-4">
               <div className="flex flex-col items-center justify-center text-center">
-                <Badge variant="outline" className="mb-3 border-violet-200 bg-violet-50/50 text-violet-700 dark:bg-violet-900/20 dark:text-violet-300">
+                <Badge variant="outline" className="mb-4 border-violet-200 bg-violet-50/50 px-4 py-1 text-violet-700 dark:bg-violet-900/20 dark:text-violet-300">
                   Central de Busca Total
                 </Badge>
-                <h2 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl dark:text-white">
+                <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl dark:text-white">
                   O que você deseja encontrar hoje?
                 </h2>
-                <p className="mt-2 text-sm text-slate-500 max-w-lg">
+                <p className="mt-3 text-base text-slate-500 max-w-lg">
                   Pesquise matrículas, colaboradores, empresas ou tire dúvidas sobre processos corporativos com nossa IA Assistente.
                 </p>
               </div>
-              <div className="relative transform transition-all duration-300 hover:scale-[1.01]">
-                <div className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-violet-600/20 to-indigo-600/20 blur-lg opacity-75" />
+              <div className="relative transform transition-all duration-500 hover:scale-[1.01]">
+                <div className="absolute -inset-2 rounded-3xl bg-gradient-to-r from-violet-600/10 to-indigo-600/10 blur-2xl opacity-75" />
                 <GlobalSearch variant="hero" />
               </div>
             </section>
