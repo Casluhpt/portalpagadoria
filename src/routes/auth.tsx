@@ -76,7 +76,7 @@ function translateAuthError(msg: string): string {
   if (m.includes("too many requests") || m.includes("rate limit"))
     return "Muitas tentativas. Aguarde alguns minutos antes de tentar de novo.";
   if (m.includes("network") || m.includes("failed to fetch"))
-    return "Sem conexão com o servidor. Verifique sua internet e tente novamente.";
+    return "conexão com o gifhub. Verifique sua internet e tente novamente.";
   if (m.includes("user already registered"))
     return "Este e-mail já está cadastrado. Use a aba Entrar.";
   if (m.includes("password should be") || m.includes("weak password"))
