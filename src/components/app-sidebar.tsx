@@ -370,17 +370,20 @@ export function AppSidebar() {
       {/* Floating IA Chat */}
       {chatOpen && (
         <div className="fixed bottom-4 right-4 z-50 flex h-[500px] w-[350px] flex-col overflow-hidden rounded-2xl border border-violet-200 bg-card shadow-2xl animate-in slide-in-from-bottom-4">
-          <div className="flex items-center justify-between bg-gradient-to-r from-violet-600 to-indigo-700 p-4 text-white">
-            <div className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/20">
+          <div className="flex items-center justify-between bg-gradient-to-r from-violet-600 to-indigo-700 p-4 text-white shadow-md">
+            <div className="flex items-center gap-3">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white/20 shadow-inner">
                 <Bot className="h-5 w-5" />
               </div>
               <div>
-                <h3 className="text-sm font-bold">IA Pagadoria</h3>
-                <span className="text-[10px] text-white/70">Online</span>
+                <h3 className="text-sm font-bold leading-none">IA da Pagadoria</h3>
+                <div className="mt-1 flex items-center gap-1.5">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="text-[10px] text-white/80 font-medium">Interativo</span>
+                </div>
               </div>
             </div>
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-white hover:bg-white/20" onClick={() => setChatOpen(false)}>
+            <Button variant="ghost" size="icon" className="h-8 w-8 text-white hover:bg-white/20 transition-colors" onClick={() => setChatOpen(false)}>
               <X className="h-4 w-4" />
             </Button>
           </div>
@@ -393,21 +396,39 @@ export function AppSidebar() {
               </div>
             )}
             {chatMessages.map((msg, i) => (
-              <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
-                <div className={`max-w-[85%] rounded-2xl px-4 py-2 text-xs ${
-                  msg.role === "user" 
-                    ? "bg-violet-600 text-white rounded-tr-none" 
-                    : "bg-muted text-foreground rounded-tl-none border border-border"
-                }`}>
-                  {msg.content}
+              <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"} animate-in fade-in slide-in-from-bottom-2`}>
+                <div className="flex items-start gap-2 max-w-[90%]">
+                  {msg.role === "assistant" && (
+                    <div className="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-violet-100 text-violet-600 dark:bg-violet-900/40">
+                      <Bot className="h-3.5 w-3.5" />
+                    </div>
+                  )}
+                  <div className={`rounded-2xl px-4 py-2.5 text-xs shadow-sm ${
+                    msg.role === "user" 
+                      ? "bg-violet-600 text-white rounded-tr-none" 
+                      : "bg-card text-foreground rounded-tl-none border border-border"
+                  }`}>
+                    {msg.content}
+                    {msg.role === "assistant" && i === chatMessages.length - 1 && !isTyping && (
+                      <div className="mt-2 flex gap-1.5 border-t border-border pt-1.5 opacity-80">
+                        <button className="text-[10px] font-bold text-violet-600 hover:underline" onClick={() => setChatInput("Explique mais")}>Dúvidas?</button>
+                        <span className="text-muted-foreground">·</span>
+                        <button className="text-[10px] font-bold text-violet-600 hover:underline" onClick={() => navigate({ to: "/material-apoio" })}>Ajuda</button>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             ))}
             {isTyping && (
-              <div className="flex justify-start">
-                <div className="max-w-[85%] rounded-2xl px-4 py-2 text-xs bg-muted text-foreground rounded-tl-none border border-border flex items-center gap-2">
-                  <Loader2 className="h-3 w-3 animate-spin" />
-                  <span>Digitando...</span>
+              <div className="flex justify-start animate-pulse">
+                <div className="flex items-start gap-2 max-w-[90%]">
+                  <div className="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-violet-100 text-violet-600 dark:bg-violet-900/40">
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                  </div>
+                  <div className="rounded-2xl px-4 py-2.5 text-xs bg-muted text-foreground rounded-tl-none border border-border">
+                    <span>Processando sua solicitação...</span>
+                  </div>
                 </div>
               </div>
             )}

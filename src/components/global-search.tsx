@@ -281,32 +281,65 @@ export function GlobalSearch({ variant = "compact" }: { variant?: "compact" | "h
           {isAiMode && (
             <CommandGroup heading="IA Assistente da Pagadoria">
               <div className="px-2 py-3">
-                <div className="rounded-lg border border-violet-100 bg-violet-50/80 p-4 dark:border-violet-800 dark:bg-violet-900/20">
-                  {isAiLoading ? (
-                    <div className="flex items-center gap-2 text-xs italic text-violet-600 dark:text-violet-300">
-                      <Loader2 className="h-3 w-3 animate-spin" />
-                      Consultando o material de apoio autorizado…
+                <div className="flex flex-col gap-4 rounded-lg border border-violet-100 bg-violet-50/80 p-4 dark:border-violet-800 dark:bg-violet-900/20">
+                  <div className="flex items-start gap-3">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-violet-600 text-white shadow-sm">
+                      <Bot className="h-5 w-5" />
                     </div>
-                  ) : (
-                    <div className="whitespace-pre-line text-xs leading-relaxed text-violet-900 dark:text-violet-100">
-                      {aiResponse}
-                      <div className="mt-4 flex gap-2">
-                        <Button
-                          size="sm"
-                          className="h-7 text-[10px]"
-                          onClick={() => goTo("/material-apoio", "Material de Apoio")}
-                        >
-                          Abrir Material de Apoio
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="h-7 text-[10px]"
-                          onClick={() => setIsAiMode(false)}
-                        >
-                          Nova pesquisa
-                        </Button>
-                      </div>
+                    <div className="flex-1 space-y-2">
+                      <p className="text-[10px] font-bold uppercase tracking-wider text-violet-600 dark:text-violet-400">Pergunta:</p>
+                      <p className="text-xs font-medium text-foreground italic">"{search}"</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-violet-100 text-violet-600 shadow-sm dark:bg-violet-900/40">
+                      <Sparkles className="h-5 w-5" />
+                    </div>
+                    <div className="flex-1 space-y-2">
+                      <p className="text-[10px] font-bold uppercase tracking-wider text-violet-600 dark:text-violet-400">Resposta Interativa:</p>
+                      {isAiLoading ? (
+                        <div className="flex items-center gap-2 text-xs italic text-violet-600 dark:text-violet-300">
+                          <Loader2 className="h-3 w-3 animate-spin" />
+                          Processando sua solicitação...
+                        </div>
+                      ) : (
+                        <div className="whitespace-pre-line text-xs leading-relaxed text-violet-900 dark:text-violet-100">
+                          {aiResponse}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {!isAiLoading && (
+                    <div className="mt-2 flex flex-wrap gap-2 border-t border-violet-200/50 pt-3 dark:border-violet-700/50">
+                      <Button
+                        size="sm"
+                        className="h-7 gap-1.5 bg-violet-600 text-[10px] hover:bg-violet-700"
+                        onClick={() => goTo("/material-apoio", "Material de Apoio")}
+                      >
+                        <BookOpen className="h-3 w-3" /> Ver Documentação
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-7 text-[10px] border-violet-200 hover:bg-violet-100 dark:border-violet-800 dark:hover:bg-violet-900/40"
+                        onClick={() => setIsAiMode(false)}
+                      >
+                        Nova Pesquisa
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="h-7 text-[10px] text-violet-600 hover:text-violet-700 hover:bg-violet-100 dark:hover:bg-violet-900/40"
+                        onClick={() => {
+                          setSearch("");
+                          setIsAiMode(false);
+                          setAiResponse(null);
+                        }}
+                      >
+                        Limpar conversa
+                      </Button>
                     </div>
                   )}
                 </div>
