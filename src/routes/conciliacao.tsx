@@ -37,6 +37,9 @@ function BankReconciliationPage() {
                 <TabsTrigger value="conciliacao" className="gap-2">
                   <ShieldCheck className="h-4 w-4" /> Conciliar
                 </TabsTrigger>
+                <TabsTrigger value="semanal" className="gap-2">
+                  <History className="h-4 w-4" /> Conciliação Semanal
+                </TabsTrigger>
                 <TabsTrigger value="historico" className="gap-2">
                   <History className="h-4 w-4" /> Histórico
                 </TabsTrigger>
@@ -113,6 +116,10 @@ function BankReconciliationPage() {
                   </div>
                 </div>
               </TabsContent>
+
+              <TabsContent value="semanal" className="space-y-6">
+                <ConciliacaoSemanalView />
+              </TabsContent>
             </Tabs>
           </main>
         </div>
@@ -120,3 +127,70 @@ function BankReconciliationPage() {
     </SidebarProvider>
   );
 }
+
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { useMutation } from "@tanstack/react-query";
+import { exportarConciliacaoSemanal } from "@/lib/conciliacao-engine";
+import { useSession } from "@/hooks/use-session";
+import { toast } from "sonner";
+import { Download, Calendar as CalendarIcon, FileSpreadsheet } from "lucide-react";
+
+function ConciliacaoSemanalView() {
+  const { user } = useSession();
+  const [dataIni, setDataIni] = useState("");
+  const [dataFim, setDataFim] = useState("");
+
+  const exportMut = useMutation({
+    mutationFn: () => exportarConciliacaoSemanal(dataIni, dataFim, user!.id),
+    onSuccess: () => {
+      toast.success("Arquivo de conciliação semanal gerado e registrado no sino.");
+    },
+    onError: (e: any) => toast.error(e.message),
+  });
+
+  return (
+    <Card className="border-slate-200">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 text-lg">
+          <FileSpreadsheet className="h-5 w-5 text-emerald-600" />
+          Extração Semanal (Referência: Pagamentos Diversos)
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="space-y-2">
+            <Label>Data Início</Label>
+            <Input type="date" value={dataIni} onChange={(e) => setDataIni(e.target.value)} />
+          </div>
+          <div className="space-y-2">
+            <Label>Data Fim</Label>
+            <Input type="date" value={dataFim} onChange={(e) => setDataFim(e.target.value)} />
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-3 rounded-lg bg-slate-50 p-4 border border-slate-200">
+          <h4 className="text-sm font-semibold text-slate-700">Resumo da Operação</h4>
+          <ul className="text-xs text-slate-500 space-y-2 list-disc pl-4">
+            <li>Os títulos das colunas seguirão o padrão da base de <b>Pagamentos Diversos</b>.</li>
+            <li>O arquivo será baixado localmente e uma cópia será vinculada à <b>Base de Anexos</b>.</li>
+            <li>Uma notificação será enviada para o sino com atalho de download direto.</li>
+          </ul>
+        </div>
+
+        <Button 
+          className="w-full bg-emerald-600 hover:bg-emerald-700 gap-2" 
+          disabled={!dataIni || !dataFim || exportMut.isPending}
+          onClick={() => exportMut.mutate()}
+        >
+          {exportMut.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
+          Gerar Conciliação Semanal
+        </Button>
+      </CardContent>
+    </Card>
+  );
+}
+
+import { Card, CardHeader, CardTitle, Loader2 } from "@/components/ui/card";
+import { useState } from "react";
