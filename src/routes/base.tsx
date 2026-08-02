@@ -5,6 +5,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Loader2, Plus, Search, Trash2, ArrowUpDown, ArrowUp, ArrowDown, Upload, Download, FileSpreadsheet } from "lucide-react";
 
 import { AppSidebar } from "@/components/app-sidebar";
+import { useSession } from "@/hooks/use-session";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
