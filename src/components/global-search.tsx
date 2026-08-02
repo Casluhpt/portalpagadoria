@@ -194,8 +194,7 @@ export function GlobalSearch({ variant = "compact" }: { variant?: "compact" | "h
       >
         <Search className="h-5 w-5 shrink-0 text-violet-600" />
         <span className="flex-1 truncate text-sm text-muted-foreground">
-          Central de busca total: matrícula, usuário, empresa, colaborador, fornecedor, competência,
-          cards…
+          Matrícula, usuário, empresa, colaborador, fornecedor, competência, cards…
         </span>
         <span className="hidden items-center gap-1 rounded-full bg-violet-100 px-2.5 py-1 text-[10px] font-semibold text-violet-700 sm:flex dark:bg-violet-900/40 dark:text-violet-300">
           <Sparkles className="h-3 w-3" /> IA Assistente
