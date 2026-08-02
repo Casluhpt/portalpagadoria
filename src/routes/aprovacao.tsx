@@ -321,6 +321,7 @@ const EMP_CODIGOS = EMPRESAS.map((e) => e.codigo);
 
 function BaseView({ rows, ano, isLoading, onUpsert, onBulkInsert, onDelete }: BaseProps) {
   const [busca, setBusca] = useState("");
+  const [importMode, setImportMode] = useState<"incremental" | "replace">("incremental");
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [confirmDel, setConfirmDel] = useState(false);
   const [novoQtd, setNovoQtd] = useState(1);
@@ -442,7 +443,7 @@ function BaseView({ rows, ano, isLoading, onUpsert, onBulkInsert, onDelete }: Ba
         };
       }).filter((r) => r.empresa || r.ordem_pagamento || r.valor);
       if (!payload.length) return toast.error("Nenhuma linha válida encontrada");
-      const res = await onBulkInsert(payload);
+      const res = await onBulkInsert({ rows: payload, replaceAll: importMode === "replace" });
       toast.success(`${res.inserted} linha(s) importada(s)`);
     } catch (e: any) {
       toast.error("Falha ao importar: " + (e?.message ?? e));
