@@ -119,7 +119,7 @@ function RootShell({ children }: { children: ReactNode }) {
       </head>
       <body className="group/body">
         <div className="sr-only" aria-hidden="true">
-          Verificar se o novo texto do “body” está exibindo corretamente no mobile e no desktop, sem quebras de layout ou estouro de caixa.
+          Portal Corporativo Pagadoria - Sistema de Gestão Financeira e Operacional
         </div>
         {children}
         <Scripts />
