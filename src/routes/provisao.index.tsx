@@ -298,7 +298,7 @@ function ProvisaoDashboard() {
       <div className="flex flex-wrap items-center justify-end gap-3">
         {fechamentoHoje ? (
           <div className="flex items-center gap-2 rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-900">
-            <Lock className="h-4 w-4" />
+            <FileCheck2 className="h-4 w-4" />
             <span>
               Provisão de hoje <b>fechada</b>
               {fechamentoHoje.fechada_por_nome ? ` por ${fechamentoHoje.fechada_por_nome}` : ""}
@@ -316,7 +316,7 @@ function ProvisaoDashboard() {
           </div>
         ) : (
           <div className="flex items-center gap-2 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-800">
-            <LockOpen className="h-4 w-4" />
+            <Calendar className="h-4 w-4" />
             Provisão de hoje ainda aberta para lançamentos.
           </div>
         )}

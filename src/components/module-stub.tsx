@@ -24,7 +24,7 @@ export function ModuleStub({ title, description, phase, adminOnly }: ModuleStubP
           <CardHeader>
             <div className="flex items-center gap-3">
               <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-violet-100 text-violet-700">
-                {adminOnly ? <Lock className="h-5 w-5" /> : <Construction className="h-5 w-5" />}
+                <Construction className="h-5 w-5" />
               </div>
               <div>
                 <CardTitle className="text-xl text-foreground">{title}</CardTitle>

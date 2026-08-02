@@ -80,7 +80,7 @@ function AcoesCriticasTable() {
   return (
     <div className="flex flex-1 flex-col p-4">
       <div className="mb-3 flex items-center gap-2 rounded-lg border border-indigo-200 bg-indigo-50/60 px-3 py-2 text-xs text-indigo-900">
-        <Lock className="h-3.5 w-3.5" />
+        <ShieldAlert className="h-3.5 w-3.5" />
         Trilha imutável — nenhum usuário, inclusive Administração, pode editar ou apagar estes registros.
       </div>
 
