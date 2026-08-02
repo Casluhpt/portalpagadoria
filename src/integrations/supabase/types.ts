@@ -142,6 +142,51 @@ export type Database = {
         }
         Relationships: []
       }
+      conciliacao_historico: {
+        Row: {
+          arquivo_importado_nome: string | null
+          arquivo_importado_url: string | null
+          arquivo_resultado_url: string | null
+          competencias_utilizadas: string[] | null
+          executado_em: string | null
+          executado_por: string | null
+          id: string
+          nomenclatura: string | null
+          periodo_fim: string | null
+          periodo_inicio: string | null
+          resultado_sumario: Json | null
+          tipo: string
+        }
+        Insert: {
+          arquivo_importado_nome?: string | null
+          arquivo_importado_url?: string | null
+          arquivo_resultado_url?: string | null
+          competencias_utilizadas?: string[] | null
+          executado_em?: string | null
+          executado_por?: string | null
+          id?: string
+          nomenclatura?: string | null
+          periodo_fim?: string | null
+          periodo_inicio?: string | null
+          resultado_sumario?: Json | null
+          tipo: string
+        }
+        Update: {
+          arquivo_importado_nome?: string | null
+          arquivo_importado_url?: string | null
+          arquivo_resultado_url?: string | null
+          competencias_utilizadas?: string[] | null
+          executado_em?: string | null
+          executado_por?: string | null
+          id?: string
+          nomenclatura?: string | null
+          periodo_fim?: string | null
+          periodo_inicio?: string | null
+          resultado_sumario?: Json | null
+          tipo?: string
+        }
+        Relationships: []
+      }
       despesas_fixas: {
         Row: {
           ano: number
