@@ -80,6 +80,7 @@ const navigationGroups = [
   { id: "geral", label: "Navegação Geral" },
   { id: "operacao", label: "Operação e Resultados" },
   { id: "financeiro", label: "Financeiro e Controle" },
+  { id: "base_anexos", label: "Base de Anexos e Relatórios" },
   { id: "apoio", label: "Suporte e IA" }
 ];
 
@@ -95,11 +96,12 @@ const mainItems: MenuItem[] = [
   { title: "Despesas Fixas", url: "/despesas-fixas", icon: Wallet, match: (p) => p.startsWith("/despesas-fixas"), group: "financeiro" },
   { title: "Controle E-Social", url: "/esocial", icon: FileSpreadsheet, match: (p) => p.startsWith("/esocial"), group: "financeiro" },
 
-  { title: "[anexo]", url: "/anexos", icon: FileArchive, match: (p) => p.startsWith("/anexos"), group: "geral" },
+  { title: "[anexo]", url: "/anexos", icon: FileArchive, match: (p) => p.startsWith("/anexos"), group: "base_anexos" },
+  { title: "Exportação de Relatórios", url: "/exportacao", icon: Download, match: (p) => p.startsWith("/exportacao"), group: "base_anexos" },
+
   { title: "Administração de Comunicados", url: "/administracao", icon: Settings, match: (p) => p.startsWith("/administracao"), adminOnly: true, group: "geral" },
   { title: "Fechamento de Competência", url: "/fechamento", icon: FileCheck2, match: (p) => p.startsWith("/fechamento"), group: "geral" },
   { title: "Central de Divergências", url: "/divergencias", icon: AlertTriangle, match: (p) => p.startsWith("/divergencias"), group: "geral" },
-  { title: "Exportação de Relatórios", url: "/exportacao", icon: Download, match: (p) => p.startsWith("/exportacao"), group: "geral" },
 
   { title: "Material de Apoio", url: "/material-apoio", icon: BookOpen, match: (p) => p.startsWith("/material-apoio"), group: "apoio" },
   { title: "Busca Inteligente (IA)", url: "#", icon: Search, match: () => false, action: "search", group: "apoio" },
