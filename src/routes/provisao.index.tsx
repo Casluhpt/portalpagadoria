@@ -322,13 +322,21 @@ function ProvisaoDashboard() {
         )}
         <FechamentoCompetenciaButton />
         <Button
-          onClick={() => notificar.mutate()}
+          onClick={async () => {
+            try {
+              await integrarPagamentosNaProvisao();
+              qc.invalidateQueries({ queryKey: provisaoQueryKey });
+              await notificar.mutateAsync();
+            } catch (err: any) {
+              toast.error("Erro na integração automática: " + err.message);
+            }
+          }}
           disabled={notificar.isPending || !user}
           size="lg"
           className="gap-2 bg-emerald-700 font-semibold text-white shadow-sm hover:bg-emerald-800"
         >
           <Send className="h-4 w-4" />
-          {notificar.isPending ? "Enviando…" : "Notificar Envio e Fechar Dia"}
+          {notificar.isPending ? "Processando..." : "Notificar Envio e Fechar Dia"}
         </Button>
       </div>
 
