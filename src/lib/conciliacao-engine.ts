@@ -30,8 +30,12 @@ export async function fetchCompetenciasDisponiveis() {
   if (err2) throw err2;
 
   const todas = new Set<string>();
-  ativas?.forEach(r => if (r.competencia) todas.add(r.competencia));
-  fechadas?.forEach(r => if (r.mes) todas.add(r.mes));
+  ativas?.forEach(r => {
+    if (r.competencia) todas.add(r.competencia);
+  });
+  fechadas?.forEach(r => {
+    if (r.mes) todas.add(r.mes);
+  });
 
   return Array.from(todas).sort().reverse();
 }
@@ -45,10 +49,7 @@ export async function fetchPagamentosParaConciliacao(competencias: string[]) {
   
   if (err1) throw err1;
 
-  // 2. Busca nos fechamentos (aqui precisaríamos de uma lógica para ler o snapshot ou arquivo)
-  // Como o sistema atual deleta ao fechar, vamos assumir que por enquanto a conciliação
-  // foca na base ativa ou precisamos de uma tabela de 'histórico de itens' que não temos ainda.
-  // Para fins de demonstração da lógica pedida:
+  // Em uma implementação real completa, buscaríamos também no histórico de itens arquivados
   
   return (ativas || []).map(r => ({
     empresa: r.empresa || "N/A",
@@ -101,11 +102,8 @@ export function executarConciliacao(importados: ConciliacaoItem[], base: Concili
 }
 
 function buscarCombinacao(arr: ConciliacaoItem[], target: number): ConciliacaoItem[] {
-  // Algoritmo simples de subset sum (simplificado para performance)
   const result: ConciliacaoItem[] = [];
   let currentSum = 0;
-  
-  // Ordena por valor para facilitar
   const sorted = [...arr].sort((a, b) => b.valor - a.valor);
   
   for (const item of sorted) {
