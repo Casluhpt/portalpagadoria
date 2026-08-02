@@ -80,12 +80,13 @@ function UsuariosContent() {
 
 function roleLabel(r: string) {
   switch (r) {
-    case "administrador": return "Administrador";
+    case "administrador": return "Administração";
     case "auditor": return "Auditor";
     case "operacional": return "Operacional";
     case "criador_competencia": return "Criador de Competência";
     case "consulta": return "Consulta";
     case "viewer": return "Viewer";
+    case "visitante": return "Visitante";
     default: return r;
   }
 }
@@ -110,7 +111,7 @@ function UsuariosTable() {
   const [inviteOpen, setInviteOpen] = useState(false);
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteNome, setInviteNome] = useState("");
-  const [inviteRole, setInviteRole] = useState<"administrador" | "viewer">("viewer");
+  const [inviteRole, setInviteRole] = useState<"administrador" | "viewer" | "visitante">("viewer");
 
   const { data = [], isLoading, error, refetch, isFetching } = useQuery({
     queryKey: ["admin-users"],
@@ -144,7 +145,7 @@ function UsuariosTable() {
   });
 
   const roleMut = useMutation({
-    mutationFn: (vars: { userId: string; role: "administrador" | "viewer" }) =>
+    mutationFn: (vars: { userId: string; role: "administrador" | "viewer" | "visitante" }) =>
       setRoleFn({ data: vars }),
     onSuccess: () => {
       toast.success("Perfil atualizado.");
@@ -164,7 +165,7 @@ function UsuariosTable() {
   });
 
   const inviteMut = useMutation({
-    mutationFn: (vars: { email: string; role: "administrador" | "viewer"; nome?: string }) =>
+    mutationFn: (vars: { email: string; role: "administrador" | "viewer" | "visitante"; nome?: string }) =>
       inviteFn({ data: { ...vars, redirectTo: `${window.location.origin}/reset-password` } }),
     onSuccess: () => {
       toast.success("Convite enviado com sucesso.");
@@ -196,6 +197,11 @@ function UsuariosTable() {
 
   return (
     <div className="flex flex-1 flex-col gap-3 p-4">
+      <div className="mb-4 rounded-lg bg-indigo-50/50 p-4 border border-indigo-100 dark:bg-indigo-900/10 dark:border-indigo-900/30">
+        <p className="text-sm text-indigo-800 dark:text-indigo-300">
+          preciso que o administrador tenha uma visão geral aonde e quem podera ter visualização, não poderar ver, e podera editar pelo site, definido pela as opções, administração, viewer e visitante
+        </p>
+      </div>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <p className="text-xs text-muted-foreground">
@@ -249,14 +255,17 @@ function UsuariosTable() {
             </div>
             <div className="space-y-1">
               <Label>Perfil</Label>
-              <Select value={inviteRole} onValueChange={(v) => setInviteRole(v as "administrador" | "viewer")}>
+              <Select value={inviteRole} onValueChange={(v) => setInviteRole(v as "administrador" | "viewer" | "visitante")}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="viewer">
                     <span className="inline-flex items-center gap-1"><Eye className="h-3 w-3" /> Viewer</span>
                   </SelectItem>
                   <SelectItem value="administrador">
-                    <span className="inline-flex items-center gap-1"><ShieldCheck className="h-3 w-3" /> Administrador</span>
+                    <span className="inline-flex items-center gap-1"><ShieldCheck className="h-3 w-3" /> Administração</span>
+                  </SelectItem>
+                  <SelectItem value="visitante">
+                    <span className="inline-flex items-center gap-1"><UserPlus className="h-3 w-3" /> Visitante</span>
                   </SelectItem>
                 </SelectContent>
               </Select>
@@ -315,8 +324,8 @@ function UsuariosTable() {
                 <td className="border-b border-border px-3 py-2">
                   <div className="flex flex-wrap items-center gap-2">
                     {(() => {
-                      const current: "administrador" | "viewer" =
-                        u.roles.includes("administrador") ? "administrador" : "viewer";
+                      const current: "administrador" | "viewer" | "visitante" =
+                        u.roles.includes("administrador") ? "administrador" : u.roles.includes("visitante") ? "visitante" : "viewer";
                       const isSelf = user?.id === u.id;
                       const otherRoles = u.roles.filter((r) => r !== "administrador" && r !== "viewer");
                       return (
@@ -325,7 +334,7 @@ function UsuariosTable() {
                             value={current}
                             disabled={roleMut.isPending || isSelf}
                             onValueChange={(v) =>
-                              roleMut.mutate({ userId: u.id, role: v as "administrador" | "viewer" })
+                              roleMut.mutate({ userId: u.id, role: v as "administrador" | "viewer" | "visitante" })
                             }
                           >
                             <SelectTrigger className="h-8 w-[160px] text-xs">
@@ -334,12 +343,17 @@ function UsuariosTable() {
                             <SelectContent>
                               <SelectItem value="administrador">
                                 <span className="inline-flex items-center gap-1">
-                                  <ShieldCheck className="h-3 w-3" /> Administrador
+                                  <ShieldCheck className="h-3 w-3" /> Administração
                                 </span>
                               </SelectItem>
                               <SelectItem value="viewer">
                                 <span className="inline-flex items-center gap-1">
                                   <Eye className="h-3 w-3" /> Viewer
+                                </span>
+                              </SelectItem>
+                              <SelectItem value="visitante">
+                                <span className="inline-flex items-center gap-1">
+                                  <UserPlus className="h-3 w-3" /> Visitante
                                 </span>
                               </SelectItem>
                             </SelectContent>

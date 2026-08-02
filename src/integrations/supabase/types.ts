@@ -944,6 +944,7 @@ export type Database = {
         | "consulta"
         | "auditor"
         | "viewer"
+        | "visitante"
       app_version_tipo: "major" | "minor" | "patch" | "hotfix"
       solicitacao_status:
         | "aberta"
@@ -1092,6 +1093,7 @@ export const Constants = {
         "consulta",
         "auditor",
         "viewer",
+        "visitante",
       ],
       app_version_tipo: ["major", "minor", "patch", "hotfix"],
       solicitacao_status: [

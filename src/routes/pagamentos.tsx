@@ -46,6 +46,7 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
 import { useSession } from "@/hooks/use-session";
+import { useRoles } from "@/hooks/use-roles";
 import { supabase } from "@/integrations/supabase/client";
 import {
   createPagamento, createPagamentosBulk, deletePagamento,
@@ -94,6 +95,7 @@ function fmtDateTime(iso: string | null | undefined) {
 
 function PagamentosPage() {
   const { user } = useSession();
+  const { isAdmin } = useRoles();
   const colaboradorNome =
     (user?.user_metadata?.nome as string) ||
     (user?.user_metadata?.full_name as string) ||
@@ -114,6 +116,11 @@ function PagamentosPage() {
           </header>
           <Tabs defaultValue="dashboard" className="flex flex-1 flex-col">
             <div className="border-b border-border bg-background px-4">
+              <div className="mt-2 rounded-lg bg-indigo-50/50 p-3 border border-indigo-100 dark:bg-indigo-900/10 dark:border-indigo-900/30">
+                <p className="text-[11px] leading-relaxed text-indigo-800 dark:text-indigo-300">
+                  preciso que o administrador tenha uma visão geral aonde e quem podera ter visualização, não poderar ver, e podera editar pelo site, definido pela as opções, administração, viewer e visitante
+                </p>
+              </div>
               <TabsList className="h-11 bg-transparent">
                 <TabsTrigger value="dashboard" className="gap-2">
                   <LayoutGrid className="h-4 w-4" /> Dashboard
@@ -125,7 +132,7 @@ function PagamentosPage() {
 
             </div>
             <TabsContent value="lancamentos" className="flex-1 p-0 data-[state=inactive]:hidden">
-              <LancamentosTab colaboradorNome={colaboradorNome} userId={user?.id ?? null} />
+              <LancamentosTab colaboradorNome={colaboradorNome} userId={user?.id ?? null} isAdmin={isAdmin} />
             </TabsContent>
             <TabsContent value="dashboard" className="flex-1 p-0 data-[state=inactive]:hidden">
               <DashboardTab />
@@ -139,7 +146,7 @@ function PagamentosPage() {
 
 /* ---------------- LANÇAMENTOS ---------------- */
 
-function LancamentosTab({ colaboradorNome, userId }: { colaboradorNome: string; userId: string | null }) {
+function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome: string; userId: string | null; isAdmin: boolean }) {
   const qc = useQueryClient();
   const fileRef = useRef<HTMLInputElement>(null);
   
@@ -155,7 +162,11 @@ function LancamentosTab({ colaboradorNome, userId }: { colaboradorNome: string; 
 
   const currentUserQueue = userId ? queue.find(q => q.user_id === userId) : undefined;
   const activeUser = queue.find(q => q.status === 'ativo');
-  const isEditingEnabled = !!userId && activeUser?.user_id === userId;
+  const { roles } = useRoles();
+  const isViewer = roles.includes("viewer");
+  const isVisitante = roles.includes("visitante");
+  
+  const isEditingEnabled = !!userId && activeUser?.user_id === userId && !isViewer && !isVisitante;
   const nextUser = queue.filter(q => q.status === 'aguardando').sort((a, b) => {
     const da = a.entrou_em ? new Date(a.entrou_em).getTime() : 0;
     const db = b.entrou_em ? new Date(b.entrou_em).getTime() : 0;
@@ -1180,6 +1191,8 @@ function FilterSelect({
 }
 
 function FechamentoCompetenciaButton({ onComplete, disabled }: { onComplete: () => void; disabled?: boolean }) {
+  const { isAdmin } = useRoles();
+
   const [open, setOpen] = useState(false);
   const [nome, setNome] = useState("");
   const { user } = useSession();
@@ -1200,7 +1213,7 @@ function FechamentoCompetenciaButton({ onComplete, disabled }: { onComplete: () 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="sm" variant="outline" className="gap-1 border-emerald-600 text-emerald-700 hover:bg-emerald-50" disabled={disabled}>
+        <Button size="sm" variant="outline" className="gap-1 border-emerald-600 text-emerald-700 hover:bg-emerald-50" disabled={disabled || !isAdmin}>
           <TableIcon className="h-4 w-4" /> Fechamento de Competência
         </Button>
       </DialogTrigger>

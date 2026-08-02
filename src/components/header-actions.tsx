@@ -37,11 +37,13 @@ import { NotificationBell } from "./notification-bell";
 import { GlobalSearch } from "./global-search";
 
 const roleLabel: Record<string, string> = {
-  administrador: "Administrador",
+  administrador: "Administração",
   criador_competencia: "Criador de Competência",
   operacional: "Operacional",
   consulta: "Consulta",
   auditor: "Auditor",
+  viewer: "Visualizador",
+  visitante: "Visitante",
 };
 
 const presenceMeta: Record<PresenceStatus, { label: string; dot: string; Icon: typeof Circle }> = {
