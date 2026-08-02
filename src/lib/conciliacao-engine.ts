@@ -62,8 +62,41 @@ export async function fetchPagamentosParaConciliacao(competencias: string[]) {
   }));
 }
 
-export function executarConciliacao(importados: ConciliacaoItem[], base: ConciliacaoItem[]) {
-  const resultados = importados.map(imp => {
+export async function executarConciliacao(
+  tipo: "Varejo" | "Distribuição", 
+  importados: any[], 
+  userId: string
+) {
+  // 1. Buscar a base de referência (Pagamentos Diversos ativos + Competências recentes)
+  const { data: baseRows, error } = await supabase
+    .from("pagamentos_diversos")
+    .select("empresa, data_credito, valor_lg, celula, id")
+    .limit(10000); // Em prod, ideal filtrar por competências próximas
+
+  if (error) throw error;
+
+  const base: ConciliacaoItem[] = (baseRows || []).map(r => ({
+    empresa: r.empresa || "",
+    data: r.data_credito || "",
+    valor: Number(r.valor_lg) || 0,
+    origem: "base",
+    tipo,
+    id: r.id
+  }));
+
+  const normalizados = importados.map(imp => {
+    // Normalização básica de campos comuns em arquivos de retorno
+    return {
+      empresa: imp.Empresa || imp.empresa || imp.EMPRESA || "",
+      data: imp.Data || imp.data || imp.DATA || imp["Data Crédito"] || "",
+      valor: Number(String(imp.Valor || imp.valor || imp.VALOR || imp["Valor Total"] || 0).replace(/[^\d.,]/g, "").replace(",", ".")),
+      origem: "importado" as const,
+      tipo,
+      original: imp
+    };
+  });
+
+  const resultados = normalizados.map(imp => {
     // Nível 1: Correspondência exata (Empresa, Data, Valor)
     const exactMatch = base.find(b => 
       b.empresa === imp.empresa && 
@@ -75,8 +108,20 @@ export function executarConciliacao(importados: ConciliacaoItem[], base: Concili
       return { ...imp, matchId: "ok", nivel: 1, diferenca: 0 };
     }
 
-    // Nível 2: Soma de valores para a mesma empresa e data próxima (± 3 dias)
+    // Nível 2: Data próxima (± 2 dias)
     const dataImp = new Date(imp.data);
+    const dataProxima = base.find(b => {
+      if (b.empresa !== imp.empresa || Math.abs(b.valor - imp.valor) > 0.01) return false;
+      const dataB = new Date(b.data);
+      const diffDays = Math.abs(dataB.getTime() - dataImp.getTime()) / (1000 * 3600 * 24);
+      return diffDays <= 2;
+    });
+
+    if (dataProxima) {
+      return { ...imp, matchId: "ok-data", nivel: 2, diferenca: 0 };
+    }
+
+    // Nível 3: Soma de valores (SubSet Sum simplificado)
     const candidatos = base.filter(b => {
       if (b.empresa !== imp.empresa) return false;
       const dataB = new Date(b.data);
@@ -84,14 +129,13 @@ export function executarConciliacao(importados: ConciliacaoItem[], base: Concili
       return diffDays <= 3;
     });
 
-    // Tenta encontrar uma combinação de candidatos que resulte no valor
     const sugestao = buscarCombinacao(candidatos, imp.valor);
-    if (sugestao.length > 0) {
+    if (sugestao.length > 1) { // 1 item seria Nível 1/2
       const soma = sugestao.reduce((s, c) => s + c.valor, 0);
       return { 
         ...imp, 
-        matchId: "sugestao", 
-        nivel: 2, 
+        matchId: "soma", 
+        nivel: 3, 
         sugestao, 
         diferenca: imp.valor - soma 
       };
@@ -99,6 +143,44 @@ export function executarConciliacao(importados: ConciliacaoItem[], base: Concili
 
     return { ...imp, matchId: "divergente", nivel: 5, diferenca: imp.valor };
   });
+
+  // 2. Gerar Excel com os resultados em 2 sheets
+  const wb = XLSX.utils.book_new();
+  
+  // Sheet 1: Todos os registros importados com seu status
+  const ws1Data = resultados.map(r => ({
+    "Empresa": r.empresa,
+    "Data": r.data,
+    "Valor Original": r.valor,
+    "Nível Conciliação": r.nivel,
+    "Status": r.nivel === 5 ? "Divergente" : "Conciliado",
+    "Diferença": r.diferenca
+  }));
+  const ws1 = XLSX.utils.json_to_sheet(ws1Data);
+  XLSX.utils.book_append_sheet(wb, ws1, tipo);
+
+  // Sheet 2: Somente Divergências (Nível 5) ou Diferenças
+  const ws2Data = resultados.filter(r => r.nivel >= 3).map(r => ({
+    "Empresa": r.empresa,
+    "Data": r.data,
+    "Valor": r.valor,
+    "Nível": r.nivel,
+    "Diferença": r.diferenca,
+    "Sugestão": r.sugestao?.map(s => `ID:${s.id} (R$ ${s.valor})`).join(", ") || "Nenhuma"
+  }));
+  const ws2 = XLSX.utils.json_to_sheet(ws2Data);
+  XLSX.utils.book_append_sheet(wb, ws2, "Divergências e Sugestões");
+
+  const fileName = `conciliacao-${tipo.toLowerCase()}-${format(new Date(), "yyyy-MM-dd-HHmm")}.xlsx`;
+  XLSX.writeFile(wb, fileName);
+
+  // 3. Notificar e registrar
+  const { notificarArquivoPronto } = await import("./notificacoes-arquivos");
+  await notificarArquivoPronto(
+    `Conciliação ${tipo} Concluída`,
+    `O processamento de ${resultados.length} registros foi finalizado. O arquivo detalhado está disponível.`,
+    userId
+  );
 
   return resultados;
 }
