@@ -295,6 +295,7 @@ function PortalPage() {
                   year: "numeric",
                 })}
               </div>
+              <div className="hidden h-8 w-[1px] bg-slate-200 md:block" />
               <HeaderActions />
             </div>
           </header>
