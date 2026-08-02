@@ -54,37 +54,54 @@ export const perguntarIa = createServerFn({ method: "POST" })
       return { resposta: null, erro: "Não foi possível consultar a IA Assistente agora." };
     }
 
-    const reader = res.body.getReader();
-    const decoder = new TextDecoder();
-    let buffer = "";
     let texto = "";
 
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      buffer += decoder.decode(value, { stream: true });
-      const parts = buffer.split("\n\n");
-      buffer = parts.pop() ?? "";
-      for (const part of parts) {
-        for (const line of part.split("\n")) {
-          if (!line.startsWith("data:")) continue;
-          const payload = line.slice(5).trim();
-          if (!payload || payload === "[DONE]") continue;
-          try {
-            const evt = JSON.parse(payload) as {
-              type?: string;
-              delta?: string;
-              response?: { output_text?: string };
-            };
-            if (evt.type === "response.output_text.delta" && typeof evt.delta === "string") {
-              texto += evt.delta;
-            } else if (evt.type === "response.completed" && !texto && evt.response?.output_text) {
-              texto = evt.response.output_text;
+    try {
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const parts = buffer.split("\n\n");
+        buffer = parts.pop() ?? "";
+        for (const part of parts) {
+          const lines = part.split("\n");
+          for (const line of lines) {
+            if (!line.startsWith("data:")) continue;
+            const payload = line.slice(5).trim();
+            if (!payload || payload === "[DONE]") continue;
+            try {
+              const evt = JSON.parse(payload);
+              // Handle multiple potential event formats (direct delta, choices array, etc.)
+              const delta = evt.choices?.[0]?.delta?.content || 
+                            evt.delta || 
+                            (evt.type === "response.output_text.delta" ? evt.delta : "") ||
+                            (evt.type === "response.completed" ? evt.response?.output_text : "") ||
+                            "";
+              texto += delta;
+            } catch {
+              /* ignora eventos parciais */
             }
-          } catch {
-            /* ignora eventos parciais */
           }
         }
+      }
+    } catch (err) {
+      console.error("Stream reading error:", err);
+    }
+
+    if (!texto.trim()) {
+      try {
+        const fullText = await res.text();
+        const json = JSON.parse(fullText);
+        texto = json.choices?.[0]?.message?.content || 
+                json.response?.output_text || 
+                json.output_text || 
+                "";
+      } catch {
+        /* ignore */
       }
     }
 

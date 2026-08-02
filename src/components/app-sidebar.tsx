@@ -192,14 +192,22 @@ export function AppSidebar() {
 
     try {
       const r = await perguntarIa({ data: { pergunta: userMsg, contexto } });
+      if (r.erro) {
+         setChatMessages((prev) => [
+          ...prev,
+          { role: "assistant", content: `Aviso: ${r.erro}` },
+        ]);
+      } else {
+        setChatMessages((prev) => [
+          ...prev,
+          { role: "assistant", content: r.resposta ?? "Não encontrei material autorizado suficiente para responder com segurança." },
+        ]);
+      }
+    } catch (err) {
+      console.error("Erro na IA:", err);
       setChatMessages((prev) => [
         ...prev,
-        { role: "assistant", content: r.resposta ?? r.erro ?? "Não foi possível processar." },
-      ]);
-    } catch {
-      setChatMessages((prev) => [
-        ...prev,
-        { role: "assistant", content: "Erro na conexão com a IA." },
+        { role: "assistant", content: "Erro na conexão com a IA Assistente. Verifique sua conexão ou tente novamente mais tarde." },
       ]);
     } finally {
       setIsTyping(false);

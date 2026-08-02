@@ -167,7 +167,7 @@ export function GlobalSearch({ variant = "compact" }: { variant?: "compact" | "h
     try {
       const r = await perguntarIa({ data: { pergunta: q, contexto } });
       setAiResponse(
-        r.resposta ?? r.erro ?? "Não foi possível consultar a IA Assistente agora.",
+        r.erro ? `Aviso: ${r.erro}` : (r.resposta ?? "Não encontrei material autorizado suficiente para responder com segurança."),
       );
     } catch {
       setAiResponse("Falha de comunicação com a IA Assistente. Tente novamente.");
