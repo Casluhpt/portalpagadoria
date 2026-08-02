@@ -28,6 +28,7 @@ import {
 
 import { AppSidebar } from "@/components/app-sidebar";
 import { HeaderActions } from "@/components/header-actions";
+import { GlobalSearch } from "@/components/global-search";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -299,6 +300,18 @@ function PortalPage() {
           </header>
 
           <main className="flex-1 space-y-8 p-6 lg:p-8">
+            <section className="mx-auto w-full max-w-3xl">
+              <div className="mb-2 flex items-center justify-center gap-2 text-center text-xs font-medium text-muted-foreground">
+                <Search className="h-3.5 w-3.5 text-violet-600" />
+                Central de busca total do Portal da Pagadoria
+              </div>
+              <GlobalSearch variant="hero" />
+              <p className="mt-2 text-center text-[11px] text-muted-foreground">
+                Pesquise matrícula, usuário, empresa, colaborador, fornecedor, competência e cards —
+                ou pergunte à IA Assistente da Pagadoria.
+              </p>
+            </section>
+
             <section className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-indigo-900 via-violet-800 to-purple-900 p-8 text-white shadow-xl">
               <div className="absolute -right-16 -top-16 h-64 w-64 rounded-full bg-white/10 blur-3xl" />
               <div className="absolute -bottom-20 -left-10 h-72 w-72 rounded-full bg-fuchsia-400/10 blur-3xl" />

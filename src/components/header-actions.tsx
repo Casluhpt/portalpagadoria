@@ -35,6 +35,7 @@ import { usePresence, type PresenceStatus } from "@/hooks/use-presence";
 
 import { NotificationBell } from "./notification-bell";
 import { GlobalSearch } from "./global-search";
+import { ThemeMenuSection } from "./theme-toggle";
 
 const roleLabel: Record<string, string> = {
   administrador: "Administração",
@@ -153,6 +154,7 @@ export function HeaderActions() {
               );
             })}
           </DropdownMenuRadioGroup>
+          <ThemeMenuSection />
         </DropdownMenuContent>
       </DropdownMenu>
 
