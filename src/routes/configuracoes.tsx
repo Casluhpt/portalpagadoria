@@ -88,6 +88,10 @@ function ConfiguracoesPage() {
                   </CardContent>
                 </Card>
               </TabsContent>
+              <TabsContent value="documentacao" className="m-0 focus-visible:outline-none">
+                <DocumentationSection />
+              </TabsContent>
+
 
               <TabsContent value="diagnostico" className="m-0 focus-visible:outline-none">
                 <div className="grid gap-6 md:grid-cols-2">
