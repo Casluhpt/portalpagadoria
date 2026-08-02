@@ -1,4 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
+import * as XLSX from "xlsx";
+import { format } from "date-fns";
 
 export type ConciliacaoItem = {
   empresa: string;
@@ -99,6 +101,40 @@ export function executarConciliacao(importados: ConciliacaoItem[], base: Concili
   });
 
   return resultados;
+}
+
+
+export async function exportarConciliacaoSemanal(
+  dataIni: string,
+  dataFim: string,
+  userId: string
+) {
+  // 1. Busca dados filtrados por data
+  const { data, error } = await supabase
+    .from("pagamentos_diversos")
+    .select("*")
+    .gte("data_credito", dataIni)
+    .lte("data_credito", dataFim);
+
+  if (error) throw error;
+
+  // 2. Gera Excel com títulos da base
+  const ws = XLSX.utils.json_to_sheet(data || []);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Pagamentos Filtrados");
+  
+  const fileName = `conciliacao-semanal-${dataIni}-a-${dataFim}.xlsx`;
+  XLSX.writeFile(wb, fileName);
+
+  // 3. Notificação e Anexo (Simulado - em prod enviaria para Storage)
+  const { notificarArquivoPronto } = await import("./notificacoes-arquivos");
+  await notificarArquivoPronto(
+    "Relatório de Conciliação Pronto",
+    `O arquivo filtrado de ${dataIni} a ${dataFim} foi gerado. Disponível em Base de Anexos > Conciliação Bancária.`,
+    userId
+  );
+  
+  return data;
 }
 
 function buscarCombinacao(arr: ConciliacaoItem[], target: number): ConciliacaoItem[] {

@@ -227,7 +227,19 @@ function NotifList({
                   <p className="truncate font-semibold text-slate-900">{c.titulo}</p>
                   <span className="shrink-0 text-[10px] text-slate-400">{rel(c.criado_em)}</span>
                 </div>
-                <p className="mt-0.5 whitespace-pre-wrap text-xs text-slate-600">{c.mensagem}</p>
+                <p className="mt-0.5 whitespace-pre-wrap text-xs text-slate-600">
+                  {c.mensagem}
+                  {c.mensagem.includes("http") && (
+                    <a 
+                      href={c.mensagem.split(" ").find(w => w.startsWith("http"))} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="ml-1 block font-medium text-violet-600 hover:underline"
+                    >
+                      Baixar arquivo agora
+                    </a>
+                  )}
+                </p>
                 {!c.lido && (
                   <button
                     className="mt-1 text-[11px] font-medium text-violet-700 hover:underline"
