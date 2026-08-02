@@ -78,7 +78,7 @@ function PortalPage() {
         .from("app_versions")
         .select("versao, lancada_em, tipo, titulo, resumo, itens, destaque")
         .order("lancada_em", { ascending: false })
-        .limit(10);
+        .limit(5);
       if (error) throw error;
       return data ?? [];
     },
