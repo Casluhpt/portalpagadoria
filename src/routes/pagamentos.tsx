@@ -378,16 +378,43 @@ function LancamentosTab({ colaboradorNome, userId }: { colaboradorNome: string; 
       if (errors.length) toast.warning(`${errors.length} aviso(s) na importação. ${errors.slice(0,3).join("; ")}${errors.length>3?"…":""}`);
       if (!parsed.length) { toast.error(`Nenhum registro válido encontrado na aba "${dataSheetName}"`); return; }
       toast.info(`Lendo aba "${dataSheetName}" — ${parsed.length} linha(s)…`);
-      // Rules for import: automated column validation, duplicate check, required fields
-      const requiredCols = ["célula", "empresa", "valor lg", "data de crédito"];
-      const missing = requiredCols.filter(col => !labelMap.has(norm(col)));
-      
-      if (missing.length > 0 && errors.length === 0) {
-        // Only show missing columns if we didn't find them in labelMap
-        // but wait, the logic below actually uses labelMap to build rec.
+      // Regras v1.8.0: Validação de duplicados e campos obrigatórios
+      const required = ["célula", "empresa", "valor lg", "data de crédito"];
+      const seen = new Set<string>();
+      const finalParsed: PagamentoInput[] = [];
+      const validationErrors: string[] = [];
+
+      parsed.forEach((rec, idx) => {
+        const line = idx + 2;
+        // Validação de campos obrigatórios
+        required.forEach(req => {
+          const col = PAGAMENTO_CAMPOS.find(c => norm(c.label) === req);
+          if (col && (rec[col.key as keyof PagamentoInput] === undefined || rec[col.key as keyof PagamentoInput] === null)) {
+            validationErrors.push(`Linha ${line}: Campo obrigatório "${col.label}" está vazio.`);
+          }
+        });
+
+        // Identificação de duplicados (Chave: Empresa + Data + Valor + Célula)
+        const dupKey = `${rec.empresa}|${rec.data_credito}|${rec.valor_lg}|${rec.celula}`;
+        if (seen.has(dupKey)) {
+          validationErrors.push(`Linha ${line}: Registro duplicado detectado.`);
+        } else {
+          seen.add(dupKey);
+          finalParsed.push(rec);
+        }
+      });
+
+      if (validationErrors.length > 0) {
+        toast.error(`Erros de validação encontrados (${validationErrors.length}). Importação cancelada.`);
+        console.error("Relatório de erros de importação:", validationErrors);
+        return;
       }
 
-      importMut.mutate(parsed);
+      const confirmed = window.confirm(`Confirma a importação de ${finalParsed.length} registros? Esta ação pode substituir ou adicionar dados à base atual.`);
+      if (!confirmed) return;
+
+      toast.info(`Iniciando importação auditada por ${colaboradorNome}...`);
+      importMut.mutate(finalParsed);
     } catch (e) {
       toast.error("Erro ao ler o arquivo: " + (e as Error).message);
     }
