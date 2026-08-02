@@ -125,7 +125,7 @@ function PagamentosPage() {
 
             </div>
             <TabsContent value="lancamentos" className="flex-1 p-0 data-[state=inactive]:hidden">
-              <LancamentosTab colaboradorNome={colaboradorNome} userId={user?.id ?? null} />
+              <LancamentosTab colaboradorNome={colaboradorNome} userId={user?.id ?? null} isAdmin={isAdmin} />
             </TabsContent>
             <TabsContent value="dashboard" className="flex-1 p-0 data-[state=inactive]:hidden">
               <DashboardTab />
@@ -1184,6 +1184,8 @@ function FilterSelect({
 }
 
 function FechamentoCompetenciaButton({ onComplete, disabled }: { onComplete: () => void; disabled?: boolean }) {
+  const { isAdmin } = useRoles();
+
   const [open, setOpen] = useState(false);
   const [nome, setNome] = useState("");
   const { user } = useSession();
@@ -1204,7 +1206,7 @@ function FechamentoCompetenciaButton({ onComplete, disabled }: { onComplete: () 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="sm" variant="outline" className="gap-1 border-emerald-600 text-emerald-700 hover:bg-emerald-50" disabled={disabled}>
+        <Button size="sm" variant="outline" className="gap-1 border-emerald-600 text-emerald-700 hover:bg-emerald-50" disabled={disabled || !isAdmin}>
           <TableIcon className="h-4 w-4" /> Fechamento de Competência
         </Button>
       </DialogTrigger>
