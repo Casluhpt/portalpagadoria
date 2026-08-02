@@ -18,6 +18,7 @@ function AnexosPage() {
     "Documentações",
     "Evidências operacionais",
     "Conciliação bancaria",
+    "Processo de aprovação",
   ];
   return (
     <SidebarProvider>
@@ -29,7 +30,7 @@ function AnexosPage() {
             <Button asChild variant="ghost" size="sm">
               <Link to="/"><ArrowLeft className="mr-1 h-4 w-4" /> Portal</Link>
             </Button>
-            <h1 className="ml-2 font-semibold text-slate-800">Base de Anexos</h1>
+            <h1 className="ml-2 font-semibold text-slate-800">[anexo]</h1>
           </header>
           <main className="flex-1 space-y-6 p-6">
             <Card className="border-slate-200">
@@ -39,7 +40,7 @@ function AnexosPage() {
                     <FileArchive className="h-6 w-6" />
                   </div>
                   <div>
-                    <h2 className="text-lg font-bold text-slate-900">Documentos da Pagadoria</h2>
+                    <h2 className="text-lg font-bold text-slate-900">[anexo]</h2>
                     <p className="text-sm text-slate-600">
                       Centralização de comprovantes, relatórios, layouts e evidências operacionais.
                     </p>
