@@ -1298,7 +1298,12 @@ export type Database = {
       }
       ensure_viewer_role: { Args: never; Returns: undefined }
       fechar_competencia_provisao: {
-        Args: { _ano: string; _mes: string; _nome: string; _usuario_id: string }
+        Args: {
+          _ano: string
+          _mes: string
+          _nome: string
+          _usuario_id?: string
+        }
         Returns: string
       }
       fechar_provisao_diaria: {
