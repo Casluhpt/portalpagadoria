@@ -493,16 +493,22 @@ function MaterialApoioPage() {
               <div className="flex flex-wrap items-center gap-2">
                 <Button
                   size="sm"
-                  variant={categoria === null ? "default" : "outline"}
-                  onClick={() => setCategoria(null)}
+                  variant={categoria === null && !somenteFavoritos ? "default" : "outline"}
+                  onClick={() => {
+                    setCategoria(null);
+                    setSomenteFavoritos(false);
+                  }}
                 >
-                  Todos ({materiais.length})
+                  Todos os Conteúdos ({materiais.length})
                 </Button>
                 <Button
                   size="sm"
                   variant={somenteFavoritos ? "default" : "outline"}
                   className="gap-1.5"
-                  onClick={() => setSomenteFavoritos((v) => !v)}
+                  onClick={() => {
+                    setSomenteFavoritos(true);
+                    setCategoria(null);
+                  }}
                 >
                   <Star
                     className={`h-3.5 w-3.5 ${somenteFavoritos ? "fill-current" : "text-amber-500"}`}
@@ -513,8 +519,11 @@ function MaterialApoioPage() {
                   <Button
                     key={c}
                     size="sm"
-                    variant={categoria === c ? "default" : "outline"}
-                    onClick={() => setCategoria(c)}
+                    variant={categoria === c && !somenteFavoritos ? "default" : "outline"}
+                    onClick={() => {
+                      setCategoria(c);
+                      setSomenteFavoritos(false);
+                    }}
                   >
                     {c}
                   </Button>
