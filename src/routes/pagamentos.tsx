@@ -152,7 +152,9 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
   const { data: queue = [] } = useQuery({
     queryKey: ['concorrencia-fila', 'pagamentos_diversos'],
     queryFn: () => getFilaStatus({ data: { modulo: 'pagamentos_diversos' } }),
+    enabled: !!userId,
     refetchInterval: 3000,
+    refetchIntervalInBackground: false,
   });
 
   const entrarFilaFn = useServerFn(entrarFila);
@@ -190,6 +192,7 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
   const { data = [], isLoading } = useQuery({
     queryKey: pagamentosQueryKey,
     queryFn: fetchPagamentos,
+    enabled: !!userId,
     staleTime: 30_000,
   });
 
@@ -945,9 +948,11 @@ const EditableCell = React.memo(function EditableCell({
 const PIE_COLORS = ["#3b82f6","#8b5cf6","#22c55e","#f59e0b","#ef4444","#06b6d4","#ec4899","#84cc16","#f97316","#14b8a6"];
 
 function DashboardTab() {
+  const { user } = useSession();
   const { data = [], isLoading } = useQuery({
     queryKey: pagamentosQueryKey,
     queryFn: fetchPagamentos,
+    enabled: !!user,
     staleTime: 30_000,
   });
 

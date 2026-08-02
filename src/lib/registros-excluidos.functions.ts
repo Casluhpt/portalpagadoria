@@ -71,7 +71,7 @@ const deleteInput = z.object({
 
 export const purgeRegistrosExcluidos = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: unknown) => deleteInput.parse(data))
+  .validator((data: unknown) => deleteInput.parse(data))
   .handler(async ({ data, context }): Promise<{ deleted: number }> => {
     await assertAdmin(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");

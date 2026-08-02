@@ -147,6 +147,7 @@ export function AppSidebar() {
   const { data: materiais = [] } = useQuery({
     queryKey: materialApoioQueryKey,
     queryFn: fetchMateriais,
+    enabled: !!user,
     staleTime: 5 * 60_000,
   });
 

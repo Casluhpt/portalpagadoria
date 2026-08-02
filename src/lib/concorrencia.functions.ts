@@ -3,7 +3,7 @@ import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 
 export const entrarFila = createServerFn({ method: "POST" })
-  .inputValidator((data) => z.object({
+  .validator((data) => z.object({
     userId: z.string(),
     userNome: z.string(),
     modulo: z.string(),
@@ -45,7 +45,7 @@ export const entrarFila = createServerFn({ method: "POST" })
   });
 
 export const sairFila = createServerFn({ method: "POST" })
-  .inputValidator((data) => z.object({
+  .validator((data) => z.object({
     userId: z.string(),
     modulo: z.string(),
   }).parse(data))
@@ -88,7 +88,7 @@ export const sairFila = createServerFn({ method: "POST" })
   });
 
 export const getFilaStatus = createServerFn({ method: "GET" })
-  .inputValidator((data) => z.object({
+  .validator((data) => z.object({
     modulo: z.string(),
   }).parse(data))
   .handler(async ({ data }) => {

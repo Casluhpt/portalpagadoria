@@ -30,6 +30,7 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { AppLogo } from "@/components/app-logo";
 import { HeaderActions } from "@/components/header-actions";
 import { useRoles } from "@/hooks/use-roles";
+import { useSession } from "@/hooks/use-session";
 import logoPagadoria from "@/assets/logo-pagadoria.png.asset.json";
 import { GlobalSearch } from "@/components/global-search";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
@@ -55,19 +56,23 @@ const currentMonth = () => new Date().toISOString().slice(0, 7);
 
 function PortalPage() {
   const { isAdmin } = useRoles();
+  const { user } = useSession();
   const { data: lanc = [] } = useQuery({
     queryKey: lancamentosQueryKey,
     queryFn: fetchAllLancamentos,
+    enabled: !!user,
     staleTime: 60_000,
   });
   const { data: prov = [] } = useQuery({
     queryKey: provisaoQueryKey,
     queryFn: fetchAllProvisao,
+    enabled: !!user,
     staleTime: 60_000,
   });
 
   const { data: versoes = [] } = useQuery({
     queryKey: ["app_versions", "timeline"],
+    enabled: !!user && isAdmin,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("app_versions")

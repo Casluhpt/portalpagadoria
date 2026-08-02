@@ -37,7 +37,9 @@ import {
 export const Route = createFileRoute("/despesas-fixas")({
   beforeLoad: async () => {
     const { data } = await supabase.auth.getSession();
-    if (!data.session) throw redirect({ to: "/auth" });
+    if (!data.session) {
+      throw redirect({ to: "/auth", search: { returnTo: "/despesas-fixas" } });
+    }
   },
   component: DespesasFixasPage,
 });

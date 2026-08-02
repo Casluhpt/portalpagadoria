@@ -91,7 +91,7 @@ export const listAdminUsers = createServerFn({ method: "GET" })
 
 export const resetUserPassword = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: { email: string; redirectTo?: string }) => {
+  .validator((input: { email: string; redirectTo?: string }) => {
     if (!input?.email) throw new Error("Email é obrigatório");
     return input;
   })
@@ -109,7 +109,7 @@ const ALLOWED_ROLES = ["administrador", "viewer", "visitante"] as const;
 
 export const setUserRole = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: { userId: string; role: "administrador" | "viewer" | "visitante" }) => {
+  .validator((input: { userId: string; role: "administrador" | "viewer" | "visitante" }) => {
     if (!input?.userId) throw new Error("userId é obrigatório");
     if (!ALLOWED_ROLES.includes(input.role)) throw new Error("Perfil inválido");
     return input;
@@ -135,7 +135,7 @@ export const setUserRole = createServerFn({ method: "POST" })
 
 export const inviteUser = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: { email: string; role: "administrador" | "viewer" | "visitante"; nome?: string; redirectTo?: string }) => {
+  .validator((input: { email: string; role: "administrador" | "viewer" | "visitante"; nome?: string; redirectTo?: string }) => {
     const email = (input?.email ?? "").trim().toLowerCase();
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error("Email inválido");
     if (!ALLOWED_ROLES.includes(input.role)) throw new Error("Perfil inválido");
@@ -168,7 +168,7 @@ export const inviteUser = createServerFn({ method: "POST" })
 
 export const deleteUser = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: { userId: string }) => {
+  .validator((input: { userId: string }) => {
     if (!input?.userId) throw new Error("userId é obrigatório");
     return input;
   })
@@ -185,7 +185,7 @@ export const deleteUser = createServerFn({ method: "POST" })
 
 export const setUserSetor = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: { userId: string; setor: Setor | null }) => {
+  .validator((input: { userId: string; setor: Setor | null }) => {
     if (!input?.userId) throw new Error("userId é obrigatório");
     if (input.setor !== null && !(ALLOWED_SETORES as readonly string[]).includes(input.setor)) {
       throw new Error("Setor inválido");
