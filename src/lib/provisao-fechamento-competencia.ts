@@ -36,6 +36,15 @@ export async function fecharCompetenciaProvisao(input: {
     _notify: true, // Internal flag to trigger notification logic in a real backend
   } as never);
   if (error) throw error;
+  const { logAcaoCritica } = await import("./audit-critico");
+  await logAcaoCritica({
+    acao: "arquivamento_competencia",
+    modulo: "Provisão Diária",
+    tabela: "provisao_fechamento_competencia",
+    registro_id: String(data ?? ""),
+    descricao: `Competência ${input.mes}/${input.ano} arquivada como snapshot somente leitura (${input.nome})`,
+    severidade: "critico",
+  });
   return data as unknown as string;
 }
 
@@ -49,4 +58,11 @@ export async function notificarFechamentoCompetencia(titulo: string, mensagem: s
 export async function integrarPagamentosNaProvisao(): Promise<void> {
   const { error } = await supabase.rpc("integrar_pagamentos_na_provisao" as never);
   if (error) throw error;
+  const { logAcaoCritica } = await import("./audit-critico");
+  await logAcaoCritica({
+    acao: "integracao_provisao",
+    modulo: "Provisão Diária",
+    tabela: "provisao_diaria",
+    descricao: "Integração automática dos Pagamentos Diversos na Base da Provisão Diária",
+  });
 }
