@@ -34,6 +34,7 @@ import { useProfile } from "@/hooks/use-profile";
 import { usePresence, type PresenceStatus } from "@/hooks/use-presence";
 
 import { NotificationBell } from "./notification-bell";
+import { GlobalSearch } from "./global-search";
 
 const roleLabel: Record<string, string> = {
   administrador: "Administrador",
@@ -95,6 +96,7 @@ export function HeaderActions() {
 
   return (
     <div className="flex items-center gap-1">
+      <GlobalSearch />
       <NotificationBell />
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
