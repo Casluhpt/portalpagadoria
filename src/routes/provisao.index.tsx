@@ -357,7 +357,16 @@ function FechamentoCompetenciaButton() {
       const now = new Date();
       const mes = format(now, "yyyy-MM");
       const ano = format(now, "yyyy");
-      return fecharFn({ nome, mes, ano, usuarioId: user!.id });
+      const res = await fecharFn({ nome, mes, ano, usuarioId: user!.id });
+      
+      const { notificarFechamentoCompetencia } = await import("@/lib/provisao-fechamento-competencia");
+      await notificarFechamentoCompetencia(
+        `Fechamento: ${nome}`,
+        `A competência de Provisão Diária (${mes}) foi encerrada com sucesso.`,
+        user!.id
+      );
+      
+      return res;
     },
     onSuccess: () => {
       toast.success("Competência fechada com sucesso.");
