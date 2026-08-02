@@ -562,12 +562,12 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
           </Button>
           <Button size="sm" variant="outline" className="gap-1" onClick={() => {
             handleExport();
-            if (user) {
+            if (userId) {
               import("@/lib/notificacoes-arquivos").then(m => {
                 m.notificarArquivoPronto(
                   "Exportação Concluída",
                   `Seu arquivo Excel de pagamentos foi gerado com sucesso em ${new Date().toLocaleTimeString()}.`,
-                  user.id
+                  userId
                 );
               });
             }
