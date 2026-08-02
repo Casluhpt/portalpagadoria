@@ -375,7 +375,7 @@ function PortalPage() {
                 <div className="mb-4 flex items-center justify-between gap-4">
                   <div className="flex items-center gap-3">
                     <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-card/50 overflow-hidden shadow-sm border border-border">
-                      <AppLogo className="h-8 w-8" />
+                      <AppLogo className="h-full w-full object-contain" />
                     </div>
                     <div>
                       <h2 className="text-lg font-bold text-foreground">Novidades do Portal</h2>
