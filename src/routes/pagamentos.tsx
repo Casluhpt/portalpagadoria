@@ -1257,6 +1257,14 @@ function FechamentoCompetenciaButton({ onComplete, disabled, data }: { onComplet
       // Database closure and cleanup
       const { fecharCompetenciaPagamentos } = await import("@/lib/fechamento-pagamentos");
       await fecharCompetenciaPagamentos(nome, user.id, data);
+      await logAcaoCritica({
+        acao: "fechamento_competencia",
+        modulo: "Pagamentos Diversos",
+        tabela: "fechamento_pagamentos",
+        descricao: `Competência "${nome}" fechada e arquivada com ${data.length} registro(s); base limpa para novo ciclo`,
+        metadata: { registros: data.length, competencia: nome },
+        severidade: "critico",
+      });
     },
     onSuccess: () => {
       toast.success("Competência de Pagamentos Diversos fechada e base limpa.");
