@@ -47,7 +47,10 @@ const firstOfMonth = () => {
 const fmtBR = (iso: string) => {
   if (!iso) return "—";
   try {
+    // Check if it's already in DD/MM/YYYY format or similar
+    if (iso.includes("/")) return iso;
     const [y, m, d] = iso.split("-");
+    if (!y || !m || !d) return iso;
     return `${d}/${m}/${y}`;
   } catch {
     return iso;
