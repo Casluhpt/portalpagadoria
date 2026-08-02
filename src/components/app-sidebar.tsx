@@ -137,14 +137,32 @@ export function AppSidebar() {
 
   const renderItem = (item: MenuItem) => (
     <SidebarMenuItem key={item.title}>
-      <SidebarMenuButton asChild isActive={item.match(currentPath)} tooltip={item.title}>
-        <Link to={item.url} className="flex items-center gap-2">
-          <item.icon className="h-4 w-4 shrink-0" />
-          <span className="truncate">{item.title}</span>
-          {item.restricted && (
-            <Lock className="ml-auto h-3 w-3 shrink-0 text-amber-500" aria-label="Área restrita" />
-          )}
-        </Link>
+      <SidebarMenuButton 
+        asChild={item.action !== "search"} 
+        isActive={item.match(currentPath)} 
+        tooltip={item.title}
+        onClick={item.action === "search" ? () => {
+          const event = new KeyboardEvent("keydown", { key: "k", metaKey: true, ctrlKey: true });
+          document.dispatchEvent(event);
+        } : undefined}
+      >
+        {item.action === "search" ? (
+          <div className="flex items-center gap-2 cursor-pointer w-full">
+            <item.icon className="h-4 w-4 shrink-0" />
+            <span className="truncate">{item.title}</span>
+            <kbd className="ml-auto pointer-events-none hidden h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 xl:flex">
+              ⌘K
+            </kbd>
+          </div>
+        ) : (
+          <Link to={item.url} className="flex items-center gap-2">
+            <item.icon className="h-4 w-4 shrink-0" />
+            <span className="truncate">{item.title}</span>
+            {item.restricted && (
+              <Lock className="ml-auto h-3 w-3 shrink-0 text-amber-500" aria-label="Área restrita" />
+            )}
+          </Link>
+        )}
       </SidebarMenuButton>
     </SidebarMenuItem>
   );
