@@ -595,15 +595,42 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
             Exportar Excel
           </Button>
           <FechamentoCompetenciaButton onComplete={invalidate} disabled={!isEditingEnabled} data={data} />
-          <Button
-            size="sm"
-            className="gap-1"
-            disabled={createMut.isPending || !isEditingEnabled}
-            onClick={() => createMut.mutate(1)}
-          >
-            {createMut.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
-            Novo
-          </Button>
+            <Dialog open={novoOpen} onOpenChange={setNovoOpen}>
+              <DialogTrigger asChild>
+                <Button
+                  size="sm"
+                  className="gap-1"
+                  disabled={createMut.isPending || !isEditingEnabled}
+                >
+                  {createMut.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+                  Novo
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-sm">
+                <DialogHeader>
+                  <DialogTitle>Adicionar novas linhas</DialogTitle>
+                  <DialogDescription>
+                    Selecione a quantidade de linhas que deseja adicionar (limite de 50 por vez).
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-2 py-2">
+                  <Label>Quantidade</Label>
+                  <Input 
+                    type="number" 
+                    min={1} 
+                    max={50} 
+                    value={novoQty} 
+                    onChange={(e) => setNovoQty(Math.min(50, Math.max(1, Number(e.target.value) || 1)))} 
+                  />
+                </div>
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => setNovoOpen(false)}>Cancelar</Button>
+                  <Button onClick={() => createMut.mutate(novoQty)} disabled={createMut.isPending}>
+                    Confirmar
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
         </div>
       </div>
 

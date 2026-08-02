@@ -579,10 +579,19 @@ function BaseView({ rows, ano, isLoading, onUpsert, onBulkInsert, onDelete }: Ba
         <DialogContent className="max-w-sm">
           <DialogHeader>
             <DialogTitle>Adicionar novas linhas</DialogTitle>
+            <DialogDescription>
+              Selecione a quantidade de linhas que deseja adicionar (limite de 50 por vez).
+            </DialogDescription>
           </DialogHeader>
-          <div className="space-y-2">
+          <div className="space-y-2 py-2">
             <Label>Quantidade</Label>
-            <Input type="number" min={1} max={500} value={novoQtd} onChange={(e) => setNovoQtd(Number(e.target.value))} />
+            <Input 
+              type="number" 
+              min={1} 
+              max={50} 
+              value={novoQtd} 
+              onChange={(e) => setNovoQtd(Math.min(50, Math.max(1, Number(e.target.value) || 1)))} 
+            />
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setNovoOpen(false)}>Cancelar</Button>

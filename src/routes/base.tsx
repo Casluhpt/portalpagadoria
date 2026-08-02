@@ -29,6 +29,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 
 import {
@@ -81,6 +82,8 @@ function BasePage() {
   });
 
   const [search, setSearch] = useState("");
+  const [novoQty, setNovoQty] = useState(1);
+  const [novoOpen, setNovoOpen] = useState(false);
   const [sortKey, setSortKey] = useState<keyof Lancamento>("dueDate");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
   const [pendingDelete, setPendingDelete] = useState<Lancamento | null>(null);
@@ -95,10 +98,18 @@ function BasePage() {
   });
 
   const createMut = useMutation({
-    mutationFn: () => createLancamento({}),
-    onSuccess: () => {
+    mutationFn: (qty: number) => {
+      if (qty <= 1) return createLancamento({}).then(() => 1);
+      // Mocking bulk create via repeated calls for simplicity unless a bulk function exists
+      // The requirement says "add new line", let's check if createLancamento supports bulk.
+      // Based on src/lib/lancamentos.ts, we might need a loop or a bulk fn.
+      const promises = Array.from({ length: qty }).map(() => createLancamento({}));
+      return Promise.all(promises).then((results) => results.length);
+    },
+    onSuccess: (n) => {
       invalidate();
-      toast.success("Nova linha adicionada");
+      toast.success(`${n} nova(s) linha(s) adicionada(s)`);
+      setNovoOpen(false);
     },
     onError: (e: Error) => toast.error("Falha ao inserir: " + e.message),
   });
@@ -236,15 +247,45 @@ function BasePage() {
             <Button size="sm" variant="outline" className="gap-1" onClick={exportarBase}>
               <Download className="h-4 w-4" /> Exportar
             </Button>
-            <Button
-              size="sm"
-              onClick={() => createMut.mutate()}
-              disabled={createMut.isPending}
-              className="gap-1"
-            >
-              <Plus className="h-4 w-4" />
-              Nova linha
-            </Button>
+            <Dialog open={novoOpen} onOpenChange={setNovoOpen}>
+              <DialogTrigger asChild>
+                <Button size="sm" className="gap-1">
+                  <Plus className="h-4 w-4" /> Nova linha
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle>Adicionar novas linhas</DialogTitle>
+                  <DialogDescription>
+                    Selecione a quantidade de linhas que deseja adicionar à base (máx. 50).
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="qty" className="text-right">Quantidade</Label>
+                    <Input
+                      id="qty"
+                      type="number"
+                      min={1}
+                      max={50}
+                      value={novoQty}
+                      onChange={(e) => setNovoQty(Math.min(50, Math.max(1, parseInt(e.target.value) || 1)))}
+                      className="col-span-3"
+                    />
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => setNovoOpen(false)}>Cancelar</Button>
+                  <Button
+                    onClick={() => createMut.mutate(novoQty)}
+                    disabled={createMut.isPending}
+                  >
+                    {createMut.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                    Confirmar
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           </header>
 
           <Dialog open={importOpen} onOpenChange={setImportOpen}>
