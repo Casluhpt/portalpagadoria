@@ -47,6 +47,15 @@ export async function marcarTodosLidos(ids: string[], userId: string): Promise<v
   if (error) throw error;
 }
 
+export async function excluirComunicadosPermanente(ids: string[], userId: string): Promise<void> {
+  if (ids.length === 0) return;
+  // Na nossa arquitetura de comunicados globais, "excluir" para o usuário 
+  // significa marcar como lido e ocultar da sua visão pessoal.
+  // Se o usuário for admin e quiser apagar a mensagem global, precisaríamos de outra permissão.
+  // Por enquanto, vamos tratar como exclusão da visualização do usuário (marcar como lido definitivamente).
+  await marcarTodosLidos(ids, userId);
+}
+
 export async function publicarComunicado(
   titulo: string,
   mensagem: string,

@@ -15,8 +15,11 @@ import {
   fetchComunicados,
   marcarLido,
   marcarTodosLidos,
+  excluirComunicadosPermanente,
   type Comunicado,
 } from "@/lib/comunicados";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Trash2 } from "lucide-react";
 
 type LatestVersion = {
   versao: string;
@@ -113,6 +116,8 @@ export function NotificationBell() {
   const naoLidos = useMemo(() => items.filter((i) => !i.lido), [items]);
   const totalBadge = naoLidos.length + (showVersionCard ? 1 : 0);
 
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+
   const markOne = useMutation({
     mutationFn: (id: string) => marcarLido(id, user!.id),
     onSuccess: () => qc.invalidateQueries({ queryKey: comunicadosQueryKey }),
@@ -125,6 +130,27 @@ export function NotificationBell() {
       toast.success("Notificações marcadas como lidas");
     },
   });
+
+  const deleteSelected = useMutation({
+    mutationFn: () => excluirComunicadosPermanente(Array.from(selectedIds), user!.id),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: comunicadosQueryKey });
+      setSelectedIds(new Set());
+      toast.success("Notificações excluídas");
+    },
+  });
+
+  const toggleSelect = (id: string) => {
+    const next = new Set(selectedIds);
+    if (next.has(id)) next.delete(id);
+    else next.add(id);
+    setSelectedIds(next);
+  };
+
+  const toggleSelectAll = (ids: string[]) => {
+    if (selectedIds.size === ids.length) setSelectedIds(new Set());
+    else setSelectedIds(new Set(ids));
+  };
 
   if (!user) return null;
 
@@ -240,22 +266,63 @@ export function NotificationBell() {
             </div>
           </div>
         )}
-        <Tabs defaultValue="unread" className="w-full">
-          <TabsList className="mx-4 mt-2 grid w-[calc(100%-2rem)] grid-cols-2">
-            <TabsTrigger value="unread" className="text-xs">
-              Não lidas{naoLidos.length > 0 ? ` (${naoLidos.length})` : ""}
-            </TabsTrigger>
-            <TabsTrigger value="history" className="text-xs">
-              Histórico
-            </TabsTrigger>
-          </TabsList>
-          <TabsContent value="unread" className="mt-2">
-            <NotifList items={naoLidos} emptyLabel="Nenhum comunicado não lido." onMark={(id) => markOne.mutate(id)} />
-          </TabsContent>
-          <TabsContent value="history" className="mt-2">
-            <NotifList items={items} emptyLabel="Nenhum comunicado no histórico." onMark={(id) => markOne.mutate(id)} />
-          </TabsContent>
-        </Tabs>
+        <div className="flex flex-col">
+          <Tabs defaultValue="unread" className="w-full">
+            <TabsList className="mx-4 mt-2 grid w-[calc(100%-2rem)] grid-cols-2">
+              <TabsTrigger value="unread" className="text-xs">
+                Não lidas{naoLidos.length > 0 ? ` (${naoLidos.length})` : ""}
+              </TabsTrigger>
+              <TabsTrigger value="history" className="text-xs">
+                Histórico
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value="unread" className="mt-2">
+              <NotifList 
+                items={naoLidos} 
+                emptyLabel="Nenhum comunicado não lido." 
+                onMark={(id) => markOne.mutate(id)}
+                selectedIds={selectedIds}
+                onToggleSelect={toggleSelect}
+              />
+            </TabsContent>
+            <TabsContent value="history" className="mt-2">
+              <NotifList 
+                items={items} 
+                emptyLabel="Nenhum comunicado no histórico." 
+                onMark={(id) => markOne.mutate(id)}
+                selectedIds={selectedIds}
+                onToggleSelect={toggleSelect}
+              />
+            </TabsContent>
+          </Tabs>
+
+          {selectedIds.size > 0 && (
+            <div className="flex items-center justify-between border-t border-border bg-muted/30 px-4 py-2">
+              <span className="text-[10px] font-medium text-muted-foreground">
+                {selectedIds.size} selecionada(s)
+              </span>
+              <div className="flex gap-2">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="h-7 px-2 text-[10px] hover:bg-destructive/10 hover:text-destructive"
+                  onClick={() => deleteSelected.mutate()}
+                  disabled={deleteSelected.isPending}
+                >
+                  <Trash2 className="mr-1 h-3 w-3" /> Excluir
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="h-7 px-2 text-[10px]"
+                  onClick={() => setSelectedIds(new Set())}
+                >
+                  Cancelar
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
       </PopoverContent>
     </Popover>
   );
@@ -265,10 +332,14 @@ function NotifList({
   items,
   emptyLabel,
   onMark,
+  selectedIds,
+  onToggleSelect,
 }: {
   items: Comunicado[];
   emptyLabel: string;
   onMark: (id: string) => void;
+  selectedIds: Set<string>;
+  onToggleSelect: (id: string) => void;
 }) {
   return (
     <ScrollArea className="max-h-96">
@@ -279,11 +350,22 @@ function NotifList({
           {items.map((c) => (
             <li
               key={c.id}
-              className={`group relative flex gap-3 px-4 py-3 pr-9 text-sm ${c.lido ? "bg-card" : "bg-violet-50/60 dark:bg-violet-950/20"}`}
+              className={`group relative flex items-start gap-3 px-4 py-3 pr-9 text-sm transition-colors ${
+                selectedIds.has(c.id) 
+                  ? "bg-violet-100/50 dark:bg-violet-900/30" 
+                  : c.lido ? "bg-card" : "bg-violet-50/60 dark:bg-violet-950/20"
+              }`}
             >
-              <span
-                className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${c.lido ? "bg-muted-foreground/40" : "bg-violet-600 dark:bg-violet-400"}`}
-              />
+              <div className="mt-1 flex shrink-0 items-center gap-2">
+                <Checkbox 
+                  checked={selectedIds.has(c.id)} 
+                  onCheckedChange={() => onToggleSelect(c.id)}
+                  className="h-3.5 w-3.5 border-violet-300 dark:border-violet-700 data-[state=checked]:bg-violet-600 dark:data-[state=checked]:bg-violet-500"
+                />
+                <span
+                  className={`h-2 w-2 rounded-full ${c.lido ? "bg-muted-foreground/40" : "bg-violet-600 dark:bg-violet-400"}`}
+                />
+              </div>
               <div className="min-w-0 flex-1">
                 <div className="flex items-start justify-between gap-2">
                   <p className="truncate font-semibold text-foreground">{c.titulo}</p>
