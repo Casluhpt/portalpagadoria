@@ -72,13 +72,13 @@ function PortalPage() {
 
   const { data: versoes = [] } = useQuery({
     queryKey: ["app_versions", "timeline"],
-    enabled: !!user && isAdmin,
+    enabled: !!user,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("app_versions")
         .select("versao, lancada_em, tipo, titulo, resumo, itens, destaque")
         .order("lancada_em", { ascending: false })
-        .limit(4);
+        .limit(10);
       if (error) throw error;
       return data ?? [];
     },
