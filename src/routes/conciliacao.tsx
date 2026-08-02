@@ -81,40 +81,7 @@ function BankReconciliationPage() {
               </TabsContent>
 
               <TabsContent value="conciliacao" className="space-y-6">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <div className="rounded-xl border bg-white p-6 shadow-sm space-y-4">
-                    <h3 className="font-bold text-slate-800 flex items-center gap-2">
-                      <div className="h-8 w-8 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-xs font-bold">1</div>
-                      Varejo (Itaú)
-                    </h3>
-                    <p className="text-xs text-slate-500">Importe o arquivo de retorno consolidado do Varejo para processamento.</p>
-                    <div className="border-2 border-dashed border-slate-200 rounded-lg p-10 text-center hover:border-blue-400 transition-colors cursor-pointer bg-slate-50/50">
-                      <p className="text-sm text-slate-600 font-medium">Clique ou arraste o arquivo do Varejo</p>
-                      <p className="text-[10px] text-slate-400 mt-1">Formatos suportados: .XLSX, .CSV, .TXT (Retorno)</p>
-                    </div>
-                  </div>
-
-                  <div className="rounded-xl border bg-white p-6 shadow-sm space-y-4">
-                    <h3 className="font-bold text-slate-800 flex items-center gap-2">
-                      <div className="h-8 w-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs font-bold">2</div>
-                      Distribuição (Itaú)
-                    </h3>
-                    <p className="text-xs text-slate-500">Importe o arquivo de retorno da Distribuição para conciliação.</p>
-                    <div className="border-2 border-dashed border-slate-200 rounded-lg p-10 text-center hover:border-indigo-400 transition-colors cursor-pointer bg-slate-50/50">
-                      <p className="text-sm text-slate-600 font-medium">Clique ou arraste o arquivo da Distribuição</p>
-                      <p className="text-[10px] text-slate-400 mt-1">Formatos suportados: .XLSX, .CSV, .TXT (Retorno)</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="rounded-xl border bg-white p-6 shadow-sm space-y-4">
-                  <h3 className="font-bold text-slate-800 flex items-center gap-2">
-                    <ShieldCheck className="h-5 w-5 text-emerald-600" /> Comparativo Bankmanager
-                  </h3>
-                  <div className="h-48 flex items-center justify-center text-slate-400 border border-dashed rounded-lg bg-slate-50/50">
-                    Aguardando arquivos para processar o cruzamento multi-fonte
-                  </div>
-                </div>
+                <ConciliacaoAtivaView />
               </TabsContent>
 
               <TabsContent value="semanal" className="space-y-6">
@@ -193,5 +160,131 @@ function ConciliacaoSemanalView() {
 }
 
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Loader2 } from "lucide-react";
-import { useState } from "react";
+import { Loader2, Upload, FileText, CheckCircle2, XCircle } from "lucide-react";
+import { useState, useRef } from "react";
+import * as XLSX from "xlsx";
+import { executarConciliacao } from "@/lib/conciliacao-engine";
+
+function ConciliacaoAtivaView() {
+  const { user } = useSession();
+  const [loading, setLoading] = useState(false);
+  const [tipo, setTipo] = useState<"Varejo" | "Distribuição" | null>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !tipo || !user) return;
+
+    setLoading(true);
+    try {
+      const reader = new FileReader();
+      reader.onload = async (evt) => {
+        try {
+          const bstr = evt.target?.result;
+          const wb = XLSX.read(bstr, { type: "binary" });
+          const wsname = wb.SheetNames[0];
+          const ws = wb.Sheets[wsname];
+          const data = XLSX.utils.sheet_to_json(ws);
+
+          if (!data.length) throw new Error("Arquivo vazio");
+
+          toast.info(`Processando ${data.length} registros de ${tipo}...`);
+          
+          // Executar engine de conciliação multi-nível
+          await executarConciliacao(tipo, data, user.id);
+          
+          toast.success(`Conciliação de ${tipo} concluída com sucesso! Verifique seu sino.`);
+        } catch (err: any) {
+          toast.error("Erro no processamento: " + err.message);
+        } finally {
+          setLoading(false);
+          if (fileRef.current) fileRef.current.value = "";
+        }
+      };
+      reader.readAsBinaryString(file);
+    } catch (err: any) {
+      toast.error("Erro ao ler arquivo");
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <input type="file" ref={fileRef} className="hidden" accept=".xlsx,.xls,.csv" onChange={handleFile} />
+      
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card className="border-blue-100 hover:shadow-md transition-shadow">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-bold flex items-center gap-2">
+              <div className="h-6 w-6 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-[10px] font-bold">1</div>
+              Varejo (Itaú)
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-xs text-slate-500">Importe o arquivo de retorno consolidado do Varejo.</p>
+            <Button 
+              variant="outline" 
+              className="w-full h-24 border-dashed border-2 hover:border-blue-400 hover:bg-blue-50/50 flex-col gap-2"
+              onClick={() => { setTipo("Varejo"); fileRef.current?.click(); }}
+              disabled={loading}
+            >
+              {loading && tipo === "Varejo" ? <Loader2 className="h-5 w-5 animate-spin" /> : <Upload className="h-5 w-5 text-blue-500" />}
+              <span className="text-xs font-medium">Selecionar arquivo Varejo</span>
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card className="border-indigo-100 hover:shadow-md transition-shadow">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-bold flex items-center gap-2">
+              <div className="h-6 w-6 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-[10px] font-bold">2</div>
+              Distribuição (Itaú)
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-xs text-slate-500">Importe o arquivo de retorno da Distribuição.</p>
+            <Button 
+              variant="outline" 
+              className="w-full h-24 border-dashed border-2 hover:border-indigo-400 hover:bg-indigo-50/50 flex-col gap-2"
+              onClick={() => { setTipo("Distribuição"); fileRef.current?.click(); }}
+              disabled={loading}
+            >
+              {loading && tipo === "Distribuição" ? <Loader2 className="h-5 w-5 animate-spin" /> : <Upload className="h-5 w-5 text-indigo-500" />}
+              <span className="text-xs font-medium">Selecionar arquivo Distribuição</span>
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+
+      <Card className="border-slate-200">
+        <CardHeader className="pb-3 border-b bg-slate-50/50">
+          <CardTitle className="text-sm font-bold flex items-center gap-2 text-slate-700">
+            <ShieldCheck className="h-4 w-4 text-emerald-600" /> Funcionamento da Conciliação Multi-nível
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-0">
+          <div className="grid md:grid-cols-2 lg:grid-cols-5 divide-x divide-slate-100">
+            {[
+              { level: 1, label: "Exata", desc: "Data, Empresa e Valor idênticos.", icon: CheckCircle2, color: "text-emerald-500" },
+              { level: 2, label: "Data Próxima", desc: "Empresa e Valor exatos, data +/- 2 dias.", icon: CheckCircle2, color: "text-blue-500" },
+              { level: 3, label: "Soma (SubSet)", desc: "Um valor do arquivo é a soma de vários títulos.", icon: Sparkles, color: "text-violet-500" },
+              { level: 4, label: "Ajuste de Tarifa", desc: "Valor com diferença mínima aceitável.", icon: AlertTriangle, color: "text-amber-500" },
+              { level: 5, label: "Divergência", desc: "Nenhuma correspondência encontrada.", icon: XCircle, color: "text-red-500" },
+            ].map((n) => (
+              <div key={n.level} className="p-4 space-y-2">
+                <div className="flex items-center gap-2">
+                  <n.icon className={`h-4 w-4 ${n.color}`} />
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Nível {n.level}</span>
+                </div>
+                <p className="text-xs font-bold text-slate-900">{n.label}</p>
+                <p className="text-[10px] text-slate-500 leading-relaxed">{n.desc}</p>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+import { Sparkles } from "lucide-react";
