@@ -235,9 +235,10 @@ function DashboardConteudo() {
               </div>
             </Link>
             {isLoading && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
-            <Button asChild size="sm" variant="default" className="gap-1.5">
-              <Link to="/base">
-                <Database className="h-3.5 w-3.5" /> Base de Resultados
+            <Button asChild size="sm" variant="ghost" className="h-9 px-3 text-white hover:bg-white/10 border border-white/20 ml-auto mr-4">
+              <Link to="/base" className="flex items-center gap-2">
+                <Database className="h-4 w-4" />
+                <span className="text-sm font-medium">Base de Resultados</span>
               </Link>
             </Button>
           </header>
