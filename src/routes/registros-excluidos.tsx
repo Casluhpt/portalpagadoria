@@ -268,7 +268,7 @@ function Board() {
       <div>
         <p className="text-sm text-muted-foreground">
           Área restrita ao Administrador — histórico dos registros apagados, organizados por empresa.
-          Arraste um cartão para a zona vermelha ou selecione múltiplos e clique em <strong>Apagar definitivamente</strong>.
+          Arraste um cartão para a zona vermelha ou selecione múltiplos e clique em <strong>Apagar definitivamente</strong>. Preciso falar algo?
         </p>
       </div>
 
