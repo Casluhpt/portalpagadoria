@@ -23,7 +23,6 @@ import { Route as ExportacaoRouteImport } from './routes/exportacao'
 import { Route as EsocialRouteImport } from './routes/esocial'
 import { Route as DivergenciasRouteImport } from './routes/divergencias'
 import { Route as DespesasFixasRouteImport } from './routes/despesas-fixas'
-import { Route as DashboardGerencialRouteImport } from './routes/dashboard-gerencial'
 import { Route as ConfiguracoesRouteImport } from './routes/configuracoes'
 import { Route as ConciliacaoRouteImport } from './routes/conciliacao'
 import { Route as BaseRouteImport } from './routes/base'
@@ -107,11 +106,6 @@ const DespesasFixasRoute = DespesasFixasRouteImport.update({
   path: '/despesas-fixas',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DashboardGerencialRoute = DashboardGerencialRouteImport.update({
-  id: '/dashboard-gerencial',
-  path: '/dashboard-gerencial',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ConfiguracoesRoute = ConfiguracoesRouteImport.update({
   id: '/configuracoes',
   path: '/configuracoes',
@@ -184,7 +178,6 @@ export interface FileRoutesByFullPath {
   '/base': typeof BaseRoute
   '/conciliacao': typeof ConciliacaoRoute
   '/configuracoes': typeof ConfiguracoesRoute
-  '/dashboard-gerencial': typeof DashboardGerencialRoute
   '/despesas-fixas': typeof DespesasFixasRoute
   '/divergencias': typeof DivergenciasRoute
   '/esocial': typeof EsocialRoute
@@ -213,7 +206,6 @@ export interface FileRoutesByTo {
   '/base': typeof BaseRoute
   '/conciliacao': typeof ConciliacaoRoute
   '/configuracoes': typeof ConfiguracoesRoute
-  '/dashboard-gerencial': typeof DashboardGerencialRoute
   '/despesas-fixas': typeof DespesasFixasRoute
   '/divergencias': typeof DivergenciasRoute
   '/esocial': typeof EsocialRoute
@@ -242,7 +234,6 @@ export interface FileRoutesById {
   '/base': typeof BaseRoute
   '/conciliacao': typeof ConciliacaoRoute
   '/configuracoes': typeof ConfiguracoesRoute
-  '/dashboard-gerencial': typeof DashboardGerencialRoute
   '/despesas-fixas': typeof DespesasFixasRoute
   '/divergencias': typeof DivergenciasRoute
   '/esocial': typeof EsocialRoute
@@ -273,7 +264,6 @@ export interface FileRouteTypes {
     | '/base'
     | '/conciliacao'
     | '/configuracoes'
-    | '/dashboard-gerencial'
     | '/despesas-fixas'
     | '/divergencias'
     | '/esocial'
@@ -302,7 +292,6 @@ export interface FileRouteTypes {
     | '/base'
     | '/conciliacao'
     | '/configuracoes'
-    | '/dashboard-gerencial'
     | '/despesas-fixas'
     | '/divergencias'
     | '/esocial'
@@ -330,7 +319,6 @@ export interface FileRouteTypes {
     | '/base'
     | '/conciliacao'
     | '/configuracoes'
-    | '/dashboard-gerencial'
     | '/despesas-fixas'
     | '/divergencias'
     | '/esocial'
@@ -360,7 +348,6 @@ export interface RootRouteChildren {
   BaseRoute: typeof BaseRoute
   ConciliacaoRoute: typeof ConciliacaoRoute
   ConfiguracoesRoute: typeof ConfiguracoesRoute
-  DashboardGerencialRoute: typeof DashboardGerencialRoute
   DespesasFixasRoute: typeof DespesasFixasRoute
   DivergenciasRoute: typeof DivergenciasRoute
   EsocialRoute: typeof EsocialRoute
@@ -477,13 +464,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DespesasFixasRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/dashboard-gerencial': {
-      id: '/dashboard-gerencial'
-      path: '/dashboard-gerencial'
-      fullPath: '/dashboard-gerencial'
-      preLoaderRoute: typeof DashboardGerencialRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/configuracoes': {
       id: '/configuracoes'
       path: '/configuracoes'
@@ -596,7 +576,6 @@ const rootRouteChildren: RootRouteChildren = {
   BaseRoute: BaseRoute,
   ConciliacaoRoute: ConciliacaoRoute,
   ConfiguracoesRoute: ConfiguracoesRoute,
-  DashboardGerencialRoute: DashboardGerencialRoute,
   DespesasFixasRoute: DespesasFixasRoute,
   DivergenciasRoute: DivergenciasRoute,
   EsocialRoute: EsocialRoute,
@@ -615,3 +594,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
