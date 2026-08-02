@@ -40,8 +40,8 @@ export const Route = createFileRoute("/despesas-fixas")({
 });
 
 const MESES = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
-const brl = (n: number) =>
-  n.toLocaleString("pt-BR", { style: "currency", currency: "BRL", minimumFractionDigits: 2 });
+const brl = (n: number | null | undefined) =>
+  (n ?? 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL", minimumFractionDigits: 2 });
 
 const chipGrupo: Record<GrupoDespesa, string> = {
   "PJ": "bg-blue-100 text-blue-800 border-blue-200",
@@ -370,11 +370,18 @@ function DespesasFixasPage() {
                               <td className="px-2 py-2 text-right font-semibold tabular-nums">{brl(dashboard.previsto)}</td>
                             </tr>
                             <tr className="bg-emerald-50/60">
-                              <td className="px-2 py-2 text-xs font-semibold text-emerald-700">Lançado</td>
+                              <td className="px-2 py-2 text-xs font-semibold text-emerald-700">Realizado</td>
                               {dashboard.porMes.map((m, i) => (
                                 <td key={i} className="px-2 py-2 text-right tabular-nums text-emerald-700">{brl(m.lancado)}</td>
                               ))}
                               <td className="px-2 py-2 text-right font-semibold tabular-nums text-emerald-700">{brl(dashboard.lancado)}</td>
+                            </tr>
+                            <tr className="bg-slate-50/40">
+                              <td className="px-2 py-2 text-xs font-semibold text-slate-500">Saldo</td>
+                              {dashboard.porMes.map((m, i) => (
+                                <td key={i} className="px-2 py-2 text-right tabular-nums">{brl(m.previsto - m.lancado)}</td>
+                              ))}
+                              <td className="px-2 py-2 text-right font-semibold tabular-nums">{brl(dashboard.previsto - dashboard.lancado)}</td>
                             </tr>
                           </tbody>
                         </table>
@@ -722,14 +729,26 @@ function DescricaoDialog({
           </DialogDescription>
         </DialogHeader>
         <div className="grid grid-cols-3 gap-3">
-          <div className="col-span-2">
+          <div className="col-span-1">
             <Label>Descrição / Nomenclatura</Label>
             <Input value={descricao} onChange={(e) => setDescricao(e.target.value)} />
+          </div>
+          <div>
+            <Label>SAP Code</Label>
+            <Input value={sapCode} onChange={(e) => setSapCode(e.target.value)} placeholder="ex.: 12345" />
           </div>
           <div>
             <Label>Nº do pedido</Label>
             <Input value={numeroPedido} onChange={(e) => setNumeroPedido(e.target.value)}
               placeholder="ex.: 78910" />
+          </div>
+          <div>
+            <Label>Orçamento Anual</Label>
+            <Input type="number" value={valorPrevistoAnual} onChange={(e) => setValorPrevistoAnual(Number(e.target.value))} placeholder="0.00" />
+          </div>
+          <div>
+            <Label>Saldo Inicial Pedido</Label>
+            <Input type="number" value={saldoInicialPedido} onChange={(e) => setSaldoInicialPedido(Number(e.target.value))} placeholder="0.00" />
           </div>
           {linha.categoria === "PJ" && (
             <div className="col-span-3">
