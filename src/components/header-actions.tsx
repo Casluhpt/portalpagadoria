@@ -98,8 +98,8 @@ export function HeaderActions() {
   const meta = presenceMeta[status];
 
   return (
-    <div className="flex items-center gap-1.5">
-      <div className="hidden xl:block">
+    <div className="flex min-w-0 items-center gap-1 sm:gap-1.5">
+      <div className="hidden lg:block">
         <GlobalSearch />
       </div>
       <NotificationBell />

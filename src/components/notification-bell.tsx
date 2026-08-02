@@ -149,7 +149,7 @@ export function NotificationBell() {
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent align="end" className="w-96 p-0">
+      <PopoverContent align="end" collisionPadding={12} className="w-[calc(100vw-1.5rem)] max-w-96 p-0 sm:w-96">
         <div className="flex items-center justify-between border-b border-border px-4 py-3">
           <div>
             <div className="flex items-center gap-2">
@@ -173,7 +173,7 @@ export function NotificationBell() {
                   <Clock className="h-4 w-4" />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-40 p-1" side="left" align="start">
+              <PopoverContent className="w-40 p-1" side="bottom" align="end" collisionPadding={12}>
                 <div className="grid gap-1">
                   <p className="px-2 py-1 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Silenciar</p>
                   {isSnoozed ? (
