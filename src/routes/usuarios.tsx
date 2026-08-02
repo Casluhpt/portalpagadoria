@@ -467,9 +467,7 @@ function UsuariosTable() {
           </tbody>
         </table>
       </div>
-      <p className="text-[11px] text-muted-foreground">
-        * Status em tempo real: presença é atualizada enquanto o usuário mantém a aba aberta.
-      </p>
+      {/* Status em tempo real desativado conforme solicitação */}
     </div>
   );
 }

@@ -38,34 +38,8 @@ export function usePresence() {
 
   // On login → announce, heartbeat while tab visible, offline on unload
   useEffect(() => {
-    if (!user?.id) return;
-    // Announce current status immediately
-    void push(statusRef.current);
-
-    const tick = () => {
-      if (typeof document !== "undefined" && document.visibilityState === "hidden") return;
-      if (statusRef.current === "offline") return;
-      void push(statusRef.current);
-    };
-    const interval = window.setInterval(tick, HEARTBEAT_MS);
-
-    const onVisibility = () => {
-      if (document.visibilityState === "visible" && statusRef.current !== "offline") {
-        void push(statusRef.current);
-      }
-    };
-    const onUnload = () => { void push("offline"); };
-
-    document.addEventListener("visibilitychange", onVisibility);
-    window.addEventListener("beforeunload", onUnload);
-    window.addEventListener("pagehide", onUnload);
-
-    return () => {
-      window.clearInterval(interval);
-      document.removeEventListener("visibilitychange", onVisibility);
-      window.removeEventListener("beforeunload", onUnload);
-      window.removeEventListener("pagehide", onUnload);
-    };
+    // Real-time presence heartbeat disabled per user request
+    return;
   }, [user?.id]);
 
   // Sign out → offline
