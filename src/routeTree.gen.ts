@@ -15,6 +15,7 @@ import { Route as RegistrosExcluidosRouteImport } from './routes/registros-exclu
 import { Route as ProvisaoRouteImport } from './routes/provisao'
 import { Route as PrincipalRouteImport } from './routes/principal'
 import { Route as PagamentosRouteImport } from './routes/pagamentos'
+import { Route as MaterialApoioRouteImport } from './routes/material-apoio'
 import { Route as HistoricoRouteImport } from './routes/historico'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as FechamentoRouteImport } from './routes/fechamento'
@@ -64,6 +65,11 @@ const PrincipalRoute = PrincipalRouteImport.update({
 const PagamentosRoute = PagamentosRouteImport.update({
   id: '/pagamentos',
   path: '/pagamentos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MaterialApoioRoute = MaterialApoioRouteImport.update({
+  id: '/material-apoio',
+  path: '/material-apoio',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HistoricoRoute = HistoricoRouteImport.update({
@@ -186,6 +192,7 @@ export interface FileRoutesByFullPath {
   '/fechamento': typeof FechamentoRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/historico': typeof HistoricoRoute
+  '/material-apoio': typeof MaterialApoioRoute
   '/pagamentos': typeof PagamentosRoute
   '/principal': typeof PrincipalRoute
   '/provisao': typeof ProvisaoRouteWithChildren
@@ -214,6 +221,7 @@ export interface FileRoutesByTo {
   '/fechamento': typeof FechamentoRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/historico': typeof HistoricoRoute
+  '/material-apoio': typeof MaterialApoioRoute
   '/pagamentos': typeof PagamentosRoute
   '/principal': typeof PrincipalRoute
   '/registros-excluidos': typeof RegistrosExcluidosRoute
@@ -242,6 +250,7 @@ export interface FileRoutesById {
   '/fechamento': typeof FechamentoRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/historico': typeof HistoricoRoute
+  '/material-apoio': typeof MaterialApoioRoute
   '/pagamentos': typeof PagamentosRoute
   '/principal': typeof PrincipalRoute
   '/provisao': typeof ProvisaoRouteWithChildren
@@ -272,6 +281,7 @@ export interface FileRouteTypes {
     | '/fechamento'
     | '/forgot-password'
     | '/historico'
+    | '/material-apoio'
     | '/pagamentos'
     | '/principal'
     | '/provisao'
@@ -300,6 +310,7 @@ export interface FileRouteTypes {
     | '/fechamento'
     | '/forgot-password'
     | '/historico'
+    | '/material-apoio'
     | '/pagamentos'
     | '/principal'
     | '/registros-excluidos'
@@ -327,6 +338,7 @@ export interface FileRouteTypes {
     | '/fechamento'
     | '/forgot-password'
     | '/historico'
+    | '/material-apoio'
     | '/pagamentos'
     | '/principal'
     | '/provisao'
@@ -356,6 +368,7 @@ export interface RootRouteChildren {
   FechamentoRoute: typeof FechamentoRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   HistoricoRoute: typeof HistoricoRoute
+  MaterialApoioRoute: typeof MaterialApoioRoute
   PagamentosRoute: typeof PagamentosRoute
   PrincipalRoute: typeof PrincipalRoute
   ProvisaoRoute: typeof ProvisaoRouteWithChildren
@@ -406,6 +419,13 @@ declare module '@tanstack/react-router' {
       path: '/pagamentos'
       fullPath: '/pagamentos'
       preLoaderRoute: typeof PagamentosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/material-apoio': {
+      id: '/material-apoio'
+      path: '/material-apoio'
+      fullPath: '/material-apoio'
+      preLoaderRoute: typeof MaterialApoioRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/historico': {
@@ -584,6 +604,7 @@ const rootRouteChildren: RootRouteChildren = {
   FechamentoRoute: FechamentoRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   HistoricoRoute: HistoricoRoute,
+  MaterialApoioRoute: MaterialApoioRoute,
   PagamentosRoute: PagamentosRoute,
   PrincipalRoute: PrincipalRoute,
   ProvisaoRoute: ProvisaoRouteWithChildren,
