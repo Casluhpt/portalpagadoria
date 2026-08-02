@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { Building2, Calendar, Landmark, ListChecks, Lock, LockOpen, Send, Wallet, FileCheck2, Info } from "lucide-react";
 import { toast } from "sonner";
 
@@ -8,6 +9,15 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { fetchAllProvisao, provisaoQueryKey } from "@/lib/provisao";
 import { comunicadosQueryKey, publicarComunicado } from "@/lib/comunicados";
 import { createLancamento, lancamentosQueryKey } from "@/lib/lancamentos";
