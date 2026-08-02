@@ -1,4 +1,4 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute, redirect, Link } from "@tanstack/react-router";
 import { useMemo, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -68,7 +68,31 @@ function Content() {
       </div>
     );
   }
-  return <Board />;
+  return (
+    <SidebarProvider>
+      <div className="flex min-h-screen w-full bg-background">
+        <AppSidebar />
+        <div className="flex flex-1 flex-col">
+          <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-border bg-background/80 px-4 backdrop-blur">
+            <SidebarTrigger />
+            <Link to="/" className="flex flex-1 items-center gap-2 hover:opacity-80 transition-opacity">
+              <img src="/profarma.png" alt="Profarma" className="h-7 object-contain" />
+              <div>
+                <h1 className="text-sm font-semibold text-foreground">Registros Excluídos</h1>
+                <p className="text-[10px] text-muted-foreground">Auditoria e recuperação lógica</p>
+              </div>
+            </Link>
+            <div className="ml-auto">
+              <HeaderActions />
+            </div>
+          </header>
+          <main className="flex-1 p-4 lg:p-6">
+            <Board />
+          </main>
+        </div>
+      </div>
+    </SidebarProvider>
+  );
 }
 
 function empresaOf(r: RegistroExcluido): string {
