@@ -120,6 +120,7 @@ export type Database = {
       }
       comunicados: {
         Row: {
+          canal: string | null
           criado_em: string
           criado_por: string | null
           id: string
@@ -127,6 +128,7 @@ export type Database = {
           titulo: string
         }
         Insert: {
+          canal?: string | null
           criado_em?: string
           criado_por?: string | null
           id?: string
@@ -134,6 +136,7 @@ export type Database = {
           titulo: string
         }
         Update: {
+          canal?: string | null
           criado_em?: string
           criado_por?: string | null
           id?: string
@@ -310,6 +313,39 @@ export type Database = {
           updated_at?: string
           valor?: number
           valor_realizado?: number | null
+        }
+        Relationships: []
+      }
+      fechamento_aprovacoes: {
+        Row: {
+          ano: number
+          arquivo_url: string | null
+          criado_em: string | null
+          id: string
+          nome: string
+          total_registros: number | null
+          total_valor: number | null
+          usuario_id: string | null
+        }
+        Insert: {
+          ano: number
+          arquivo_url?: string | null
+          criado_em?: string | null
+          id?: string
+          nome: string
+          total_registros?: number | null
+          total_valor?: number | null
+          usuario_id?: string | null
+        }
+        Update: {
+          ano?: number
+          arquivo_url?: string | null
+          criado_em?: string | null
+          id?: string
+          nome?: string
+          total_registros?: number | null
+          total_valor?: number | null
+          usuario_id?: string | null
         }
         Relationships: []
       }
