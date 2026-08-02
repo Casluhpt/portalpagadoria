@@ -6,6 +6,7 @@ import { ptBR } from "date-fns/locale";
 import {
   Download, GitBranch, Loader2, Search, Sparkles, ShieldCheck, Wrench, Bug,
 } from "lucide-react";
+import logoPagadoria from "@/assets/logo-pagadoria.png.asset.json";
 import { useRoles } from "@/hooks/use-roles";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -214,8 +215,8 @@ function Content() {
     <div className="flex flex-1 flex-col gap-4 p-4">
       <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-card p-4">
         <div className="flex items-center gap-3">
-          <div className="grid h-10 w-10 place-items-center rounded-lg bg-[image:var(--gradient-primary)] text-primary-foreground shadow-[var(--shadow-glow)]">
-            <GitBranch className="h-5 w-5" />
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-card/50 overflow-hidden shadow-sm border border-border">
+            <img src={logoPagadoria.url} alt="Pagadoria" className="h-6 w-6 object-contain" />
           </div>
           <div>
             <p className="text-xs uppercase tracking-wide text-muted-foreground">Versão atual</p>
