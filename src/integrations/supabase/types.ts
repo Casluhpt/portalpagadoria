@@ -406,6 +406,51 @@ export type Database = {
         }
         Relationships: []
       }
+      material_apoio: {
+        Row: {
+          categoria: string
+          conteudo: string
+          created_at: string
+          criado_por: string | null
+          criado_por_nome: string | null
+          id: string
+          ordem: number
+          palavras_chave: string[]
+          publicado: boolean
+          resumo: string | null
+          titulo: string
+          updated_at: string
+        }
+        Insert: {
+          categoria?: string
+          conteudo: string
+          created_at?: string
+          criado_por?: string | null
+          criado_por_nome?: string | null
+          id?: string
+          ordem?: number
+          palavras_chave?: string[]
+          publicado?: boolean
+          resumo?: string | null
+          titulo: string
+          updated_at?: string
+        }
+        Update: {
+          categoria?: string
+          conteudo?: string
+          created_at?: string
+          criado_por?: string | null
+          criado_por_nome?: string | null
+          id?: string
+          ordem?: number
+          palavras_chave?: string[]
+          publicado?: boolean
+          resumo?: string | null
+          titulo?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       pagamento_solicitacoes: {
         Row: {
           criado_em: string
