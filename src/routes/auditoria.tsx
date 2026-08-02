@@ -18,6 +18,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { useRoles } from "@/hooks/use-roles";
 import { RegistrosExcluidosView } from "@/routes/registros-excluidos";
+import { RestrictedArea } from "@/components/role-gate";
 import { AcoesCriticasView } from "@/components/acoes-criticas-view";
 
 type AuditTab = "log" | "criticas" | "excluidos";
