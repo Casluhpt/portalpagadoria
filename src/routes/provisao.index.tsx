@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Building2, Calendar, Landmark, ListChecks, Lock, LockOpen, Send, Wallet } from "lucide-react";
+import { Building2, Calendar, Landmark, ListChecks, Lock, LockOpen, Send, Wallet, FileCheck2, Info } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,9 @@ import {
   provisaoFechamentosKey, todayISO,
 } from "@/lib/provisao-fechamento";
 import { useSession } from "@/hooks/use-session";
+import { fecharCompetenciaProvisao, integrarPagamentosNaProvisao, fetchArchivedProvisao, provisaoArchivedQueryKey } from "@/lib/provisao-fechamento-competencia";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 import profarmaLogo from "@/assets/profarma-logo.png.asset.json";
 
 
@@ -31,8 +34,15 @@ const firstOfMonth = () => {
   const d = new Date();
   return new Date(d.getFullYear(), d.getMonth(), 1).toISOString().slice(0, 10);
 };
-const fmtBR = (iso: string) =>
-  new Date(iso + "T00:00:00").toLocaleDateString("pt-BR");
+const fmtBR = (iso: string) => {
+  if (!iso) return "—";
+  try {
+    const [y, m, d] = iso.split("-");
+    return `${d}/${m}/${y}`;
+  } catch {
+    return iso;
+  }
+};
 
 function ProvisaoDashboard() {
   const [dateFrom, setDateFrom] = useState<string>(firstOfMonth());
