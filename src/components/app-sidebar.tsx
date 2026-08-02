@@ -89,6 +89,12 @@ const advancedItems: MenuItem[] = [
   { title: "Auditoria", url: "/auditoria", icon: ScrollText, match: (p) => p === "/auditoria" || p === "/registros-excluidos", allowedRoles: ["administrador", "auditor"] },
 ];
 
+const settingItems: MenuItem[] = [
+  { title: "Administração de usuários", url: "/usuarios", icon: Users, match: (p) => p === "/usuarios", adminOnly: true },
+  { title: "Histórico de versões", url: "/historico", icon: History, match: (p) => p === "/historico", adminOnly: true },
+  { title: "Configurações Técnicas", url: "/configuracoes", icon: Cog, match: (p) => p === "/configuracoes", adminOnly: true },
+];
+
 const roleLabel: Record<AppRole, string> = {
   administrador: "Administração",
   criador_competencia: "Criador de Competência",
