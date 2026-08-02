@@ -564,7 +564,7 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
             <Download className="h-4 w-4" />
             Exportar Excel
           </Button>
-          <FechamentoCompetenciaButton onComplete={invalidate} disabled={!isEditingEnabled} />
+          <FechamentoCompetenciaButton onComplete={invalidate} disabled={!isEditingEnabled} data={data} />
           <Button
             size="sm"
             className="gap-1"
@@ -1200,21 +1200,38 @@ function FilterSelect({
   );
 }
 
-function FechamentoCompetenciaButton({ onComplete, disabled }: { onComplete: () => void; disabled?: boolean }) {
+function FechamentoCompetenciaButton({ onComplete, disabled, data }: { onComplete: () => void; disabled?: boolean; data: Pagamento[] }) {
   const { isAdmin } = useRoles();
-
   const [open, setOpen] = useState(false);
   const [nome, setNome] = useState("");
   const { user } = useSession();
 
   const mutation = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.from("pagamentos" as any).delete().neq("id", "00000000-0000-0000-0000-000000000000");
-      if (error) throw error;
+      if (!user) throw new Error("Usuário não autenticado");
+      
+      // Export current data to Excel before clearing
+      const exportRows = data.map((r) => {
+        const o: Record<string, unknown> = {};
+        for (const c of PAGAMENTO_CAMPOS) {
+          const v = (r as any)[c.key];
+          o[c.label] = c.key === "registrado_em" ? fmtDateTime(v as string) : v;
+        }
+        return o;
+      });
+      const ws = XLSX.utils.json_to_sheet(exportRows);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Fechamento");
+      XLSX.writeFile(wb, `fechamento-${nome}-${format(new Date(), "dd-MM-yyyy")}.xlsx`);
+
+      // Database closure and cleanup
+      const { fecharCompetenciaPagamentos } = await import("@/lib/fechamento-pagamentos");
+      await fecharCompetenciaPagamentos(nome, user.id, data);
     },
     onSuccess: () => {
-      toast.success("Competência de Pagamentos Diversos fechada.");
+      toast.success("Competência de Pagamentos Diversos fechada e base limpa.");
       setOpen(false);
+      setNome("");
       onComplete();
     },
     onError: (e: any) => toast.error(e.message),
@@ -1230,10 +1247,14 @@ function FechamentoCompetenciaButton({ onComplete, disabled }: { onComplete: () 
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Fechamento de Competência — Pagamentos Diversos</DialogTitle>
-          <DialogDescription className="bg-red-50 p-3 text-red-800 border border-red-200 rounded-md flex items-start gap-2">
+          <DialogDescription className="mt-2 bg-red-50 p-4 text-red-800 border border-red-200 rounded-md flex flex-col gap-2">
+            <div className="flex items-center gap-2 font-bold text-red-600">
+              <Info className="h-5 w-5" />
+              INFORMATIVO CRÍTICO
+            </div>
             <span className="text-sm">
-              Ao realizar o fechamento, os dados de <b>Pagamentos Diversos</b> serão arquivados 
-              e a base será limpa para o próximo ciclo.
+              Ao realizar o fechamento, os dados de <b>Pagamentos Diversos</b> serão salvos em um arquivo Excel 
+              e a base será <b>totalmente limpa</b> para iniciar um novo ciclo. Esta ação é irreversível na base ativa.
             </span>
           </DialogDescription>
         </DialogHeader>
@@ -1251,11 +1272,11 @@ function FechamentoCompetenciaButton({ onComplete, disabled }: { onComplete: () 
         <DialogFooter>
           <Button variant="outline" onClick={() => setOpen(false)}>Cancelar</Button>
           <Button 
-            className="bg-red-600 hover:bg-red-700 text-white"
+            className="bg-red-600 hover:bg-red-700 text-white font-bold"
             onClick={() => mutation.mutate()}
             disabled={!nome || mutation.isPending}
           >
-            {mutation.isPending ? "Processando..." : "Realizar Fechamento"}
+            {mutation.isPending ? "Processando..." : "Realizar Fechamento e Limpar Base"}
           </Button>
         </DialogFooter>
       </DialogContent>

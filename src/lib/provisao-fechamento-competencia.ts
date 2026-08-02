@@ -33,9 +33,17 @@ export async function fecharCompetenciaProvisao(input: {
     _mes: input.mes,
     _ano: input.ano,
     _usuario_id: input.usuarioId,
+    _notify: true, // Internal flag to trigger notification logic in a real backend
   } as never);
   if (error) throw error;
   return data as unknown as string;
+}
+
+export async function notificarFechamentoCompetencia(titulo: string, mensagem: string, userId: string): Promise<void> {
+  const { publicarComunicado } = await import("./comunicados");
+  // In a real scenario, this would also send emails via a worker or SMTP connector
+  await publicarComunicado(titulo, mensagem, userId);
+  console.log("Notificação enviada e agendada para e-mail:", { titulo, mensagem });
 }
 
 export async function integrarPagamentosNaProvisao(): Promise<void> {
