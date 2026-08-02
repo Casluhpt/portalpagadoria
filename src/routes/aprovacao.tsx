@@ -375,7 +375,7 @@ function BaseView({ rows, ano, isLoading, onUpsert, onBulkInsert, onDelete }: Ba
       empresa: r.empresa, tipo: r.tipo, ordem_pagamento: r.ordem_pagamento,
       valor: Number(r.valor), status: r.status, ano, ordem: maxOrdem + i + 1,
     }));
-    await onBulkInsert(payload);
+    await onBulkInsert({ rows: payload });
     if (cutIds.size) {
       await onDelete(Array.from(cutIds));
       setCutIds(new Set());
@@ -398,7 +398,7 @@ function BaseView({ rows, ano, isLoading, onUpsert, onBulkInsert, onDelete }: Ba
       empresa: null, tipo: "mensal" as const, ordem_pagamento: null,
       valor: 0, status: "Pendente" as const, ano, ordem: maxOrdem + i + 1,
     }));
-    await onBulkInsert(payload);
+    await onBulkInsert({ rows: payload });
     setNovoOpen(false);
     toast.success(`${qtd} linha(s) adicionada(s)`);
   };
