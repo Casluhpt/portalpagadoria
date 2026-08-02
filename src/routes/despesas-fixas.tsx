@@ -68,6 +68,8 @@ type LinhaAgrupada = {
     centro_custo: string | null;
     numero_pedido: string | null;
     sap_code: string | null;
+    pedido_antigo: string | null;
+    pedido_novo: string | null;
     valor_previsto_anual: number | null;
     saldo_inicial_pedido: number | null;
     nome_real: string | null;
@@ -83,6 +85,8 @@ function DespesasFixasPage() {
   const [tab, setTab] = useState<"dashboard" | GrupoDespesa>("dashboard");
   const [busca, setBusca] = useState("");
   const [showSuspended, setShowSuspended] = useState(false);
+  const [showClosedMonths, setShowClosedMonths] = useState(false);
+  const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
   const [novaLinha, setNovaLinha] = useState<{ categoria: CategoriaDespesa; descricao: string } | null>(null);
   const [confirmDel, setConfirmDel] = useState<LinhaAgrupada | null>(null);
   const [editandoRegistro, setEditandoRegistro] = useState<{
@@ -134,6 +138,8 @@ function DespesasFixasPage() {
             centro_custo: r.centro_custo,
             numero_pedido: r.numero_pedido,
             sap_code: (r as any).sap_code ?? null,
+            pedido_antigo: (r as any).pedido_antigo ?? null,
+            pedido_novo: (r as any).pedido_novo ?? null,
             valor_previsto_anual: (r as any).valor_previsto_anual ?? null,
             saldo_inicial_pedido: (r as any).saldo_inicial_pedido ?? null,
             nome_real: (r as any).nome_real ?? null,
@@ -148,7 +154,7 @@ function DespesasFixasPage() {
       const v = Number(r.valor) || 0;
       l.totalPrevisto += v;
       if (r.lancado) l.totalLancado += v;
-      (["empresa_codigo","empresa_nome","conta","centro_custo","numero_pedido","sap_code","valor_previsto_anual","saldo_inicial_pedido","nome_real","notas","suspensa","motivo_suspensao"] as const).forEach((k) => {
+      (["empresa_codigo","empresa_nome","conta","centro_custo","numero_pedido","sap_code","pedido_antigo","pedido_novo","valor_previsto_anual","saldo_inicial_pedido","nome_real","notas","suspensa","motivo_suspensao"] as const).forEach((k) => {
         if (!l!.meta[k as keyof typeof l.meta] && (r as any)[k]) (l!.meta as any)[k] = (r as any)[k];
       });
     });
@@ -239,6 +245,31 @@ function DespesasFixasPage() {
     toast.success("Linha excluída");
   };
 
+  const excluirEmLote = async () => {
+    if (selectedKeys.size === 0) return;
+    const lins = linhas.filter(l => selectedKeys.has(l.key));
+    for (const linha of lins) {
+      const ids = linha.registros.filter(Boolean).map((r) => r!.id);
+      for (const id of ids) await deleteFn({ data: { id } });
+    }
+    qc.invalidateQueries({ queryKey });
+    setSelectedKeys(new Set());
+    toast.success(`${selectedKeys.size} linhas excluídas`);
+  };
+
+  const suspenderEmLote = async (motivo: string) => {
+    if (selectedKeys.size === 0) return;
+    const lins = linhas.filter(l => selectedKeys.has(l.key));
+    for (const l of lins) {
+      await updateMetaMut.mutateAsync({
+        categoria: l.categoria, descricao: l.descricao, ano,
+        suspensa: true, motivo_suspensao: motivo
+      });
+    }
+    setSelectedKeys(new Set());
+    toast.success(`${selectedKeys.size} linhas suspensas`);
+  };
+
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full bg-gradient-to-br from-slate-50 via-slate-100 to-emerald-50/40">
@@ -271,9 +302,27 @@ function DespesasFixasPage() {
                 <Checkbox id="suspended" checked={showSuspended} onCheckedChange={(v) => setShowSuspended(!!v)} />
                 <Label htmlFor="suspended" className="cursor-pointer">Ver suspensos</Label>
               </div>
+              <div className="flex items-center gap-2 rounded-md border px-3 text-xs bg-white h-10">
+                <Checkbox id="closedMonths" checked={showClosedMonths} onCheckedChange={(v) => setShowClosedMonths(!!v)} />
+                <Label htmlFor="closedMonths" className="cursor-pointer">Ver meses fechados</Label>
+              </div>
               <Button variant="outline" size="sm" className="gap-2">
                 <Search className="h-4 w-4" /> Busca Centralizada
               </Button>
+              {selectedKeys.size > 0 && (
+                <div className="flex items-center gap-2 border-l pl-3 ml-2">
+                  <span className="text-xs font-semibold text-indigo-600">{selectedKeys.size} selecionados</span>
+                  <Button variant="destructive" size="sm" onClick={excluirEmLote} className="h-8 px-2">
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => {
+                    const m = prompt("Motivo da suspensão em lote:");
+                    if (m) suspenderEmLote(m);
+                  }} className="h-8 px-2">
+                    Suspender
+                  </Button>
+                </div>
+              )}
               {tab !== "dashboard" && (
                 <Button size="sm" className="ml-auto bg-indigo-600 hover:bg-indigo-700"
                   onClick={() => setNovaLinha({
@@ -418,6 +467,27 @@ function DespesasFixasPage() {
                     <TabsContent key={g} value={g} className="space-y-2">
                       <GrupoTabela
                         linhas={linhasPorGrupo(g)}
+                        showClosedMonths={showClosedMonths}
+                        selectedKeys={selectedKeys}
+                        onToggleSelect={(key, e) => {
+                          const newSelected = new Set(selectedKeys);
+                          if (e.ctrlKey || e.metaKey) {
+                            if (newSelected.has(key)) newSelected.delete(key); else newSelected.add(key);
+                          } else {
+                            newSelected.clear();
+                            newSelected.add(key);
+                          }
+                          setSelectedKeys(newSelected);
+                        }}
+                        onToggleAll={(keys) => {
+                          if (keys.every(k => selectedKeys.has(k))) {
+                            const next = new Set(selectedKeys);
+                            keys.forEach(k => next.delete(k));
+                            setSelectedKeys(next);
+                          } else {
+                            setSelectedKeys(new Set([...selectedKeys, ...keys]));
+                          }
+                        }}
                         onOpenCelula={(linha, mes) => setEditandoRegistro({ linha, mes })}
                         onOpenDescricao={(linha) => setEditandoDescricao(linha)}
                         onExcluir={(linha) => setConfirmDel(linha)}
@@ -505,34 +575,27 @@ function StatCard({ title, value, icon, tone, isCount }: { title: string; value:
 }
 
 function GrupoTabela({
-  linhas, onOpenCelula, onOpenDescricao, onExcluir,
+  linhas, showClosedMonths, selectedKeys, onToggleSelect, onToggleAll, onOpenCelula, onOpenDescricao, onExcluir,
 }: {
   linhas: LinhaAgrupada[];
+  showClosedMonths: boolean;
+  selectedKeys: Set<string>;
+  onToggleSelect: (key: string, e: React.MouseEvent) => void;
+  onToggleAll: (keys: string[]) => void;
   onOpenCelula: (l: LinhaAgrupada, mes: number) => void;
   onOpenDescricao: (l: LinhaAgrupada) => void;
   onExcluir: (l: LinhaAgrupada) => void;
 }) {
-  const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
+  const currentMonthIdx = new Date().getMonth(); // 0-11
+  const visibleMonths = useMemo(() => {
+    if (showClosedMonths) return MESES;
+    return MESES.filter((_, i) => i >= currentMonthIdx - 1);
+  }, [showClosedMonths, currentMonthIdx]);
 
-  const toggleSelect = (key: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    const newSelected = new Set(selectedKeys);
-    if (e.ctrlKey || e.metaKey) {
-      if (newSelected.has(key)) newSelected.delete(key); else newSelected.add(key);
-    } else {
-      newSelected.clear();
-      newSelected.add(key);
-    }
-    setSelectedKeys(newSelected);
-  };
+  const allSelected = linhas.length > 0 && linhas.every(l => selectedKeys.has(l.key));
+  const someSelected = !allSelected && linhas.some(l => selectedKeys.has(l.key));
 
-  const allSelected = linhas.length > 0 && selectedKeys.size === linhas.length;
-  const someSelected = selectedKeys.size > 0 && selectedKeys.size < linhas.length;
-
-  const toggleAll = () => {
-    if (allSelected) setSelectedKeys(new Set());
-    else setSelectedKeys(new Set(linhas.map(l => l.key)));
-  };
+  const handleToggleAll = () => onToggleAll(linhas.map(l => l.key));
 
   if (linhas.length === 0) {
     return (
@@ -547,11 +610,11 @@ function GrupoTabela({
         <thead className="sticky top-0 bg-slate-50">
           <tr>
             <th className="w-8 border-b border-border px-2 py-2">
-              <Checkbox checked={allSelected ? true : someSelected ? "indeterminate" : false} onCheckedChange={toggleAll} />
+              <Checkbox checked={allSelected ? true : someSelected ? "indeterminate" : false} onCheckedChange={handleToggleAll} />
             </th>
-            <th className="border-b border-border px-3 py-2 text-left font-semibold">Descrição / Empresa</th>
-            {MESES.map((m) => (
-              <th key={m} className="border-b border-border px-2 py-2 text-right font-semibold">{m}</th>
+            <th className="border-b border-border px-3 py-2 text-left font-semibold">Descrição / Empresa / Pedido</th>
+            {MESES.map((m, i) => (
+              visibleMonths.includes(m) && <th key={m} className="border-b border-border px-2 py-2 text-right font-semibold">{m}</th>
             ))}
             <th className="border-b border-border px-3 py-2 text-right font-semibold">Orçado/Saldo</th>
             <th className="border-b border-border px-3 py-2 text-right font-semibold">Previsto/Realizado</th>
@@ -567,7 +630,7 @@ function GrupoTabela({
                 l.meta.suspensa && "opacity-50 grayscale bg-slate-100/50",
                 selectedKeys.has(l.key) && "bg-blue-50"
               )}
-              onClick={(e) => toggleSelect(l.key, e)}
+              onClick={(e) => onToggleSelect(l.key, e)}
             >
               <td className="border-b border-border px-2 py-1">
                 <Checkbox checked={selectedKeys.has(l.key)} onCheckedChange={() => {}} onClick={(e) => e.stopPropagation()} />
@@ -604,9 +667,11 @@ function GrupoTabela({
                 </button>
               </td>
               {l.registros.map((r, i) => (
-                <td key={i} className="border-b border-border px-1 py-1 text-right">
-                  <CelulaMes registro={r} onClick={() => onOpenCelula(l, i + 1)} />
-                </td>
+                visibleMonths.includes(MESES[i]) && (
+                  <td key={i} className="border-b border-border px-1 py-1 text-right">
+                    <CelulaMes registro={r} onClick={() => onOpenCelula(l, i + 1)} />
+                  </td>
+                )
               ))}
               <td className="border-b border-border px-3 py-2 text-right tabular-nums">
                 <div className="flex flex-col items-end">
@@ -880,18 +945,19 @@ function DescricaoDialog({
   onClose: () => void;
   onSave: (payload: any) => Promise<void>;
 }) {
+  const [meta, setMeta] = useState(linha.meta);
   const [descricao, setDescricao] = useState(linha.descricao);
-  const [nomeReal, setNomeReal] = useState(linha.meta.nome_real ?? "");
-  const [empresaCodigo, setEmpresaCodigo] = useState(linha.meta.empresa_codigo ?? "");
-  const [conta, setConta] = useState(linha.meta.conta ?? "");
-  const [centroCusto, setCentroCusto] = useState(linha.meta.centro_custo ?? "");
-  const [numeroPedido, setNumeroPedido] = useState(linha.meta.numero_pedido ?? "");
-  const [sapCode, setSapCode] = useState(linha.meta.sap_code ?? "");
-  const [valorPrevistoAnual, setValorPrevistoAnual] = useState(linha.meta.valor_previsto_anual ?? 0);
-  const [saldoInicialPedido, setSaldoInicialPedido] = useState(linha.meta.saldo_inicial_pedido ?? 0);
-  const [suspensa, setSuspensa] = useState(linha.meta.suspensa);
-  const [motivoSuspensao, setMotivoSuspensao] = useState(linha.meta.motivo_suspensao ?? "");
-  const [notas, setNotas] = useState(linha.meta.notas ?? "");
+  const [nomeReal, setNomeReal] = useState(meta.nome_real ?? "");
+  const [empresaCodigo, setEmpresaCodigo] = useState(meta.empresa_codigo ?? "");
+  const [conta, setConta] = useState(meta.conta ?? "");
+  const [centroCusto, setCentroCusto] = useState(meta.centro_custo ?? "");
+  const [numeroPedido, setNumeroPedido] = useState(meta.numero_pedido ?? "");
+  const [sapCode, setSapCode] = useState(meta.sap_code ?? "");
+  const [valorPrevistoAnual, setValorPrevistoAnual] = useState(meta.valor_previsto_anual ?? 0);
+  const [saldoInicialPedido, setSaldoInicialPedido] = useState(meta.saldo_inicial_pedido ?? 0);
+  const [suspensa, setSuspensa] = useState(meta.suspensa);
+  const [motivoSuspensao, setMotivoSuspensao] = useState(meta.motivo_suspensao ?? "");
+  const [notas, setNotas] = useState(meta.notas ?? "");
   const [saving, setSaving] = useState(false);
 
   const submit = async () => {
@@ -906,6 +972,8 @@ function DescricaoDialog({
         conta: conta || null,
         centro_custo: centroCusto || null,
         numero_pedido: numeroPedido || null,
+        pedido_antigo: meta.pedido_antigo || null,
+        pedido_novo: meta.pedido_novo || null,
         sap_code: sapCode || null,
         valor_previsto_anual: valorPrevistoAnual || null,
         saldo_inicial_pedido: saldoInicialPedido || null,
@@ -936,7 +1004,17 @@ function DescricaoDialog({
             <Input value={sapCode} onChange={(e) => setSapCode(e.target.value)} placeholder="ex.: 12345" />
           </div>
           <div>
-            <Label>Nº do pedido</Label>
+            <Label>Nº pedido Antigo</Label>
+            <Input value={meta.pedido_antigo || ""} onChange={(e) => setMeta({ ...meta, pedido_antigo: e.target.value })}
+              placeholder="Antigo" />
+          </div>
+          <div>
+            <Label>Nº pedido Novo</Label>
+            <Input value={meta.pedido_novo || ""} onChange={(e) => setMeta({ ...meta, pedido_novo: e.target.value })}
+              placeholder="Novo" />
+          </div>
+          <div>
+            <Label>Nº do pedido (Atual)</Label>
             <Input value={numeroPedido} onChange={(e) => setNumeroPedido(e.target.value)}
               placeholder="ex.: 78910" />
           </div>

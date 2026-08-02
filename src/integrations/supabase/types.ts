@@ -245,11 +245,15 @@ export type Database = {
           numero_pedido: string | null
           observacao: string | null
           ordem: number
+          pedido_antigo: string | null
+          pedido_novo: string | null
+          sap_code: string | null
           suspensa: boolean | null
           tipo: string
           tipo_pj: string | null
           updated_at: string
           valor: number
+          valor_previsto_anual: number | null
           valor_realizado: number | null
         }
         Insert: {
@@ -276,11 +280,15 @@ export type Database = {
           numero_pedido?: string | null
           observacao?: string | null
           ordem?: number
+          pedido_antigo?: string | null
+          pedido_novo?: string | null
+          sap_code?: string | null
           suspensa?: boolean | null
           tipo?: string
           tipo_pj?: string | null
           updated_at?: string
           valor?: number
+          valor_previsto_anual?: number | null
           valor_realizado?: number | null
         }
         Update: {
@@ -307,14 +315,65 @@ export type Database = {
           numero_pedido?: string | null
           observacao?: string | null
           ordem?: number
+          pedido_antigo?: string | null
+          pedido_novo?: string | null
+          sap_code?: string | null
           suspensa?: boolean | null
           tipo?: string
           tipo_pj?: string | null
           updated_at?: string
           valor?: number
+          valor_previsto_anual?: number | null
           valor_realizado?: number | null
         }
         Relationships: []
+      }
+      despesas_fixas_notas: {
+        Row: {
+          criado_em: string | null
+          data_emissao: string | null
+          data_lancamento: string | null
+          data_vencimento: string | null
+          despesa_fixa_id: string | null
+          id: string
+          numero_nota: string | null
+          numero_pedido: string | null
+          tipo: string | null
+          valor: number | null
+        }
+        Insert: {
+          criado_em?: string | null
+          data_emissao?: string | null
+          data_lancamento?: string | null
+          data_vencimento?: string | null
+          despesa_fixa_id?: string | null
+          id?: string
+          numero_nota?: string | null
+          numero_pedido?: string | null
+          tipo?: string | null
+          valor?: number | null
+        }
+        Update: {
+          criado_em?: string | null
+          data_emissao?: string | null
+          data_lancamento?: string | null
+          data_vencimento?: string | null
+          despesa_fixa_id?: string | null
+          id?: string
+          numero_nota?: string | null
+          numero_pedido?: string | null
+          tipo?: string | null
+          valor?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "despesas_fixas_notas_despesa_fixa_id_fkey"
+            columns: ["despesa_fixa_id"]
+            isOneToOne: false
+            referencedRelation: "despesas_fixas"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       esocial_base: {
         Row: {

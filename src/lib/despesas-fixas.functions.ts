@@ -22,6 +22,18 @@ export const EMPRESAS = [
   { codigo: "5400", nome: "CSB HB" },
 ] as const;
 
+export type DespesaFixaNota = {
+  id: string;
+  despesa_fixa_id: string;
+  numero_nota: string | null;
+  numero_pedido: string | null;
+  valor: number;
+  data_emissao: string | null;
+  data_vencimento: string | null;
+  data_lancamento: string;
+  tipo: "Mensal" | "Adiantamento" | "Antecipação" | "PPR";
+};
+
 export type DespesaFixa = {
   id: string;
   categoria: CategoriaDespesa;
@@ -50,10 +62,13 @@ export type DespesaFixa = {
   valor_previsto_anual: number | null;
   saldo_inicial_pedido: number | null;
   sap_code: string | null;
+  pedido_antigo: string | null;
+  pedido_novo: string | null;
   created_by: string | null;
   created_by_nome: string | null;
   created_at: string;
   updated_at: string;
+  nf_entries?: DespesaFixaNota[];
 };
 
 export const listDespesasFixas = createServerFn({ method: "GET" })
@@ -62,7 +77,7 @@ export const listDespesasFixas = createServerFn({ method: "GET" })
   .handler(async ({ context, data }): Promise<DespesaFixa[]> => {
     const { data: rows, error } = await context.supabase
       .from("despesas_fixas")
-      .select("*")
+      .select("*, nf_entries:despesas_fixas_notas(*)")
       .eq("ano", data.ano)
       .order("categoria", { ascending: true })
       .order("ordem", { ascending: true })
@@ -169,6 +184,8 @@ export const updateDescricaoMeta = createServerFn({ method: "POST" })
       valor_previsto_anual: z.number().nullable().optional(),
       saldo_inicial_pedido: z.number().nullable().optional(),
       sap_code: z.string().max(60).nullable().optional(),
+      pedido_antigo: z.string().max(60).nullable().optional(),
+      pedido_novo: z.string().max(60).nullable().optional(),
       suspensa: z.boolean().optional(),
       motivo_suspensao: z.string().max(500).nullable().optional(),
     }).parse(d),
@@ -186,6 +203,8 @@ export const updateDescricaoMeta = createServerFn({ method: "POST" })
     if (data.valor_previsto_anual !== undefined) patch.valor_previsto_anual = data.valor_previsto_anual;
     if (data.saldo_inicial_pedido !== undefined) patch.saldo_inicial_pedido = data.saldo_inicial_pedido;
     if (data.sap_code !== undefined) patch.sap_code = data.sap_code;
+    if (data.pedido_antigo !== undefined) patch.pedido_antigo = data.pedido_antigo;
+    if (data.pedido_novo !== undefined) patch.pedido_novo = data.pedido_novo;
     if (data.suspensa !== undefined) patch.suspensa = data.suspensa;
     if (data.motivo_suspensao !== undefined) patch.motivo_suspensao = data.motivo_suspensao;
     if (data.nova_descricao && data.nova_descricao !== data.descricao) {
