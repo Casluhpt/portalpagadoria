@@ -155,7 +155,11 @@ function LancamentosTab({ colaboradorNome, userId }: { colaboradorNome: string; 
 
   const currentUserQueue = userId ? queue.find(q => q.user_id === userId) : undefined;
   const activeUser = queue.find(q => q.status === 'ativo');
-  const isEditingEnabled = !!userId && activeUser?.user_id === userId;
+  const { roles, isAdmin } = useRoles();
+  const isViewer = roles.includes("viewer");
+  const isVisitante = roles.includes("visitante");
+  
+  const isEditingEnabled = !!userId && activeUser?.user_id === userId && !isViewer && !isVisitante;
   const nextUser = queue.filter(q => q.status === 'aguardando').sort((a, b) => {
     const da = a.entrou_em ? new Date(a.entrou_em).getTime() : 0;
     const db = b.entrou_em ? new Date(b.entrou_em).getTime() : 0;
