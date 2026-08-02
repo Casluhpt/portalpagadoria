@@ -14,6 +14,7 @@ import {
   Trash2,
   LifeBuoy,
   ShieldCheck,
+  Star,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -59,6 +60,10 @@ import {
   rankMateriais,
   updateMaterial,
   type MaterialApoio,
+  favoritosMaterialQueryKey,
+  fetchFavoritos,
+  favoritarMaterial,
+  desfavoritarMaterial,
 } from "@/lib/material-apoio";
 
 export const Route = createFileRoute("/material-apoio")({
@@ -226,7 +231,40 @@ function MaterialApoioPage() {
     staleTime: 60_000,
   });
 
+  const { data: favoritos = [] } = useQuery({
+    queryKey: [...favoritosMaterialQueryKey, user?.id ?? "anon"],
+    queryFn: () => fetchFavoritos(user?.id),
+    enabled: !!user?.id,
+    staleTime: 30_000,
+  });
+  const favSet = useMemo(() => new Set(favoritos), [favoritos]);
+  const [salvandoFav, setSalvandoFav] = useState<string | null>(null);
+
+  async function alternarFavorito(m: MaterialApoio) {
+    if (!user?.id) {
+      toast.info("Entre na sua conta para favoritar materiais.");
+      return;
+    }
+    const jaEra = favSet.has(m.id);
+    setSalvandoFav(m.id);
+    try {
+      if (jaEra) {
+        await desfavoritarMaterial(user.id, m.id);
+        toast.success("Removido dos favoritos.");
+      } else {
+        await favoritarMaterial(user.id, m.id);
+        toast.success("Adicionado aos favoritos.");
+      }
+      await qc.invalidateQueries({ queryKey: favoritosMaterialQueryKey });
+    } catch (e: any) {
+      toast.error(e?.message ?? "Não foi possível atualizar os favoritos.");
+    } finally {
+      setSalvandoFav(null);
+    }
+  }
+
   const [busca, setBusca] = useState("");
+  const [somenteFavoritos, setSomenteFavoritos] = useState(false);
   const [categoria, setCategoria] = useState<string | null>(null);
   const [aberto, setAberto] = useState<string | null>(null);
 
@@ -247,9 +285,10 @@ function MaterialApoioPage() {
 
   const filtrados = useMemo(() => {
     let base = materiais;
+    if (somenteFavoritos) base = base.filter((m) => favSet.has(m.id));
     if (categoria) base = base.filter((m) => m.categoria === categoria);
     return rankMateriais(base, busca);
-  }, [materiais, busca, categoria]);
+  }, [materiais, busca, categoria, somenteFavoritos, favSet]);
 
   const sugestoes = useMemo(() => {
     if (busca.trim().length < 2) {
@@ -459,6 +498,17 @@ function MaterialApoioPage() {
                 >
                   Todos ({materiais.length})
                 </Button>
+                <Button
+                  size="sm"
+                  variant={somenteFavoritos ? "default" : "outline"}
+                  className="gap-1.5"
+                  onClick={() => setSomenteFavoritos((v) => !v)}
+                >
+                  <Star
+                    className={`h-3.5 w-3.5 ${somenteFavoritos ? "fill-current" : "text-amber-500"}`}
+                  />
+                  Favoritos ({favoritos.length})
+                </Button>
                 {categorias.map((c) => (
                   <Button
                     key={c}
@@ -524,6 +574,11 @@ function MaterialApoioPage() {
                                 <Badge variant="secondary" className="text-[10px]">
                                   {m.categoria}
                                 </Badge>
+                                {favSet.has(m.id) && (
+                                  <Badge className="gap-1 bg-amber-100 text-[10px] text-amber-700 hover:bg-amber-100 dark:bg-amber-900/40 dark:text-amber-300">
+                                    <Star className="h-2.5 w-2.5 fill-current" /> Favorito
+                                  </Badge>
+                                )}
                                 {!m.publicado && (
                                   <Badge variant="outline" className="text-[10px] text-amber-600">
                                     Rascunho
@@ -532,6 +587,28 @@ function MaterialApoioPage() {
                               </div>
                             </div>
                           </div>
+                          <div className="flex shrink-0 items-center gap-1">
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              className="h-7 w-7"
+                              disabled={salvandoFav === m.id}
+                              title={favSet.has(m.id) ? "Desfavoritar" : "Favoritar"}
+                              aria-label={favSet.has(m.id) ? "Desfavoritar material" : "Favoritar material"}
+                              onClick={() => alternarFavorito(m)}
+                            >
+                              {salvandoFav === m.id ? (
+                                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                              ) : (
+                                <Star
+                                  className={`h-4 w-4 ${
+                                    favSet.has(m.id)
+                                      ? "fill-amber-400 text-amber-500"
+                                      : "text-muted-foreground"
+                                  }`}
+                                />
+                              )}
+                            </Button>
                           {isAdmin && (
                             <div className="flex gap-1">
                               <Button
@@ -554,6 +631,7 @@ function MaterialApoioPage() {
                               </Button>
                             </div>
                           )}
+                          </div>
                         </div>
                       </CardHeader>
                       <CardContent className="flex flex-1 flex-col justify-between gap-3">

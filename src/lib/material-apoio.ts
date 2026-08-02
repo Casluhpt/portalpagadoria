@@ -83,3 +83,33 @@ export function rankMateriais(materiais: MaterialApoio[], term: string) {
     .sort((a, b) => b.score - a.score)
     .map((r) => r.m);
 }
+
+/* ---------- Favoritos (por usuário) ---------- */
+
+export const favoritosMaterialQueryKey = ["material_apoio_favoritos"] as const;
+
+export async function fetchFavoritos(userId: string | null | undefined): Promise<string[]> {
+  if (!userId) return [];
+  const { data, error } = await supabase
+    .from("material_apoio_favoritos")
+    .select("material_id")
+    .eq("user_id", userId);
+  if (error) throw error;
+  return (data ?? []).map((r) => r.material_id as string);
+}
+
+export async function favoritarMaterial(userId: string, materialId: string) {
+  const { error } = await supabase
+    .from("material_apoio_favoritos")
+    .insert({ user_id: userId, material_id: materialId });
+  if (error && error.code !== "23505") throw error;
+}
+
+export async function desfavoritarMaterial(userId: string, materialId: string) {
+  const { error } = await supabase
+    .from("material_apoio_favoritos")
+    .delete()
+    .eq("user_id", userId)
+    .eq("material_id", materialId);
+  if (error) throw error;
+}

@@ -451,6 +451,38 @@ export type Database = {
         }
         Relationships: []
       }
+      material_apoio_favoritos: {
+        Row: {
+          created_at: string
+          id: string
+          material_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          material_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          material_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "material_apoio_favoritos_material_id_fkey"
+            columns: ["material_id"]
+            isOneToOne: false
+            referencedRelation: "material_apoio"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pagamento_solicitacoes: {
         Row: {
           criado_em: string
