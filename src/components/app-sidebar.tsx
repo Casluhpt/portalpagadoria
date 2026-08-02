@@ -209,31 +209,14 @@ export function AppSidebar() {
                 {advancedItems.filter(canSee).map(renderItem)}
                 
                 {isAdmin && (
-                  <Collapsible asChild className="group/collapsible">
-                    <SidebarMenuItem>
-                      <CollapsibleTrigger asChild>
-                        <SidebarMenuButton tooltip="Configurações avançadas">
-                          <Settings className="h-4 w-4 shrink-0" />
-                          <span>Configurações avançadas</span>
-                          <ChevronRight className="ml-auto h-4 w-4 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-                        </SidebarMenuButton>
-                      </CollapsibleTrigger>
-                      <CollapsibleContent>
-                        <SidebarMenuSub>
-                          {settingItems.map((item) => (
-                            <SidebarMenuSubItem key={item.title}>
-                              <SidebarMenuSubButton asChild isActive={item.match(currentPath)}>
-                                <Link to={item.url}>
-                                  <item.icon className="h-4 w-4" />
-                                  <span>{item.title}</span>
-                                </Link>
-                              </SidebarMenuSubButton>
-                            </SidebarMenuSubItem>
-                          ))}
-                        </SidebarMenuSub>
-                      </CollapsibleContent>
-                    </SidebarMenuItem>
-                  </Collapsible>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild isActive={currentPath.startsWith("/configuracoes")} tooltip="Configurações">
+                      <Link to="/configuracoes">
+                        <Settings className="h-4 w-4 shrink-0" />
+                        <span>Configurações</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
                 )}
               </SidebarMenu>
             </SidebarGroupContent>
