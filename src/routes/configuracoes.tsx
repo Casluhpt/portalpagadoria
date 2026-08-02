@@ -396,6 +396,11 @@ function DiagnosticPanel() {
             <span className="text-sm text-slate-600 font-bold">1.2 GB / 10 GB</span>
           </div>
           <div className="flex items-center justify-between py-2">
+            <span className="text-sm font-medium">Pasta [anexo]</span>
+            <span className="text-sm text-emerald-600 font-bold">Ativa</span>
+          </div>
+          </div>
+          <div className="flex items-center justify-between py-2">
             <span className="text-sm font-medium">Último Backup</span>
             <span className="text-sm text-emerald-600 font-bold">Hoje, 03:00 AM</span>
           </div>
