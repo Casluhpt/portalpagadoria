@@ -397,7 +397,7 @@ function UserTableRow({ u, user, roleMut, setorMut, deleteMut, resetMut, compact
           {(() => {
             const current: "administrador" | "viewer" | "visitante" =
               u.roles.includes("administrador") ? "administrador" : u.roles.includes("visitante") ? "visitante" : "viewer";
-            const otherRoles = u.roles.filter((r) => r !== "administrador" && r !== "viewer");
+            const otherRoles = u.roles.filter((r: any) => r !== "administrador" && r !== "viewer");
             return (
               <>
                 <Select
