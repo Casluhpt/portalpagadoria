@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { HelpCircle, Bug, AlertCircle, MessageSquare, Send, CheckCircle2, Paperclip, X, Loader2, Settings, Users, History, ChevronRight, Activity, Cloud, ShieldCheck } from "lucide-react";
+import { HelpCircle, Bug, AlertCircle, MessageSquare, Send, CheckCircle2, Paperclip, X, Loader2, Settings, Users, History, ChevronRight, Activity, Cloud, ShieldCheck, Mail, Save } from "lucide-react";
 import { useState, useRef } from "react";
 import { useSession } from "@/hooks/use-session";
 import { useMutation } from "@tanstack/react-query";
@@ -133,12 +133,18 @@ function ConfiguracoesPage() {
                   <TabsTrigger value="diagnostico" className="gap-2">
                     <Activity className="h-4 w-4" /> Diagnóstico
                   </TabsTrigger>
+                  <TabsTrigger value="seguranca" className="gap-2">
+                    <ShieldCheck className="h-4 w-4" /> Segurança Avançada
+                  </TabsTrigger>
                 </TabsList>
                 <TabsContent value="suporte">
                   <SupportForm />
                 </TabsContent>
                 <TabsContent value="diagnostico">
                   <DiagnosticPanel />
+                </TabsContent>
+                <TabsContent value="seguranca">
+                  <AdvancedSecuritySettings />
                 </TabsContent>
               </Tabs>
             </div>

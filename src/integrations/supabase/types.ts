@@ -316,6 +316,66 @@ export type Database = {
         }
         Relationships: []
       }
+      esocial_base: {
+        Row: {
+          atualizado_em: string | null
+          bandeira: string | null
+          cnpj: string | null
+          criado_em: string | null
+          dcomp_compensado: boolean | null
+          empresa: string | null
+          id: string
+          mes_ano: string
+          nome_coligada: string | null
+          notificado: boolean | null
+          num_empresa: string | null
+          num_fopag: string | null
+          status_lancamento: string | null
+          valor_fgts: number | null
+          valor_inss: number | null
+          valor_irrf: number | null
+          valor_pis: number | null
+        }
+        Insert: {
+          atualizado_em?: string | null
+          bandeira?: string | null
+          cnpj?: string | null
+          criado_em?: string | null
+          dcomp_compensado?: boolean | null
+          empresa?: string | null
+          id?: string
+          mes_ano: string
+          nome_coligada?: string | null
+          notificado?: boolean | null
+          num_empresa?: string | null
+          num_fopag?: string | null
+          status_lancamento?: string | null
+          valor_fgts?: number | null
+          valor_inss?: number | null
+          valor_irrf?: number | null
+          valor_pis?: number | null
+        }
+        Update: {
+          atualizado_em?: string | null
+          bandeira?: string | null
+          cnpj?: string | null
+          criado_em?: string | null
+          dcomp_compensado?: boolean | null
+          empresa?: string | null
+          id?: string
+          mes_ano?: string
+          nome_coligada?: string | null
+          notificado?: boolean | null
+          num_empresa?: string | null
+          num_fopag?: string | null
+          status_lancamento?: string | null
+          valor_fgts?: number | null
+          valor_inss?: number | null
+          valor_irrf?: number | null
+          valor_pis?: number | null
+        }
+        Relationships: []
+      }
       fechamento_aprovacoes: {
         Row: {
           ano: number
@@ -753,6 +813,24 @@ export type Database = {
           numero_pedido?: string
           saldo_inicial?: number | null
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      portal_settings: {
+        Row: {
+          key: string
+          updated_at: string | null
+          value: Json | null
+        }
+        Insert: {
+          key: string
+          updated_at?: string | null
+          value?: Json | null
+        }
+        Update: {
+          key?: string
+          updated_at?: string | null
+          value?: Json | null
         }
         Relationships: []
       }
