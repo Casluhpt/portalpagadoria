@@ -210,13 +210,31 @@ function UsuariosTable() {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
+          <div className="flex items-center rounded-md border bg-background p-1">
+            <Button
+              variant={viewMode === "ampla" ? "secondary" : "ghost"}
+              size="sm"
+              className="h-7 gap-1 px-2"
+              onClick={() => setViewMode("ampla")}
+            >
+              <List className="h-3.5 w-3.5" /> Visão Ampla
+            </Button>
+            <Button
+              variant={viewMode === "setor" ? "secondary" : "ghost"}
+              size="sm"
+              className="h-7 gap-1 px-2"
+              onClick={() => setViewMode("setor")}
+            >
+              <LayoutGrid className="h-3.5 w-3.5" /> Por Setor
+            </Button>
+          </div>
           <div className="relative">
             <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Buscar por nome, email, perfil…"
-              className="h-9 w-72 pl-8"
+              placeholder="Buscar por nome, email, setor…"
+              className="h-9 w-64 pl-8"
             />
           </div>
           <Button size="sm" onClick={() => setInviteOpen(true)}>
