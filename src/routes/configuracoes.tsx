@@ -61,18 +61,53 @@ function SupportForm() {
   const { user } = useSession();
   const sendFn = useServerFn(sendSupportRequest);
   const [success, setSuccess] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [file, setFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [formData, setFormData] = useState({
     assunto: "" as "Bug e Correção" | "Erro" | "Melhoria",
     comentario: "",
     anexo_url: "",
   });
 
+  const uploadFile = async (file: File) => {
+    try {
+      setUploading(true);
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
+      const filePath = `${user?.id}/${fileName}`;
+
+      const { data, error } = await supabase.storage
+        .from('suporte_anexos')
+        .upload(filePath, file);
+
+      if (error) throw error;
+
+      // Get signed URL since bucket is private
+      const { data: urlData, error: urlError } = await supabase.storage
+        .from('suporte_anexos')
+        .createSignedUrl(filePath, 60 * 60 * 24 * 365); // 1 year expiry
+
+      if (urlError) throw urlError;
+      return urlData.signedUrl;
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const sendMut = useMutation({
     mutationFn: async () => {
       if (!user) throw new Error("Usuário não autenticado");
+      
+      let finalAnexoUrl = formData.anexo_url;
+      if (file) {
+        finalAnexoUrl = await uploadFile(file);
+      }
+
       return sendFn({
         data: {
           ...formData,
+          anexo_url: finalAnexoUrl,
           user_id: user.id,
           user_nome: (user.user_metadata?.nome || user.user_metadata?.full_name || "Usuário"),
           user_email: user.email!,
@@ -83,6 +118,7 @@ function SupportForm() {
       setSuccess(true);
       setTimeout(() => setSuccess(false), 5000);
       setFormData({ assunto: "" as any, comentario: "", anexo_url: "" });
+      setFile(null);
     },
     onError: (e: Error) => toast.error("Erro ao enviar: " + e.message),
   });
