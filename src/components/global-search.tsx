@@ -219,6 +219,7 @@ export function GlobalSearch({ variant = "compact" }: { variant?: "compact" | "h
       {trigger}
 
       <CommandDialog
+        className="duration-700 animate-in fade-in-0 zoom-in-95 slide-in-from-top-4"
         open={open}
         onOpenChange={(val) => {
           setOpen(val);
