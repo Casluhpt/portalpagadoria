@@ -21,10 +21,10 @@ export function BackButton() {
       onClick={onClick}
       aria-label="Voltar para a tela anterior"
       title="Voltar"
-      className="group fixed left-4 top-1/2 z-40 -translate-y-1/2 inline-flex items-center gap-2 rounded-full bg-gradient-to-br from-violet-600 to-indigo-700 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-violet-500/40 ring-1 ring-white/20 backdrop-blur transition hover:from-violet-500 hover:to-indigo-600 hover:shadow-xl hover:shadow-violet-500/50 active:scale-95"
+      className="group fixed left-6 top-6 z-[60] inline-flex h-9 items-center gap-2 rounded-lg bg-white/90 px-3 text-xs font-semibold text-slate-700 shadow-sm ring-1 ring-slate-200 backdrop-blur-md transition-all hover:bg-white hover:text-indigo-600 hover:shadow-md active:scale-95"
     >
-      <ArrowLeft className="h-4 w-4 transition group-hover:-translate-x-0.5" />
-      <span className="hidden sm:inline">Voltar</span>
+      <ArrowLeft className="h-3.5 w-3.5 transition group-hover:-translate-x-0.5" />
+      <span>Voltar</span>
     </button>
   );
 }
