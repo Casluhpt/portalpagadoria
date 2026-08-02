@@ -177,11 +177,14 @@ export function DocumentacaoTecnicaSection() {
           {podeBaixar && (
             <div className="flex flex-wrap gap-2">
               <Button size="sm" onClick={baixarPDF} className="gap-2">
-                <Download className="h-4 w-4" /> Baixar material em PDF
+                <Download className="h-4 w-4" /> PDF: Doc. Técnica e Engenharia
+              </Button>
+              <Button size="sm" onClick={baixarVersoesPDF} className="gap-2" variant="secondary">
+                <Download className="h-4 w-4" /> PDF: Histórico de Versões
               </Button>
               <Button size="sm" variant="outline" asChild className="gap-2">
                 <a href={CODIGO_URL} download="codigo-fonte-portal-pagadoria.txt">
-                  <FileCode2 className="h-4 w-4" /> Baixar código de criação
+                  <FileCode2 className="h-4 w-4" /> Código-fonte Completo
                 </a>
               </Button>
             </div>
