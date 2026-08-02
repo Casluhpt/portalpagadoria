@@ -2,7 +2,7 @@ import { createFileRoute, redirect, Link } from '@tanstack/react-router';
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { HeaderActions } from "@/components/header-actions";
-import profarmaLogo from "@/assets/profarma-logo.png.asset.json";
+import { AppLogo } from "@/components/app-logo";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { LayoutDashboard, ShieldCheck, History, AlertTriangle } from "lucide-react";
 
@@ -26,7 +26,7 @@ function BankReconciliationPage() {
           <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-border bg-card/90 px-4 backdrop-blur">
             <SidebarTrigger />
             <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-              <img src="/profarma.png" alt="Profarma" className="h-7 object-contain" />
+              <AppLogo className="h-7 w-auto" />
               <div className="ml-2 flex flex-col leading-tight">
                 <span className="text-sm font-semibold text-foreground">Conciliação Bancária</span>
                 <span className="text-[11px] text-muted-foreground">Validação multi-fonte</span>

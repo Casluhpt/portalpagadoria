@@ -288,7 +288,7 @@ function DespesasFixasPage() {
           <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-border bg-card/90 px-4 backdrop-blur">
             <SidebarTrigger />
             <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-              <img src="/profarma.png" alt="Profarma" className="h-7 object-contain" />
+              <AppLogo className="h-7 w-auto" />
               <div className="flex items-center gap-2">
                 <h1 className="text-sm font-semibold text-foreground">Despesas Fixas</h1>
                 <Badge variant="secondary">Ano {ano}</Badge>
