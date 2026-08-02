@@ -40,7 +40,7 @@ function AnexosPage() {
                     <FileArchive className="h-6 w-6" />
                   </div>
                   <div>
-                    <h2 className="text-lg font-bold text-slate-900">Documentos da Pagadoria</h2>
+                    <h2 className="text-lg font-bold text-slate-900">[anexo]</h2>
                     <p className="text-sm text-slate-600">
                       Centralização de comprovantes, relatórios, layouts e evidências operacionais.
                     </p>
