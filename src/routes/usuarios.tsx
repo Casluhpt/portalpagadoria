@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { TechnicalSpec } from "@/components/technical-spec";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { format, formatDistanceToNow } from "date-fns";
@@ -197,11 +198,7 @@ function UsuariosTable() {
 
   return (
     <div className="flex flex-1 flex-col gap-3 p-4">
-      <div className="mb-4 rounded-lg bg-indigo-50/50 p-4 border border-indigo-100 dark:bg-indigo-900/10 dark:border-indigo-900/30">
-        <p className="text-sm text-indigo-800 dark:text-indigo-300">
-          preciso que o administrador tenha uma visão geral aonde e quem podera ter visualização, não poderar ver, e podera editar pelo site, definido pela as opções, administração, viewer e visitante
-        </p>
-      </div>
+      <TechnicalSpec className="mb-4" />
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <p className="text-xs text-muted-foreground">
