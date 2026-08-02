@@ -73,25 +73,36 @@ type MenuItem = {
   restricted?: boolean;
   allowedRoles?: AppRole[];
   action?: "search";
+  group?: string;
 };
 
-const mainItems: MenuItem[] = [
-  { title: "Início", url: "/", icon: Home, match: (p) => p === "/" },
-  { title: "Resultados Principais", url: "/principal", icon: LayoutDashboard, match: (p) => p === "/principal", restricted: true, adminOnly: true },
-  { title: "Base de Resultados", url: "/base", icon: Database, match: (p) => p === "/base", restricted: true, adminOnly: true },
-  { title: "Provisão Diária", url: "/provisao", icon: Wallet, match: (p) => p === "/provisao", restricted: true, adminOnly: true },
-  { title: "[anexo]", url: "/anexos", icon: FileArchive, match: (p) => p.startsWith("/anexos") },
-  { title: "Conciliação Bancária", url: "/conciliacao", icon: ShieldCheck, match: (p) => p.startsWith("/conciliacao"), restricted: true, adminOnly: true },
-  { title: "Pagamentos Diversos", url: "/pagamentos", icon: Banknote, match: (p) => p.startsWith("/pagamentos") },
-  { title: "Administração de Comunicados", url: "/administracao", icon: Settings, match: (p) => p.startsWith("/administracao"), adminOnly: true },
-  { title: "Fechamento de Competência", url: "/fechamento", icon: FileCheck2, match: (p) => p.startsWith("/fechamento") },
-  { title: "Central de Divergências", url: "/divergencias", icon: AlertTriangle, match: (p) => p.startsWith("/divergencias") },
-  { title: "Despesas Fixas", url: "/despesas-fixas", icon: Wallet, match: (p) => p.startsWith("/despesas-fixas") },
-  { title: "Exportação de Relatórios", url: "/exportacao", icon: Download, match: (p) => p.startsWith("/exportacao") },
-  { title: "Material de Apoio", url: "/material-apoio", icon: BookOpen, match: (p) => p.startsWith("/material-apoio") },
-  { title: "Controle E-Social", url: "/esocial", icon: FileSpreadsheet, match: (p) => p.startsWith("/esocial") },
-  { title: "Busca Inteligente (IA)", url: "#", icon: Search, match: () => false, action: "search" },
+const navigationGroups = [
+  { id: "geral", label: "Navegação Geral" },
+  { id: "operacao", label: "Operação e Resultados" },
+  { id: "financeiro", label: "Financeiro e Controle" },
+  { id: "apoio", label: "Suporte e IA" }
+];
 
+const mainItems: MenuItem[] = [
+  { title: "Início", url: "/", icon: Home, match: (p) => p === "/", group: "geral" },
+  
+  { title: "Resultados Principais", url: "/principal", icon: LayoutDashboard, match: (p) => p === "/principal", restricted: true, adminOnly: true, group: "operacao" },
+  { title: "Base de Resultados", url: "/base", icon: Database, match: (p) => p === "/base", restricted: true, adminOnly: true, group: "operacao" },
+  { title: "Provisão Diária", url: "/provisao", icon: Wallet, match: (p) => p === "/provisao", restricted: true, adminOnly: true, group: "operacao" },
+  
+  { title: "Conciliação Bancária", url: "/conciliacao", icon: ShieldCheck, match: (p) => p.startsWith("/conciliacao"), restricted: true, adminOnly: true, group: "financeiro" },
+  { title: "Pagamentos Diversos", url: "/pagamentos", icon: Banknote, match: (p) => p.startsWith("/pagamentos"), group: "financeiro" },
+  { title: "Despesas Fixas", url: "/despesas-fixas", icon: Wallet, match: (p) => p.startsWith("/despesas-fixas"), group: "financeiro" },
+  { title: "Controle E-Social", url: "/esocial", icon: FileSpreadsheet, match: (p) => p.startsWith("/esocial"), group: "financeiro" },
+
+  { title: "[anexo]", url: "/anexos", icon: FileArchive, match: (p) => p.startsWith("/anexos"), group: "geral" },
+  { title: "Administração de Comunicados", url: "/administracao", icon: Settings, match: (p) => p.startsWith("/administracao"), adminOnly: true, group: "geral" },
+  { title: "Fechamento de Competência", url: "/fechamento", icon: FileCheck2, match: (p) => p.startsWith("/fechamento"), group: "geral" },
+  { title: "Central de Divergências", url: "/divergencias", icon: AlertTriangle, match: (p) => p.startsWith("/divergencias"), group: "geral" },
+  { title: "Exportação de Relatórios", url: "/exportacao", icon: Download, match: (p) => p.startsWith("/exportacao"), group: "geral" },
+
+  { title: "Material de Apoio", url: "/material-apoio", icon: BookOpen, match: (p) => p.startsWith("/material-apoio"), group: "apoio" },
+  { title: "Busca Inteligente (IA)", url: "#", icon: Search, match: () => false, action: "search", group: "apoio" },
 ];
 
 const advancedItems: MenuItem[] = [
@@ -194,14 +205,21 @@ export function AppSidebar() {
         </Link>
       </SidebarHeader>
       <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>Módulos</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {mainItems.filter(canSee).map(renderItem)}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+        {navigationGroups.map(group => {
+          const groupItems = mainItems.filter(item => item.group === group.id && canSee(item));
+          if (groupItems.length === 0) return null;
+          
+          return (
+            <SidebarGroup key={group.id}>
+              <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  {groupItems.map(renderItem)}
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+          );
+        })}
 
         {(advancedItems.filter(canSee).length > 0 || isAdmin) && (
           <SidebarGroup>
