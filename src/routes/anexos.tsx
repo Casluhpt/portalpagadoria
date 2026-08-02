@@ -26,11 +26,14 @@ function AnexosPage() {
       <div className="flex min-h-screen w-full bg-muted">
         <AppSidebar />
         <div className="flex flex-1 flex-col">
-          <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b bg-card/90 px-4 backdrop-blur">
+          <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-border bg-background/80 px-4 backdrop-blur">
             <SidebarTrigger />
             <Link to="/" className="flex flex-1 items-center gap-2 hover:opacity-80 transition-opacity">
               <img src="/profarma.png" alt="Profarma" className="h-7 object-contain" />
-              <h1 className="text-sm font-semibold text-foreground">[anexo]</h1>
+              <div>
+                <h1 className="text-sm font-semibold text-foreground">[anexo]</h1>
+                <p className="text-[10px] text-muted-foreground">Repositório de documentos digitais</p>
+              </div>
             </Link>
             <div className="ml-auto">
               <HeaderActions />
