@@ -22,6 +22,8 @@ import {
   Bell
 } from "lucide-react";
 import { useState, useMemo } from "react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -59,8 +61,14 @@ function ESocialPage() {
 
   const stats = useMemo(() => {
     const pendentes = base.filter(i => i.status_lancamento === 'Pendente' && !i.num_fopag && !i.dcomp_compensado).length;
-    const totalMes = base.reduce((acc, i) => acc + (Number(i.valor_inss) + Number(i.valor_irrf) + Number(i.valor_fgts) + Number(i.valor_pis)), 0);
-    return { pendentes, totalMes };
+    
+    const inss = base.reduce((acc, i) => acc + (Number(i.valor_inss) || 0), 0);
+    const irrf = base.reduce((acc, i) => acc + (Number(i.valor_irrf) || 0), 0);
+    const fgts = base.reduce((acc, i) => acc + (Number(i.valor_fgts) || 0), 0);
+    const pis = base.reduce((acc, i) => acc + (Number(i.valor_pis) || 0), 0);
+    
+    const totalMes = inss + irrf + fgts + pis;
+    return { pendentes, totalMes, inss, irrf, fgts, pis };
   }, [base]);
 
   return (
@@ -120,8 +128,35 @@ function ESocialPage() {
 
               <Card className="border-border dark:border-border">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                    <CreditCard className="h-4 w-4" /> Total de Impostos no Mês
+                  <CardTitle className="text-sm font-medium text-muted-foreground flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <CreditCard className="h-4 w-4" /> Total de Impostos no Mês
+                    </div>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full hover:bg-muted">
+                          <Info className="h-3.5 w-3.5 text-indigo-600" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-64 p-3 shadow-xl border-border bg-card" align="end">
+                        <div className="space-y-2">
+                          <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground border-b pb-1">Detalhamento da Soma</h4>
+                          <div className="grid grid-cols-2 gap-y-1 text-xs">
+                            <span className="text-muted-foreground">INSS:</span>
+                            <span className="font-medium text-right">{stats.inss.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
+                            
+                            <span className="text-muted-foreground">IRRF:</span>
+                            <span className="font-medium text-right">{stats.irrf.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
+                            
+                            <span className="text-muted-foreground">FGTS:</span>
+                            <span className="font-medium text-right">{stats.fgts.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
+                            
+                            <span className="text-muted-foreground">PIS:</span>
+                            <span className="font-medium text-right">{stats.pis.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
+                          </div>
+                        </div>
+                      </PopoverContent>
+                    </Popover>
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
