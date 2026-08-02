@@ -6,7 +6,7 @@ import * as XLSX from "xlsx";
 import {
   Loader2, Plus, Search, Trash2, ArrowUpDown, ArrowUp, ArrowDown,
   Upload, Download, LayoutGrid, Table as TableIcon,
-  Scissors, Palette, X, Lock, Unlock, Users, Timer, LogOut
+  Scissors, Palette, X, Lock, Unlock, Users, Timer, LogOut, Info
 } from "lucide-react";
 import {
   Dialog, DialogContent, DialogDescription, DialogFooter,
