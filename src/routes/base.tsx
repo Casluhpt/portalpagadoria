@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
+import * as XLSX from "xlsx";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Loader2, Plus, Search, Trash2, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
+import { Loader2, Plus, Search, Trash2, ArrowUpDown, ArrowUp, ArrowDown, Upload, Download, FileSpreadsheet } from "lucide-react";
 
 import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
@@ -19,7 +20,20 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+
+import {
+  LANCAMENTO_COLUNAS,
+  importLancamentosBulk,
   createLancamento,
   deleteLancamento,
   fetchAllLancamentos,
@@ -98,6 +112,65 @@ function BasePage() {
     onError: (e: Error) => toast.error("Falha ao excluir: " + e.message),
   });
 
+  const fileRef = useRef<HTMLInputElement | null>(null);
+  const [importOpen, setImportOpen] = useState(false);
+  const [importMode, setImportMode] = useState<"incremental" | "substituir">("incremental");
+
+  const importMut = useMutation({
+    mutationFn: async (file: File) => {
+      const buf = await file.arrayBuffer();
+      const wb = XLSX.read(buf, { cellDates: true });
+      const sheet = wb.Sheets[wb.SheetNames[0]];
+      const json = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, { defval: null });
+      if (json.length === 0) throw new Error("Planilha vazia");
+
+      const norm = (v: string) => v.toString().trim().toLowerCase();
+      const mapa = new Map(LANCAMENTO_COLUNAS.map((c) => [norm(c.label), c]));
+      const registros = json.map((linha) => {
+        const out: Record<string, unknown> = {};
+        for (const [k, v] of Object.entries(linha)) {
+          const col = mapa.get(norm(k));
+          if (!col || v == null || v === "") continue;
+          if (col.tipo === "numero") {
+            const n = typeof v === "number" ? v : Number(String(v).replace(/[^0-9,.-]/g, "").replace(/\./g, "").replace(",", "."));
+            out[col.key] = Number.isFinite(n) ? n : null;
+          } else if (col.tipo === "data") {
+            const d = v instanceof Date ? v : new Date(String(v));
+            out[col.key] = Number.isNaN(d.getTime()) ? null : d.toISOString().slice(0, 10);
+          } else {
+            out[col.key] = String(v);
+          }
+        }
+        return out as Partial<Lancamento>;
+      }).filter((r) => Object.keys(r).length > 0);
+
+      if (registros.length === 0) throw new Error("Nenhuma coluna reconhecida. Baixe o modelo e confira os cabeçalhos.");
+      return importLancamentosBulk(registros, importMode === "substituir");
+    },
+    onSuccess: (qtd) => {
+      invalidate();
+      setImportOpen(false);
+      toast.success(`${qtd.toLocaleString("pt-BR")} registros importados`);
+    },
+    onError: (e: Error) => toast.error("Falha na importação: " + e.message),
+  });
+
+  const baixarModelo = () => {
+    const ws = XLSX.utils.aoa_to_sheet([LANCAMENTO_COLUNAS.map((c) => c.label)]);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Base");
+    XLSX.writeFile(wb, "modelo-base-resultados.xlsx");
+  };
+
+  const exportarBase = () => {
+    const dados = (data ?? []).map((r) =>
+      Object.fromEntries(LANCAMENTO_COLUNAS.map((c) => [c.label, r[c.key] ?? ""])),
+    );
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(dados), "Base");
+    XLSX.writeFile(wb, `base-resultados-${new Date().toISOString().slice(0, 10)}.xlsx`);
+  };
+
   const rows = useMemo(() => {
     const list = data ?? [];
     const q = search.trim().toLowerCase();
@@ -139,7 +212,7 @@ function BasePage() {
           <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-border bg-background/80 px-4 backdrop-blur">
             <SidebarTrigger />
             <div className="flex-1">
-              <h1 className="text-sm font-semibold text-foreground">Base</h1>
+              <h1 className="text-sm font-semibold text-foreground">Base de Resultados Principais</h1>
               <p className="text-xs text-muted-foreground">
                 {isLoading
                   ? "Carregando…"
@@ -157,6 +230,12 @@ function BasePage() {
                 className="pl-8"
               />
             </div>
+            <Button size="sm" variant="outline" className="gap-1" onClick={() => setImportOpen(true)}>
+              <Upload className="h-4 w-4" /> Importar Excel
+            </Button>
+            <Button size="sm" variant="outline" className="gap-1" onClick={exportarBase}>
+              <Download className="h-4 w-4" /> Exportar
+            </Button>
             <Button
               size="sm"
               onClick={() => createMut.mutate()}
@@ -167,6 +246,68 @@ function BasePage() {
               Nova linha
             </Button>
           </header>
+
+          <Dialog open={importOpen} onOpenChange={setImportOpen}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Importar base de resultados</DialogTitle>
+                <DialogDescription>
+                  Selecione o modo de importação e envie a planilha. Os cabeçalhos devem seguir o modelo.
+                </DialogDescription>
+              </DialogHeader>
+              <RadioGroup
+                value={importMode}
+                onValueChange={(v) => setImportMode(v as "incremental" | "substituir")}
+                className="gap-3"
+              >
+                <div className="flex items-start gap-2 rounded-md border border-border p-3">
+                  <RadioGroupItem value="incremental" id="modo-incremental" className="mt-0.5" />
+                  <Label htmlFor="modo-incremental" className="cursor-pointer font-normal">
+                    <span className="font-medium">Incremental</span>
+                    <span className="block text-xs text-muted-foreground">Adiciona aos registros existentes.</span>
+                  </Label>
+                </div>
+                <div className="flex items-start gap-2 rounded-md border border-border p-3">
+                  <RadioGroupItem value="substituir" id="modo-substituir" className="mt-0.5" />
+                  <Label htmlFor="modo-substituir" className="cursor-pointer font-normal">
+                    <span className="font-medium">Substituir a base</span>
+                    <span className="block text-xs text-muted-foreground">
+                      Remove os registros atuais (exclusão lógica, restaurável em Auditoria) antes de importar.
+                    </span>
+                  </Label>
+                </div>
+              </RadioGroup>
+              <input
+                ref={fileRef}
+                type="file"
+                accept=".xlsx,.xls,.csv"
+                className="hidden"
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  e.target.value = "";
+                  if (f) importMut.mutate(f);
+                }}
+              />
+              <DialogFooter className="gap-2 sm:justify-between">
+                <Button variant="ghost" size="sm" className="gap-1" onClick={baixarModelo}>
+                  <FileSpreadsheet className="h-4 w-4" /> Baixar modelo
+                </Button>
+                <Button
+                  size="sm"
+                  className="gap-1"
+                  disabled={importMut.isPending}
+                  onClick={() => fileRef.current?.click()}
+                >
+                  {importMut.isPending ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Upload className="h-4 w-4" />
+                  )}
+                  Selecionar planilha
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
 
           <main className="flex-1 overflow-hidden p-4">
             <div className="relative h-[calc(100vh-8rem)] overflow-auto rounded-lg border border-border bg-card">

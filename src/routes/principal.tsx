@@ -1,7 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Check, ChevronDown, Filter, Loader2, RotateCcw } from "lucide-react";
+import { Check, ChevronDown, Database, Filter, Loader2, RotateCcw } from "lucide-react";
 import {
   Bar,
   BarChart,
@@ -233,6 +233,11 @@ function DashboardConteudo() {
               </div>
               {isLoading && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
             </div>
+            <Button asChild size="sm" variant="default" className="gap-1.5">
+              <Link to="/base">
+                <Database className="h-3.5 w-3.5" /> Base de Resultados
+              </Link>
+            </Button>
           </header>
 
           <main className="flex-1 p-4 lg:p-6">

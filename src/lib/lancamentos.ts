@@ -126,3 +126,45 @@ export async function deleteLancamento(id: string): Promise<void> {
 }
 
 export const lancamentosQueryKey = ["lancamentos"] as const;
+
+/** Cabeçalhos aceitos na importação Excel (rótulo → campo do modelo). */
+export const LANCAMENTO_COLUNAS: { label: string; key: keyof Omit<Lancamento, "id">; tipo: "texto" | "numero" | "data" }[] = [
+  { label: "Pré-Pedido", key: "prePedido", tipo: "numero" },
+  { label: "Issuer", key: "issuer", tipo: "texto" },
+  { label: "Supplier", key: "supplier", tipo: "texto" },
+  { label: "Invoice Number", key: "invoiceNumber", tipo: "texto" },
+  { label: "Account Group", key: "accountGroup", tipo: "texto" },
+  { label: "Center", key: "center", tipo: "texto" },
+  { label: "Company", key: "company", tipo: "numero" },
+  { label: "Due Date", key: "dueDate", tipo: "data" },
+  { label: "Gross Amount", key: "grossAmount", tipo: "numero" },
+  { label: "Register Date", key: "registerDate", tipo: "data" },
+  { label: "Desc Status", key: "descStatus", tipo: "texto" },
+  { label: "Log", key: "log", tipo: "texto" },
+  { label: "Text", key: "text", tipo: "texto" },
+  { label: "Action", key: "action", tipo: "texto" },
+  { label: "Empresa", key: "Empresa", tipo: "texto" },
+];
+
+/** Importa lançamentos em lote. `substituir` limpa a base antes (exclusão lógica no banco). */
+export async function importLancamentosBulk(
+  registros: Partial<Lancamento>[],
+  substituir: boolean,
+): Promise<number> {
+  if (substituir) {
+    const atuais = await fetchAllLancamentos();
+    for (const r of atuais) await deleteLancamento(r.id);
+  }
+  const rows = registros.map((r) => toRow(r));
+  const CHUNK = 400;
+  let total = 0;
+  for (let i = 0; i < rows.length; i += CHUNK) {
+    const { error, data } = await supabase
+      .from("lancamentos")
+      .insert(rows.slice(i, i + CHUNK) as never)
+      .select("id");
+    if (error) throw error;
+    total += data?.length ?? 0;
+  }
+  return total;
+}
