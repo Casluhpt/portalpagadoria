@@ -1110,7 +1110,7 @@ function FechamentoCompetenciaButton({ onComplete }: { onComplete: () => void })
 
   const mutation = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.from("pagamentos").delete().neq("id", "00000000-0000-0000-0000-000000000000");
+      const { error } = await supabase.from("pagamentos" as any).delete().neq("id", "00000000-0000-0000-0000-000000000000");
       if (error) throw error;
     },
     onSuccess: () => {
