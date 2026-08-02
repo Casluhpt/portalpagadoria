@@ -228,7 +228,7 @@ export function GlobalSearch({ variant = "compact" }: { variant?: "compact" | "h
           }
         }}
       >
-        <div className="flex items-center gap-2 border-b px-3">
+        <div className="flex items-center gap-2 border-none px-3">
           <Search className="h-4 w-4 shrink-0 opacity-50" />
           <CommandInput
             placeholder="Busque matrícula, usuário, empresa, colaborador, fornecedor, competência…"
