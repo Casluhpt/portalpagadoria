@@ -64,6 +64,9 @@ type LinhaAgrupada = {
     conta: string | null;
     centro_custo: string | null;
     numero_pedido: string | null;
+    sap_code: string | null;
+    valor_previsto_anual: number | null;
+    saldo_inicial_pedido: number | null;
     nome_real: string | null;
     notas: string | null;
   };
@@ -123,6 +126,9 @@ function DespesasFixasPage() {
             conta: r.conta,
             centro_custo: r.centro_custo,
             numero_pedido: r.numero_pedido,
+            sap_code: (r as any).sap_code ?? null,
+            valor_previsto_anual: (r as any).valor_previsto_anual ?? null,
+            saldo_inicial_pedido: (r as any).saldo_inicial_pedido ?? null,
             nome_real: (r as any).nome_real ?? null,
             notas: (r as any).notas ?? null,
           },
@@ -133,7 +139,7 @@ function DespesasFixasPage() {
       const v = Number(r.valor) || 0;
       l.totalPrevisto += v;
       if (r.lancado) l.totalLancado += v;
-      (["empresa_codigo","empresa_nome","conta","centro_custo","numero_pedido","nome_real","notas"] as const).forEach((k) => {
+      (["empresa_codigo","empresa_nome","conta","centro_custo","numero_pedido","sap_code","valor_previsto_anual","saldo_inicial_pedido","nome_real","notas"] as const).forEach((k) => {
         if (!l!.meta[k] && (r as any)[k]) l!.meta[k] = (r as any)[k];
       });
     });
