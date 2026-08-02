@@ -18,6 +18,7 @@ function AnexosPage() {
     "Documentações",
     "Evidências operacionais",
     "Conciliação bancaria",
+    "Processo de aprovação",
   ];
   return (
     <SidebarProvider>
