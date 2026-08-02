@@ -276,8 +276,8 @@ export function AppSidebar() {
             className="h-10 w-10 object-contain" 
           />
           <div className="flex flex-col leading-tight group-data-[collapsible=icon]:hidden">
-            <span className="text-sm font-semibold text-sidebar-foreground">Pagadoria</span>
-            <span className="text-xs text-muted-foreground">Portal Corporativo</span>
+            <span className="text-sm font-semibold text-sidebar-foreground">Portal Pagadoria</span>
+            <span className="text-[10px] text-muted-foreground">Central de inteligência financeira</span>
           </div>
         </Link>
       </SidebarHeader>
