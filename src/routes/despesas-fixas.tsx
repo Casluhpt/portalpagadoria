@@ -265,8 +265,15 @@ function DespesasFixasPage() {
                 placeholder="Buscar por descrição, empresa ou código…"
                 value={busca} onChange={(e) => setBusca(e.target.value)} className="w-80"
               />
+              <div className="flex items-center gap-2 rounded-md border px-3 text-xs bg-white h-10">
+                <Checkbox id="suspended" checked={showSuspended} onCheckedChange={(v) => setShowSuspended(!!v)} />
+                <Label htmlFor="suspended" className="cursor-pointer">Ver suspensos</Label>
+              </div>
+              <Button variant="outline" size="sm" className="gap-2">
+                <Search className="h-4 w-4" /> Busca Centralizada
+              </Button>
               {tab !== "dashboard" && (
-                <Button size="sm" className="ml-auto"
+                <Button size="sm" className="ml-auto bg-indigo-600 hover:bg-indigo-700"
                   onClick={() => setNovaLinha({
                     categoria: tab === "PJ" ? "PJ" : tab === "Fornecedores" ? "Fornecedores" : "Pensão",
                     descricao: "",

@@ -169,6 +169,8 @@ export const updateDescricaoMeta = createServerFn({ method: "POST" })
       valor_previsto_anual: z.number().nullable().optional(),
       saldo_inicial_pedido: z.number().nullable().optional(),
       sap_code: z.string().max(60).nullable().optional(),
+      suspensa: z.boolean().optional(),
+      motivo_suspensao: z.string().max(500).nullable().optional(),
     }).parse(d),
   )
   .handler(async ({ context, data }) => {
@@ -184,6 +186,8 @@ export const updateDescricaoMeta = createServerFn({ method: "POST" })
     if (data.valor_previsto_anual !== undefined) patch.valor_previsto_anual = data.valor_previsto_anual;
     if (data.saldo_inicial_pedido !== undefined) patch.saldo_inicial_pedido = data.saldo_inicial_pedido;
     if (data.sap_code !== undefined) patch.sap_code = data.sap_code;
+    if (data.suspensa !== undefined) patch.suspensa = data.suspensa;
+    if (data.motivo_suspensao !== undefined) patch.motivo_suspensao = data.motivo_suspensao;
     if (data.nova_descricao && data.nova_descricao !== data.descricao) {
       patch.descricao = data.nova_descricao;
     }
