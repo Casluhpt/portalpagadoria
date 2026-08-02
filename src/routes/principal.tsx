@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppLogo } from "@/components/app-logo";
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Check, ChevronDown, Database, Filter, LayoutDashboard, Loader2, RotateCcw } from "lucide-react";
+import { Check, ChevronDown, Database, FileText, Filter, LayoutDashboard, Loader2, RotateCcw } from "lucide-react";
 import {
   Bar,
   BarChart,
@@ -34,6 +34,7 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ShieldAlert } from "lucide-react";
 import { useRoles } from "@/hooks/use-roles";
+import { exportResultadosPDF } from "@/lib/export-utils";
 
 import { fetchAllLancamentos, lancamentosQueryKey, type Lancamento } from "@/lib/lancamentos";
 import logoAsset from "@/assets/profarma-logo.png.asset.json";
@@ -214,6 +215,25 @@ function DashboardConteudo() {
     (actions.length ? 1 : 0) +
     (dateFrom || dateTo ? 1 : 0);
 
+  const handleExportPDF = async () => {
+    const activeFilters = [];
+    if (dateFrom || dateTo) activeFilters.push({ label: "Período", value: `${dateFrom || "Início"} até ${dateTo || "Fim"}` });
+    if (status.length) activeFilters.push({ label: "Status", value: status.join(", ") });
+    if (issuers.length) activeFilters.push({ label: "Colaboradores", value: issuers.join(", ") });
+    if (empresas.length) activeFilters.push({ label: "Empresas", value: empresas.join(", ") });
+    if (actions.length) activeFilters.push({ label: "Lançamentos", value: actions.join(", ") });
+
+    await exportResultadosPDF({
+      total,
+      valorTotal: brl(valorTotal),
+      filtros: activeFilters,
+      byMonth,
+      byUser,
+      byModalidade: byModalidade,
+      byEmpresa
+    });
+  };
+
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full bg-background">
@@ -292,10 +312,18 @@ function DashboardConteudo() {
                   <Button
                     variant="secondary"
                     size="sm"
+                    onClick={handleExportPDF}
+                    className="bg-white/10 text-white hover:bg-white/20 border-white/20"
+                  >
+                    <FileText className="mr-1.5 h-3.5 w-3.5" /> PDF
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    size="sm"
                     onClick={resetAll}
                     className="bg-white/10 text-white hover:bg-white/20 border-white/20"
                   >
-                    <RotateCcw className="mr-1 h-3.5 w-3.5" /> Limpar
+                    <RotateCcw className="mr-1.5 h-3.5 w-3.5" /> Limpar
                   </Button>
                 </div>
               </div>
