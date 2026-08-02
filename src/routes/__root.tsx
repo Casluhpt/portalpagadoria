@@ -114,7 +114,6 @@ function RootShell({ children }: { children: ReactNode }) {
         <HeadContent />
       </head>
       <body className="group/body">
-        <div className="fixed top-0 left-0 z-[9999] opacity-0 group-hover/body:opacity-100 pointer-events-none p-2 bg-black/50 text-white text-[10px]">OI</div>
         {children}
         <Scripts />
       </body>
