@@ -339,6 +339,7 @@ function Content() {
           </li>
         ))}
       </ol>
+      </div>
     </div>
   );
 }
