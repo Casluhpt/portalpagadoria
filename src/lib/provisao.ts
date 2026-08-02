@@ -36,7 +36,16 @@ type InsertRow = {
 };
 
 const toRow = (m: Partial<Provisao>): InsertRow => {
-  const out: InsertRow = {};
+  // If no mes is provided, we derive it from data or use a fallback to satisfy the NOT NULL constraint
+  let mes = m.mes;
+  if (!mes && m.data) {
+    mes = m.data.substring(0, 7); // YYYY-MM
+  }
+  
+  const out: InsertRow = {
+    mes: mes || new Date().toISOString().substring(0, 7)
+  };
+  
   if ("data" in m) out.data = m.data ?? null;
   if ("empresa" in m) out.empresa = m.empresa ?? null;
   if ("banco" in m) out.banco = m.banco ?? null;
