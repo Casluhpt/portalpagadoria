@@ -116,6 +116,28 @@ function SignInForm() {
     }
     setErrorMsg(null);
     toast.success("Sessão iniciada");
+    // Registro de acesso administrativo na trilha de auditoria
+    try {
+      const { data: sess } = await supabase.auth.getUser();
+      const uid = sess.user?.id;
+      if (uid) {
+        const { data: isAdmin } = await (supabase as any).rpc("has_role", {
+          _user_id: uid,
+          _role: "administrador",
+        });
+        if (isAdmin) {
+          const { logAcaoCritica } = await import("@/lib/audit-critico");
+          await logAcaoCritica({
+            acao: "tentativa_login_admin",
+            modulo: "Autenticação",
+            descricao: `Login administrativo realizado por ${sess.user?.email ?? uid}`,
+            severidade: "alerta",
+          });
+        }
+      }
+    } catch {
+      /* falha de log não interrompe o login */
+    }
   };
 
   return (
