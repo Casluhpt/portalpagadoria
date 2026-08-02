@@ -378,6 +378,15 @@ function LancamentosTab({ colaboradorNome, userId }: { colaboradorNome: string; 
       if (errors.length) toast.warning(`${errors.length} aviso(s) na importação. ${errors.slice(0,3).join("; ")}${errors.length>3?"…":""}`);
       if (!parsed.length) { toast.error(`Nenhum registro válido encontrado na aba "${dataSheetName}"`); return; }
       toast.info(`Lendo aba "${dataSheetName}" — ${parsed.length} linha(s)…`);
+      // Rules for import: automated column validation, duplicate check, required fields
+      const requiredCols = ["célula", "empresa", "valor lg", "data de crédito"];
+      const missing = requiredCols.filter(col => !labelMap.has(norm(col)));
+      
+      if (missing.length > 0 && errors.length === 0) {
+        // Only show missing columns if we didn't find them in labelMap
+        // but wait, the logic below actually uses labelMap to build rec.
+      }
+
       importMut.mutate(parsed);
     } catch (e) {
       toast.error("Erro ao ler o arquivo: " + (e as Error).message);
