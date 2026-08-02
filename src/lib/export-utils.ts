@@ -11,7 +11,7 @@ export const exportResultadosPDF = async (data: {
   byEmpresa: { name: string; count: number }[];
 }) => {
   const doc = new jsPDF();
-  const purple = [76, 29, 149]; // #4c1d95
+  const purple: [number, number, number] = [76, 29, 149]; // #4c1d95
 
   // Header
   doc.setFillColor(purple[0], purple[1], purple[2]);
