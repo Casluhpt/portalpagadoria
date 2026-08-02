@@ -205,22 +205,22 @@ export function NotificationBell() {
           </div>
         </div>
         {showVersionCard && latestVersion && (
-          <div className="relative border-b border-violet-100 bg-gradient-to-r from-violet-50 to-indigo-50 px-4 py-3">
+          <div className="relative border-b border-violet-100 bg-gradient-to-r from-violet-50 to-indigo-50 dark:from-violet-950/40 dark:to-indigo-950/40 dark:border-violet-800/30 px-4 py-3">
             <button
               onClick={dismissVersion}
               aria-label="Dispensar novidade"
-              className="absolute right-2 top-2 rounded-full p-1 text-violet-500 hover:bg-violet-100"
+              className="absolute right-2 top-2 rounded-full p-1 text-violet-500 hover:bg-violet-100 dark:hover:bg-violet-900/50"
             >
               <X className="h-3.5 w-3.5" />
             </button>
             <div className="flex items-start gap-2 pr-6">
-              <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-violet-600" />
+              <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-violet-600 dark:text-violet-400" />
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
                   <span className="rounded-full bg-violet-600 px-1.5 py-0.5 text-[10px] font-bold text-white">
                     {latestVersion.versao}
                   </span>
-                  <span className="text-[10px] font-semibold uppercase tracking-wide text-violet-700">
+                  <span className="text-[10px] font-semibold uppercase tracking-wide text-violet-700 dark:text-violet-300">
                     Nova versão
                   </span>
                 </div>
@@ -228,11 +228,11 @@ export function NotificationBell() {
                   {latestVersion.titulo}
                 </p>
                 {latestVersion.resumo && (
-                  <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">{latestVersion.resumo}</p>
+                  <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground dark:text-slate-300">{latestVersion.resumo}</p>
                 )}
                 <Link
                   to="/historico"
-                  className="mt-1 inline-block text-[11px] font-medium text-violet-700 hover:underline"
+                  className="mt-1 inline-block text-[11px] font-medium text-violet-700 dark:text-violet-400 hover:underline"
                 >
                   Ver histórico completo →
                 </Link>
@@ -279,10 +279,10 @@ function NotifList({
           {items.map((c) => (
             <li
               key={c.id}
-              className={`group relative flex gap-3 px-4 py-3 pr-9 text-sm ${c.lido ? "bg-card" : "bg-violet-50/60"}`}
+              className={`group relative flex gap-3 px-4 py-3 pr-9 text-sm ${c.lido ? "bg-card" : "bg-violet-50/60 dark:bg-violet-950/20"}`}
             >
               <span
-                className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${c.lido ? "bg-muted-foreground/40" : "bg-violet-600"}`}
+                className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${c.lido ? "bg-muted-foreground/40" : "bg-violet-600 dark:bg-violet-400"}`}
               />
               <div className="min-w-0 flex-1">
                 <div className="flex items-start justify-between gap-2">
