@@ -452,6 +452,51 @@ function BaseView({ rows, ano, isLoading, onUpsert, onBulkInsert, onDelete }: Ba
     }
   };
 
+  const handleFechamento = async (nome: string) => {
+    try {
+      if (rows.length === 0) return toast.error("Base vazia");
+      
+      const wsData = [
+        ["Empresa (código)", "Tipo", "Ordem Pagamento", "Valor", "Status"],
+        ...rows.map((r) => [r.empresa ?? "", r.tipo, r.ordem_pagamento ?? "", Number(r.valor), r.status]),
+      ];
+      const ws = XLSX.utils.aoa_to_sheet(wsData);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Aprovacoes");
+      const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+      const file = new File([excelBuffer], `aprovacao_${nome}_${Date.now()}.xlsx`, { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+
+      const filePath = `processo-aprovacao/fechamento_${Date.now()}.xlsx`;
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('suporte_anexos')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: urlData } = await supabase.storage
+        .from('suporte_anexos')
+        .getPublicUrl(filePath);
+
+      const totalValor = rows.reduce((s, r) => s + Number(r.valor || 0), 0);
+
+      const { error: dbError } = await supabase.from("fechamento_aprovacoes").insert({
+        nome,
+        ano,
+        arquivo_url: urlData.publicUrl,
+        total_registros: rows.length,
+        total_valor,
+        usuario_id: (await supabase.auth.getUser()).data.user?.id
+      });
+
+      if (dbError) throw dbError;
+
+      await onDelete(rows.map(r => r.id));
+      toast.success("Competência fechada e base limpa!");
+    } catch (e: any) {
+      toast.error("Erro no fechamento: " + e.message);
+    }
+  };
+
   return (
     <div className="space-y-3">
       <div className="flex flex-wrap items-center gap-2">
@@ -461,6 +506,12 @@ function BaseView({ rows, ano, isLoading, onUpsert, onBulkInsert, onDelete }: Ba
         </div>
         <Badge variant="secondary">{selected.size} selecionada(s)</Badge>
         <div className="flex-1" />
+        <Button variant="outline" size="sm" onClick={() => {
+          const nome = prompt("Nome da competência para fechamento:", `Competência ${new Date().toLocaleDateString()}`);
+          if (nome) handleFechamento(nome);
+        }}>
+          Fechamento
+        </Button>
         <Button variant="outline" size="sm" onClick={handleCopy}><Copy className="h-4 w-4 mr-1" />Copiar</Button>
         <Button variant="outline" size="sm" onClick={handleCut}><Scissors className="h-4 w-4 mr-1" />Recortar</Button>
         <Button variant="outline" size="sm" onClick={handlePaste} disabled={!clipboard.length}>Colar ({clipboard.length})</Button>
