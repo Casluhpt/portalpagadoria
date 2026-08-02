@@ -6,7 +6,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { format, formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Loader2, KeyRound, ShieldAlert, Search, ShieldCheck, Eye, UserPlus, Trash2 } from "lucide-react";
+import { Loader2, KeyRound, ShieldAlert, Search, ShieldCheck, Eye, UserPlus, Trash2, List, LayoutGrid } from "lucide-react";
 
 import { AppSidebar } from "@/components/app-sidebar";
 import { HeaderActions } from "@/components/header-actions";
@@ -189,13 +189,25 @@ function UsuariosTable() {
     onError: (e: any) => toast.error(e?.message ?? "Falha ao excluir conta"),
   });
 
-  const rows = useMemo(() => {
+  const [viewMode, setViewMode] = useState<"ampla" | "setor">("ampla");
+
+  const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
     if (!q) return data;
     return data.filter((u) =>
-      [u.email, u.nome, ...u.roles].filter(Boolean).join(" ").toLowerCase().includes(q),
+      [u.email, u.nome, u.setor, ...u.roles].filter(Boolean).join(" ").toLowerCase().includes(q),
     );
   }, [data, search]);
+
+  const grouped = useMemo(() => {
+    const groups: Record<string, typeof data> = {};
+    filtered.forEach((u) => {
+      const s = u.setor || "Sem Setor";
+      if (!groups[s]) groups[s] = [];
+      groups[s].push(u);
+    });
+    return groups;
+  }, [filtered]);
 
   const onlineCount = data.filter((u) => u.online).length;
 
@@ -210,13 +222,31 @@ function UsuariosTable() {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
+          <div className="flex items-center rounded-md border bg-background p-1">
+            <Button
+              variant={viewMode === "ampla" ? "secondary" : "ghost"}
+              size="sm"
+              className="h-7 gap-1 px-2"
+              onClick={() => setViewMode("ampla")}
+            >
+              <List className="h-3.5 w-3.5" /> Visão Ampla
+            </Button>
+            <Button
+              variant={viewMode === "setor" ? "secondary" : "ghost"}
+              size="sm"
+              className="h-7 gap-1 px-2"
+              onClick={() => setViewMode("setor")}
+            >
+              <LayoutGrid className="h-3.5 w-3.5" /> Por Setor
+            </Button>
+          </div>
           <div className="relative">
             <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Buscar por nome, email, perfil…"
-              className="h-9 w-72 pl-8"
+              placeholder="Buscar por nome, email, setor…"
+              className="h-9 w-64 pl-8"
             />
           </div>
           <Button size="sm" onClick={() => setInviteOpen(true)}>
@@ -287,187 +317,205 @@ function UsuariosTable() {
       </Dialog>
 
       <div className="relative flex-1 overflow-auto rounded-lg border border-border bg-card">
-        <table className="min-w-full border-collapse text-sm">
-          <thead className="sticky top-0 z-10 bg-muted/95 backdrop-blur">
-            <tr>
-              <th className="border-b border-border px-3 py-2 text-left font-semibold">Status</th>
-              <th className="border-b border-border px-3 py-2 text-left font-semibold">Nome</th>
-              <th className="border-b border-border px-3 py-2 text-left font-semibold">Email</th>
-              <th className="border-b border-border px-3 py-2 text-left font-semibold">Perfis</th>
-              <th className="border-b border-border px-3 py-2 text-left font-semibold">Setor</th>
-              <th className="border-b border-border px-3 py-2 text-left font-semibold">Criado em</th>
-              <th className="border-b border-border px-3 py-2 text-left font-semibold">Último acesso</th>
-              <th className="border-b border-border px-3 py-2 text-right font-semibold">Ações</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((u: AdminUserRow) => (
-              <tr key={u.id} className="hover:bg-muted/40">
-                <td className="whitespace-nowrap border-b border-border px-3 py-2">
-                  {(() => {
-                    const map = {
-                      online: { label: "Online", color: "bg-emerald-500" },
-                      ausente: { label: "Ausente", color: "bg-amber-500" },
-                      offline: { label: "Offline", color: "bg-muted-foreground/40" },
-                    } as const;
-                    const m = map[u.presence];
-                    return (
-                      <span className="inline-flex items-center gap-2">
-                        <span className={`h-2.5 w-2.5 rounded-full ${m.color}`} aria-hidden />
-                        <span className="text-xs text-muted-foreground">{m.label}</span>
-                      </span>
-                    );
-                  })()}
-                </td>
-                <td className="border-b border-border px-3 py-2">{u.nome ?? "—"}</td>
-                <td className="border-b border-border px-3 py-2 font-mono text-xs">{u.email ?? "—"}</td>
-                <td className="border-b border-border px-3 py-2">
-                  <div className="flex flex-wrap items-center gap-2">
-                    {(() => {
-                      const current: "administrador" | "viewer" | "visitante" =
-                        u.roles.includes("administrador") ? "administrador" : u.roles.includes("visitante") ? "visitante" : "viewer";
-                      const isSelf = user?.id === u.id;
-                      const otherRoles = u.roles.filter((r) => r !== "administrador" && r !== "viewer");
-                      return (
-                        <>
-                          <Select
-                            value={current}
-                            disabled={roleMut.isPending || isSelf}
-                            onValueChange={(v) =>
-                              roleMut.mutate({ userId: u.id, role: v as "administrador" | "viewer" | "visitante" })
-                            }
-                          >
-                            <SelectTrigger className="h-8 w-[160px] text-xs">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="administrador">
-                                <span className="inline-flex items-center gap-1">
-                                  <ShieldCheck className="h-3 w-3" /> Administração
-                                </span>
-                              </SelectItem>
-                              <SelectItem value="viewer">
-                                <span className="inline-flex items-center gap-1">
-                                  <Eye className="h-3 w-3" /> Viewer
-                                </span>
-                              </SelectItem>
-                              <SelectItem value="visitante">
-                                <span className="inline-flex items-center gap-1">
-                                  <UserPlus className="h-3 w-3" /> Visitante
-                                </span>
-                              </SelectItem>
-                            </SelectContent>
-                          </Select>
-                          {otherRoles.map((r) => (
-                            <Badge key={r} variant={roleVariant(r)}>{roleLabel(r)}</Badge>
-                          ))}
-                          {isSelf && (
-                            <span className="text-[10px] text-muted-foreground">(você)</span>
-                          )}
-                        </>
-                      );
-                    })()}
-                  </div>
-                </td>
-                <td className="whitespace-nowrap border-b border-border px-3 py-2">
-                  <Select
-                    value={u.setor ?? ""}
-                    disabled={setorMut.isPending}
-                    onValueChange={(v) =>
-                      setorMut.mutate({ userId: u.id, setor: v as Setor })
-                    }
-                  >
-                    <SelectTrigger className="h-8 w-[160px] text-xs">
-                      <SelectValue placeholder="—" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {ALLOWED_SETORES.map((s) => (
-                        <SelectItem key={s} value={s} className="text-xs">{s}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </td>
-                <td className="whitespace-nowrap border-b border-border px-3 py-2 text-xs text-muted-foreground">
-                  {u.created_at ? format(new Date(u.created_at), "dd/MM/yyyy HH:mm") : "—"}
-                </td>
-                <td className="whitespace-nowrap border-b border-border px-3 py-2 text-xs text-muted-foreground">
-                  {u.last_sign_in_at ? (
-                    <span title={format(new Date(u.last_sign_in_at), "dd/MM/yyyy HH:mm:ss")}>
-                      {formatDistanceToNow(new Date(u.last_sign_in_at), { addSuffix: true, locale: ptBR })}
-                    </span>
-                  ) : "Nunca acessou"}
-                </td>
-                <td className="whitespace-nowrap border-b border-border px-3 py-2 text-right">
-                  <div className="flex justify-end gap-2">
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button size="sm" variant="outline" disabled={!u.email}>
-                          <KeyRound className="mr-1 h-3.5 w-3.5" /> Resetar senha
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Enviar redefinição de senha?</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            Um email será enviado para <strong>{u.email}</strong> com um link seguro para
-                            redefinição da senha.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                          <AlertDialogAction
-                            onClick={() => u.email && resetMut.mutate(u.email)}
-                          >
-                            Enviar
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          disabled={u.id === user?.id || deleteMut.isPending}
-                          title={u.id === user?.id ? "Você não pode excluir sua própria conta" : "Excluir conta"}
-                        >
-                          <Trash2 className="mr-1 h-3.5 w-3.5" /> Excluir
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Excluir conta permanentemente?</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            A conta de <strong>{u.nome ?? u.email}</strong> ({u.email}) será removida
-                            do sistema. Esta ação não pode ser desfeita.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                          <AlertDialogAction
-                            onClick={() => deleteMut.mutate(u.id)}
-                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                          >
-                            Excluir conta
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  </div>
-                </td>
-              </tr>
-            ))}
-            {!isLoading && rows.length === 0 && (
+        {viewMode === "ampla" ? (
+          <table className="min-w-full border-collapse text-sm">
+            <thead className="sticky top-0 z-10 bg-muted/95 backdrop-blur">
               <tr>
-                <td colSpan={7} className="px-4 py-16 text-center text-sm text-muted-foreground">
-                  Nenhum usuário encontrado.
-                </td>
+                <th className="border-b border-border px-3 py-2 text-left font-semibold">Status</th>
+                <th className="border-b border-border px-3 py-2 text-left font-semibold">Nome</th>
+                <th className="border-b border-border px-3 py-2 text-left font-semibold">Email</th>
+                <th className="border-b border-border px-3 py-2 text-left font-semibold">Perfis</th>
+                <th className="border-b border-border px-3 py-2 text-left font-semibold">Setor</th>
+                <th className="border-b border-border px-3 py-2 text-left font-semibold">Criado em</th>
+                <th className="border-b border-border px-3 py-2 text-left font-semibold">Último acesso</th>
+                <th className="border-b border-border px-3 py-2 text-right font-semibold">Ações</th>
               </tr>
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {filtered.map((u: AdminUserRow) => (
+                <UserTableRow key={u.id} u={u} user={user} roleMut={roleMut} setorMut={setorMut} deleteMut={deleteMut} resetMut={resetMut} />
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <div className="space-y-8 p-4">
+            {Object.entries(grouped).map(([setor, users]) => (
+              <div key={setor} className="space-y-3">
+                <div className="flex items-center gap-2 border-b border-slate-100 pb-2">
+                  <h3 className="font-bold text-slate-900">{setor}</h3>
+                  <Badge variant="secondary" className="text-[10px]">{users.length}</Badge>
+                </div>
+                <table className="min-w-full border-collapse text-sm">
+                  <thead className="bg-muted/50">
+                    <tr>
+                      <th className="border-b border-border px-3 py-2 text-left font-semibold">Nome</th>
+                      <th className="border-b border-border px-3 py-2 text-left font-semibold">Email</th>
+                      <th className="border-b border-border px-3 py-2 text-left font-semibold">Perfis</th>
+                      <th className="border-b border-border px-3 py-2 text-right font-semibold">Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {users.map((u: AdminUserRow) => (
+                      <UserTableRow key={u.id} u={u} user={user} roleMut={roleMut} setorMut={setorMut} deleteMut={deleteMut} resetMut={resetMut} compact />
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
-      {/* Status em tempo real desativado conforme solicitação */}
     </div>
+  );
+}
+function UserTableRow({ u, user, roleMut, setorMut, deleteMut, resetMut, compact }: any) {
+  const isSelf = user?.id === u.id;
+  return (
+    <tr className="hover:bg-muted/40">
+      {!compact && (
+        <td className="whitespace-nowrap border-b border-border px-3 py-2">
+          {(() => {
+            const map = {
+              online: { label: "Online", color: "bg-emerald-500" },
+              ausente: { label: "Ausente", color: "bg-amber-500" },
+              offline: { label: "Offline", color: "bg-muted-foreground/40" },
+            } as const;
+            const m = map[u.presence as keyof typeof map] || map.offline;
+            return (
+              <span className="inline-flex items-center gap-2">
+                <span className={`h-2.5 w-2.5 rounded-full ${m.color}`} aria-hidden />
+                <span className="text-xs text-muted-foreground">{m.label}</span>
+              </span>
+            );
+          })()}
+        </td>
+      )}
+      <td className="border-b border-border px-3 py-2">{u.nome ?? "—"}</td>
+      <td className="border-b border-border px-3 py-2 font-mono text-xs">{u.email ?? "—"}</td>
+      <td className="border-b border-border px-3 py-2">
+        <div className="flex flex-wrap items-center gap-2">
+          {(() => {
+            const current: "administrador" | "viewer" | "visitante" =
+              u.roles.includes("administrador") ? "administrador" : u.roles.includes("visitante") ? "visitante" : "viewer";
+            const otherRoles = u.roles.filter((r: any) => r !== "administrador" && r !== "viewer");
+            return (
+              <>
+                <Select
+                  value={current}
+                  disabled={roleMut.isPending || isSelf}
+                  onValueChange={(v) =>
+                    roleMut.mutate({ userId: u.id, role: v as "administrador" | "viewer" | "visitante" })
+                  }
+                >
+                  <SelectTrigger className="h-8 w-[160px] text-xs">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="administrador">
+                      <span className="inline-flex items-center gap-1">
+                        <ShieldCheck className="h-3 w-3" /> Administração
+                      </span>
+                    </SelectItem>
+                    <SelectItem value="viewer">
+                      <span className="inline-flex items-center gap-1">
+                        <Eye className="h-3 w-3" /> Viewer
+                      </span>
+                    </SelectItem>
+                    <SelectItem value="visitante">
+                      <span className="inline-flex items-center gap-1">
+                        <UserPlus className="h-3 w-3" /> Visitante
+                      </span>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+                {otherRoles.map((r: any) => (
+                  <Badge key={r} variant={roleVariant(r)}>{roleLabel(r)}</Badge>
+                ))}
+                {isSelf && (
+                  <span className="text-[10px] text-muted-foreground">(você)</span>
+                )}
+              </>
+            );
+          })()}
+        </div>
+      </td>
+      {!compact && (
+        <>
+          <td className="whitespace-nowrap border-b border-border px-3 py-2">
+            <Select
+              value={u.setor ?? ""}
+              disabled={setorMut.isPending}
+              onValueChange={(v) =>
+                setorMut.mutate({ userId: u.id, setor: v as Setor })
+              }
+            >
+              <SelectTrigger className="h-8 w-[160px] text-xs">
+                <SelectValue placeholder="—" />
+              </SelectTrigger>
+              <SelectContent>
+                {ALLOWED_SETORES.map((s) => (
+                  <SelectItem key={s} value={s} className="text-xs">{s}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </td>
+          <td className="whitespace-nowrap border-b border-border px-3 py-2 text-xs text-muted-foreground">
+            {u.criado_em ? format(new Date(u.criado_em), "dd/MM/yy HH:mm", { locale: ptBR }) : "—"}
+          </td>
+          <td className="whitespace-nowrap border-b border-border px-3 py-2 text-xs text-muted-foreground">
+            {u.last_seen ? formatDistanceToNow(new Date(u.last_seen), { locale: ptBR, addSuffix: true }) : "—"}
+          </td>
+        </>
+      )}
+      <td className="whitespace-nowrap border-b border-border px-3 py-2 text-right">
+        <div className="flex items-center justify-end gap-1">
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground" title="Redefinir senha">
+                <KeyRound className="h-4 w-4" />
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Redefinir senha?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Um email será enviado para <b>{u.email}</b> com as instruções.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                <AlertDialogAction onClick={() => resetMut.mutate(u.email!)}>
+                  Confirmar
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+
+          {!isSelf && (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive/70 hover:text-destructive" title="Excluir conta">
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Excluir permanentemente?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Esta ação não pode ser desfeita. A conta de <b>{u.nome || u.email}</b> será removida do sistema.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                  <AlertDialogAction onClick={() => deleteMut.mutate(u.id)} className="bg-destructive hover:bg-destructive/90 text-white">
+                    Excluir Usuário
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
+        </div>
+      </td>
+    </tr>
   );
 }

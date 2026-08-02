@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Bell, CheckCheck, Sparkles, X } from "lucide-react";
+import { Bell, BellOff, CheckCheck, Sparkles, X, Clock } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -53,6 +53,31 @@ const rel = (iso: string) => {
 export function NotificationBell() {
   const { user } = useSession();
   const qc = useQueryClient();
+
+  const [snoozeUntil, setSnoozeUntil] = useState<number | null>(() => {
+    const val = typeof window !== "undefined" ? window.localStorage.getItem(`notif_snooze:${user?.id}`) : null;
+    return val ? parseInt(val) : null;
+  });
+
+  const isSnoozed = snoozeUntil ? snoozeUntil > Date.now() : false;
+
+  const handleSnooze = (hours: number | "forever") => {
+    if (!user) return;
+    let until = 0;
+    if (hours === "forever") until = Date.now() + 100 * 365 * 24 * 60 * 60 * 1000;
+    else until = Date.now() + hours * 60 * 60 * 1000;
+    
+    setSnoozeUntil(until);
+    window.localStorage.setItem(`notif_snooze:${user.id}`, until.toString());
+    toast.info(`Notificações silenciadas por ${hours === "forever" ? "sempre" : hours + "h"}`);
+  };
+
+  const clearSnooze = () => {
+    if (!user) return;
+    setSnoozeUntil(null);
+    window.localStorage.removeItem(`notif_snooze:${user.id}`);
+    toast.info("Notificações reativadas");
+  };
 
   const { data: items = [] } = useQuery({
     queryKey: [...comunicadosQueryKey, user?.id ?? "anon"],
@@ -112,8 +137,12 @@ export function NotificationBell() {
           className="relative"
           aria-label={`Notificações${totalBadge ? ` (${totalBadge} não lidas)` : ""}`}
         >
-          <Bell className="h-5 w-5 text-slate-600" />
-          {totalBadge > 0 && (
+          {isSnoozed ? (
+            <BellOff className="h-5 w-5 text-slate-400" />
+          ) : (
+            <Bell className="h-5 w-5 text-slate-600" />
+          )}
+          {totalBadge > 0 && !isSnoozed && (
             <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-semibold text-white ring-2 ring-white">
               {totalBadge > 9 ? "9+" : totalBadge}
             </span>
@@ -123,24 +152,57 @@ export function NotificationBell() {
       <PopoverContent align="end" className="w-96 p-0">
         <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3">
           <div>
-            <p className="text-sm font-semibold text-slate-900">Notificações</p>
+            <div className="flex items-center gap-2">
+              <p className="text-sm font-semibold text-slate-900">Notificações</p>
+              {isSnoozed && (
+                <span className="flex items-center gap-1 rounded bg-amber-50 px-1 py-0.5 text-[9px] font-bold text-amber-700">
+                  <BellOff className="h-2.5 w-2.5" /> Mudo
+                </span>
+              )}
+            </div>
             <p className="text-[11px] text-slate-500">
               {naoLidos.length > 0
                 ? `${naoLidos.length} comunicado(s) não lido(s)`
                 : "Nenhum comunicado não lido"}
             </p>
           </div>
-          {naoLidos.length > 0 && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-8 gap-1 text-xs"
-              onClick={() => markAll.mutate()}
-              disabled={markAll.isPending}
-            >
-              <CheckCheck className="h-3.5 w-3.5" /> Marcar todas
-            </Button>
-          )}
+          <div className="flex items-center gap-1">
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400">
+                  <Clock className="h-4 w-4" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-40 p-1" side="left" align="start">
+                <div className="grid gap-1">
+                  <p className="px-2 py-1 text-[10px] font-semibold text-slate-500 uppercase tracking-wider">Silenciar</p>
+                  {isSnoozed ? (
+                    <Button variant="ghost" className="justify-start h-8 text-xs font-medium text-indigo-600" onClick={clearSnooze}>
+                      Tirar do silencioso
+                    </Button>
+                  ) : (
+                    <>
+                      <Button variant="ghost" className="justify-start h-8 text-xs" onClick={() => handleSnooze(4)}>4 horas</Button>
+                      <Button variant="ghost" className="justify-start h-8 text-xs" onClick={() => handleSnooze(8)}>8 horas</Button>
+                      <Button variant="ghost" className="justify-start h-8 text-xs" onClick={() => handleSnooze(12)}>12 horas</Button>
+                      <Button variant="ghost" className="justify-start h-8 text-xs" onClick={() => handleSnooze("forever")}>Para sempre</Button>
+                    </>
+                  )}
+                </div>
+              </PopoverContent>
+            </Popover>
+            {naoLidos.length > 0 && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 gap-1 text-xs"
+                onClick={() => markAll.mutate()}
+                disabled={markAll.isPending}
+              >
+                <CheckCheck className="h-3.5 w-3.5" /> Marcar todas
+              </Button>
+            )}
+          </div>
         </div>
         {showVersionCard && latestVersion && (
           <div className="relative border-b border-violet-100 bg-gradient-to-r from-violet-50 to-indigo-50 px-4 py-3">

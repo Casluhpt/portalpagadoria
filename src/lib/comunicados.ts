@@ -51,9 +51,10 @@ export async function publicarComunicado(
   titulo: string,
   mensagem: string,
   userId: string,
+  canal: "portal" | "email" | "ambos" = "portal",
 ): Promise<void> {
   const { error } = await supabase
     .from("comunicados")
-    .insert({ titulo, mensagem, criado_por: userId });
+    .insert({ titulo, mensagem, criado_por: userId, canal });
   if (error) throw error;
 }

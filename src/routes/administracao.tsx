@@ -53,6 +53,8 @@ function ComunicadosPanel() {
   const qc = useQueryClient();
   const [titulo, setTitulo] = useState("");
   const [mensagem, setMensagem] = useState("");
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [canal, setCanal] = useState<"portal" | "email" | "ambos">("portal");
 
   const { data: items = [] } = useQuery({
     queryKey: [...comunicadosQueryKey, "admin"],
@@ -61,9 +63,9 @@ function ComunicadosPanel() {
   });
 
   const publish = useMutation({
-    mutationFn: () => publicarComunicado(titulo.trim(), mensagem.trim(), user!.id),
+    mutationFn: () => publicarComunicado(titulo.trim(), mensagem.trim(), user!.id, canal),
     onSuccess: () => {
-      toast.success("Comunicado publicado para todos os colaboradores");
+      toast.success("Comunicado publicado com sucesso");
       setTitulo("");
       setMensagem("");
       qc.invalidateQueries({ queryKey: comunicadosQueryKey });
@@ -71,13 +73,14 @@ function ComunicadosPanel() {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const remove = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase.from("comunicados").delete().eq("id", id);
+  const removeBulk = useMutation({
+    mutationFn: async (ids: string[]) => {
+      const { error } = await supabase.from("comunicados").delete().in("id", ids);
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Comunicado removido");
+      toast.success("Comunicados removidos");
+      setSelectedIds(new Set());
       qc.invalidateQueries({ queryKey: comunicadosQueryKey });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -136,6 +139,23 @@ function ComunicadosPanel() {
               maxLength={2000}
             />
           </div>
+          <div className="space-y-2">
+            <Label>Canal de envio</Label>
+            <div className="flex gap-4">
+              <label className="flex items-center gap-2 text-sm cursor-pointer">
+                <input type="radio" name="canal" checked={canal === "portal"} onChange={() => setCanal("portal")} />
+                Somente Portal
+              </label>
+              <label className="flex items-center gap-2 text-sm cursor-pointer">
+                <input type="radio" name="canal" checked={canal === "email"} onChange={() => setCanal("email")} />
+                Somente Email
+              </label>
+              <label className="flex items-center gap-2 text-sm cursor-pointer">
+                <input type="radio" name="canal" checked={canal === "ambos"} onChange={() => setCanal("ambos")} />
+                Os dois
+              </label>
+            </div>
+          </div>
           <Button
             className="w-full"
             disabled={!canSubmit}
@@ -147,9 +167,25 @@ function ComunicadosPanel() {
       </Card>
 
       <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Histórico de comunicados</CardTitle>
-          <p className="text-xs text-slate-500">Últimos 100 comunicados publicados.</p>
+        <CardHeader className="flex-row items-center justify-between">
+          <div>
+            <CardTitle className="text-base">Histórico de comunicados</CardTitle>
+            <p className="text-xs text-slate-500">Últimos 100 comunicados publicados.</p>
+          </div>
+          {selectedIds.size > 0 && (
+            <Button
+              variant="destructive"
+              size="sm"
+              className="gap-2"
+              onClick={() => {
+                if (confirm(`Remover ${selectedIds.size} comunicados selecionados?`)) {
+                  removeBulk.mutate(Array.from(selectedIds));
+                }
+              }}
+            >
+              <Trash2 className="h-4 w-4" /> Excluir ({selectedIds.size})
+            </Button>
+          )}
         </CardHeader>
         <CardContent>
           {items.length === 0 ? (
@@ -157,8 +193,19 @@ function ComunicadosPanel() {
           ) : (
             <ul className="divide-y divide-slate-100">
               {items.map((c) => (
-                <li key={c.id} className="flex items-start justify-between gap-3 py-3">
-                  <div className="min-w-0">
+                <li key={c.id} className="flex items-start gap-3 py-3">
+                  <input
+                    type="checkbox"
+                    checked={selectedIds.has(c.id)}
+                    onChange={(e) => {
+                      const next = new Set(selectedIds);
+                      if (e.target.checked) next.add(c.id);
+                      else next.delete(c.id);
+                      setSelectedIds(next);
+                    }}
+                    className="mt-1 h-4 w-4 rounded border-slate-300"
+                  />
+                  <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-semibold text-slate-900">{c.titulo}</p>
                     <p className="mt-0.5 whitespace-pre-wrap text-xs text-slate-600">
                       {c.mensagem}
@@ -167,18 +214,6 @@ function ComunicadosPanel() {
                       {new Date(c.criado_em).toLocaleString("pt-BR")}
                     </p>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="text-slate-500 hover:text-red-600"
-                    aria-label="Remover comunicado"
-                    disabled={remove.isPending}
-                    onClick={() => {
-                      if (confirm("Remover este comunicado?")) remove.mutate(c.id);
-                    }}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
                 </li>
               ))}
             </ul>
