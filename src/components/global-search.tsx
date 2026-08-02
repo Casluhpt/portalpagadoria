@@ -123,7 +123,7 @@ export function GlobalSearch({ variant = "compact" }: { variant?: "compact" | "h
       { title: "Material de Apoio", url: "/material-apoio", icon: BookOpen, module: "Ajuda" },
       { title: "Resultados Principais", url: "/principal", icon: BarChart3, module: "Indicadores", adminOnly: true },
       { title: "Provisão Diária", url: "/provisao", icon: Wallet, module: "Financeiro", adminOnly: true },
-      { title: "Base de Anexos", url: "/anexos", icon: FileSpreadsheet, module: "Documentos" },
+      { title: "[anexo]", url: "/anexos", icon: FileSpreadsheet, module: "Documentos" },
       { title: "Conciliação Bancária", url: "/conciliacao", icon: ShieldCheck, module: "Financeiro", adminOnly: true },
       { title: "Pagamentos Diversos", url: "/pagamentos", icon: Banknote, module: "Financeiro" },
       { title: "Administração de Comunicados", url: "/administracao", icon: Settings, module: "Gestão", adminOnly: true },
