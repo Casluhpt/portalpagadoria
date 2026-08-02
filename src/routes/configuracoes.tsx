@@ -38,116 +38,77 @@ function ConfiguracoesPage() {
           </header>
           
           <main className="flex-1 p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {/* Card Administração de Usuários */}
-              <Card 
-                className="group hover:shadow-lg transition-all border-border cursor-pointer overflow-hidden flex flex-col"
-                onClick={() => navigate({ to: "/usuarios" })}
-              >
-                <div className="p-6 flex flex-col h-full">
-                  <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
-                    <Users className="h-6 w-6" />
-                  </div>
-                  <h3 className="text-lg font-bold text-foreground mb-2">Administração de usuários</h3>
-                  <p className="text-sm text-muted-foreground flex-1">
-                    Gestão completa de acessos, permissões e perfis de usuários do portal.
-                  </p>
-                  <div className="mt-6 flex items-center text-xs font-semibold text-indigo-600 uppercase tracking-wider">
-                    Acessar Módulo <ChevronRight className="ml-1 h-3 w-3" />
-                  </div>
+            <Tabs defaultValue="suporte" className="w-full max-w-5xl mx-auto space-y-8">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-2">
+                <div>
+                  <h2 className="text-2xl font-bold text-foreground">Acesso Rápido</h2>
+                  <p className="text-sm text-muted-foreground">Gerencie o portal e solicite suporte técnico.</p>
                 </div>
-              </Card>
-
-              {/* Card Histórico de Versões */}
-              <Card 
-                className="group hover:shadow-lg transition-all border-border cursor-pointer overflow-hidden flex flex-col"
-                onClick={() => navigate({ to: "/historico" })}
-              >
-                <div className="p-6 flex flex-col h-full">
-                  <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-amber-50 text-amber-600 group-hover:bg-amber-600 group-hover:text-white transition-colors">
-                    <History className="h-6 w-6" />
-                  </div>
-                  <h3 className="text-lg font-bold text-foreground mb-2">Histórico de versões</h3>
-                  <p className="text-sm text-muted-foreground flex-1">
-                    Visualize o log detalhado de atualizações, melhorias e correções aplicadas ao sistema.
-                  </p>
-                  <div className="mt-6 flex items-center text-xs font-semibold text-amber-600 uppercase tracking-wider">
-                    Ver Histórico <ChevronRight className="ml-1 h-3 w-3" />
-                  </div>
-                </div>
-              </Card>
-
-              {/* Card Portal Diagnosis */}
-              <Card 
-                className="group hover:shadow-lg transition-all border-border cursor-pointer overflow-hidden flex flex-col"
-                onClick={() => {
-                  const tabs = document.querySelector('[role="tablist"]');
-                  const diagTrigger = tabs?.querySelector('[value="diagnostico"]') as HTMLElement;
-                  diagTrigger?.click();
-                }}
-              >
-                <div className="p-6 flex flex-col h-full">
-                  <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-violet-50 text-violet-600 group-hover:bg-violet-600 group-hover:text-white transition-colors">
-                    <Activity className="h-6 w-6" />
-                  </div>
-                  <h3 className="text-lg font-bold text-foreground mb-2">Diagnóstico do Portal</h3>
-                  <p className="text-sm text-muted-foreground flex-1">
-                    Erros, sobrecargas, vírus e armazenamento da nuvem em tempo real.
-                  </p>
-                  <div className="mt-6 flex items-center text-xs font-semibold text-violet-600 uppercase tracking-wider">
-                    Ver Diagnóstico <ChevronRight className="ml-1 h-3 w-3" />
-                  </div>
-                </div>
-              </Card>
-
-              {/* Card Suporte Técnico */}
-              <Card 
-                className="group hover:shadow-lg transition-all border-border cursor-pointer overflow-hidden flex flex-col"
-                onClick={() => {
-                  const tabs = document.querySelector('[role="tablist"]');
-                  const supportTrigger = tabs?.querySelector('[value="suporte"]') as HTMLElement;
-                  supportTrigger?.click();
-                }}
-              >
-                <div className="p-6 flex flex-col h-full">
-                  <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
-                    <HelpCircle className="h-6 w-6" />
-                  </div>
-                  <h3 className="text-lg font-bold text-foreground mb-2">Suporte Técnico</h3>
-                  <p className="text-sm text-muted-foreground flex-1">
-                    Central de ajuda para relatar bugs, sugerir melhorias ou tirar dúvidas técnicas.
-                  </p>
-                  <div className="mt-6 flex items-center text-xs font-semibold text-emerald-600 uppercase tracking-wider">
-                    Abrir Chamado <ChevronRight className="ml-1 h-3 w-3" />
-                  </div>
-                </div>
-              </Card>
-            </div>
-
-            <div className="mt-12 border-t pt-8">
-              <Tabs defaultValue="suporte" className="w-full">
-                <TabsList className="mb-6">
-                  <TabsTrigger value="suporte" className="gap-2">
-                    <HelpCircle className="h-4 w-4" /> Formulário de Suporte
+                <TabsList className="bg-muted/50 border border-border p-1 h-auto grid grid-cols-2 md:grid-cols-4 w-full md:w-auto">
+                  <TabsTrigger value="suporte" className="py-2.5 px-4 text-xs font-semibold data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                    <HelpCircle className="h-3.5 w-3.5 mr-2" /> Suporte
                   </TabsTrigger>
-                  <TabsTrigger value="diagnostico" className="gap-2">
-                    <Activity className="h-4 w-4" /> Diagnóstico
+                  <TabsTrigger value="administracao" className="py-2.5 px-4 text-xs font-semibold data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                    <Users className="h-3.5 w-3.5 mr-2" /> Usuários
                   </TabsTrigger>
-                  <TabsTrigger value="seguranca" className="gap-2">
-                    <ShieldCheck className="h-4 w-4" /> Segurança Avançada
+                  <TabsTrigger value="diagnostico" className="py-2.5 px-4 text-xs font-semibold data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                    <Activity className="h-3.5 w-3.5 mr-2" /> Diagnóstico
+                  </TabsTrigger>
+                  <TabsTrigger value="seguranca" className="py-2.5 px-4 text-xs font-semibold data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                    <ShieldCheck className="h-3.5 w-3.5 mr-2" /> Segurança
                   </TabsTrigger>
                 </TabsList>
-                <TabsContent value="suporte">
-                  <SupportForm />
-                </TabsContent>
-                <TabsContent value="diagnostico">
+              </div>
+
+              <TabsContent value="suporte" className="m-0 focus-visible:outline-none">
+                <SupportForm />
+              </TabsContent>
+
+              <TabsContent value="administracao" className="m-0 focus-visible:outline-none">
+                <Card className="border-border">
+                  <CardHeader>
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      <Users className="h-5 w-5 text-indigo-600" /> 
+                      Gestão de Acessos
+                    </CardTitle>
+                    <CardDescription>
+                      Administre as permissões, cargos e setores dos usuários cadastrados no portal.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Button 
+                      className="bg-indigo-600 hover:bg-indigo-700" 
+                      onClick={() => navigate({ to: "/usuarios" })}
+                    >
+                      Acessar Administração de Usuários
+                    </Button>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="diagnostico" className="m-0 focus-visible:outline-none">
+                <div className="grid gap-6 md:grid-cols-2">
                   <DiagnosticPanel />
-                </TabsContent>
-                <TabsContent value="seguranca">
-                  <AdvancedSecuritySettings />
-                </TabsContent>
-              </Tabs>
-            </div>
+                  <Card className="border-border">
+                    <CardHeader>
+                      <CardTitle className="text-base flex items-center gap-2">
+                        <History className="h-4 w-4 text-amber-600" /> Histórico de Versões
+                      </CardTitle>
+                      <CardDescription>Log detalhado de atualizações e melhorias.</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <Button variant="outline" size="sm" onClick={() => navigate({ to: "/historico" })}>
+                        Ver Histórico Completo
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="seguranca" className="m-0 focus-visible:outline-none">
+                <AdvancedSecuritySettings />
+              </TabsContent>
+            </Tabs>
           </main>
         </div>
       </div>
