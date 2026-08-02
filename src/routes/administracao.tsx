@@ -150,9 +150,25 @@ function ComunicadosPanel() {
       </Card>
 
       <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Histórico de comunicados</CardTitle>
-          <p className="text-xs text-slate-500">Últimos 100 comunicados publicados.</p>
+        <CardHeader className="flex-row items-center justify-between">
+          <div>
+            <CardTitle className="text-base">Histórico de comunicados</CardTitle>
+            <p className="text-xs text-slate-500">Últimos 100 comunicados publicados.</p>
+          </div>
+          {selectedIds.size > 0 && (
+            <Button
+              variant="destructive"
+              size="sm"
+              className="gap-2"
+              onClick={() => {
+                if (confirm(`Remover ${selectedIds.size} comunicados selecionados?`)) {
+                  removeBulk.mutate(Array.from(selectedIds));
+                }
+              }}
+            >
+              <Trash2 className="h-4 w-4" /> Excluir ({selectedIds.size})
+            </Button>
+          )}
         </CardHeader>
         <CardContent>
           {items.length === 0 ? (
@@ -160,8 +176,19 @@ function ComunicadosPanel() {
           ) : (
             <ul className="divide-y divide-slate-100">
               {items.map((c) => (
-                <li key={c.id} className="flex items-start justify-between gap-3 py-3">
-                  <div className="min-w-0">
+                <li key={c.id} className="flex items-start gap-3 py-3">
+                  <input
+                    type="checkbox"
+                    checked={selectedIds.has(c.id)}
+                    onChange={(e) => {
+                      const next = new Set(selectedIds);
+                      if (e.target.checked) next.add(c.id);
+                      else next.delete(c.id);
+                      setSelectedIds(next);
+                    }}
+                    className="mt-1 h-4 w-4 rounded border-slate-300"
+                  />
+                  <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-semibold text-slate-900">{c.titulo}</p>
                     <p className="mt-0.5 whitespace-pre-wrap text-xs text-slate-600">
                       {c.mensagem}
@@ -170,18 +197,6 @@ function ComunicadosPanel() {
                       {new Date(c.criado_em).toLocaleString("pt-BR")}
                     </p>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="text-slate-500 hover:text-red-600"
-                    aria-label="Remover comunicado"
-                    disabled={remove.isPending}
-                    onClick={() => {
-                      if (confirm("Remover este comunicado?")) remove.mutate(c.id);
-                    }}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
                 </li>
               ))}
             </ul>
