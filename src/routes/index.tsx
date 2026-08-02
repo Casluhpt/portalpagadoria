@@ -328,9 +328,8 @@ function PortalPage() {
                     Portal Corporativo
                   </Badge>
                   <h1 className="text-3xl font-bold tracking-tight md:text-4xl">Pagadoria</h1>
-                  <p className="mt-2 text-base text-white/80 md:text-lg">
-                    Central de inteligência da Pagadoria com foco em resultados, pagamentos,
-                    provisões e conciliações financeiras.
+                  <p className="mt-2 text-base text-white/80 md:text-lg max-w-xl">
+                    Central de inteligência da Pagadoria com foco em resultados, pagamentos e provisões, garantindo a governança e a fluidez de seus processos financeiros.
                   </p>
                 </div>
                 <div className="flex gap-2">
