@@ -279,25 +279,23 @@ export function GlobalSearch({ variant = "compact" }: { variant?: "compact" | "h
           </CommandEmpty>
 
           {isAiMode && (
-            <CommandGroup heading="IA Assistente da Pagadoria">
+            <CommandGroup>
               <div className="px-2 py-3">
                 <div className="flex flex-col gap-4 rounded-lg border border-violet-100 bg-violet-50/80 p-4 dark:border-violet-800 dark:bg-violet-900/20">
                   <div className="flex items-start gap-3">
                     <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-violet-600 text-white shadow-sm">
                       <Bot className="h-5 w-5" />
                     </div>
-                    <div className="flex-1 space-y-2">
-                      <p className="text-[10px] font-bold uppercase tracking-wider text-violet-600 dark:text-violet-400">Pergunta:</p>
+                    <div className="flex-1 space-y-1">
                       <p className="text-xs font-medium text-foreground italic">"{search}"</p>
                     </div>
                   </div>
 
-                  <div className="flex items-start gap-3">
+                  <div className="flex items-start gap-3 border-t border-violet-200/30 pt-4 dark:border-violet-700/30">
                     <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-violet-100 text-violet-600 shadow-sm dark:bg-violet-900/40">
                       <Sparkles className="h-5 w-5" />
                     </div>
                     <div className="flex-1 space-y-2">
-                      <p className="text-[10px] font-bold uppercase tracking-wider text-violet-600 dark:text-violet-400">Resposta Interativa:</p>
                       {isAiLoading ? (
                         <div className="flex items-center gap-2 text-xs italic text-violet-600 dark:text-violet-300">
                           <Loader2 className="h-3 w-3 animate-spin" />
