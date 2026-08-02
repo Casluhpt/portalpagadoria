@@ -313,6 +313,42 @@ export type Database = {
         }
         Relationships: []
       }
+      fechamento_pagamentos: {
+        Row: {
+          ano: string
+          arquivo_url: string | null
+          criado_em: string | null
+          id: string
+          mes: string
+          nome: string
+          total_registros: number | null
+          total_valor: number | null
+          usuario_id: string | null
+        }
+        Insert: {
+          ano: string
+          arquivo_url?: string | null
+          criado_em?: string | null
+          id?: string
+          mes: string
+          nome: string
+          total_registros?: number | null
+          total_valor?: number | null
+          usuario_id?: string | null
+        }
+        Update: {
+          ano?: string
+          arquivo_url?: string | null
+          criado_em?: string | null
+          id?: string
+          mes?: string
+          nome?: string
+          total_registros?: number | null
+          total_valor?: number | null
+          usuario_id?: string | null
+        }
+        Relationships: []
+      }
       lancamentos: {
         Row: {
           account_group: string | null
