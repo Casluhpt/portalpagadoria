@@ -18,6 +18,8 @@ import { sendSupportRequest } from "@/lib/suporte.functions";
 import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
+import { UsuariosTableWrapper as UsuariosTable } from "@/components/admin/usuarios-table";
+
 
 export const Route = createFileRoute("/configuracoes")({
   component: ConfiguracoesPage,
