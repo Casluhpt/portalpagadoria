@@ -726,6 +726,19 @@ function RegistroDialog({
             <Input value={numeroNf} onChange={(e) => setNumeroNf(e.target.value)} placeholder="ex.: 000123" />
           </div>
           <div>
+            <Label><CalendarClock className="mr-1 inline h-3 w-3" /> Data Emissão NF</Label>
+            <Input type="date" value={dataEmissao} onChange={(e) => setDataEmissao(e.target.value)} />
+          </div>
+          <div>
+            <Label>Competência</Label>
+            <Select value={competencia} onValueChange={setCompetencia}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                {MESES.map(m => <SelectItem key={m} value={m}>{m}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
             <Label><CalendarClock className="mr-1 inline h-3 w-3" /> Data de lançamento</Label>
             <Input type="date" value={dataLanc} onChange={(e) => setDataLanc(e.target.value)} />
           </div>
