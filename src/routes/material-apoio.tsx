@@ -15,6 +15,7 @@ import {
   LifeBuoy,
   ShieldCheck,
   Star,
+  Keyboard,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -488,6 +489,28 @@ function MaterialApoioPage() {
                 </CardContent>
               )}
             </Card>
+
+            <section id="atalhos" className="rounded-xl border border-blue-100 bg-blue-50/30 p-5">
+              <div className="flex items-center gap-2 mb-4">
+                <Keyboard className="h-5 w-5 text-blue-600" />
+                <h3 className="text-sm font-bold text-blue-900">Atalhos Globais (Ctrl + Tecla)</h3>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+                {[
+                  { key: 'H', label: 'Início / Home' },
+                  { key: 'P', label: 'Pagamentos' },
+                  { key: 'C', label: 'Conciliação' },
+                  { key: 'M', label: 'Material Apoio' },
+                  { key: 'A', label: 'Base Anexos' },
+                  { key: 'F', label: 'Fechamento' },
+                ].map(s => (
+                  <div key={s.key} className="flex flex-col items-center justify-center p-3 bg-white rounded-lg border border-blue-100 shadow-sm text-center">
+                    <kbd className="mb-1 rounded bg-slate-100 px-2 py-0.5 font-mono text-xs font-bold border border-slate-300">Ctrl + {s.key}</kbd>
+                    <span className="text-[9px] text-slate-500 uppercase font-bold tracking-tighter">{s.label}</span>
+                  </div>
+                ))}
+              </div>
+            </section>
 
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="flex flex-wrap items-center gap-2">
