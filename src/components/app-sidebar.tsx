@@ -82,6 +82,8 @@ const mainItems: MenuItem[] = [
   
   { title: "Despesas Fixas", url: "/despesas-fixas", icon: Wallet, match: (p) => p.startsWith("/despesas-fixas") },
   { title: "Exportação de Relatórios", url: "/exportacao", icon: Download, match: (p) => p.startsWith("/exportacao") },
+  { title: "Busca Global", url: "#", icon: Search, match: () => false, action: "search" },
+];
 ];
 
 const advancedItems: MenuItem[] = [
