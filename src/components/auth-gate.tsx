@@ -10,7 +10,8 @@ const isPublica = (pathname: string) =>
 
 export function AuthGate({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
-  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const location = useRouterState({ select: (s) => s.location });
+  const pathname = location.pathname;
   const [autenticado, setAutenticado] = useState<boolean | null>(null);
 
   useEffect(() => {
@@ -32,9 +33,15 @@ export function AuthGate({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (autenticado === false && !isPublica(pathname)) {
-      navigate({ to: "/auth", replace: true });
+      const returnTo = `${pathname}${location.searchStr ?? ""}${location.hash ?? ""}`;
+      navigate({
+        to: "/auth",
+        search: returnTo === "/" ? undefined : { returnTo },
+        replace: true,
+      });
     }
-  }, [autenticado, pathname, navigate]);
+  }, [autenticado, pathname, location.searchStr, location.hash, navigate]);
+
 
   if (isPublica(pathname)) return <>{children}</>;
 
