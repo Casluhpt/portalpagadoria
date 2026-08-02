@@ -2,7 +2,7 @@ import { createFileRoute, Link } from '@tanstack/react-router';
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { HeaderActions } from "@/components/header-actions";
-import profarmaLogo from "@/assets/profarma-logo.png.asset.json";
+import { AppLogo } from "@/components/app-logo";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { 
@@ -79,7 +79,7 @@ function ESocialPage() {
           <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-border bg-card/90 px-4 backdrop-blur dark:bg-card/90 dark:border-border">
             <SidebarTrigger />
             <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-              <img src="/profarma.png" alt="Profarma" className="h-7 object-contain" />
+              <AppLogo className="h-7 w-auto" />
               <div className="ml-2 flex flex-col leading-tight">
                 <span className="text-sm font-semibold text-foreground dark:text-foreground">Controle E-Social</span>
                 <span className="text-[11px] text-muted-foreground">Acompanhamento Mensal de Lançamentos</span>

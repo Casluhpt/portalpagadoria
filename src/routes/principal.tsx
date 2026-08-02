@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { AppLogo } from "@/components/app-logo";
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Check, ChevronDown, Database, Filter, Loader2, RotateCcw } from "lucide-react";
@@ -85,7 +86,7 @@ function Dashboard() {
           <div className="flex flex-1 flex-col">
             <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-border bg-background/80 px-4 backdrop-blur">
               <SidebarTrigger />
-              <h1 className="text-sm font-semibold text-foreground">Principal</h1>
+              <AppLogo className="h-7 w-auto" />
             </header>
             {rolesLoading ? (
               <div className="flex flex-1 items-center justify-center text-sm text-muted-foreground">Carregando…</div>
