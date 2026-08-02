@@ -9,6 +9,7 @@ import {
   Loader2, Plus, Trash2, Wallet, Filter, LayoutDashboard, Table2,
   Building2, CalendarClock, CheckCircle2, Clock, TrendingUp, Search, X
 } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
 
 import { AppSidebar } from "@/components/app-sidebar";
 import { HeaderActions } from "@/components/header-actions";
@@ -980,7 +981,7 @@ function DescricaoDialog({
             <Label>Notas / Observações Internas</Label>
             <Textarea 
               value={notas} 
-              onChange={(e) => setNotas(e.target.value)} 
+              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setNotas(e.target.value)} 
               placeholder="Detalhes adicionais sobre esta despesa..." 
               className="h-20" 
             />
