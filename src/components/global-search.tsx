@@ -261,20 +261,9 @@ export function GlobalSearch({ variant = "compact" }: { variant?: "compact" | "h
           )}
         </div>
 
-        <CommandList className="max-h-[460px]">
-          <CommandEmpty>
-            <div className="flex flex-col items-center justify-center py-6 text-center">
-              <Bot className="mb-2 h-10 w-10 text-violet-300" />
-              <p className="text-sm font-medium">Nenhum resultado direto no portal.</p>
-              <Button variant="link" className="text-xs text-violet-600" onClick={askAi}>
-                Perguntar à IA Assistente da Pagadoria
-              </Button>
-            </div>
-          </CommandEmpty>
-
-          {isAiMode && (
-            <CommandGroup>
-              <div className="px-2 py-3">
+        {isAiMode && (
+          <div className="max-h-[460px] overflow-y-auto">
+            <div className="px-2 py-3">
                 <div className="flex flex-col gap-4 rounded-lg border-none bg-violet-50/80 p-4 dark:bg-violet-900/20">
                   <div className="flex items-start gap-3">
                     <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-violet-600 text-white shadow-sm">
