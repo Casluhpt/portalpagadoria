@@ -30,6 +30,7 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { AppLogo } from "@/components/app-logo";
 import { HeaderActions } from "@/components/header-actions";
 import { useRoles } from "@/hooks/use-roles";
+import { useSession } from "@/hooks/use-session";
 import logoPagadoria from "@/assets/logo-pagadoria.png.asset.json";
 import { GlobalSearch } from "@/components/global-search";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
