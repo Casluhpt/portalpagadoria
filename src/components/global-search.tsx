@@ -413,7 +413,7 @@ export function GlobalSearch({ variant = "compact" }: { variant?: "compact" | "h
           )}
         </CommandList>
 
-        <div className="flex items-center justify-end border-none bg-muted/50 px-4 py-1.5" />
+        <div className="flex items-center justify-end border-none bg-transparent px-4 py-1.5" />
       </CommandDialog>
     </>
   );
