@@ -69,9 +69,40 @@ function BankReconciliationPage() {
                 </div>
               </TabsContent>
 
-              <TabsContent value="conciliacao">
-                <div className="flex items-center justify-center p-20 text-slate-400 border border-dashed rounded-lg">
-                  Espaço para Importação de Arquivos Bankmanager / Itaú Varejo e Distribuição
+              <TabsContent value="conciliacao" className="space-y-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <div className="rounded-xl border bg-white p-6 shadow-sm space-y-4">
+                    <h3 className="font-bold text-slate-800 flex items-center gap-2">
+                      <div className="h-8 w-8 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-xs font-bold">1</div>
+                      Varejo (Itaú)
+                    </h3>
+                    <p className="text-xs text-slate-500">Importe o arquivo de retorno consolidado do Varejo para processamento.</p>
+                    <div className="border-2 border-dashed border-slate-200 rounded-lg p-10 text-center hover:border-blue-400 transition-colors cursor-pointer bg-slate-50/50">
+                      <p className="text-sm text-slate-600 font-medium">Clique ou arraste o arquivo do Varejo</p>
+                      <p className="text-[10px] text-slate-400 mt-1">Formatos suportados: .XLSX, .CSV, .TXT (Retorno)</p>
+                    </div>
+                  </div>
+
+                  <div className="rounded-xl border bg-white p-6 shadow-sm space-y-4">
+                    <h3 className="font-bold text-slate-800 flex items-center gap-2">
+                      <div className="h-8 w-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs font-bold">2</div>
+                      Distribuição (Itaú)
+                    </h3>
+                    <p className="text-xs text-slate-500">Importe o arquivo de retorno da Distribuição para conciliação.</p>
+                    <div className="border-2 border-dashed border-slate-200 rounded-lg p-10 text-center hover:border-indigo-400 transition-colors cursor-pointer bg-slate-50/50">
+                      <p className="text-sm text-slate-600 font-medium">Clique ou arraste o arquivo da Distribuição</p>
+                      <p className="text-[10px] text-slate-400 mt-1">Formatos suportados: .XLSX, .CSV, .TXT (Retorno)</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="rounded-xl border bg-white p-6 shadow-sm space-y-4">
+                  <h3 className="font-bold text-slate-800 flex items-center gap-2">
+                    <ShieldCheck className="h-5 w-5 text-emerald-600" /> Comparativo Bankmanager
+                  </h3>
+                  <div className="h-48 flex items-center justify-center text-slate-400 border border-dashed rounded-lg bg-slate-50/50">
+                    Aguardando arquivos para processar o cruzamento multi-fonte
+                  </div>
                 </div>
               </TabsContent>
             </Tabs>
