@@ -517,6 +517,30 @@ function MaterialApoioPage() {
                 <Button
                   size="sm"
                   variant={categoria === null && !somenteFavoritos ? "default" : "outline"}
+                  className={categoria === null && !somenteFavoritos ? "bg-violet-600 hover:bg-violet-700" : ""}
+                  onClick={() => {
+                    setCategoria(null);
+                    setSomenteFavoritos(false);
+                  }}
+                >
+                  Todos os Conteúdos
+                </Button>
+                <Button
+                  size="sm"
+                  variant={somenteFavoritos ? "default" : "outline"}
+                  className={somenteFavoritos ? "bg-amber-500 hover:bg-amber-600 text-white" : ""}
+                  onClick={() => {
+                    setSomenteFavoritos(true);
+                    setCategoria(null);
+                  }}
+                >
+                  <Star className={`mr-2 h-4 w-4 ${somenteFavoritos ? "fill-white" : "text-amber-500"}`} />
+                  Favoritos
+                </Button>
+                <div className="h-6 w-[1px] bg-slate-200 mx-1 hidden sm:block" />
+                <Button
+                  size="sm"
+                  variant={categoria === null && !somenteFavoritos ? "default" : "outline"}
                   onClick={() => {
                     setCategoria(null);
                     setSomenteFavoritos(false);
