@@ -66,7 +66,7 @@ export async function reabrirProvisaoDia(data: string, justificativa?: string): 
     tabela: "provisao_fechamentos",
     registro_id: data,
     descricao: `Reabertura da provisão do dia ${data}`,
-    justificativa: justificativa ?? null ?? undefined,
+    justificativa: justificativa,
     severidade: "critico",
   });
 }
