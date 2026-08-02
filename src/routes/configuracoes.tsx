@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { HeaderActions } from "@/components/header-actions";
@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { HelpCircle, Bug, AlertCircle, MessageSquare, Send, CheckCircle2, Paperclip, X, Loader2 } from "lucide-react";
+import { HelpCircle, Bug, AlertCircle, MessageSquare, Send, CheckCircle2, Paperclip, X, Loader2, Settings, Users, History } from "lucide-react";
 import { useState, useRef } from "react";
 import { useSession } from "@/hooks/use-session";
 import { useMutation } from "@tanstack/react-query";
@@ -23,6 +23,7 @@ export const Route = createFileRoute("/configuracoes")({
 });
 
 function ConfiguracoesPage() {
+  const navigate = useNavigate();
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full bg-background">
@@ -37,18 +38,80 @@ function ConfiguracoesPage() {
           </header>
           
           <main className="flex-1 p-6">
-            <Tabs defaultValue="suporte" className="w-full">
-              <TabsList className="mb-4">
-                <TabsTrigger value="geral" disabled>Geral</TabsTrigger>
-                <TabsTrigger value="integracoes" disabled>Integrações</TabsTrigger>
-                <TabsTrigger value="suporte" className="gap-2">
-                  <HelpCircle className="h-4 w-4" /> Dúvidas, Sugestões e Melhorias
+            <Tabs defaultValue="geral" className="w-full flex flex-col md:flex-row gap-6">
+              <TabsList className="flex flex-col h-auto bg-transparent border-none p-0 gap-1 w-full md:w-64 shrink-0">
+                <TabsTrigger 
+                  value="geral" 
+                  className="justify-start gap-3 px-4 py-3 h-auto w-full data-[state=active]:bg-white data-[state=active]:shadow-sm border border-transparent data-[state=active]:border-border rounded-lg transition-all"
+                >
+                  <div className="flex h-8 w-8 items-center justify-center rounded-md bg-slate-100 text-slate-600 group-data-[state=active]:bg-indigo-100 group-data-[state=active]:text-indigo-600">
+                    <Settings className="h-4 w-4" />
+                  </div>
+                  <div className="flex flex-col items-start text-left">
+                    <span className="text-sm font-medium">Geral</span>
+                    <span className="text-[10px] text-muted-foreground font-normal">Preferências do sistema</span>
+                  </div>
+                </TabsTrigger>
+
+                <TabsTrigger 
+                  value="usuarios" 
+                  onClick={() => navigate({ to: "/usuarios" })}
+                  className="justify-start gap-3 px-4 py-3 h-auto w-full data-[state=active]:bg-white data-[state=active]:shadow-sm border border-transparent data-[state=active]:border-border rounded-lg transition-all"
+                >
+                  <div className="flex h-8 w-8 items-center justify-center rounded-md bg-slate-100 text-slate-600">
+                    <Users className="h-4 w-4" />
+                  </div>
+                  <div className="flex flex-col items-start text-left">
+                    <span className="text-sm font-medium">Administração de usuários</span>
+                    <span className="text-[10px] text-muted-foreground font-normal">Gestão de acessos e perfis</span>
+                  </div>
+                </TabsTrigger>
+
+                <TabsTrigger 
+                  value="historico" 
+                  onClick={() => navigate({ to: "/historico" })}
+                  className="justify-start gap-3 px-4 py-3 h-auto w-full data-[state=active]:bg-white data-[state=active]:shadow-sm border border-transparent data-[state=active]:border-border rounded-lg transition-all"
+                >
+                  <div className="flex h-8 w-8 items-center justify-center rounded-md bg-slate-100 text-slate-600">
+                    <History className="h-4 w-4" />
+                  </div>
+                  <div className="flex flex-col items-start text-left">
+                    <span className="text-sm font-medium">Histórico de versões</span>
+                    <span className="text-[10px] text-muted-foreground font-normal">Logs de atualização e mudanças</span>
+                  </div>
+                </TabsTrigger>
+
+                <TabsTrigger 
+                  value="suporte" 
+                  className="justify-start gap-3 px-4 py-3 h-auto w-full data-[state=active]:bg-white data-[state=active]:shadow-sm border border-transparent data-[state=active]:border-border rounded-lg transition-all"
+                >
+                  <div className="flex h-8 w-8 items-center justify-center rounded-md bg-slate-100 text-slate-600 group-data-[state=active]:bg-indigo-100 group-data-[state=active]:text-indigo-600">
+                    <HelpCircle className="h-4 w-4" />
+                  </div>
+                  <div className="flex flex-col items-start text-left">
+                    <span className="text-sm font-medium">Suporte Técnico</span>
+                    <span className="text-[10px] text-muted-foreground font-normal">Dúvidas, sugestões e erros</span>
+                  </div>
                 </TabsTrigger>
               </TabsList>
               
-              <TabsContent value="suporte">
-                <SupportForm />
-              </TabsContent>
+              <div className="flex-1 min-w-0">
+                <TabsContent value="geral" className="mt-0">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Configurações Gerais</CardTitle>
+                      <CardDescription>Gerencie as preferências globais do portal.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="h-[200px] flex items-center justify-center text-muted-foreground">
+                      Módulo em desenvolvimento
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+                
+                <TabsContent value="suporte" className="mt-0">
+                  <SupportForm />
+                </TabsContent>
+              </div>
             </Tabs>
           </main>
         </div>
