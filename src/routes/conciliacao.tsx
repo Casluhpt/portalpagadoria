@@ -26,7 +26,7 @@ function BankReconciliationPage() {
           <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-border bg-card/90 px-4 backdrop-blur">
             <SidebarTrigger />
             <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-              <AppLogo className="h-7 w-auto" />
+              <AppLogo className="h-6 w-auto shrink-0 sm:h-7" />
               <div className="ml-2 flex flex-col leading-tight">
                 <span className="text-sm font-semibold text-foreground">Conciliação Bancária</span>
                 <span className="text-[11px] text-muted-foreground">Validação multi-fonte</span>
