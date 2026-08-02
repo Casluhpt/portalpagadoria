@@ -8,7 +8,7 @@ export const getPagamentosParaConciliacao = createServerFn({ method: "GET" })
   }).parse(data))
   .handler(async ({ data }) => {
     const { data: pagamentos, error } = await supabase
-      .from("pagamentos")
+      .from("pagamentos_diversos")
       .select("*")
       .in("competencia", data.competencias);
     
@@ -36,4 +36,15 @@ export const saveConciliacaoHistorico = createServerFn({ method: "POST" })
     
     if (error) throw new Error(error.message);
     return inserted;
+  });
+
+export const listConciliacaoHistorico = createServerFn({ method: "GET" })
+  .handler(async () => {
+    const { data, error } = await supabase
+      .from("conciliacao_historico")
+      .select("*")
+      .order("executado_em", { ascending: false });
+    
+    if (error) throw new Error(error.message);
+    return data;
   });
