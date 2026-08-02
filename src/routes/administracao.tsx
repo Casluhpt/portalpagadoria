@@ -139,6 +139,23 @@ function ComunicadosPanel() {
               maxLength={2000}
             />
           </div>
+          <div className="space-y-2">
+            <Label>Canal de envio</Label>
+            <div className="flex gap-4">
+              <label className="flex items-center gap-2 text-sm cursor-pointer">
+                <input type="radio" name="canal" checked={canal === "portal"} onChange={() => setCanal("portal")} />
+                Somente Portal
+              </label>
+              <label className="flex items-center gap-2 text-sm cursor-pointer">
+                <input type="radio" name="canal" checked={canal === "email"} onChange={() => setCanal("email")} />
+                Somente Email
+              </label>
+              <label className="flex items-center gap-2 text-sm cursor-pointer">
+                <input type="radio" name="canal" checked={canal === "ambos"} onChange={() => setCanal("ambos")} />
+                Os dois
+              </label>
+            </div>
+          </div>
           <Button
             className="w-full"
             disabled={!canSubmit}
