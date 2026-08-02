@@ -926,7 +926,7 @@ function DescricaoDialog({
           </DialogDescription>
         </DialogHeader>
         <div className="grid grid-cols-3 gap-3">
-          <div className="col-span-1">
+          <div className="col-span-2">
             <Label>Descrição / Nomenclatura</Label>
             <Input value={descricao} onChange={(e) => setDescricao(e.target.value)} />
           </div>
@@ -946,6 +946,28 @@ function DescricaoDialog({
           <div>
             <Label>Saldo Inicial Pedido</Label>
             <Input type="number" value={saldoInicialPedido} onChange={(e) => setSaldoInicialPedido(Number(e.target.value))} placeholder="0.00" />
+          </div>
+          <div className="col-span-3 border-t pt-2 mt-2">
+            <Label className="text-indigo-700 font-bold mb-2 block">Informações de Pagamento (Fase 1.6.0+)</Label>
+            <div className="grid grid-cols-3 gap-3">
+              <div>
+                <Label>Empresa</Label>
+                <Select value={empresaCodigo} onValueChange={setEmpresaCodigo}>
+                  <SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger>
+                  <SelectContent>
+                    {EMPRESAS.map(e => <SelectItem key={e.codigo} value={e.codigo}>{e.codigo} - {e.nome}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label>Centro de Custo</Label>
+                <Input value={centroCusto} onChange={(e) => setCentroCusto(e.target.value)} placeholder="0000" />
+              </div>
+              <div>
+                <Label>Conta Contábil</Label>
+                <Input value={conta} onChange={(e) => setConta(e.target.value)} placeholder="0.0.0.0" />
+              </div>
+            </div>
           </div>
           {linha.categoria === "PJ" && (
             <div className="col-span-3">
