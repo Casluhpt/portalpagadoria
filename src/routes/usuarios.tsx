@@ -357,6 +357,8 @@ function UsuariosTable() {
 }
 function UserTableRow({ u, user, roleMut, setorMut, deleteMut, resetMut, compact }: any) {
   const isSelf = user?.id === u.id;
+  const [pendingRole, setPendingRole] = useState<"administrador" | "viewer" | "visitante" | null>(null);
+  const [justificativa, setJustificativa] = useState("");
   return (
     <tr className="hover:bg-muted/40">
       {!compact && (
