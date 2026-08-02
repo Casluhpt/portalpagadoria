@@ -76,6 +76,7 @@ function uniqSorted<T>(arr: (T | null | undefined)[]): T[] {
 
 function Dashboard() {
   const { isAdmin, loading: rolesLoading } = useRoles();
+
   if (rolesLoading || !isAdmin) {
     return (
       <SidebarProvider>
@@ -105,12 +106,18 @@ function Dashboard() {
       </SidebarProvider>
     );
   }
+
+  return <DashboardConteudo />;
+}
+
+function DashboardConteudo() {
   const { data: raw, isLoading, error } = useQuery({
     queryKey: lancamentosQueryKey,
     queryFn: fetchAllLancamentos,
     staleTime: 30_000,
   });
   const rows = useMemo(() => applyDisplay(raw ?? []), [raw]);
+
 
   const allStatus = useMemo(() => uniqSorted(rows.map((r) => r.descStatus)), [rows]);
   const allEmpresas = useMemo(() => uniqSorted(rows.map((r) => r.Empresa)), [rows]);
