@@ -6,6 +6,7 @@ export type Provisao = {
   empresa: string | null;
   banco: string | null;
   valor: number | null;
+  mes: string;
 };
 
 type Row = {
@@ -14,6 +15,7 @@ type Row = {
   empresa: string | null;
   banco: string | null;
   valor: number | null;
+  mes: string;
 };
 
 const toModel = (r: Row): Provisao => ({
@@ -22,6 +24,7 @@ const toModel = (r: Row): Provisao => ({
   empresa: r.empresa,
   banco: r.banco,
   valor: r.valor == null ? null : Number(r.valor),
+  mes: r.mes,
 });
 
 type InsertRow = {
@@ -29,6 +32,7 @@ type InsertRow = {
   empresa?: string | null;
   banco?: string | null;
   valor?: number | null;
+  mes: string;
 };
 
 const toRow = (m: Partial<Provisao>): InsertRow => {
