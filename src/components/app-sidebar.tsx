@@ -35,6 +35,7 @@ import {
   Users,
   Lock,
   Clock,
+  Search,
 } from "lucide-react";
 import { toast } from "sonner";
 import type { ComponentType } from "react";
@@ -63,24 +64,24 @@ type MenuItem = {
   icon: ComponentType<{ className?: string }>;
   match: (p: string) => boolean;
   adminOnly?: boolean;
-  restricted?: boolean; // shows lock icon; admin-only in practice
-  allowedRoles?: AppRole[]; // if set, only these roles see it
+  restricted?: boolean;
+  allowedRoles?: AppRole[];
+  action?: "search";
 };
 
 const mainItems: MenuItem[] = [
   { title: "Início", url: "/", icon: Home, match: (p) => p === "/" },
   { title: "Resultados Principais", url: "/principal", icon: LayoutDashboard, match: (p) => p === "/principal", restricted: true, adminOnly: true },
   { title: "Provisão Diária", url: "/provisao", icon: Wallet, match: (p) => p === "/provisao", restricted: true, adminOnly: true },
-  
   { title: "Base de Anexos", url: "/anexos", icon: FileArchive, match: (p) => p.startsWith("/anexos") },
   { title: "Conciliação Bancária", url: "/conciliacao", icon: ShieldCheck, match: (p) => p.startsWith("/conciliacao"), restricted: true, adminOnly: true },
   { title: "Pagamentos Diversos", url: "/pagamentos", icon: Banknote, match: (p) => p.startsWith("/pagamentos") },
   { title: "Administração de Comunicados", url: "/administracao", icon: Settings, match: (p) => p.startsWith("/administracao"), adminOnly: true },
   { title: "Fechamento de Competência", url: "/fechamento", icon: FileCheck2, match: (p) => p.startsWith("/fechamento") },
   { title: "Central de Divergências", url: "/divergencias", icon: AlertTriangle, match: (p) => p.startsWith("/divergencias") },
-  
   { title: "Despesas Fixas", url: "/despesas-fixas", icon: Wallet, match: (p) => p.startsWith("/despesas-fixas") },
   { title: "Exportação de Relatórios", url: "/exportacao", icon: Download, match: (p) => p.startsWith("/exportacao") },
+  { title: "Busca Global", url: "#", icon: Search, match: () => false, action: "search" },
 ];
 
 const advancedItems: MenuItem[] = [
@@ -136,14 +137,32 @@ export function AppSidebar() {
 
   const renderItem = (item: MenuItem) => (
     <SidebarMenuItem key={item.title}>
-      <SidebarMenuButton asChild isActive={item.match(currentPath)} tooltip={item.title}>
-        <Link to={item.url} className="flex items-center gap-2">
-          <item.icon className="h-4 w-4 shrink-0" />
-          <span className="truncate">{item.title}</span>
-          {item.restricted && (
-            <Lock className="ml-auto h-3 w-3 shrink-0 text-amber-500" aria-label="Área restrita" />
-          )}
-        </Link>
+      <SidebarMenuButton 
+        asChild={item.action !== "search"} 
+        isActive={item.match(currentPath)} 
+        tooltip={item.title}
+        onClick={item.action === "search" ? () => {
+          const event = new KeyboardEvent("keydown", { key: "k", metaKey: true, ctrlKey: true });
+          document.dispatchEvent(event);
+        } : undefined}
+      >
+        {item.action === "search" ? (
+          <div className="flex items-center gap-2 cursor-pointer w-full">
+            <item.icon className="h-4 w-4 shrink-0" />
+            <span className="truncate">{item.title}</span>
+            <kbd className="ml-auto pointer-events-none hidden h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 xl:flex">
+              ⌘K
+            </kbd>
+          </div>
+        ) : (
+          <Link to={item.url} className="flex items-center gap-2">
+            <item.icon className="h-4 w-4 shrink-0" />
+            <span className="truncate">{item.title}</span>
+            {item.restricted && (
+              <Lock className="ml-auto h-3 w-3 shrink-0 text-amber-500" aria-label="Área restrita" />
+            )}
+          </Link>
+        )}
       </SidebarMenuButton>
     </SidebarMenuItem>
   );
