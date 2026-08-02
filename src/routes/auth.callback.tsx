@@ -13,18 +13,21 @@ function AuthCallbackPage() {
 
   useEffect(() => {
     const handleCallback = async () => {
+      const url = new URL(window.location.href);
+      const redirect = url.searchParams.get("redirect") || "/";
+
       // O Supabase processa automaticamente o hash/search na URL para estabelecer a sessão
       const { data, error } = await supabase.auth.getSession();
 
       if (error) {
-        toast.error("Erro na verificação do e-mail: " + error.message);
+        toast.error("Erro na verificação do link: " + error.message);
         navigate({ to: "/auth", replace: true });
         return;
       }
 
       if (data.session) {
-        toast.success("E-mail verificado com sucesso!");
-        navigate({ to: "/", replace: true });
+        toast.success("Link verificado com sucesso!");
+        navigate({ to: redirect as any, replace: true });
       } else {
         // Caso não haja sessão imediata, redireciona para o login
         navigate({ to: "/auth", replace: true });
