@@ -241,7 +241,7 @@ function ESocialPage() {
               <div className="text-xs text-amber-800 dark:text-amber-300">
                 <p className="font-semibold mb-1">Nota de Segurança e Governança:</p>
                 <p>Caso algum valor não tenha dado baixa (sem o n° do fopag ou DCOMP), o sistema emitirá uma notificação automática para os usuários responsáveis pelos lançamentos.</p>
-                <p className="mt-1">A "Base de Pagamentos Diversos" é enviada diariamente para o e-mail do administrador configurado em "Configurações Técnicas > Segurança Avançada".</p>
+                <p className="mt-1">A "Base de Pagamentos Diversos" é enviada diariamente para o e-mail do administrador configurado em "Configurações Técnicas &gt; Segurança Avançada".</p>
               </div>
             </div>
           </main>
