@@ -96,7 +96,6 @@ function fmtDateTime(iso: string | null | undefined) {
 function PagamentosPage() {
   const { user } = useSession();
   const { isAdmin } = useRoles();
-  const { isAdmin } = useRoles();
   const colaboradorNome =
     (user?.user_metadata?.nome as string) ||
     (user?.user_metadata?.full_name as string) ||
@@ -158,7 +157,7 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
 
   const currentUserQueue = userId ? queue.find(q => q.user_id === userId) : undefined;
   const activeUser = queue.find(q => q.status === 'ativo');
-  const { roles, isAdmin } = useRoles();
+  const { roles } = useRoles();
   const isViewer = roles.includes("viewer");
   const isVisitante = roles.includes("visitante");
   
