@@ -945,18 +945,19 @@ function DescricaoDialog({
   onClose: () => void;
   onSave: (payload: any) => Promise<void>;
 }) {
+  const [meta, setMeta] = useState(linha.meta);
   const [descricao, setDescricao] = useState(linha.descricao);
-  const [nomeReal, setNomeReal] = useState(linha.meta.nome_real ?? "");
-  const [empresaCodigo, setEmpresaCodigo] = useState(linha.meta.empresa_codigo ?? "");
-  const [conta, setConta] = useState(linha.meta.conta ?? "");
-  const [centroCusto, setCentroCusto] = useState(linha.meta.centro_custo ?? "");
-  const [numeroPedido, setNumeroPedido] = useState(linha.meta.numero_pedido ?? "");
-  const [sapCode, setSapCode] = useState(linha.meta.sap_code ?? "");
-  const [valorPrevistoAnual, setValorPrevistoAnual] = useState(linha.meta.valor_previsto_anual ?? 0);
-  const [saldoInicialPedido, setSaldoInicialPedido] = useState(linha.meta.saldo_inicial_pedido ?? 0);
-  const [suspensa, setSuspensa] = useState(linha.meta.suspensa);
-  const [motivoSuspensao, setMotivoSuspensao] = useState(linha.meta.motivo_suspensao ?? "");
-  const [notas, setNotas] = useState(linha.meta.notas ?? "");
+  const [nomeReal, setNomeReal] = useState(meta.nome_real ?? "");
+  const [empresaCodigo, setEmpresaCodigo] = useState(meta.empresa_codigo ?? "");
+  const [conta, setConta] = useState(meta.conta ?? "");
+  const [centroCusto, setCentroCusto] = useState(meta.centro_custo ?? "");
+  const [numeroPedido, setNumeroPedido] = useState(meta.numero_pedido ?? "");
+  const [sapCode, setSapCode] = useState(meta.sap_code ?? "");
+  const [valorPrevistoAnual, setValorPrevistoAnual] = useState(meta.valor_previsto_anual ?? 0);
+  const [saldoInicialPedido, setSaldoInicialPedido] = useState(meta.saldo_inicial_pedido ?? 0);
+  const [suspensa, setSuspensa] = useState(meta.suspensa);
+  const [motivoSuspensao, setMotivoSuspensao] = useState(meta.motivo_suspensao ?? "");
+  const [notas, setNotas] = useState(meta.notas ?? "");
   const [saving, setSaving] = useState(false);
 
   const submit = async () => {
@@ -971,6 +972,8 @@ function DescricaoDialog({
         conta: conta || null,
         centro_custo: centroCusto || null,
         numero_pedido: numeroPedido || null,
+        pedido_antigo: meta.pedido_antigo || null,
+        pedido_novo: meta.pedido_novo || null,
         sap_code: sapCode || null,
         valor_previsto_anual: valorPrevistoAnual || null,
         saldo_inicial_pedido: saldoInicialPedido || null,
@@ -1002,7 +1005,7 @@ function DescricaoDialog({
           </div>
           <div>
             <Label>Nº pedido Antigo</Label>
-            <Input value={linha.meta.pedido_antigo || ""} onChange={(e) => setEditandoDescricao({ ...linha, meta: { ...linha.meta, pedido_antigo: e.target.value } })}
+            <Input value={meta.pedido_antigo || ""} onChange={(e) => setMeta({ ...meta, pedido_antigo: e.target.value })}
               placeholder="Antigo" />
           </div>
           <div>
