@@ -9,8 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { HelpCircle, Bug, AlertCircle, MessageSquare, Send, CheckCircle2, Paperclip, X, Loader2, Settings, Users, History, ChevronRight, Activity, Cloud, ShieldCheck } from "lucide-react";
-import { useState, useRef } from "react";
+import { HelpCircle, Bug, AlertCircle, MessageSquare, Send, CheckCircle2, Paperclip, X, Loader2, Settings, Users, History, ChevronRight, Activity, Cloud, ShieldCheck, Mail, Save } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
 import { useSession } from "@/hooks/use-session";
 import { useMutation } from "@tanstack/react-query";
 import { sendSupportRequest } from "@/lib/suporte.functions";
@@ -133,12 +133,18 @@ function ConfiguracoesPage() {
                   <TabsTrigger value="diagnostico" className="gap-2">
                     <Activity className="h-4 w-4" /> Diagnóstico
                   </TabsTrigger>
+                  <TabsTrigger value="seguranca" className="gap-2">
+                    <ShieldCheck className="h-4 w-4" /> Segurança Avançada
+                  </TabsTrigger>
                 </TabsList>
                 <TabsContent value="suporte">
                   <SupportForm />
                 </TabsContent>
                 <TabsContent value="diagnostico">
                   <DiagnosticPanel />
+                </TabsContent>
+                <TabsContent value="seguranca">
+                  <AdvancedSecuritySettings />
                 </TabsContent>
               </Tabs>
             </div>
@@ -429,5 +435,137 @@ function DiagnosticPanel() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+function AdvancedSecuritySettings() {
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [settings, setSettings] = useState({
+    enabled: false,
+    email: "",
+  });
+
+  const fetchSettings = async () => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('portal_settings')
+        .select('value')
+        .eq('key', 'envio_base_pagamentos_email')
+        .single();
+      
+      if (error && error.code !== 'PGRST116') throw error;
+      if (data?.value) {
+        setSettings(data.value as any);
+      }
+    } catch (e: any) {
+      toast.error("Erro ao carregar configurações: " + e.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const saveSettings = async () => {
+    setSaving(true);
+    try {
+      const { error } = await supabase
+        .from('portal_settings')
+        .upsert({
+          key: 'envio_base_pagamentos_email',
+          value: settings,
+          updated_at: new Date().toISOString()
+        });
+      
+      if (error) throw error;
+      toast.success("Configurações salvas com sucesso!");
+    } catch (e: any) {
+      toast.error("Erro ao salvar: " + e.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchSettings();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex h-40 items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-indigo-600" />
+      </div>
+    );
+  }
+
+  return (
+    <Card className="mx-auto max-w-2xl">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <ShieldCheck className="h-5 w-5 text-indigo-600" />
+          Configurações de Segurança e Auditoria
+        </CardTitle>
+        <CardDescription>
+          Controles avançados para exportação e monitoramento de dados sensíveis.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <div className="flex items-center justify-between rounded-lg border border-slate-100 p-4 bg-slate-50/50">
+          <div className="space-y-0.5">
+            <Label className="text-base">Envio Diário da Base de Pagamentos</Label>
+            <p className="text-sm text-muted-foreground">
+              Enviar por e-mail a "base" de "pagamentos diversos" ao final de cada dia.
+            </p>
+          </div>
+          <div className="flex items-center h-6">
+             <input 
+              type="checkbox" 
+              className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
+              checked={settings.enabled}
+              onChange={(e) => setSettings(prev => ({ ...prev, enabled: e.target.checked }))}
+            />
+          </div>
+        </div>
+
+        {settings.enabled && (
+          <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
+            <Label htmlFor="admin-email">E-mail do Administrador Destinatário</Label>
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <Input 
+                  id="admin-email"
+                  type="email"
+                  placeholder="admin@exemplo.com"
+                  className="pl-10"
+                  value={settings.email}
+                  onChange={(e) => setSettings(prev => ({ ...prev, email: e.target.value }))}
+                />
+              </div>
+            </div>
+            <p className="text-[11px] text-amber-600 font-medium">
+              Nota: Este usuário receberá um arquivo Excel consolidado com todos os lançamentos do dia.
+            </p>
+          </div>
+        )}
+
+        <Button 
+          className="w-full bg-indigo-600 hover:bg-indigo-700 mt-4" 
+          disabled={saving}
+          onClick={saveSettings}
+        >
+          {saving ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Salvando...
+            </>
+          ) : (
+            <>
+              <Save className="mr-2 h-4 w-4" /> Salvar Configurações
+            </>
+          )}
+        </Button>
+      </CardContent>
+    </Card>
   );
 }
