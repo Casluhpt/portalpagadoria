@@ -3,7 +3,7 @@ import { useMemo, useRef, useState } from "react";
 import { AppLogo } from "@/components/app-logo";
 import * as XLSX from "xlsx";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Loader2, Plus, Search, Trash2, ArrowUpDown, ArrowUp, ArrowDown, Upload, Download, FileSpreadsheet } from "lucide-react";
+import { Loader2, Plus, Search, Trash2, ArrowUpDown, ArrowUp, ArrowDown, Upload, Download, FileSpreadsheet, LayoutDashboard, Database } from "lucide-react";
 
 import { AppSidebar } from "@/components/app-sidebar";
 import { useSession } from "@/hooks/use-session";
@@ -239,7 +239,22 @@ function BasePage() {
                 </p>
               </div>
             </Link>
-            <div className="relative w-64">
+            <div className="flex items-center bg-muted rounded-lg p-1 border border-border">
+              <Button asChild size="sm" variant="ghost" className="h-8 px-4 text-muted-foreground hover:bg-background hover:text-foreground">
+                <Link to="/principal" className="flex items-center gap-2">
+                  <LayoutDashboard className="h-3.5 w-3.5" />
+                  <span className="text-xs font-semibold">Dashboard</span>
+                </Link>
+              </Button>
+              <Button asChild size="sm" variant="ghost" className="h-8 px-4 text-foreground bg-background shadow-sm">
+                <Link to="/base" className="flex items-center gap-2">
+                  <Database className="h-3.5 w-3.5" />
+                  <span className="text-xs font-semibold">Base de Resultados</span>
+                </Link>
+              </Button>
+            </div>
+
+            <div className="relative w-64 ml-auto">
               <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 placeholder="Pesquisar em toda a base…"

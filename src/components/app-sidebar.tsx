@@ -99,7 +99,6 @@ const mainItems: MenuItem[] = [
   { title: "Início", url: "/", icon: Home, match: (p: string) => p === "/", group: "geral" },
   
   { title: "Resultados Principais", url: "/principal", icon: LayoutDashboard, match: (p: string) => p === "/principal", restricted: true, adminOnly: true, group: "operacao" },
-  { title: "Base de Resultados", url: "/base", icon: Database, match: (p: string) => p === "/base", restricted: true, adminOnly: true, group: "operacao" },
   { title: "Provisão Diária", url: "/provisao", icon: Wallet, match: (p: string) => p === "/provisao", restricted: true, adminOnly: true, group: "operacao" },
   
   { title: "Conciliação Bancária", url: "/conciliacao", icon: ShieldCheck, match: (p: string) => p.startsWith("/conciliacao"), restricted: true, adminOnly: true, group: "financeiro" },

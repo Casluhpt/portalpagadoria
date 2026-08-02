@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppLogo } from "@/components/app-logo";
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Check, ChevronDown, Database, Filter, Loader2, RotateCcw } from "lucide-react";
+import { Check, ChevronDown, Database, Filter, LayoutDashboard, Loader2, RotateCcw } from "lucide-react";
 import {
   Bar,
   BarChart,
@@ -235,11 +235,20 @@ function DashboardConteudo() {
               </div>
             </Link>
             {isLoading && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
-            <Button asChild size="sm" variant="default" className="gap-1.5">
-              <Link to="/base">
-                <Database className="h-3.5 w-3.5" /> Base de Resultados
-              </Link>
-            </Button>
+            <div className="ml-auto flex items-center bg-white/10 rounded-lg p-1 border border-white/20 mr-4">
+              <Button asChild size="sm" variant="ghost" className="h-8 px-4 text-white hover:bg-white/10 bg-white/10 shadow-sm">
+                <Link to="/principal" className="flex items-center gap-2">
+                  <LayoutDashboard className="h-3.5 w-3.5" />
+                  <span className="text-xs font-semibold">Dashboard</span>
+                </Link>
+              </Button>
+              <Button asChild size="sm" variant="ghost" className="h-8 px-4 text-white/70 hover:bg-white/10 hover:text-white">
+                <Link to="/base" className="flex items-center gap-2">
+                  <Database className="h-3.5 w-3.5" />
+                  <span className="text-xs font-semibold">Base de Resultados</span>
+                </Link>
+              </Button>
+            </div>
           </header>
 
           <main className="flex-1 p-4 lg:p-6">
