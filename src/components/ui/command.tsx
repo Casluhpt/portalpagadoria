@@ -1,4 +1,5 @@
 "use client";
+// Refined for translucent minimalism and smooth feedback
 
 import * as React from "react";
 import { type DialogProps } from "@radix-ui/react-dialog";
