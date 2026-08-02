@@ -89,19 +89,6 @@ function ConfiguracoesPage() {
               <TabsContent value="diagnostico" className="m-0 focus-visible:outline-none">
                 <div className="grid gap-6 md:grid-cols-2">
                   <DiagnosticPanel />
-                  <Card className="border-border">
-                    <CardHeader>
-                      <CardTitle className="text-base flex items-center gap-2">
-                        <History className="h-4 w-4 text-amber-600" /> Histórico de Versões
-                      </CardTitle>
-                      <CardDescription>Log detalhado de atualizações e melhorias.</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <Button variant="outline" size="sm" onClick={() => navigate({ to: "/historico" })}>
-                        Ver Histórico Completo
-                      </Button>
-                    </CardContent>
-                  </Card>
                 </div>
               </TabsContent>
 
