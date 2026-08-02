@@ -65,7 +65,15 @@ function BankReconciliationPage() {
                 </div>
 
                 <div className="rounded-xl border bg-white p-8 text-center">
-                  <p className="text-slate-500">Módulo de Conciliação em fase de implementação (v1.6.0).</p>
+                  <p className="text-slate-500">Módulo de Conciliação Bancária v1.9.0 em implementação.</p>
+                  <div className="mt-4 text-left max-w-2xl mx-auto space-y-4">
+                    <p className="text-sm text-slate-600 font-medium border-b pb-2">Próximos Passos:</p>
+                    <ul className="text-sm text-slate-500 list-disc pl-5 space-y-2">
+                      <li>Implementar a lógica de análise de correspondência (5 níveis) no conciliacao.tsx.</li>
+                      <li>Conectar a importação de planilhas (Varejo/Distribuição) com as novas regras de validação.</li>
+                      <li>Configurar o feedback de status por tooltip, conforme os requisitos de visualização dinâmica.</li>
+                    </ul>
+                  </div>
                 </div>
               </TabsContent>
 
