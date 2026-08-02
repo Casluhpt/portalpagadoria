@@ -336,7 +336,7 @@ function PortalPage() {
                   </p>
                 </div>
                 <div className="flex gap-2">
-                  <Button asChild size="lg" className="bg-card text-indigo-900 hover:bg-card/90">
+                  <Button asChild size="lg" className="bg-white text-indigo-900 hover:bg-white/90 dark:bg-slate-900 dark:text-white dark:hover:bg-slate-800 dark:border dark:border-white/20 shadow-lg">
                     <Link to="/principal">
                       <LineChart className="mr-2 h-4 w-4" /> Resultados Principais
                     </Link>
