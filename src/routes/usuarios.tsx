@@ -87,7 +87,7 @@ function roleLabel(r: string) {
     case "criador_competencia": return "Criador de Competência";
     case "consulta": return "Consulta";
     case "viewer": return "Viewer";
-    case "visitante": return "Visitante";
+    case "visitante": return "Gerência/Visitante";
     default: return r;
   }
 }
