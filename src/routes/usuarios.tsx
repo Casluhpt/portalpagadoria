@@ -121,6 +121,8 @@ function UsuariosTable() {
   });
 
 
+  // Real-time presence updates are disabled as per project requirements
+  /*
   useEffect(() => {
     const channel = supabase
       .channel("admin-users-presence")
@@ -136,6 +138,7 @@ function UsuariosTable() {
       supabase.removeChannel(channel);
     };
   }, [qc]);
+  */
 
 
   const resetMut = useMutation({
