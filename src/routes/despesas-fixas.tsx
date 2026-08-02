@@ -68,6 +68,8 @@ type LinhaAgrupada = {
     centro_custo: string | null;
     numero_pedido: string | null;
     sap_code: string | null;
+    pedido_antigo: string | null;
+    pedido_novo: string | null;
     valor_previsto_anual: number | null;
     saldo_inicial_pedido: number | null;
     nome_real: string | null;
@@ -134,6 +136,8 @@ function DespesasFixasPage() {
             centro_custo: r.centro_custo,
             numero_pedido: r.numero_pedido,
             sap_code: (r as any).sap_code ?? null,
+            pedido_antigo: (r as any).pedido_antigo ?? null,
+            pedido_novo: (r as any).pedido_novo ?? null,
             valor_previsto_anual: (r as any).valor_previsto_anual ?? null,
             saldo_inicial_pedido: (r as any).saldo_inicial_pedido ?? null,
             nome_real: (r as any).nome_real ?? null,
@@ -148,7 +152,7 @@ function DespesasFixasPage() {
       const v = Number(r.valor) || 0;
       l.totalPrevisto += v;
       if (r.lancado) l.totalLancado += v;
-      (["empresa_codigo","empresa_nome","conta","centro_custo","numero_pedido","sap_code","valor_previsto_anual","saldo_inicial_pedido","nome_real","notas","suspensa","motivo_suspensao"] as const).forEach((k) => {
+      (["empresa_codigo","empresa_nome","conta","centro_custo","numero_pedido","sap_code","pedido_antigo","pedido_novo","valor_previsto_anual","saldo_inicial_pedido","nome_real","notas","suspensa","motivo_suspensao"] as const).forEach((k) => {
         if (!l!.meta[k as keyof typeof l.meta] && (r as any)[k]) (l!.meta as any)[k] = (r as any)[k];
       });
     });
