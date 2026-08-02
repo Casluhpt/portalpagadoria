@@ -21,9 +21,9 @@ export function BackButton() {
       onClick={onClick}
       aria-label="Voltar para a tela anterior"
       title="Voltar"
-      className="group fixed bottom-5 left-4 z-[60] inline-flex h-10 items-center gap-2 rounded-full bg-card px-4 text-xs font-semibold text-foreground shadow-lg ring-1 ring-border backdrop-blur-md transition-all hover:bg-muted hover:text-primary hover:shadow-md active:scale-95 lg:bottom-auto lg:left-6 lg:top-6 lg:rounded-lg lg:px-3 lg:shadow-sm"
+      className="group fixed bottom-5 left-4 z-[60] inline-flex h-10 items-center gap-2 rounded-full bg-background/60 px-4 text-xs font-semibold text-foreground shadow-[var(--shadow-elegant)] ring-1 ring-border/40 backdrop-blur-2xl transition-all duration-500 hover:bg-background/80 hover:text-primary hover:shadow-[var(--shadow-glow)] hover:translate-x-1 active:scale-95 lg:bottom-auto lg:left-6 lg:top-6 lg:rounded-xl lg:px-4"
     >
-      <ArrowLeft className="h-3.5 w-3.5 transition group-hover:-translate-x-0.5" />
+      <ArrowLeft className="h-3.5 w-3.5 transition group-hover:-translate-x-1" />
       <span>Voltar</span>
     </button>
   );
