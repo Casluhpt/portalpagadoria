@@ -79,10 +79,10 @@ function ESocialPage() {
           <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-border bg-card/90 px-4 backdrop-blur dark:bg-card/90 dark:border-border">
             <SidebarTrigger />
             <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-              <AppLogo className="h-7 w-auto" />
-              <div className="ml-2 flex flex-col leading-tight">
+              <AppLogo className="h-6 w-auto shrink-0 sm:h-7" />
+              <div className="ml-2 flex min-w-0 flex-col leading-tight">
                 <span className="text-sm font-semibold text-foreground dark:text-foreground">Controle E-Social</span>
-                <span className="text-[11px] text-muted-foreground">Acompanhamento Mensal de Lançamentos</span>
+                <span className="hidden truncate text-[11px] text-muted-foreground sm:block">Acompanhamento Mensal de Lançamentos</span>
               </div>
             </Link>
             <div className="ml-auto flex items-center gap-3">

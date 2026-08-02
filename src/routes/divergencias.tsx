@@ -73,7 +73,7 @@ function DivergenciasPage() {
           <header className="sticky top-0 z-10 flex h-14 items-center gap-4 border-b border-border bg-background/80 px-4 backdrop-blur">
             <SidebarTrigger />
             <div>
-              <h1 className="text-sm font-semibold text-foreground">Central de Divergências</h1>
+              <h1 className="truncate text-sm font-semibold text-foreground">Central de Divergências</h1>
               <p className="text-xs text-muted-foreground">
                 Solicitações de lançamento em dias com provisão já fechada.
               </p>

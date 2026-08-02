@@ -15,7 +15,7 @@ function AlertasPage() {
         <div className="flex flex-1 flex-col">
           <header className="sticky top-0 z-10 flex h-14 items-center gap-4 border-b border-border bg-background/80 px-4 backdrop-blur">
             <SidebarTrigger />
-            <h1 className="text-sm font-semibold text-foreground">Notificações e Alertas</h1>
+            <h1 className="truncate text-sm font-semibold text-foreground">Notificações e Alertas</h1>
           </header>
           <ModuleStub
             title="Notificações e Alertas"

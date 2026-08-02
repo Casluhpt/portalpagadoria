@@ -77,10 +77,10 @@ function Content() {
           <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-border bg-background/80 px-4 backdrop-blur">
             <SidebarTrigger />
             <Link to="/" className="flex flex-1 items-center gap-2 hover:opacity-80 transition-opacity">
-              <AppLogo className="h-7 w-auto" />
-              <div>
-                <h1 className="text-sm font-semibold text-foreground">Registros Excluídos</h1>
-                <p className="text-[10px] text-muted-foreground">Auditoria e recuperação lógica</p>
+              <AppLogo className="h-6 w-auto shrink-0 sm:h-7" />
+              <div className="min-w-0">
+                <h1 className="truncate text-sm font-semibold text-foreground">Registros Excluídos</h1>
+                <p className="hidden truncate text-[10px] text-muted-foreground sm:block">Auditoria e recuperação lógica</p>
               </div>
             </Link>
             <div className="ml-auto">
@@ -587,7 +587,7 @@ function EmpresaAberta({
                   <FolderOpen className="hidden h-6 w-6 text-amber-500 transition group-hover:block" />
                   <div className="min-w-0">
                     <p className="truncate text-sm font-semibold capitalize text-foreground">{k}</p>
-                    <p className="text-[10px] text-muted-foreground">{itens.length} arquivo{itens.length === 1 ? "" : "s"}</p>
+                    <p className="hidden truncate text-[10px] text-muted-foreground sm:block">{itens.length} arquivo{itens.length === 1 ? "" : "s"}</p>
                   </div>
                 </button>
               </div>

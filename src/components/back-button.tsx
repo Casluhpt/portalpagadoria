@@ -1,6 +1,5 @@
 import { useRouter, useRouterState } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
-import { AppLogo } from "./app-logo";
 
 export function BackButton() {
   const router = useRouter();
@@ -22,9 +21,8 @@ export function BackButton() {
       onClick={onClick}
       aria-label="Voltar para a tela anterior"
       title="Voltar"
-      className="group fixed left-6 top-6 z-[60] inline-flex h-10 items-center gap-2 rounded-lg bg-white dark:bg-zinc-900 px-3 text-xs font-semibold text-foreground shadow-sm ring-1 ring-border backdrop-blur-md transition-all hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-indigo-600 hover:shadow-md active:scale-95"
+      className="group fixed bottom-5 left-4 z-[60] inline-flex h-10 items-center gap-2 rounded-full bg-card px-4 text-xs font-semibold text-foreground shadow-lg ring-1 ring-border backdrop-blur-md transition-all hover:bg-muted hover:text-primary hover:shadow-md active:scale-95 lg:bottom-auto lg:left-6 lg:top-6 lg:rounded-lg lg:px-3 lg:shadow-sm"
     >
-      {/* AppLogo removed per user request */}
       <ArrowLeft className="h-3.5 w-3.5 transition group-hover:-translate-x-0.5" />
       <span>Voltar</span>
     </button>
