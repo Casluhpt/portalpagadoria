@@ -143,9 +143,11 @@ function AuditoriaContent() {
 }
 
 function AuditoriaTable() {
+  const { user } = useSession();
   const { data = [], isLoading, error } = useQuery({
     queryKey: ["pagamentos_audit"],
     queryFn: fetchAudit,
+    enabled: !!user,
     staleTime: 30_000,
   });
 

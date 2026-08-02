@@ -66,6 +66,7 @@ function ProvisaoDashboard() {
   const { data, isLoading } = useQuery({
     queryKey: provisaoQueryKey,
     queryFn: fetchAllProvisao,
+    enabled: !!user,
     staleTime: 30_000,
   });
 

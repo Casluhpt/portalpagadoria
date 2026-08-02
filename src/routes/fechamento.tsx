@@ -6,6 +6,7 @@ import { HeaderActions } from "@/components/header-actions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Info, Calendar, Database, Users, TrendingUp } from "lucide-react";
 import { fetchFechamentosPagamentos, fechamentoPagamentosKey } from "@/lib/fechamento-pagamentos";
+import { useSession } from "@/hooks/use-session";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export const Route = createFileRoute("/fechamento")({
@@ -16,9 +17,11 @@ const brl = (n: number) =>
   n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 function FechamentoPage() {
+  const { user } = useSession();
   const { data: fechamentos, isLoading } = useQuery({
     queryKey: fechamentoPagamentosKey,
     queryFn: fetchFechamentosPagamentos,
+    enabled: !!user,
   });
 
   return (

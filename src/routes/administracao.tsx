@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Megaphone, Trash2, ShieldAlert } from "lucide-react";
@@ -22,6 +22,13 @@ import {
 } from "@/lib/comunicados";
 
 export const Route = createFileRoute("/administracao")({
+  beforeLoad: async ({ context }) => {
+    const { supabase } = await import("@/integrations/supabase/client");
+    const { data } = await supabase.auth.getSession();
+    if (!data.session) {
+      throw redirect({ to: "/auth", search: { returnTo: "/administracao" } });
+    }
+  },
   component: AdministracaoPage,
 });
 
