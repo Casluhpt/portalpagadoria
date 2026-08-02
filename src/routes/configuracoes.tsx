@@ -537,3 +537,70 @@ function AdvancedSecuritySettings() {
     </Card>
   );
 }
+
+function DocumentationSection() {
+  return (
+    <Card className="mx-auto max-w-4xl border-border">
+      <CardHeader>
+        <CardTitle className="text-xl flex items-center gap-2">
+          <Code className="h-5 w-5 text-indigo-600" />
+          Documentação Técnica e Engenharia de Prompt v2.0.0
+        </CardTitle>
+        <CardDescription>
+          Especificações detalhadas da estrutura, fluxos e regras de negócio do portal.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-8 text-sm text-foreground/90">
+        <div className="rounded-lg bg-indigo-50/30 p-4 border border-indigo-100 dark:bg-indigo-950/20 dark:border-indigo-900/30">
+          <p className="leading-relaxed italic">
+            Aqui está o compilado detalhado das informações fornecidas, estruturado especificamente no formato de especificações técnicas e requisitos de interface para a Lovable ou Bolt. O conteúdo foi setorizado de forma rigorosa e limpa, eliminando elementos informais e focando na precisão técnica dos fluxos e regras de negócio.
+          </p>
+        </div>
+
+        <section className="space-y-4">
+          <h3 className="text-lg font-bold text-indigo-600 dark:text-indigo-400 border-b border-border pb-2">
+            1. Módulo de Configurações e Canal de Suporte Técnico
+          </h3>
+          
+          <div className="space-y-4 ml-2">
+            <div>
+              <h4 className="font-semibold text-foreground mb-2">Localização e Interface do Usuário</h4>
+              <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
+                <li>Incorporar na aba Configurações uma nova funcionalidade intitulada "Dúvidas, Sugestões e Melhorias".</li>
+                <li>Apresentar ao usuário um formulário simplificado de envio contendo: Assunto (Bug, Erro, Melhoria), Anexo (Opcional) e Comentário.</li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="font-semibold text-foreground mb-2">Regras de Negócio e Back-end</h4>
+              <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
+                <li>Identificação automatizada do usuário via sessão autenticada.</li>
+                <li>Disparo simultâneo de notificação ao administrador e inserção na "Central de Divergências".</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section className="space-y-4">
+          <h3 className="text-lg font-bold text-indigo-600 dark:text-indigo-400 border-b border-border pb-2">
+            2. Engenharia de Prompt e Otimização de Resposta
+          </h3>
+          <p className="text-muted-foreground ml-2">
+            O sistema deve priorizar a clareza nas respostas da IA, utilizando o material de apoio como fonte primária de verdade. Toda interação deve ser logada para fins de auditoria e melhoria contínua do modelo de linguagem.
+          </p>
+        </section>
+
+        <section className="space-y-4">
+          <h3 className="text-lg font-bold text-indigo-600 dark:text-indigo-400 border-b border-border pb-2">
+            3. Controle de Versão e Roadmap
+          </h3>
+          <ul className="list-disc pl-7 space-y-1 text-muted-foreground">
+            <li>v2.0.0: Implementação da Central de Inteligência e Fila Virtual.</li>
+            <li>v2.1.0: Expansão do Módulo de Conciliação e IA Assistente.</li>
+            <li>v2.2.0: Foco em Proteção, Backup e Integridade de Dados.</li>
+          </ul>
+        </section>
+      </CardContent>
+    </Card>
+  );
+}
