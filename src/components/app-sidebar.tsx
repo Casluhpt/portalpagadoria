@@ -92,7 +92,6 @@ const mainItems: MenuItem[] = [
 ];
 
 const advancedItems: MenuItem[] = [
-  { title: "Dashboard Gerencial", url: "/dashboard-gerencial", icon: BarChart3, match: (p) => p === "/dashboard-gerencial" },
   { title: "Auditoria", url: "/auditoria", icon: ScrollText, match: (p) => p === "/auditoria" || p === "/registros-excluidos", allowedRoles: ["administrador", "auditor"] },
 ];
 
