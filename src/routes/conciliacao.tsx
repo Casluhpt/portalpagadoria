@@ -192,5 +192,6 @@ function ConciliacaoSemanalView() {
   );
 }
 
-import { Card, CardHeader, CardTitle, Loader2 } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Loader2 } from "lucide-react";
 import { useState } from "react";
