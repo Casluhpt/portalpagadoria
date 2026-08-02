@@ -24,6 +24,8 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { useRoles } from "@/hooks/use-roles";
+import { RestrictedArea } from "@/components/role-gate";
+import { logAcaoCritica, ACOES_CRITICAS } from "@/lib/audit-critico";
 import { useSession } from "@/hooks/use-session";
 import { useQueryClient } from "@tanstack/react-query";
 import { listAdminUsers, resetUserPassword, setUserRole, setUserSetor, inviteUser, deleteUser, ALLOWED_SETORES, type AdminUserRow, type Setor } from "@/lib/admin-users.functions";
@@ -57,26 +59,11 @@ function UsuariosPage() {
 }
 
 function UsuariosContent() {
-  const { isAdmin, loading } = useRoles();
-  if (loading) {
-    return (
-      <div className="flex flex-1 items-center justify-center">
-        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-      </div>
-    );
-  }
-  if (!isAdmin) {
-    return (
-      <div className="flex flex-1 flex-col items-center justify-center gap-3 p-8 text-center">
-        <ShieldAlert className="h-10 w-10 text-muted-foreground" />
-        <h2 className="text-lg font-semibold">Acesso restrito</h2>
-        <p className="max-w-md text-sm text-muted-foreground">
-          Somente administradores podem gerenciar usuários.
-        </p>
-      </div>
-    );
-  }
-  return <UsuariosTable />;
+  return (
+    <RestrictedArea area="Administração de Usuários" role="administrador">
+      <UsuariosTable />
+    </RestrictedArea>
+  );
 }
 
 function roleLabel(r: string) {
