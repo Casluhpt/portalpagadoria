@@ -301,16 +301,22 @@ function PortalPage() {
           </header>
 
           <main className="flex-1 space-y-8 p-6 lg:p-8">
-            <section className="mx-auto w-full max-w-3xl">
-              <div className="mb-2 flex items-center justify-center gap-2 text-center text-xs font-medium text-muted-foreground">
-                <Search className="h-3.5 w-3.5 text-violet-600" />
-                Central de busca total do Portal da Pagadoria
+            <section className="mx-auto w-full max-w-4xl space-y-6">
+              <div className="flex flex-col items-center justify-center text-center">
+                <Badge variant="outline" className="mb-3 border-violet-200 bg-violet-50/50 text-violet-700 dark:bg-violet-900/20 dark:text-violet-300">
+                  Central de Busca Total
+                </Badge>
+                <h2 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl dark:text-white">
+                  O que você deseja encontrar hoje?
+                </h2>
+                <p className="mt-2 text-sm text-slate-500 max-w-lg">
+                  Pesquise matrículas, colaboradores, empresas ou tire dúvidas sobre processos corporativos com nossa IA Assistente.
+                </p>
               </div>
-              <GlobalSearch variant="hero" />
-              <p className="mt-2 text-center text-[11px] text-muted-foreground">
-                Pesquise matrícula, usuário, empresa, colaborador, fornecedor, competência e cards —
-                ou pergunte à IA Assistente da Pagadoria.
-              </p>
+              <div className="relative transform transition-all duration-300 hover:scale-[1.01]">
+                <div className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-violet-600/20 to-indigo-600/20 blur-lg opacity-75" />
+                <GlobalSearch variant="hero" />
+              </div>
             </section>
 
             <section className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-indigo-900 via-violet-800 to-purple-900 p-8 text-white shadow-xl">
