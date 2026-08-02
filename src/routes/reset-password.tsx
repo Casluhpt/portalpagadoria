@@ -54,15 +54,15 @@ function ResetPasswordPage() {
 
   return (
     <div className="grid min-h-dvh place-items-center bg-gradient-to-br from-slate-100 via-slate-100 to-violet-100 p-4">
-      <Card className="w-full max-w-md border-slate-200 shadow-lg">
+      <Card className="w-full max-w-md border-border shadow-lg">
         <CardHeader className="items-center text-center">
           <img src={profarmaLogo.url} alt="Profarma" className="mb-2 h-10" />
-          <CardTitle className="text-xl text-slate-800">Nova senha</CardTitle>
-          <p className="text-sm text-slate-500">Defina uma nova senha para acessar o portal.</p>
+          <CardTitle className="text-xl text-foreground">Nova senha</CardTitle>
+          <p className="text-sm text-muted-foreground">Defina uma nova senha para acessar o portal.</p>
         </CardHeader>
         <CardContent>
           {!ready ? (
-            <div className="flex flex-col items-center gap-2 py-6 text-sm text-slate-500">
+            <div className="flex flex-col items-center gap-2 py-6 text-sm text-muted-foreground">
               <Loader2 className="h-5 w-5 animate-spin" />
               Validando link de recuperação…
             </div>
@@ -101,7 +101,7 @@ function ResetPasswordPage() {
                 )}
                 Salvar nova senha
               </Button>
-              <p className="flex items-center justify-center text-xs text-slate-500">
+              <p className="flex items-center justify-center text-xs text-muted-foreground">
                 <KeyRound className="mr-1 h-3 w-3" />
                 Após salvar você voltará para a tela de login.
               </p>

@@ -278,15 +278,15 @@ function PortalPage() {
       <div className="flex min-h-screen w-full bg-[#F8FAFC] dark:bg-background transition-colors duration-300">
         <AppSidebar />
         <div className="flex flex-1 flex-col">
-          <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-slate-200 bg-white/80 px-4 backdrop-blur">
+          <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-border bg-card/90 px-4 backdrop-blur">
             <SidebarTrigger />
             <img src={profarmaLogo.url} alt="Profarma" className="h-7" />
             <div className="ml-2 hidden flex-col leading-tight sm:flex">
-              <span className="text-sm font-semibold text-slate-800">Portal Pagadoria</span>
-              <span className="text-[11px] text-slate-500">Central de inteligência financeira</span>
+              <span className="text-sm font-semibold text-foreground">Portal Pagadoria</span>
+              <span className="text-[11px] text-muted-foreground">Central de inteligência financeira</span>
             </div>
             <div className="ml-auto flex items-center gap-3">
-              <div className="hidden items-center gap-1 text-xs text-slate-500 md:flex">
+              <div className="hidden items-center gap-1 text-xs text-muted-foreground md:flex">
                 <CalendarDays className="h-4 w-4" />
                 {new Date().toLocaleDateString("pt-BR", {
                   weekday: "long",
@@ -295,7 +295,7 @@ function PortalPage() {
                   year: "numeric",
                 })}
               </div>
-              <div className="hidden h-8 w-[1px] bg-slate-200 md:block" />
+              <div className="hidden h-8 w-[1px] bg-muted md:block" />
               <HeaderActions />
             </div>
           </header>
@@ -306,10 +306,10 @@ function PortalPage() {
                 <Badge variant="outline" className="mb-4 border-violet-200 bg-violet-50/50 px-4 py-1 text-violet-700 dark:bg-violet-900/20 dark:text-violet-300">
                   Central de Busca Total
                 </Badge>
-                <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl dark:text-white">
+                <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl dark:text-white">
                   O que você deseja encontrar hoje?
                 </h2>
-                <p className="mt-3 text-base text-slate-500 max-w-lg">
+                <p className="mt-3 text-base text-muted-foreground max-w-lg">
                   Pesquise matrículas, colaboradores, empresas ou tire dúvidas sobre processos corporativos com nossa IA Assistente.
                 </p>
               </div>
@@ -333,7 +333,7 @@ function PortalPage() {
                   </p>
                 </div>
                 <div className="flex gap-2">
-                  <Button asChild size="lg" className="bg-white text-indigo-900 hover:bg-white/90">
+                  <Button asChild size="lg" className="bg-card text-indigo-900 hover:bg-card/90">
                     <Link to="/principal">
                       <LineChart className="mr-2 h-4 w-4" /> Resultados Principais
                     </Link>
@@ -384,15 +384,15 @@ function PortalPage() {
             </section>
 
             {visibleVersoes.length > 0 && (
-              <section className="rounded-2xl border border-violet-200 bg-white/70 p-6 shadow-sm backdrop-blur">
+              <section className="rounded-2xl border border-violet-200 bg-card/90 p-6 shadow-sm backdrop-blur">
                 <div className="mb-4 flex items-center justify-between gap-4">
                   <div className="flex items-center gap-3">
                     <div className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-violet-600 to-indigo-700 text-white shadow-md">
                       <Sparkles className="h-5 w-5" />
                     </div>
                     <div>
-                      <h2 className="text-lg font-bold text-slate-900">Novidades do Portal</h2>
-                      <p className="text-xs text-slate-500">
+                      <h2 className="text-lg font-bold text-foreground">Novidades do Portal</h2>
+                      <p className="text-xs text-muted-foreground">
                         Acompanhe as melhorias mais recentes. Feche uma atualização quando não quiser mais vê-la.
                       </p>
                     </div>
@@ -412,7 +412,7 @@ function PortalPage() {
                       : [];
                     return (
                       <div key={`${v.versao}-${slideKey}`} className="animate-slide-in-right-slow">
-                        <Card className={isLatest ? "border-violet-300 shadow-md" : "border-slate-200"}>
+                        <Card className={isLatest ? "border-violet-300 shadow-md" : "border-border"}>
                           <CardContent className="p-5">
                             <div className="flex items-start justify-between gap-3">
                               <div className="min-w-0 flex-1">
@@ -425,7 +425,7 @@ function PortalPage() {
                                       Nova versão
                                     </Badge>
                                   )}
-                                  <span className="text-xs text-slate-500">
+                                  <span className="text-xs text-muted-foreground">
                                     {new Date(v.lancada_em).toLocaleDateString("pt-BR", {
                                       day: "2-digit",
                                       month: "short",
@@ -433,14 +433,14 @@ function PortalPage() {
                                     })}
                                   </span>
                                 </div>
-                                <h3 className="mt-1 text-base font-semibold text-slate-900">
+                                <h3 className="mt-1 text-base font-semibold text-foreground">
                                   {v.titulo}
                                 </h3>
                                 {v.resumo && (
-                                  <p className="mt-0.5 text-sm text-slate-600">{v.resumo}</p>
+                                  <p className="mt-0.5 text-sm text-muted-foreground">{v.resumo}</p>
                                 )}
                                 {itens.length > 0 && (
-                                  <ul className="mt-2 space-y-1 text-sm text-slate-700">
+                                  <ul className="mt-2 space-y-1 text-sm text-foreground">
                                     {itens.slice(0, 4).map((it, i) => {
                                       const Icon =
                                         it.categoria === "novo"
@@ -465,7 +465,7 @@ function PortalPage() {
                                 size="sm"
                                 onClick={() => dismissVersion(v.versao)}
                                 aria-label="Fechar atualização"
-                                className="shrink-0 text-slate-400 hover:text-slate-700"
+                                className="shrink-0 text-muted-foreground hover:text-foreground"
                               >
                                 ×
                               </Button>
@@ -549,7 +549,7 @@ function KpiCard({
     slate: "from-slate-600 to-slate-800",
   };
   return (
-    <Card className="border-slate-200 shadow-sm transition-shadow hover:shadow-md">
+    <Card className="border-border shadow-sm transition-shadow hover:shadow-md">
       <CardContent className="flex items-center gap-4 p-5">
         <div
           className={`grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-gradient-to-br text-white shadow-md ${tones[tone]}`}
@@ -557,11 +557,11 @@ function KpiCard({
           {icon}
         </div>
         <div className="min-w-0 flex-1">
-          <p className="text-[11px] font-medium uppercase tracking-wider text-slate-500">
+          <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
             {label}
           </p>
-          <p className="mt-0.5 truncate text-2xl font-bold text-slate-900">{value}</p>
-          {hint && <p className="text-xs text-slate-500">{hint}</p>}
+          <p className="mt-0.5 truncate text-2xl font-bold text-foreground">{value}</p>
+          {hint && <p className="text-xs text-muted-foreground">{hint}</p>}
         </div>
       </CardContent>
     </Card>
@@ -587,7 +587,7 @@ type ModuleDef = {
 function ModuleCard({ m }: { m: ModuleDef }) {
   const Icon = m.icon;
   return (
-    <Card className="group relative overflow-hidden border-slate-200 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-xl">
+    <Card className="group relative overflow-hidden border-border shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-xl">
       <div className={`h-1.5 w-full bg-gradient-to-r ${m.accent}`} />
       <CardContent className="space-y-5 p-6">
         <div className="flex items-start justify-between gap-4">
@@ -598,16 +598,16 @@ function ModuleCard({ m }: { m: ModuleDef }) {
               <Icon className="h-6 w-6" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-slate-900">{m.title}</h3>
-              <p className="text-xs text-slate-500">{m.subtitle}</p>
+              <h3 className="text-lg font-bold text-foreground">{m.title}</h3>
+              <p className="text-xs text-muted-foreground">{m.subtitle}</p>
             </div>
           </div>
           <Badge className={`shrink-0 ${m.chip} hover:${m.chip}`}>{m.base}</Badge>
         </div>
 
-        <p className="text-sm text-slate-600">{m.objetivo}</p>
+        <p className="text-sm text-muted-foreground">{m.objetivo}</p>
 
-        <ul className="grid grid-cols-1 gap-1.5 text-sm text-slate-700 sm:grid-cols-2">
+        <ul className="grid grid-cols-1 gap-1.5 text-sm text-foreground sm:grid-cols-2">
           {m.bullets.map((b) => (
             <li key={b} className="flex items-start gap-1.5">
               <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-violet-500" />
@@ -616,7 +616,7 @@ function ModuleCard({ m }: { m: ModuleDef }) {
           ))}
         </ul>
 
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 rounded-lg bg-slate-50 px-3 py-2 text-xs text-slate-600">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 rounded-lg bg-muted px-3 py-2 text-xs text-muted-foreground">
           <span className="flex items-center gap-1">
             <ScrollText className="h-3.5 w-3.5" /> Base: <b>{m.base}</b>
           </span>

@@ -28,12 +28,12 @@ export const Route = createFileRoute("/administracao")({
 function AdministracaoPage() {
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen w-full bg-slate-50">
+      <div className="flex min-h-screen w-full bg-muted">
         <AppSidebar />
         <div className="flex flex-1 flex-col">
           <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-border bg-background/80 px-4 backdrop-blur">
             <SidebarTrigger />
-            <h1 className="text-sm font-semibold text-slate-700">Administração de Comunicados</h1>
+            <h1 className="text-sm font-semibold text-foreground">Administração de Comunicados</h1>
             <div className="ml-auto">
               <HeaderActions />
             </div>
@@ -113,7 +113,7 @@ function ComunicadosPanel() {
           <CardTitle className="flex items-center gap-2 text-base">
             <Megaphone className="h-4 w-4 text-violet-600" /> Publicar comunicado global
           </CardTitle>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-muted-foreground">
             Todos os colaboradores logados receberão a notificação no sino do topo.
           </p>
         </CardHeader>
@@ -170,7 +170,7 @@ function ComunicadosPanel() {
         <CardHeader className="flex-row items-center justify-between">
           <div>
             <CardTitle className="text-base">Histórico de comunicados</CardTitle>
-            <p className="text-xs text-slate-500">Últimos 100 comunicados publicados.</p>
+            <p className="text-xs text-muted-foreground">Últimos 100 comunicados publicados.</p>
           </div>
           {selectedIds.size > 0 && (
             <Button
@@ -189,7 +189,7 @@ function ComunicadosPanel() {
         </CardHeader>
         <CardContent>
           {items.length === 0 ? (
-            <p className="text-sm text-slate-500">Nenhum comunicado publicado ainda.</p>
+            <p className="text-sm text-muted-foreground">Nenhum comunicado publicado ainda.</p>
           ) : (
             <ul className="divide-y divide-slate-100">
               {items.map((c) => (
@@ -203,14 +203,14 @@ function ComunicadosPanel() {
                       else next.delete(c.id);
                       setSelectedIds(next);
                     }}
-                    className="mt-1 h-4 w-4 rounded border-slate-300"
+                    className="mt-1 h-4 w-4 rounded border-border"
                   />
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-semibold text-slate-900">{c.titulo}</p>
-                    <p className="mt-0.5 whitespace-pre-wrap text-xs text-slate-600">
+                    <p className="truncate text-sm font-semibold text-foreground">{c.titulo}</p>
+                    <p className="mt-0.5 whitespace-pre-wrap text-xs text-muted-foreground">
                       {c.mensagem}
                     </p>
-                    <p className="mt-1 text-[11px] text-slate-400">
+                    <p className="mt-1 text-[11px] text-muted-foreground">
                       {new Date(c.criado_em).toLocaleString("pt-BR")}
                     </p>
                   </div>

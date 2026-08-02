@@ -65,15 +65,15 @@ function ESocialPage() {
 
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen w-full bg-slate-50 dark:bg-slate-950">
+      <div className="flex min-h-screen w-full bg-muted dark:bg-slate-950">
         <AppSidebar />
         <div className="flex flex-1 flex-col">
-          <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-slate-200 bg-white/80 px-4 backdrop-blur dark:bg-slate-900/80 dark:border-slate-800">
+          <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-border bg-card/90 px-4 backdrop-blur dark:bg-slate-900/80 dark:border-slate-800">
             <SidebarTrigger />
             <img src={profarmaLogo.url} alt="Profarma" className="h-7" />
             <div className="ml-2 flex flex-col leading-tight">
-              <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">Controle E-Social</span>
-              <span className="text-[11px] text-slate-500">Acompanhamento Mensal de Lançamentos</span>
+              <span className="text-sm font-semibold text-foreground dark:text-slate-200">Controle E-Social</span>
+              <span className="text-[11px] text-muted-foreground">Acompanhamento Mensal de Lançamentos</span>
             </div>
             <div className="ml-auto flex items-center gap-3">
               <HeaderActions />
@@ -97,9 +97,9 @@ function ESocialPage() {
                 </CardContent>
               </Card>
 
-              <Card className="border-slate-200 dark:border-slate-800">
+              <Card className="border-border dark:border-slate-800">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-slate-500 flex items-center gap-2">
+                  <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                     <Calendar className="h-4 w-4" /> Mês de Referência
                   </CardTitle>
                 </CardHeader>
@@ -118,24 +118,24 @@ function ESocialPage() {
                 </CardContent>
               </Card>
 
-              <Card className="border-slate-200 dark:border-slate-800">
+              <Card className="border-border dark:border-slate-800">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-slate-500 flex items-center gap-2">
+                  <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                     <CreditCard className="h-4 w-4" /> Total de Impostos no Mês
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+                  <div className="text-2xl font-bold text-foreground dark:text-slate-100">
                     {stats.totalMes.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                   </div>
-                  <p className="text-xs text-slate-500 mt-1">Soma de INSS, IRRF, FGTS e PIS</p>
+                  <p className="text-xs text-muted-foreground mt-1">Soma de INSS, IRRF, FGTS e PIS</p>
                 </CardContent>
               </Card>
             </div>
 
             <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
               <div className="relative w-full md:w-96">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input 
                   placeholder="Buscar por empresa, CNPJ ou coligada..." 
                   className="pl-10"
@@ -153,8 +153,8 @@ function ESocialPage() {
               </div>
             </div>
 
-            <Card className="border-slate-200 dark:border-slate-800 overflow-hidden">
-              <CardHeader className="bg-slate-50/50 dark:bg-slate-900/50 border-b dark:border-slate-800">
+            <Card className="border-border dark:border-slate-800 overflow-hidden">
+              <CardHeader className="bg-muted/50 dark:bg-slate-900/50 border-b dark:border-slate-800">
                 <CardTitle className="text-base flex items-center gap-2">
                   <FileSpreadsheet className="h-5 w-5 text-indigo-600" /> Base de Acompanhamento E-Social
                 </CardTitle>
@@ -162,7 +162,7 @@ function ESocialPage() {
               </CardHeader>
               <CardContent className="p-0 overflow-x-auto">
                 <table className="w-full text-sm text-left">
-                  <thead className="text-xs text-slate-500 uppercase bg-slate-50 dark:bg-slate-900 dark:text-slate-400 border-b dark:border-slate-800">
+                  <thead className="text-xs text-muted-foreground uppercase bg-muted dark:bg-slate-900 dark:text-muted-foreground border-b dark:border-slate-800">
                     <tr>
                       <th className="px-4 py-3 font-semibold">Empresa / Coligada</th>
                       <th className="px-4 py-3 font-semibold">CNPJ</th>
@@ -176,13 +176,13 @@ function ESocialPage() {
                   <tbody className="divide-y dark:divide-slate-800">
                     {isLoading ? (
                       <tr>
-                        <td colSpan={7} className="px-4 py-8 text-center text-slate-500">
+                        <td colSpan={7} className="px-4 py-8 text-center text-muted-foreground">
                           Carregando base...
                         </td>
                       </tr>
                     ) : filteredData.length === 0 ? (
                       <tr>
-                        <td colSpan={7} className="px-4 py-8 text-center text-slate-500">
+                        <td colSpan={7} className="px-4 py-8 text-center text-muted-foreground">
                           Nenhum registro encontrado para {mesFiltro}.
                         </td>
                       </tr>
@@ -190,19 +190,19 @@ function ESocialPage() {
                       filteredData.map((item) => {
                         const isOk = item.num_fopag || item.dcomp_compensado;
                         return (
-                          <tr key={item.id} className={`hover:bg-slate-50/50 dark:hover:bg-slate-900/50 transition-colors ${!isOk ? 'bg-red-50/30 dark:bg-red-900/10' : ''}`}>
+                          <tr key={item.id} className={`hover:bg-muted/50 dark:hover:bg-slate-900/50 transition-colors ${!isOk ? 'bg-red-50/30 dark:bg-red-900/10' : ''}`}>
                             <td className="px-4 py-3">
-                              <div className="font-medium text-slate-900 dark:text-slate-200">{item.empresa}</div>
-                              <div className="text-[10px] text-slate-400 uppercase">{item.nome_coligada} · {item.bandeira}</div>
+                              <div className="font-medium text-foreground dark:text-slate-200">{item.empresa}</div>
+                              <div className="text-[10px] text-muted-foreground uppercase">{item.nome_coligada} · {item.bandeira}</div>
                             </td>
-                            <td className="px-4 py-3 text-slate-600 dark:text-slate-400 font-mono text-xs">{item.cnpj}</td>
+                            <td className="px-4 py-3 text-muted-foreground dark:text-muted-foreground font-mono text-xs">{item.cnpj}</td>
                             <td className="px-4 py-3 text-right">
-                              <div className="text-xs"><span className="text-slate-400">INSS:</span> {Number(item.valor_inss).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
-                              <div className="text-xs"><span className="text-slate-400">IRRF:</span> {Number(item.valor_irrf).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
+                              <div className="text-xs"><span className="text-muted-foreground">INSS:</span> {Number(item.valor_inss).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
+                              <div className="text-xs"><span className="text-muted-foreground">IRRF:</span> {Number(item.valor_irrf).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
                             </td>
                             <td className="px-4 py-3 text-right">
-                              <div className="text-xs"><span className="text-slate-400">FGTS:</span> {Number(item.valor_fgts).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
-                              <div className="text-xs"><span className="text-slate-400">PIS:</span> {Number(item.valor_pis).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
+                              <div className="text-xs"><span className="text-muted-foreground">FGTS:</span> {Number(item.valor_fgts).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
+                              <div className="text-xs"><span className="text-muted-foreground">PIS:</span> {Number(item.valor_pis).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
                             </td>
                             <td className="px-4 py-3">
                               {item.num_fopag ? (
@@ -210,7 +210,7 @@ function ESocialPage() {
                                   <CheckCircle2 className="h-3 w-3" /> {item.num_fopag}
                                 </Badge>
                               ) : (
-                                <Badge variant="outline" className="bg-slate-100 text-slate-500 border-slate-200 gap-1">
+                                <Badge variant="outline" className="bg-muted text-muted-foreground border-border gap-1">
                                   Pendente
                                 </Badge>
                               )}
@@ -219,11 +219,11 @@ function ESocialPage() {
                               {item.dcomp_compensado ? (
                                 <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-100 border-none">DCOMP = Compensado</Badge>
                               ) : (
-                                <span className="text-xs text-slate-400">—</span>
+                                <span className="text-xs text-muted-foreground">—</span>
                               )}
                             </td>
                             <td className="px-4 py-3 text-center">
-                              <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-indigo-600">
+                              <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-indigo-600">
                                 <ArrowRight className="h-4 w-4" />
                               </Button>
                             </td>

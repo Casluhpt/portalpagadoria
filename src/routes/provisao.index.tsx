@@ -196,7 +196,7 @@ function ProvisaoDashboard() {
             <img
               src={profarmaLogo.url}
               alt="Profarma"
-              className="h-8 rounded bg-white/95 px-2 py-1"
+              className="h-8 rounded bg-card/90 px-2 py-1"
             />
             <CardTitle className="text-lg font-bold tracking-wide">
               ADP - PAGADORIA
@@ -215,7 +215,7 @@ function ProvisaoDashboard() {
               value={dateFrom}
               max={dateTo}
               onChange={(e) => setDateFrom(e.target.value)}
-              className="h-9 w-[160px] border-emerald-300 bg-white text-sm text-slate-900"
+              className="h-9 w-[160px] border-emerald-300 bg-card text-sm text-foreground"
             />
             <span className="text-sm text-emerald-50">a</span>
             <Input
@@ -224,7 +224,7 @@ function ProvisaoDashboard() {
               value={dateTo}
               min={dateFrom}
               onChange={(e) => setDateTo(e.target.value)}
-              className="h-9 w-[160px] border-emerald-300 bg-white text-sm text-slate-900"
+              className="h-9 w-[160px] border-emerald-300 bg-card text-sm text-foreground"
             />
             <span className="rounded bg-emerald-50 px-2 py-1 text-sm font-semibold text-emerald-900">
               {rangeLabel}
@@ -265,15 +265,15 @@ function ProvisaoDashboard() {
                 {grouped.map((g, i) => (
                   <tr
                     key={`${g.empresa}-${g.banco}`}
-                    className={i % 2 === 0 ? "bg-emerald-50/40" : "bg-white"}
+                    className={i % 2 === 0 ? "bg-emerald-50/40" : "bg-card"}
                   >
-                    <td className="border-b border-r border-emerald-200/60 px-4 py-2 font-semibold text-slate-800">
+                    <td className="border-b border-r border-emerald-200/60 px-4 py-2 font-semibold text-foreground">
                       {g.empresa.toUpperCase()}
                     </td>
-                    <td className="border-b border-r border-emerald-200/60 px-4 py-2 text-slate-700">
+                    <td className="border-b border-r border-emerald-200/60 px-4 py-2 text-foreground">
                       {g.banco}
                     </td>
-                    <td className="border-b border-emerald-200/60 px-4 py-2 text-right font-medium tabular-nums text-slate-800">
+                    <td className="border-b border-emerald-200/60 px-4 py-2 text-right font-medium tabular-nums text-foreground">
                       {brl(g.valor)}
                     </td>
                   </tr>

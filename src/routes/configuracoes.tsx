@@ -31,7 +31,7 @@ function ConfiguracoesPage() {
         <div className="flex flex-1 flex-col">
           <header className="sticky top-0 z-10 flex h-14 items-center gap-4 border-b border-border bg-background/80 px-4 backdrop-blur">
             <SidebarTrigger />
-            <h1 className="text-sm font-semibold text-slate-700">Configurações</h1>
+            <h1 className="text-sm font-semibold text-foreground">Configurações</h1>
             <div className="ml-auto">
               <HeaderActions />
             </div>
@@ -41,14 +41,14 @@ function ConfiguracoesPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {/* Card Administração de Usuários */}
               <Card 
-                className="group hover:shadow-lg transition-all border-slate-200 cursor-pointer overflow-hidden flex flex-col"
+                className="group hover:shadow-lg transition-all border-border cursor-pointer overflow-hidden flex flex-col"
                 onClick={() => navigate({ to: "/usuarios" })}
               >
                 <div className="p-6 flex flex-col h-full">
                   <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
                     <Users className="h-6 w-6" />
                   </div>
-                  <h3 className="text-lg font-bold text-slate-900 mb-2">Administração de usuários</h3>
+                  <h3 className="text-lg font-bold text-foreground mb-2">Administração de usuários</h3>
                   <p className="text-sm text-muted-foreground flex-1">
                     Gestão completa de acessos, permissões e perfis de usuários do portal.
                   </p>
@@ -60,14 +60,14 @@ function ConfiguracoesPage() {
 
               {/* Card Histórico de Versões */}
               <Card 
-                className="group hover:shadow-lg transition-all border-slate-200 cursor-pointer overflow-hidden flex flex-col"
+                className="group hover:shadow-lg transition-all border-border cursor-pointer overflow-hidden flex flex-col"
                 onClick={() => navigate({ to: "/historico" })}
               >
                 <div className="p-6 flex flex-col h-full">
                   <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-amber-50 text-amber-600 group-hover:bg-amber-600 group-hover:text-white transition-colors">
                     <History className="h-6 w-6" />
                   </div>
-                  <h3 className="text-lg font-bold text-slate-900 mb-2">Histórico de versões</h3>
+                  <h3 className="text-lg font-bold text-foreground mb-2">Histórico de versões</h3>
                   <p className="text-sm text-muted-foreground flex-1">
                     Visualize o log detalhado de atualizações, melhorias e correções aplicadas ao sistema.
                   </p>
@@ -79,7 +79,7 @@ function ConfiguracoesPage() {
 
               {/* Card Portal Diagnosis */}
               <Card 
-                className="group hover:shadow-lg transition-all border-slate-200 cursor-pointer overflow-hidden flex flex-col"
+                className="group hover:shadow-lg transition-all border-border cursor-pointer overflow-hidden flex flex-col"
                 onClick={() => {
                   const tabs = document.querySelector('[role="tablist"]');
                   const diagTrigger = tabs?.querySelector('[value="diagnostico"]') as HTMLElement;
@@ -90,7 +90,7 @@ function ConfiguracoesPage() {
                   <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-violet-50 text-violet-600 group-hover:bg-violet-600 group-hover:text-white transition-colors">
                     <Activity className="h-6 w-6" />
                   </div>
-                  <h3 className="text-lg font-bold text-slate-900 mb-2">Diagnóstico do Portal</h3>
+                  <h3 className="text-lg font-bold text-foreground mb-2">Diagnóstico do Portal</h3>
                   <p className="text-sm text-muted-foreground flex-1">
                     Erros, sobrecargas, vírus e armazenamento da nuvem em tempo real.
                   </p>
@@ -102,7 +102,7 @@ function ConfiguracoesPage() {
 
               {/* Card Suporte Técnico */}
               <Card 
-                className="group hover:shadow-lg transition-all border-slate-200 cursor-pointer overflow-hidden flex flex-col"
+                className="group hover:shadow-lg transition-all border-border cursor-pointer overflow-hidden flex flex-col"
                 onClick={() => {
                   const tabs = document.querySelector('[role="tablist"]');
                   const supportTrigger = tabs?.querySelector('[value="suporte"]') as HTMLElement;
@@ -113,7 +113,7 @@ function ConfiguracoesPage() {
                   <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
                     <HelpCircle className="h-6 w-6" />
                   </div>
-                  <h3 className="text-lg font-bold text-slate-900 mb-2">Suporte Técnico</h3>
+                  <h3 className="text-lg font-bold text-foreground mb-2">Suporte Técnico</h3>
                   <p className="text-sm text-muted-foreground flex-1">
                     Central de ajuda para relatar bugs, sugerir melhorias ou tirar dúvidas técnicas.
                   </p>
@@ -284,23 +284,23 @@ function SupportForm() {
               <Button 
                 variant="outline" 
                 type="button"
-                className="w-full border-dashed border-slate-300 h-20 flex flex-col items-center justify-center gap-1 hover:border-indigo-400 hover:bg-indigo-50/50 transition-colors"
+                className="w-full border-dashed border-border h-20 flex flex-col items-center justify-center gap-1 hover:border-indigo-400 hover:bg-indigo-50/50 transition-colors"
                 onClick={() => fileInputRef.current?.click()}
               >
-                <Paperclip className="h-5 w-5 text-slate-400" />
-                <span className="text-xs text-slate-500">Clique para selecionar um arquivo</span>
+                <Paperclip className="h-5 w-5 text-muted-foreground" />
+                <span className="text-xs text-muted-foreground">Clique para selecionar um arquivo</span>
               </Button>
             ) : (
-              <div className="flex items-center justify-between p-3 border rounded-lg bg-slate-50 border-slate-200">
+              <div className="flex items-center justify-between p-3 border rounded-lg bg-muted border-border">
                 <div className="flex items-center gap-2 overflow-hidden">
                   <Paperclip className="h-4 w-4 text-indigo-600 shrink-0" />
-                  <span className="text-sm truncate text-slate-700">{file.name}</span>
-                  <span className="text-[10px] text-slate-400">({(file.size / 1024 / 1024).toFixed(2)} MB)</span>
+                  <span className="text-sm truncate text-foreground">{file.name}</span>
+                  <span className="text-[10px] text-muted-foreground">({(file.size / 1024 / 1024).toFixed(2)} MB)</span>
                 </div>
                 <Button 
                   variant="ghost" 
                   size="icon" 
-                  className="h-8 w-8 text-slate-400 hover:text-destructive"
+                  className="h-8 w-8 text-muted-foreground hover:text-destructive"
                   onClick={() => setFile(null)}
                 >
                   <X className="h-4 w-4" />
@@ -370,17 +370,17 @@ function DiagnosticPanel() {
           <CardDescription>Status em tempo real do processamento.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex items-center justify-between py-2 border-b border-slate-100">
+          <div className="flex items-center justify-between py-2 border-b border-border">
             <span className="text-sm font-medium">Latência de API</span>
             <span className="text-sm text-emerald-600 font-bold">32ms (Excelente)</span>
           </div>
-          <div className="flex items-center justify-between py-2 border-b border-slate-100">
+          <div className="flex items-center justify-between py-2 border-b border-border">
             <span className="text-sm font-medium">Carga da CPU</span>
-            <span className="text-sm text-slate-600 font-bold">12%</span>
+            <span className="text-sm text-muted-foreground font-bold">12%</span>
           </div>
           <div className="flex items-center justify-between py-2">
             <span className="text-sm font-medium">Erros detectados (24h)</span>
-            <span className="text-sm text-slate-600 font-bold">0</span>
+            <span className="text-sm text-muted-foreground font-bold">0</span>
           </div>
         </CardContent>
       </Card>
@@ -393,15 +393,15 @@ function DiagnosticPanel() {
           <CardDescription>Uso de disco e backups.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex items-center justify-between py-2 border-b border-slate-100">
+          <div className="flex items-center justify-between py-2 border-b border-border">
             <span className="text-sm font-medium">Banco de Dados</span>
-            <span className="text-sm text-slate-600 font-bold">452 MB / 5 GB</span>
+            <span className="text-sm text-muted-foreground font-bold">452 MB / 5 GB</span>
           </div>
-          <div className="flex items-center justify-between py-2 border-b border-slate-100">
+          <div className="flex items-center justify-between py-2 border-b border-border">
             <span className="text-sm font-medium">Anexos e Documentos</span>
-            <span className="text-sm text-slate-600 font-bold">1.2 GB / 10 GB</span>
+            <span className="text-sm text-muted-foreground font-bold">1.2 GB / 10 GB</span>
           </div>
-          <div className="flex items-center justify-between py-2 border-b border-slate-100">
+          <div className="flex items-center justify-between py-2 border-b border-border">
             <span className="text-sm font-medium">Pasta [anexo]</span>
             <span className="text-sm text-emerald-600 font-bold">Ativa</span>
           </div>
@@ -420,11 +420,11 @@ function DiagnosticPanel() {
           <CardDescription>Proteção do portal.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex items-center justify-between py-2 border-b border-slate-100">
+          <div className="flex items-center justify-between py-2 border-b border-border">
             <span className="text-sm font-medium">Ameaças Bloqueadas</span>
-            <span className="text-sm text-slate-600 font-bold">4 (Ataques DDOS)</span>
+            <span className="text-sm text-muted-foreground font-bold">4 (Ataques DDOS)</span>
           </div>
-          <div className="flex items-center justify-between py-2 border-b border-slate-100">
+          <div className="flex items-center justify-between py-2 border-b border-border">
             <span className="text-sm font-medium">Scan de Vírus</span>
             <span className="text-sm text-emerald-600 font-bold">Limpou sem ocorrências</span>
           </div>
@@ -510,7 +510,7 @@ function AdvancedSecuritySettings() {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div className="flex items-center justify-between rounded-lg border border-slate-100 p-4 bg-slate-50/50">
+        <div className="flex items-center justify-between rounded-lg border border-border p-4 bg-muted/50">
           <div className="space-y-0.5">
             <Label className="text-base">Envio Diário da Base de Pagamentos</Label>
             <p className="text-sm text-muted-foreground">
@@ -520,7 +520,7 @@ function AdvancedSecuritySettings() {
           <div className="flex items-center h-6">
              <input 
               type="checkbox" 
-              className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
+              className="h-4 w-4 rounded border-border text-indigo-600 focus:ring-indigo-600"
               checked={settings.enabled}
               onChange={(e) => setSettings(prev => ({ ...prev, enabled: e.target.checked }))}
             />
@@ -532,7 +532,7 @@ function AdvancedSecuritySettings() {
             <Label htmlFor="admin-email">E-mail do Administrador Destinatário</Label>
             <div className="flex gap-2">
               <div className="relative flex-1">
-                <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input 
                   id="admin-email"
                   type="email"

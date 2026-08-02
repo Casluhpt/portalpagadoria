@@ -327,8 +327,8 @@ function UsuariosTable() {
           <div className="space-y-8 p-4">
             {Object.entries(grouped).map(([setor, users]) => (
               <div key={setor} className="space-y-3">
-                <div className="flex items-center gap-2 border-b border-slate-100 pb-2">
-                  <h3 className="font-bold text-slate-900">{setor}</h3>
+                <div className="flex items-center gap-2 border-b border-border pb-2">
+                  <h3 className="font-bold text-foreground">{setor}</h3>
                   <Badge variant="secondary" className="text-[10px]">{users.length}</Badge>
                 </div>
                 <table className="min-w-full border-collapse text-sm">

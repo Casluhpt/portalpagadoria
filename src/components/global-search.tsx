@@ -190,7 +190,7 @@ export function GlobalSearch({ variant = "compact" }: { variant?: "compact" | "h
     variant === "hero" ? (
       <button
         onClick={() => setOpen(true)}
-        className="group flex w-full items-center gap-3 rounded-2xl border border-violet-200/80 bg-white px-4 py-4 text-left shadow-lg shadow-violet-100/50 transition-all duration-300 hover:border-violet-400 hover:shadow-xl hover:shadow-violet-200/50 dark:bg-card dark:shadow-none"
+        className="group flex w-full items-center gap-3 rounded-2xl border border-violet-200/80 bg-card px-4 py-4 text-left shadow-lg shadow-violet-100/50 transition-all duration-300 hover:border-violet-400 hover:shadow-xl hover:shadow-violet-200/50 dark:bg-card dark:shadow-none"
       >
         <Search className="h-5 w-5 shrink-0 text-violet-600" />
         <span className="flex-1 truncate text-sm text-muted-foreground">

@@ -13,15 +13,15 @@ export const Route = createFileRoute('/conciliacao')({
 function BankReconciliationPage() {
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen w-full bg-slate-50">
+      <div className="flex min-h-screen w-full bg-muted">
         <AppSidebar />
         <div className="flex flex-1 flex-col">
-          <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-slate-200 bg-white/80 px-4 backdrop-blur">
+          <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-border bg-card/90 px-4 backdrop-blur">
             <SidebarTrigger />
             <img src={profarmaLogo.url} alt="Profarma" className="h-7" />
             <div className="ml-2 flex flex-col leading-tight">
-              <span className="text-sm font-semibold text-slate-800">Conciliação Bancária</span>
-              <span className="text-[11px] text-slate-500">Validação multi-fonte</span>
+              <span className="text-sm font-semibold text-foreground">Conciliação Bancária</span>
+              <span className="text-[11px] text-muted-foreground">Validação multi-fonte</span>
             </div>
             <div className="ml-auto flex items-center gap-3">
               <HeaderActions />
@@ -50,28 +50,28 @@ function BankReconciliationPage() {
 
               <TabsContent value="dashboard" className="space-y-4">
                 <div className="grid gap-4 md:grid-cols-3">
-                  <div className="rounded-xl border bg-white p-6 shadow-sm">
-                    <h3 className="text-sm font-medium text-slate-500">Status Geral</h3>
-                    <p className="mt-2 text-3xl font-bold text-slate-900">92.4%</p>
+                  <div className="rounded-xl border bg-card p-6 shadow-sm">
+                    <h3 className="text-sm font-medium text-muted-foreground">Status Geral</h3>
+                    <p className="mt-2 text-3xl font-bold text-foreground">92.4%</p>
                     <p className="text-xs text-emerald-600 mt-1">Conciliado (Junho/2026)</p>
                   </div>
-                  <div className="rounded-xl border bg-white p-6 shadow-sm">
-                    <h3 className="text-sm font-medium text-slate-500">Divergências</h3>
+                  <div className="rounded-xl border bg-card p-6 shadow-sm">
+                    <h3 className="text-sm font-medium text-muted-foreground">Divergências</h3>
                     <p className="mt-2 text-3xl font-bold text-amber-600">12</p>
-                    <p className="text-xs text-slate-500 mt-1">Aguardando ajuste</p>
+                    <p className="text-xs text-muted-foreground mt-1">Aguardando ajuste</p>
                   </div>
-                  <div className="rounded-xl border bg-white p-6 shadow-sm">
-                    <h3 className="text-sm font-medium text-slate-500">Pendências Críticas</h3>
+                  <div className="rounded-xl border bg-card p-6 shadow-sm">
+                    <h3 className="text-sm font-medium text-muted-foreground">Pendências Críticas</h3>
                     <p className="mt-2 text-3xl font-bold text-red-600">2</p>
-                    <p className="text-xs text-slate-500 mt-1">Sem retorno bancário</p>
+                    <p className="text-xs text-muted-foreground mt-1">Sem retorno bancário</p>
                   </div>
                 </div>
 
-                <div className="rounded-xl border bg-white p-8 text-center">
-                  <p className="text-slate-500">Módulo de Conciliação Bancária v1.9.0 em implementação.</p>
+                <div className="rounded-xl border bg-card p-8 text-center">
+                  <p className="text-muted-foreground">Módulo de Conciliação Bancária v1.9.0 em implementação.</p>
                   <div className="mt-4 text-left max-w-2xl mx-auto space-y-4">
-                    <p className="text-sm text-slate-600 font-medium border-b pb-2">Próximos Passos:</p>
-                    <ul className="text-sm text-slate-500 list-disc pl-5 space-y-2">
+                    <p className="text-sm text-muted-foreground font-medium border-b pb-2">Próximos Passos:</p>
+                    <ul className="text-sm text-muted-foreground list-disc pl-5 space-y-2">
                       <li>Implementar a lógica de análise de correspondência (5 níveis) no conciliacao.tsx.</li>
                       <li>Conectar a importação de planilhas (Varejo/Distribuição) com as novas regras de validação.</li>
                       <li>Configurar o feedback de status por tooltip, conforme os requisitos de visualização dinâmica.</li>
@@ -118,7 +118,7 @@ function ConciliacaoSemanalView() {
   });
 
   return (
-    <Card className="border-slate-200">
+    <Card className="border-border">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-lg">
           <FileSpreadsheet className="h-5 w-5 text-emerald-600" />
@@ -137,9 +137,9 @@ function ConciliacaoSemanalView() {
           </div>
         </div>
 
-        <div className="flex flex-col gap-3 rounded-lg bg-slate-50 p-4 border border-slate-200">
-          <h4 className="text-sm font-semibold text-slate-700">Resumo da Operação</h4>
-          <ul className="text-xs text-slate-500 space-y-2 list-disc pl-4">
+        <div className="flex flex-col gap-3 rounded-lg bg-muted p-4 border border-border">
+          <h4 className="text-sm font-semibold text-foreground">Resumo da Operação</h4>
+          <ul className="text-xs text-muted-foreground space-y-2 list-disc pl-4">
             <li>Os títulos das colunas seguirão o padrão da base de <b>Pagamentos Diversos</b>.</li>
             <li>O arquivo será baixado localmente e uma cópia será vinculada à <b>Base de Anexos</b>.</li>
             <li>Uma notificação será enviada para o sino com atalho de download direto.</li>
@@ -221,7 +221,7 @@ function ConciliacaoAtivaView() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <p className="text-xs text-slate-500">Importe o arquivo de retorno consolidado do Varejo.</p>
+            <p className="text-xs text-muted-foreground">Importe o arquivo de retorno consolidado do Varejo.</p>
             <Button 
               variant="outline" 
               className="w-full h-24 border-dashed border-2 hover:border-blue-400 hover:bg-blue-50/50 flex-col gap-2"
@@ -242,7 +242,7 @@ function ConciliacaoAtivaView() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <p className="text-xs text-slate-500">Importe o arquivo de retorno da Distribuição.</p>
+            <p className="text-xs text-muted-foreground">Importe o arquivo de retorno da Distribuição.</p>
             <Button 
               variant="outline" 
               className="w-full h-24 border-dashed border-2 hover:border-indigo-400 hover:bg-indigo-50/50 flex-col gap-2"
@@ -256,9 +256,9 @@ function ConciliacaoAtivaView() {
         </Card>
       </div>
 
-      <Card className="border-slate-200">
-        <CardHeader className="pb-3 border-b bg-slate-50/50">
-          <CardTitle className="text-sm font-bold flex items-center gap-2 text-slate-700">
+      <Card className="border-border">
+        <CardHeader className="pb-3 border-b bg-muted/50">
+          <CardTitle className="text-sm font-bold flex items-center gap-2 text-foreground">
             <ShieldCheck className="h-4 w-4 text-emerald-600" /> Funcionamento da Conciliação Multi-nível
           </CardTitle>
         </CardHeader>
@@ -274,10 +274,10 @@ function ConciliacaoAtivaView() {
               <div key={n.level} className="p-4 space-y-2">
                 <div className="flex items-center gap-2">
                   <n.icon className={`h-4 w-4 ${n.color}`} />
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Nível {n.level}</span>
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Nível {n.level}</span>
                 </div>
-                <p className="text-xs font-bold text-slate-900">{n.label}</p>
-                <p className="text-[10px] text-slate-500 leading-relaxed">{n.desc}</p>
+                <p className="text-xs font-bold text-foreground">{n.label}</p>
+                <p className="text-[10px] text-muted-foreground leading-relaxed">{n.desc}</p>
               </div>
             ))}
           </div>

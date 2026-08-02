@@ -275,11 +275,11 @@ function DespesasFixasPage() {
       <div className="flex min-h-screen w-full bg-gradient-to-br from-slate-50 via-slate-100 to-emerald-50/40">
         <AppSidebar />
         <div className="flex flex-1 flex-col">
-          <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-slate-200 bg-white/80 px-4 backdrop-blur">
+          <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-border bg-card/90 px-4 backdrop-blur">
             <SidebarTrigger />
             <div className="flex items-center gap-2">
               <Wallet className="h-5 w-5 text-emerald-700" />
-              <h1 className="text-sm font-semibold text-slate-800">Despesas Fixas</h1>
+              <h1 className="text-sm font-semibold text-foreground">Despesas Fixas</h1>
               <Badge variant="secondary">Ano {ano}</Badge>
             </div>
             <div className="ml-auto"><HeaderActions /></div>
@@ -298,11 +298,11 @@ function DespesasFixasPage() {
                 placeholder="Buscar por descrição, empresa ou código…"
                 value={busca} onChange={(e) => setBusca(e.target.value)} className="w-80"
               />
-              <div className="flex items-center gap-2 rounded-md border px-3 text-xs bg-white h-10">
+              <div className="flex items-center gap-2 rounded-md border px-3 text-xs bg-card h-10">
                 <Checkbox id="suspended" checked={showSuspended} onCheckedChange={(v) => setShowSuspended(!!v)} />
                 <Label htmlFor="suspended" className="cursor-pointer">Ver suspensos</Label>
               </div>
-              <div className="flex items-center gap-2 rounded-md border px-3 text-xs bg-white h-10">
+              <div className="flex items-center gap-2 rounded-md border px-3 text-xs bg-card h-10">
                 <Checkbox id="closedMonths" checked={showClosedMonths} onCheckedChange={(v) => setShowClosedMonths(!!v)} />
                 <Label htmlFor="closedMonths" className="cursor-pointer">Ver meses fechados</Label>
               </div>
@@ -380,9 +380,9 @@ function DespesasFixasPage() {
                     </div>
 
                     <div className="grid gap-3 md:grid-cols-2">
-                      <div className="rounded-lg border border-slate-200 bg-white p-4">
-                        <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">Valor mensal</div>
-                        <div className="mt-1 text-2xl font-bold tabular-nums text-slate-800">{brl(dashboard.previstoMensal)}</div>
+                      <div className="rounded-lg border border-border bg-card p-4">
+                        <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Valor mensal</div>
+                        <div className="mt-1 text-2xl font-bold tabular-nums text-foreground">{brl(dashboard.previstoMensal)}</div>
                         <div className="mt-1 text-xs text-emerald-700">Lançado: <span className="font-semibold">{brl(dashboard.lancadoMensal)}</span></div>
                       </div>
                       {dashboard.previstoAdto > 0 && (
@@ -399,7 +399,7 @@ function DespesasFixasPage() {
                         <div key={g.grupo} className={`rounded-lg border p-4 ${chipGrupo[g.grupo]}`}>
                           <div className="flex items-center justify-between">
                             <div className="text-xs font-semibold uppercase tracking-wide opacity-80">{g.grupo}</div>
-                            <Badge variant="outline" className="bg-white/60">#{g.quantidade}</Badge>
+                            <Badge variant="outline" className="bg-card/90">#{g.quantidade}</Badge>
                           </div>
                           <div className="mt-2 text-2xl font-bold">{brl(g.previsto)}</div>
                           <div className="mt-2 space-y-1 text-xs">
@@ -425,7 +425,7 @@ function DespesasFixasPage() {
 
 
                     <div className="rounded-lg border border-border bg-card p-4">
-                      <div className="mb-2 text-sm font-semibold text-slate-700">Evolução mensal</div>
+                      <div className="mb-2 text-sm font-semibold text-foreground">Evolução mensal</div>
                       <div className="overflow-x-auto">
                         <table className="w-full min-w-[900px] text-sm">
                           <thead>
@@ -437,7 +437,7 @@ function DespesasFixasPage() {
                           </thead>
                           <tbody>
                             <tr>
-                              <td className="px-2 py-2 text-xs font-semibold text-slate-600">Previsto</td>
+                              <td className="px-2 py-2 text-xs font-semibold text-muted-foreground">Previsto</td>
                               {dashboard.porMes.map((m, i) => (
                                 <td key={i} className="px-2 py-2 text-right tabular-nums">{brl(m.previsto)}</td>
                               ))}
@@ -450,8 +450,8 @@ function DespesasFixasPage() {
                               ))}
                               <td className="px-2 py-2 text-right font-semibold tabular-nums text-emerald-700">{brl(dashboard.lancado)}</td>
                             </tr>
-                            <tr className="bg-slate-50/40">
-                              <td className="px-2 py-2 text-xs font-semibold text-slate-500">Saldo</td>
+                            <tr className="bg-muted/50">
+                              <td className="px-2 py-2 text-xs font-semibold text-muted-foreground">Saldo</td>
                               {dashboard.porMes.map((m, i) => (
                                 <td key={i} className="px-2 py-2 text-right tabular-nums">{brl(m.previsto - m.lancado)}</td>
                               ))}
@@ -560,7 +560,7 @@ function DespesasFixasPage() {
 
 function StatCard({ title, value, icon, tone, isCount }: { title: string; value: number; icon: React.ReactNode; tone: "slate" | "emerald" | "amber"; isCount?: boolean }) {
   const toneMap = {
-    slate: "bg-white border-slate-200 text-slate-800",
+    slate: "bg-card border-border text-foreground",
     emerald: "bg-emerald-50 border-emerald-200 text-emerald-800",
     amber: "bg-amber-50 border-amber-200 text-amber-800",
   } as const;
@@ -607,7 +607,7 @@ function GrupoTabela({
   return (
     <div className="overflow-x-auto rounded-lg border border-border bg-card">
       <table className="w-full min-w-[1200px] border-collapse text-sm">
-        <thead className="sticky top-0 bg-slate-50">
+        <thead className="sticky top-0 bg-muted">
           <tr>
             <th className="w-8 border-b border-border px-2 py-2">
               <Checkbox checked={allSelected ? true : someSelected ? "indeterminate" : false} onCheckedChange={handleToggleAll} />
@@ -626,8 +626,8 @@ function GrupoTabela({
             <tr 
               key={l.key} 
               className={cn(
-                "hover:bg-slate-50/60 cursor-pointer", 
-                l.meta.suspensa && "opacity-50 grayscale bg-slate-100/50",
+                "hover:bg-muted/50 cursor-pointer", 
+                l.meta.suspensa && "opacity-50 grayscale bg-muted/50",
                 selectedKeys.has(l.key) && "bg-blue-50"
               )}
               onClick={(e) => onToggleSelect(l.key, e)}
@@ -641,13 +641,13 @@ function GrupoTabela({
                   onClick={() => onOpenDescricao(l)}
                   title="Clique para editar empresa, conta, centro de custo, pedido…"
                 >
-                  <span className="font-medium text-slate-800 underline-offset-2 group-hover:underline">
+                  <span className="font-medium text-foreground underline-offset-2 group-hover:underline">
                     {l.descricao}
                     {l.meta.nome_real && l.meta.nome_real !== l.descricao ? (
-                      <span className="ml-1 text-xs font-normal text-slate-500">— {l.meta.nome_real}</span>
+                      <span className="ml-1 text-xs font-normal text-muted-foreground">— {l.meta.nome_real}</span>
                     ) : null}
                     {l.meta.numero_pedido ? (
-                      <span className="ml-2 rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-semibold text-slate-600">
+                      <span className="ml-2 rounded bg-muted px-1.5 py-0.5 text-[10px] font-semibold text-muted-foreground">
                         Pedido {l.meta.numero_pedido}
                       </span>
                     ) : null}
@@ -675,7 +675,7 @@ function GrupoTabela({
               ))}
               <td className="border-b border-border px-3 py-2 text-right tabular-nums">
                 <div className="flex flex-col items-end">
-                  <span className="font-semibold text-slate-700">{brl(l.meta.valor_previsto_anual || 0)}</span>
+                  <span className="font-semibold text-foreground">{brl(l.meta.valor_previsto_anual || 0)}</span>
                   <div className="flex items-center gap-1">
                     <Progress value={Math.min(100, (l.totalLancado / (l.meta.valor_previsto_anual || 1)) * 100)} className="h-1 w-12" />
                     <span className={cn(
@@ -689,10 +689,10 @@ function GrupoTabela({
               </td>
               <td className="border-b border-border px-3 py-2 text-right tabular-nums">
                 <div className="flex flex-col items-end">
-                  <span className="font-semibold text-slate-700">{brl(l.totalPrevisto)}</span>
+                  <span className="font-semibold text-foreground">{brl(l.totalPrevisto)}</span>
                   <span className={cn(
                     "text-[10px] font-medium",
-                    l.totalLancado > 0 ? "text-emerald-700" : "text-slate-400"
+                    l.totalLancado > 0 ? "text-emerald-700" : "text-muted-foreground"
                   )}>{brl(l.totalLancado)}</span>
                 </div>
               </td>
@@ -720,8 +720,8 @@ function CelulaMes({ registro, onClick }: { registro: DespesaFixa | null; onClic
         (lancado
           ? "bg-emerald-100 text-emerald-800 hover:bg-emerald-200"
           : valor
-          ? "text-slate-600 hover:bg-slate-100"
-          : "text-slate-300 hover:bg-slate-100")
+          ? "text-muted-foreground hover:bg-muted"
+          : "text-slate-300 hover:bg-muted")
       }
       title={lancado ? "Lançado" : valor ? "Previsto (não lançado)" : "Sem valor"}
     >
@@ -804,7 +804,7 @@ function RegistroDialog({
         
         <div className="grid grid-cols-1 gap-6 py-4 md:grid-cols-2">
           <div className="space-y-4">
-            <div className="flex items-center gap-2 rounded-md border bg-slate-50 p-3">
+            <div className="flex items-center gap-2 rounded-md border bg-muted p-3">
               <Checkbox id="lancado" checked={lancado} onCheckedChange={(v) => setLancado(!!v)} />
               <Label htmlFor="lancado" className="cursor-pointer text-sm font-medium">
                 Já foi lançado no sistema
