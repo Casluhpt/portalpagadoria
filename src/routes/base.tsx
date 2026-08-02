@@ -75,9 +75,11 @@ const brl = (n: number | null | undefined) =>
 
 function BasePage() {
   const qc = useQueryClient();
+  const { user } = useSession();
   const { data, isLoading, error } = useQuery({
     queryKey: lancamentosQueryKey,
     queryFn: fetchAllLancamentos,
+    enabled: !!user,
     staleTime: 30_000,
   });
 
