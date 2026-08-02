@@ -324,10 +324,13 @@ function MaterialApoioPage() {
     setIaResposta(null);
     try {
       const r = await perguntarIa({ data: { pergunta: q, contexto: contextoIa } });
-      if (r.erro) toast.error(r.erro);
+      if (r.erro) {
+        toast.error(r.erro, { duration: 5000 });
+      }
       setIaResposta(r.resposta ?? null);
     } catch (e) {
-      toast.error("Falha ao consultar a IA Assistente.");
+      console.error("IA Material Apoio Catch:", e);
+      toast.error("IA de Suporte da Pagadoria: Ocorreu um erro inesperado na interface.");
     } finally {
       setIaCarregando(false);
     }

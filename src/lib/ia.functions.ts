@@ -18,41 +18,62 @@ export const perguntarIa = createServerFn({ method: "POST" })
   .validator((data: unknown) => AskInput.parse(data))
   .handler(async ({ data }) => {
     const key = process.env["LOVABLE_API_KEY"];
-    if (!key) {
-      return { resposta: null, erro: "Assistente indisponível: chave de IA não configurada." };
-    }
-
-    const res = await fetch("https://ai.gateway.lovable.dev/v1/responses", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Lovable-API-Key": key,
-        "X-Lovable-AIG-SDK": "fetch",
-      },
-      body: JSON.stringify({
-        model: "openai/gpt-4o",
-        stream: true,
-        input: [
-          { role: "system", content: SYSTEM },
-          {
-            role: "user",
-            content: `MATERIAL DE APOIO AUTORIZADO E MÓDULOS DO PORTAL:\n${data.contexto || "(nenhum material cadastrado)"}\n\nPERGUNTA DO USUÁRIO:\n${data.pergunta}`,
-          },
-        ],
-      }),
+    
+    // Injected logging for diagnosis
+    console.log("[IA] Iniciando consulta:", {
+      pergunta: data.pergunta.substring(0, 50) + "...",
+      hasContexto: !!data.contexto,
+      hasKey: !!key
     });
 
-    if (!res.ok || !res.body) {
-      const detalhe = await res.text().catch(() => "");
-      if (res.status === 429) {
-        return { resposta: null, erro: "Muitas solicitações à IA no momento. Tente novamente em instantes." };
-      }
-      if (res.status === 402) {
-        return { resposta: null, erro: "Os créditos de IA do portal foram esgotados. Fale com o administrador." };
-      }
-      console.error("Falha na IA Assistente", res.status, detalhe);
-      return { resposta: null, erro: "Não foi possível consultar a IA Assistente agora." };
+    if (!key) {
+      console.error("[IA] Erro: LOVABLE_API_KEY não encontrada no ambiente.");
+      return { 
+        resposta: null, 
+        erro: "IA de Suporte da Pagadoria: A chave de integração não está configurada corretamente no servidor." 
+      };
     }
+
+    try {
+      const res = await fetch("https://ai.gateway.lovable.dev/v1/responses", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Lovable-API-Key": key,
+          "X-Lovable-AIG-SDK": "fetch",
+        },
+        body: JSON.stringify({
+          model: "openai/gpt-4o",
+          stream: true,
+          input: [
+            { role: "system", content: SYSTEM },
+            {
+              role: "user",
+              content: `MATERIAL DE APOIO AUTORIZADO E MÓDULOS DO PORTAL:\n${data.contexto || "(nenhum material cadastrado)"}\n\nPERGUNTA DO USUÁRIO:\n${data.pergunta}`,
+            },
+          ],
+        }),
+      });
+
+      if (!res.ok || !res.body) {
+        const detalhe = await res.text().catch(() => "Sem detalhes do corpo");
+        console.error(`[IA] Falha no Gateway (Status: ${res.status}):`, detalhe);
+        
+        if (res.status === 429) {
+          return { resposta: null, erro: "IA de Suporte da Pagadoria: O serviço está temporariamente sobrecarregado (429). Tente novamente em instantes." };
+        }
+        if (res.status === 402) {
+          return { resposta: null, erro: "IA de Suporte da Pagadoria: Limite de créditos atingido (402). Contate o administrador lucas.chaves.lc2001@gmail.com." };
+        }
+        if (res.status === 401 || res.status === 403) {
+          return { resposta: null, erro: "IA de Suporte da Pagadoria: Falha de autenticação na API (${res.status}). Verifique as credenciais." };
+        }
+        
+        return { 
+          resposta: null, 
+          erro: `IA de Suporte da Pagadoria: Erro técnico na comunicação (${res.status}). O incidente foi registrado para análise.` 
+        };
+      }
 
     let texto = "";
 
@@ -89,8 +110,16 @@ export const perguntarIa = createServerFn({ method: "POST" })
         }
       }
     } catch (err) {
-      console.error("Stream reading error:", err);
+      console.error("[IA] Erro na leitura do stream:", err);
+      return { resposta: null, erro: "IA de Suporte da Pagadoria: Erro ao processar resposta em tempo real. Tente novamente." };
     }
+  } catch (err) {
+    console.error("[IA] Erro fatal na requisição:", err);
+    return { 
+      resposta: null, 
+      erro: "IA de Suporte da Pagadoria: Falha crítica de rede ou servidor. Verifique a conexão." 
+    };
+  }
 
     if (!texto.trim()) {
       try {
