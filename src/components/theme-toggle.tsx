@@ -30,11 +30,11 @@ export function ThemeMenuSection() {
     <>
       <DropdownMenuSeparator />
       <DropdownMenuSub>
-        <DropdownMenuSubTrigger className="flex items-center justify-between gap-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground">
+        <DropdownMenuSubTrigger className="flex h-10 items-center justify-between gap-4 px-2 py-0 text-[10px] uppercase tracking-wide text-muted-foreground">
           <div className="flex items-center gap-2">
             <span>Aparência</span>
           </div>
-          <span className="normal-case tracking-normal">
+          <span className="normal-case tracking-normal text-muted-foreground">
             {config.mode === "claro" ? "Modo claro" :
              config.mode === "noturno" ? "Modo noturno" :
              config.mode === "sistema" ? "Do usuário" : "Automático"}
