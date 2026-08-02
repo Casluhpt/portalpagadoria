@@ -17,7 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import profarmaLogo from "@/assets/profarma-logo.png.asset.json";
+import { AppLogo } from "@/components/app-logo";
 import { useSession } from "@/hooks/use-session";
 
 export const Route = createFileRoute("/auth")({
