@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppSidebar } from "@/components/app-sidebar";
+import { HeaderActions } from "@/components/header-actions";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -25,12 +26,18 @@ function AnexosPage() {
       <div className="flex min-h-screen w-full bg-muted">
         <AppSidebar />
         <div className="flex flex-1 flex-col">
-          <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b bg-card/90 px-4 backdrop-blur">
+          <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-border bg-background/80 px-4 backdrop-blur">
             <SidebarTrigger />
-            <Button asChild variant="ghost" size="sm">
-              <Link to="/"><ArrowLeft className="mr-1 h-4 w-4" /> Portal</Link>
-            </Button>
-            <h1 className="ml-2 font-semibold text-foreground">[anexo]</h1>
+            <Link to="/" className="flex flex-1 items-center gap-2 hover:opacity-80 transition-opacity">
+              <img src="/profarma.png" alt="Profarma" className="h-7 object-contain" />
+              <div>
+                <h1 className="text-sm font-semibold text-foreground">[anexo]</h1>
+                <p className="text-[10px] text-muted-foreground">Repositório de documentos digitais</p>
+              </div>
+            </Link>
+            <div className="ml-auto">
+              <HeaderActions />
+            </div>
           </header>
           <main className="flex-1 space-y-6 p-6">
             <Card className="border-border">

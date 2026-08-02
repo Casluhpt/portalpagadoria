@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import jsPDF from "jspdf";
@@ -404,17 +404,18 @@ function MaterialApoioPage() {
       <div className="flex min-h-screen w-full bg-background">
         <AppSidebar />
         <div className="flex flex-1 flex-col">
-          <header className="flex h-14 items-center justify-between border-b bg-background/80 px-4 backdrop-blur">
-            <div className="flex items-center gap-3">
-              <SidebarTrigger />
-              <div className="flex items-center gap-2">
-                <div className="grid h-8 w-8 place-items-center rounded-lg bg-gradient-to-br from-violet-600 to-indigo-700 text-white">
-                  <BookOpen className="h-4 w-4" />
-                </div>
-                <h1 className="text-sm font-semibold">Material de Apoio</h1>
+          <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-border bg-background/80 px-4 backdrop-blur">
+            <SidebarTrigger />
+            <Link to="/" className="flex flex-1 items-center gap-2 hover:opacity-80 transition-opacity">
+              <img src="/profarma.png" alt="Profarma" className="h-7 object-contain" />
+              <div>
+                <h1 className="text-sm font-semibold text-foreground">Material de Apoio</h1>
+                <p className="text-[10px] text-muted-foreground">Central de suporte e guias</p>
               </div>
+            </Link>
+            <div className="ml-auto">
+              <HeaderActions />
             </div>
-            <HeaderActions />
           </header>
 
           <main className="mx-auto w-full max-w-6xl flex-1 space-y-6 p-4 md:p-6">

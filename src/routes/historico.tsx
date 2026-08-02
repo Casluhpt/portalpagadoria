@@ -1,4 +1,4 @@
-import { createFileRoute, Navigate } from "@tanstack/react-router";
+import { createFileRoute, Navigate, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
@@ -212,7 +212,22 @@ function Content() {
   };
 
   return (
-    <div className="flex flex-1 flex-col gap-4 p-4">
+    <div className="flex flex-1 flex-col bg-background">
+      <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-border bg-background/80 px-4 backdrop-blur">
+        <SidebarTrigger />
+        <Link to="/" className="flex flex-1 items-center gap-2 hover:opacity-80 transition-opacity">
+          <img src="/profarma.png" alt="Profarma" className="h-7 object-contain" />
+          <div>
+            <h1 className="text-sm font-semibold text-foreground">Histórico de Versões</h1>
+            <p className="text-[10px] text-muted-foreground">Linha do tempo e novidades</p>
+          </div>
+        </Link>
+        <div className="ml-auto">
+          <HeaderActions />
+        </div>
+      </header>
+
+      <div className="flex flex-1 flex-col gap-4 p-4">
       <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-card p-4">
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-card/50 overflow-hidden shadow-sm border border-border">
@@ -324,6 +339,7 @@ function Content() {
           </li>
         ))}
       </ol>
+      </div>
     </div>
   );
 }

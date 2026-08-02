@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useRef, useState } from "react";
 import * as XLSX from "xlsx";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -225,16 +225,19 @@ function BasePage() {
         <div className="flex flex-1 flex-col">
           <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-border bg-background/80 px-4 backdrop-blur">
             <SidebarTrigger />
-            <div className="flex-1">
-              <h1 className="text-sm font-semibold text-foreground">Base de Resultados Principais</h1>
-              <p className="text-xs text-muted-foreground">
-                {isLoading
-                  ? "Carregando…"
-                  : error
-                    ? "Erro ao carregar"
-                    : `${rows.length.toLocaleString("pt-BR")} registros`}
-              </p>
-            </div>
+            <Link to="/" className="flex flex-1 items-center gap-2 hover:opacity-80 transition-opacity">
+              <img src="/profarma.png" alt="Profarma" className="h-7 object-contain" />
+              <div>
+                <h1 className="text-sm font-semibold text-foreground">Base de Resultados Principais</h1>
+                <p className="text-[10px] text-muted-foreground">
+                  {isLoading
+                    ? "Carregando…"
+                    : error
+                      ? "Erro ao carregar"
+                      : `${rows.length.toLocaleString("pt-BR")} registros`}
+                </p>
+              </div>
+            </Link>
             <div className="relative w-64">
               <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input

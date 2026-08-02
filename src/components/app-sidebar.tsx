@@ -266,10 +266,15 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader className="border-b border-sidebar-border">
-        <Link to="/" className="flex items-center gap-2 px-2 py-3 rounded-md hover:bg-sidebar-accent/50 transition-colors">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg overflow-hidden">
-            <AppLogo className="h-9 w-9" />
-          </div>
+        <Link 
+          to="/" 
+          className="flex items-center gap-2 px-2 py-3 rounded-md hover:bg-sidebar-accent/50 transition-colors"
+        >
+          <img 
+            src="/profarma.png" 
+            alt="Logo" 
+            className="h-10 w-10 object-contain" 
+          />
           <div className="flex flex-col leading-tight group-data-[collapsible=icon]:hidden">
             <span className="text-sm font-semibold text-sidebar-foreground">Pagadoria</span>
             <span className="text-xs text-muted-foreground">Portal Corporativo</span>

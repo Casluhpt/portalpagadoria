@@ -173,13 +173,13 @@ export function HeaderActions() {
           <DropdownMenuItem onClick={sendPasswordReset}>
             <KeyRound className="mr-2 h-4 w-4" /> Redefinir senha
           </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => navigate({ to: "/configuracoes" })}>
+            <Settings className="mr-2 h-4 w-4" /> Configurações
+          </DropdownMenuItem>
           {isAdmin && (
-            <>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => navigate({ to: "/configuracoes" })}>
-                <Settings className="mr-2 h-4 w-4" /> Configurações
-              </DropdownMenuItem>
-            </>
+            <DropdownMenuItem onClick={() => navigate({ to: "/usuarios" })}>
+              <Users className="mr-2 h-4 w-4" /> Usuários
+            </DropdownMenuItem>
           )}
           <DropdownMenuSeparator />
           <DropdownMenuItem onSelect={(e) => { e.preventDefault(); setConfirmSignOut(true); }}>

@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -85,10 +85,13 @@ function AprovacaoPage() {
       <main className="flex-1 min-w-0">
         <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b bg-background/95 px-4 backdrop-blur">
           <SidebarTrigger />
-          <div className="flex-1">
-            <h1 className="text-lg font-semibold">Processo de Aprovação</h1>
-            <p className="text-xs text-muted-foreground">Evidências de agendamento bancário por empresa, tipo e status.</p>
-          </div>
+          <Link to="/" className="flex flex-1 items-center gap-2 hover:opacity-80 transition-opacity">
+            <img src="/profarma.png" alt="Profarma" className="h-7 object-contain" />
+            <div>
+              <h1 className="text-sm font-semibold text-foreground">Processo de Aprovação</h1>
+              <p className="text-[10px] text-muted-foreground">Evidências de agendamento bancário</p>
+            </div>
+          </Link>
           <Select value={String(ano)} onValueChange={(v) => setAno(Number(v))}>
             <SelectTrigger className="w-24"><SelectValue /></SelectTrigger>
             <SelectContent>
