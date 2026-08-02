@@ -18,6 +18,8 @@ import { sendSupportRequest } from "@/lib/suporte.functions";
 import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
+import { UsuariosTableWrapper as UsuariosTable } from "@/components/admin/usuarios-table";
+
 
 export const Route = createFileRoute("/configuracoes")({
   component: ConfiguracoesPage,
@@ -75,25 +77,7 @@ function ConfiguracoesPage() {
               </TabsContent>
 
               <TabsContent value="administracao" className="m-0 focus-visible:outline-none">
-                <Card className="border-border">
-                  <CardHeader>
-                    <CardTitle className="text-lg flex items-center gap-2">
-                      <Users className="h-5 w-5 text-indigo-600" /> 
-                      Gestão de Acessos
-                    </CardTitle>
-                    <CardDescription>
-                      Administre as permissões, cargos e setores dos usuários cadastrados no portal.
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <Button 
-                      className="bg-indigo-600 hover:bg-indigo-700" 
-                      onClick={() => navigate({ to: "/usuarios" })}
-                    >
-                      Acessar Administração de Usuários
-                    </Button>
-                  </CardContent>
-                </Card>
+                <UsuariosTable />
               </TabsContent>
               <TabsContent value="documentacao" className="m-0 focus-visible:outline-none">
                 <DocumentationSection />
