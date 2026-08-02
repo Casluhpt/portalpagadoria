@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 import { useRoles } from "@/hooks/use-roles";
 import {
@@ -166,11 +167,15 @@ export function GlobalSearch({ variant = "compact" }: { variant?: "compact" | "h
       .slice(0, 55_000);
     try {
       const r = await perguntarIa({ data: { pergunta: q, contexto } });
-      setAiResponse(
-        r.erro ? `Aviso: ${r.erro}` : (r.resposta ?? "Não encontrei material autorizado suficiente para responder com segurança."),
-      );
-    } catch {
-      setAiResponse("Falha de comunicação com a IA Assistente. Tente novamente.");
+      if (r.erro) {
+        setAiResponse(r.erro);
+        toast.error(r.erro);
+      } else {
+        setAiResponse(r.resposta ?? "IA de Suporte da Pagadoria: Não encontrei material autorizado suficiente.");
+      }
+    } catch (err) {
+      console.error("Erro na IA Global Search:", err);
+      setAiResponse("IA de Suporte da Pagadoria: Falha de comunicação com o servidor. Tente novamente.");
     } finally {
       setIsAiLoading(false);
     }

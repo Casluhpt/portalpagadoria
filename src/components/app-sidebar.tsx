@@ -195,19 +195,20 @@ export function AppSidebar() {
       if (r.erro) {
          setChatMessages((prev) => [
           ...prev,
-          { role: "assistant", content: `Aviso: ${r.erro}` },
+          { role: "assistant", content: r.erro },
         ]);
+        toast.error(r.erro);
       } else {
         setChatMessages((prev) => [
           ...prev,
-          { role: "assistant", content: r.resposta ?? "Não encontrei material autorizado suficiente para responder com segurança." },
+          { role: "assistant", content: r.resposta ?? "IA de Suporte da Pagadoria: Não encontrei material autorizado suficiente." },
         ]);
       }
     } catch (err) {
-      console.error("Erro na IA:", err);
+      console.error("Erro na IA Sidebar:", err);
       setChatMessages((prev) => [
         ...prev,
-        { role: "assistant", content: "Erro na conexão com a IA Assistente. Verifique sua conexão ou tente novamente mais tarde." },
+        { role: "assistant", content: "IA de Suporte da Pagadoria: Erro na conexão com o servidor. Tente novamente." },
       ]);
     } finally {
       setIsTyping(false);
