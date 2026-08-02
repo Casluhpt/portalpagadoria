@@ -30,7 +30,7 @@ export function ThemeMenuSection() {
     <>
       <DropdownMenuSeparator />
       <DropdownMenuSub>
-        <DropdownMenuSubTrigger className="flex h-10 items-center justify-between gap-4 px-2 py-0 text-[10px] uppercase tracking-wide text-muted-foreground">
+        <DropdownMenuSubTrigger className="flex h-10 items-center justify-between gap-4 px-2 py-0 text-[10px] uppercase tracking-wide text-muted-foreground outline-none">
           <div className="flex items-center gap-2">
             <span>Aparência</span>
           </div>
