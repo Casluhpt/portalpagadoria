@@ -191,7 +191,7 @@ function ComunicadosPanel() {
           {items.length === 0 ? (
             <p className="text-sm text-muted-foreground">Nenhum comunicado publicado ainda.</p>
           ) : (
-            <ul className="divide-y divide-slate-100">
+            <ul className="divide-y divide-border">
               {items.map((c) => (
                 <li key={c.id} className="flex items-start gap-3 py-3">
                   <input

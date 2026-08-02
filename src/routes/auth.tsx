@@ -48,7 +48,7 @@ function AuthPage() {
 
 
   return (
-    <div className="grid min-h-dvh place-items-center bg-gradient-to-br from-slate-100 via-slate-100 to-violet-100 p-4">
+    <div className="grid min-h-dvh place-items-center bg-background p-4">
       <Card className="w-full max-w-md border-border shadow-lg">
         <CardHeader className="items-center text-center">
           <img src={profarmaLogo.url} alt="Profarma" className="mb-2 h-10" />

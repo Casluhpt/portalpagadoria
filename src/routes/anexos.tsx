@@ -46,7 +46,7 @@ function AnexosPage() {
                     </p>
                   </div>
                 </div>
-                <Button className="bg-slate-800 hover:bg-slate-900">
+                <Button className="bg-secondary hover:bg-card">
                   <Upload className="mr-2 h-4 w-4" /> Enviar arquivo
                 </Button>
               </CardContent>

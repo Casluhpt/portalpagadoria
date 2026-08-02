@@ -275,14 +275,14 @@ function NotifList({
       {items.length === 0 ? (
         <div className="px-4 py-8 text-center text-xs text-muted-foreground">{emptyLabel}</div>
       ) : (
-        <ul className="divide-y divide-slate-100">
+        <ul className="divide-y divide-border">
           {items.map((c) => (
             <li
               key={c.id}
               className={`group relative flex gap-3 px-4 py-3 pr-9 text-sm ${c.lido ? "bg-card" : "bg-violet-50/60"}`}
             >
               <span
-                className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${c.lido ? "bg-slate-300" : "bg-violet-600"}`}
+                className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${c.lido ? "bg-muted-foreground/40" : "bg-violet-600"}`}
               />
               <div className="min-w-0 flex-1">
                 <div className="flex items-start justify-between gap-2">

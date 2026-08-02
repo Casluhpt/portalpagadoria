@@ -263,7 +263,7 @@ function ConciliacaoAtivaView() {
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
-          <div className="grid md:grid-cols-2 lg:grid-cols-5 divide-x divide-slate-100">
+          <div className="grid md:grid-cols-2 lg:grid-cols-5 divide-x divide-border">
             {[
               { level: 1, label: "Exata", desc: "Data, Empresa e Valor idênticos.", icon: CheckCircle2, color: "text-emerald-500" },
               { level: 2, label: "Data Próxima", desc: "Empresa e Valor exatos, data +/- 2 dias.", icon: CheckCircle2, color: "text-blue-500" },

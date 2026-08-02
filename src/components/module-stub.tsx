@@ -12,7 +12,7 @@ interface ModuleStubProps {
 
 export function ModuleStub({ title, description, phase, adminOnly }: ModuleStubProps) {
   return (
-    <div className="min-h-[calc(100vh-3.5rem)] bg-gradient-to-br from-slate-50 via-white to-violet-50/40 p-6">
+    <div className="min-h-[calc(100vh-3.5rem)] bg-gradient-to-br from-muted via-white to-violet-50/40 p-6">
       <div className="mx-auto max-w-3xl space-y-4">
         <Button variant="ghost" size="sm" asChild>
           <Link to="/">

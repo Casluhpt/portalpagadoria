@@ -495,7 +495,7 @@ function PortalPage() {
                           onClick={() => goTo(i)}
                           aria-label={`Ir para v${v.versao}`}
                           className={`h-2 rounded-full transition-all ${
-                            i === carouselIdx ? "w-6 bg-violet-600" : "w-2 bg-slate-300 hover:bg-slate-400"
+                            i === carouselIdx ? "w-6 bg-violet-600" : "w-2 bg-muted-foreground/40 hover:bg-muted-foreground/60"
                           }`}
                         />
                       ))}

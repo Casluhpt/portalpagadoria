@@ -50,7 +50,7 @@ const roleLabel: Record<string, string> = {
 const presenceMeta: Record<PresenceStatus, { label: string; dot: string; Icon: typeof Circle }> = {
   online: { label: "Online", dot: "bg-emerald-500", Icon: Circle },
   ausente: { label: "Ausente", dot: "bg-amber-500", Icon: MinusCircle },
-  offline: { label: "Offline", dot: "bg-slate-400", Icon: XCircle },
+  offline: { label: "Offline", dot: "bg-muted-foreground/60", Icon: XCircle },
 };
 
 export function HeaderActions() {

@@ -272,7 +272,7 @@ function DespesasFixasPage() {
 
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen w-full bg-gradient-to-br from-slate-50 via-slate-100 to-emerald-50/40">
+      <div className="flex min-h-screen w-full bg-gradient-to-br from-muted via-background to-emerald-50/40">
         <AppSidebar />
         <div className="flex flex-1 flex-col">
           <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-border bg-card/90 px-4 backdrop-blur">
@@ -721,7 +721,7 @@ function CelulaMes({ registro, onClick }: { registro: DespesaFixa | null; onClic
           ? "bg-emerald-100 text-emerald-800 hover:bg-emerald-200"
           : valor
           ? "text-muted-foreground hover:bg-muted"
-          : "text-slate-300 hover:bg-muted")
+          : "text-muted-foreground hover:bg-muted")
       }
       title={lancado ? "Lançado" : valor ? "Previsto (não lançado)" : "Sem valor"}
     >

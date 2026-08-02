@@ -65,14 +65,14 @@ function ESocialPage() {
 
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen w-full bg-muted dark:bg-slate-950">
+      <div className="flex min-h-screen w-full bg-muted dark:bg-background">
         <AppSidebar />
         <div className="flex flex-1 flex-col">
-          <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-border bg-card/90 px-4 backdrop-blur dark:bg-slate-900/80 dark:border-slate-800">
+          <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-border bg-card/90 px-4 backdrop-blur dark:bg-card/90 dark:border-border">
             <SidebarTrigger />
             <img src={profarmaLogo.url} alt="Profarma" className="h-7" />
             <div className="ml-2 flex flex-col leading-tight">
-              <span className="text-sm font-semibold text-foreground dark:text-slate-200">Controle E-Social</span>
+              <span className="text-sm font-semibold text-foreground dark:text-foreground">Controle E-Social</span>
               <span className="text-[11px] text-muted-foreground">Acompanhamento Mensal de Lançamentos</span>
             </div>
             <div className="ml-auto flex items-center gap-3">
@@ -97,7 +97,7 @@ function ESocialPage() {
                 </CardContent>
               </Card>
 
-              <Card className="border-border dark:border-slate-800">
+              <Card className="border-border dark:border-border">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                     <Calendar className="h-4 w-4" /> Mês de Referência
@@ -118,14 +118,14 @@ function ESocialPage() {
                 </CardContent>
               </Card>
 
-              <Card className="border-border dark:border-slate-800">
+              <Card className="border-border dark:border-border">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                     <CreditCard className="h-4 w-4" /> Total de Impostos no Mês
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-foreground dark:text-slate-100">
+                  <div className="text-2xl font-bold text-foreground dark:text-foreground">
                     {stats.totalMes.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                   </div>
                   <p className="text-xs text-muted-foreground mt-1">Soma de INSS, IRRF, FGTS e PIS</p>
@@ -153,8 +153,8 @@ function ESocialPage() {
               </div>
             </div>
 
-            <Card className="border-border dark:border-slate-800 overflow-hidden">
-              <CardHeader className="bg-muted/50 dark:bg-slate-900/50 border-b dark:border-slate-800">
+            <Card className="border-border dark:border-border overflow-hidden">
+              <CardHeader className="bg-muted/50 dark:bg-muted/50 border-b dark:border-border">
                 <CardTitle className="text-base flex items-center gap-2">
                   <FileSpreadsheet className="h-5 w-5 text-indigo-600" /> Base de Acompanhamento E-Social
                 </CardTitle>
@@ -162,7 +162,7 @@ function ESocialPage() {
               </CardHeader>
               <CardContent className="p-0 overflow-x-auto">
                 <table className="w-full text-sm text-left">
-                  <thead className="text-xs text-muted-foreground uppercase bg-muted dark:bg-slate-900 dark:text-muted-foreground border-b dark:border-slate-800">
+                  <thead className="text-xs text-muted-foreground uppercase bg-muted dark:bg-card dark:text-muted-foreground border-b dark:border-border">
                     <tr>
                       <th className="px-4 py-3 font-semibold">Empresa / Coligada</th>
                       <th className="px-4 py-3 font-semibold">CNPJ</th>
@@ -173,7 +173,7 @@ function ESocialPage() {
                       <th className="px-4 py-3 font-semibold text-center">Ações</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y dark:divide-slate-800">
+                  <tbody className="divide-y dark:divide-border">
                     {isLoading ? (
                       <tr>
                         <td colSpan={7} className="px-4 py-8 text-center text-muted-foreground">
@@ -190,9 +190,9 @@ function ESocialPage() {
                       filteredData.map((item) => {
                         const isOk = item.num_fopag || item.dcomp_compensado;
                         return (
-                          <tr key={item.id} className={`hover:bg-muted/50 dark:hover:bg-slate-900/50 transition-colors ${!isOk ? 'bg-red-50/30 dark:bg-red-900/10' : ''}`}>
+                          <tr key={item.id} className={`hover:bg-muted/50 dark:hover:bg-muted/50 transition-colors ${!isOk ? 'bg-red-50/30 dark:bg-red-900/10' : ''}`}>
                             <td className="px-4 py-3">
-                              <div className="font-medium text-foreground dark:text-slate-200">{item.empresa}</div>
+                              <div className="font-medium text-foreground dark:text-foreground">{item.empresa}</div>
                               <div className="text-[10px] text-muted-foreground uppercase">{item.nome_coligada} · {item.bandeira}</div>
                             </td>
                             <td className="px-4 py-3 text-muted-foreground dark:text-muted-foreground font-mono text-xs">{item.cnpj}</td>
