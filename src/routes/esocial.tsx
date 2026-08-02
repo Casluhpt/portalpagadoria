@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, Link } from '@tanstack/react-router';
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { HeaderActions } from "@/components/header-actions";
@@ -78,11 +78,13 @@ function ESocialPage() {
         <div className="flex flex-1 flex-col">
           <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-border bg-card/90 px-4 backdrop-blur dark:bg-card/90 dark:border-border">
             <SidebarTrigger />
-            <img src={profarmaLogo.url} alt="Profarma" className="h-7" />
-            <div className="ml-2 flex flex-col leading-tight">
-              <span className="text-sm font-semibold text-foreground dark:text-foreground">Controle E-Social</span>
-              <span className="text-[11px] text-muted-foreground">Acompanhamento Mensal de Lançamentos</span>
-            </div>
+            <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+              <img src="/profarma.png" alt="Profarma" className="h-7 object-contain" />
+              <div className="ml-2 flex flex-col leading-tight">
+                <span className="text-sm font-semibold text-foreground dark:text-foreground">Controle E-Social</span>
+                <span className="text-[11px] text-muted-foreground">Acompanhamento Mensal de Lançamentos</span>
+              </div>
+            </Link>
             <div className="ml-auto flex items-center gap-3">
               <HeaderActions />
             </div>
