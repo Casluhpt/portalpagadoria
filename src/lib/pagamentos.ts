@@ -63,8 +63,14 @@ export async function createPagamentosBulk(
   rows: PagamentoInput[],
   colaboradorNome: string,
   userId: string | null,
+  replaceAll = false,
 ): Promise<number> {
   if (!rows.length) return 0;
+  
+  if (replaceAll) {
+    const { error } = await supabase.from(TABLE as any).delete().neq("id", "00000000-0000-0000-0000-000000000000");
+    if (error) throw error;
+  }
   const now = new Date().toISOString();
   const payload = rows.map((r) => ({
     ...sanitize(r),

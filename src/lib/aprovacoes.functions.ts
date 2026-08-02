@@ -73,8 +73,22 @@ export const upsertAprovacao = createServerFn({ method: "POST" })
 
 export const bulkInsertAprovacoes = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d) => z.object({ rows: z.array(rowSchema).min(1).max(5000) }).parse(d))
+  .inputValidator((d) => z.object({ 
+    rows: z.array(rowSchema).min(1).max(5000),
+    replaceAll: z.boolean().default(false)
+  }).parse(d))
   .handler(async ({ context, data }): Promise<{ inserted: number }> => {
+    if (data.replaceAll) {
+      // Delete all for the specific year being imported (if provided in rows, usually they are for the same year)
+      // If the UI is showing a specific year, we target that.
+      const firstYear = data.rows[0]?.ano || 2026;
+      const { error } = await (context.supabase as any)
+        .from("aprovacoes")
+        .delete()
+        .eq("ano", firstYear);
+      if (error) throw error;
+    }
+
     const payload = data.rows.map((r) => ({
       empresa: r.empresa ?? null,
       tipo: r.tipo,

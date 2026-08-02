@@ -193,12 +193,14 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
   });
 
   const [search, setSearch] = useState("");
+  const [importMode, setImportMode] = useState<"incremental" | "replace">("incremental");
   const [sortKey, setSortKey] = useState<keyof Pagamento>("registrado_em");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [highlights, setHighlights] = useState<Record<string, string>>(() => {
     if (typeof window === "undefined") return {};
     try { return JSON.parse(localStorage.getItem("pagamentos:highlights") || "{}"); } catch { return {}; }
+
   });
   useEffect(() => {
     try { localStorage.setItem("pagamentos:highlights", JSON.stringify(highlights)); } catch { /* noop */ }
@@ -300,7 +302,7 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
   });
 
   const importMut = useMutation({
-    mutationFn: (rows: PagamentoInput[]) => createPagamentosBulk(rows, colaboradorNome, userId),
+    mutationFn: (rows: PagamentoInput[]) => createPagamentosBulk(rows, colaboradorNome, userId, importMode === "replace"),
     onSuccess: (n) => { invalidate(); toast.success(`${n} lançamento(s) importado(s)`); },
     onError: (e: Error) => toast.error("Falha na importação: " + e.message),
   });
@@ -530,6 +532,17 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
         <div className="relative ml-2 w-64">
           <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input placeholder="Pesquisar…" value={search} onChange={(e) => setSearch(e.target.value)} className="pl-8 h-9" />
+        </div>
+        <div className="flex items-center gap-2 border-l border-border pl-2">
+          <Select value={importMode} onValueChange={(v: any) => setImportMode(v)}>
+            <SelectTrigger className="h-9 w-[180px] text-xs">
+              <SelectValue placeholder="Modo de importação" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="incremental">Incremental (adicionar)</SelectItem>
+              <SelectItem value="replace">Substituir a base (apagar)</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
         <div className="flex items-center gap-2">
           <input

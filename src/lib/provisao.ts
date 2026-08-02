@@ -99,8 +99,14 @@ export async function deleteProvisao(id: string): Promise<void> {
   if (error) throw error;
 }
 
-export async function bulkInsertProvisao(rows: Partial<Provisao>[]): Promise<number> {
+export async function bulkInsertProvisao(rows: Partial<Provisao>[], replaceAll = false): Promise<number> {
   if (rows.length === 0) return 0;
+  
+  if (replaceAll) {
+    const { error } = await supabase.from("provisao_diaria").delete().neq("id", "00000000-0000-0000-0000-000000000000");
+    if (error) throw error;
+  }
+
   const CHUNK = 500;
   let total = 0;
   for (let i = 0; i < rows.length; i += CHUNK) {

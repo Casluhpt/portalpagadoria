@@ -18,6 +18,13 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -113,6 +120,7 @@ function ProvisaoBasePage() {
   });
 
   const [search, setSearch] = useState("");
+  const [importMode, setImportMode] = useState<"incremental" | "replace">("incremental");
   const [sortKey, setSortKey] = useState<keyof Provisao>("data");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
   const [pendingDelete, setPendingDelete] = useState<Provisao | null>(null);
@@ -171,7 +179,7 @@ function ProvisaoBasePage() {
           valor: parseNumber(r[valorKey]),
         }))
         .filter((r) => r.data || r.empresa || r.banco || r.valor != null);
-      return bulkInsertProvisao(mapped);
+      return bulkInsertProvisao(mapped, importMode === "replace");
     },
     onSuccess: (count) => {
       invalidate();
@@ -265,6 +273,15 @@ function ProvisaoBasePage() {
           >
             <Plus className="h-4 w-4" /> Nova
           </Button>
+          <Select value={importMode} onValueChange={(v: any) => setImportMode(v)}>
+            <SelectTrigger className="h-9 w-[180px] text-xs">
+              <SelectValue placeholder="Modo de importação" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="incremental">Incremental (adicionar)</SelectItem>
+              <SelectItem value="replace">Substituir a base (apagar)</SelectItem>
+            </SelectContent>
+          </Select>
           <input
             ref={fileRef}
             type="file"

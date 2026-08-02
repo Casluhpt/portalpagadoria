@@ -313,7 +313,7 @@ type BaseProps = {
   ano: number;
   isLoading: boolean;
   onUpsert: (r: Partial<Aprovacao> & { ano: number }) => Promise<void>;
-  onBulkInsert: (rows: any[]) => Promise<{ inserted: number }>;
+  onBulkInsert: (data: { rows: any[]; replaceAll?: boolean }) => Promise<{ inserted: number }>;
   onDelete: (ids: string[]) => Promise<void>;
 };
 
@@ -321,6 +321,7 @@ const EMP_CODIGOS = EMPRESAS.map((e) => e.codigo);
 
 function BaseView({ rows, ano, isLoading, onUpsert, onBulkInsert, onDelete }: BaseProps) {
   const [busca, setBusca] = useState("");
+  const [importMode, setImportMode] = useState<"incremental" | "replace">("incremental");
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [confirmDel, setConfirmDel] = useState(false);
   const [novoQtd, setNovoQtd] = useState(1);
@@ -374,7 +375,7 @@ function BaseView({ rows, ano, isLoading, onUpsert, onBulkInsert, onDelete }: Ba
       empresa: r.empresa, tipo: r.tipo, ordem_pagamento: r.ordem_pagamento,
       valor: Number(r.valor), status: r.status, ano, ordem: maxOrdem + i + 1,
     }));
-    await onBulkInsert(payload);
+    await onBulkInsert({ rows: payload });
     if (cutIds.size) {
       await onDelete(Array.from(cutIds));
       setCutIds(new Set());
@@ -397,7 +398,7 @@ function BaseView({ rows, ano, isLoading, onUpsert, onBulkInsert, onDelete }: Ba
       empresa: null, tipo: "mensal" as const, ordem_pagamento: null,
       valor: 0, status: "Pendente" as const, ano, ordem: maxOrdem + i + 1,
     }));
-    await onBulkInsert(payload);
+    await onBulkInsert({ rows: payload });
     setNovoOpen(false);
     toast.success(`${qtd} linha(s) adicionada(s)`);
   };
@@ -442,7 +443,7 @@ function BaseView({ rows, ano, isLoading, onUpsert, onBulkInsert, onDelete }: Ba
         };
       }).filter((r) => r.empresa || r.ordem_pagamento || r.valor);
       if (!payload.length) return toast.error("Nenhuma linha válida encontrada");
-      const res = await onBulkInsert(payload);
+      const res = await onBulkInsert({ rows: payload, replaceAll: importMode === "replace" });
       toast.success(`${res.inserted} linha(s) importada(s)`);
     } catch (e: any) {
       toast.error("Falha ao importar: " + (e?.message ?? e));
