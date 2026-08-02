@@ -26,7 +26,7 @@ export const entrarFila = createServerFn({ method: "POST" })
       .eq('modulo', data.modulo);
 
     const status = count === 0 ? 'ativo' : 'aguardando';
-    const activo_desde = status === 'ativo' ? new Date().toISOString() : null;
+    const ativo_desde = status === 'ativo' ? new Date().toISOString() : null;
 
     const { data: inserted, error } = await supabase
       .from('concorrencia_fila')
