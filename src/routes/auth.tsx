@@ -228,13 +228,13 @@ function SignUpForm() {
       email,
       password,
       options: {
-        emailRedirectTo: `${window.location.origin}/`,
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
         data: { nome: trimmedNome, setor },
       },
     });
     setLoading(false);
     if (error) return toast.error(translateAuthError(error.message));
-    toast.success("Conta criada — você já pode entrar.");
+    toast.success("Conta criada — Verifique seu e-mail para confirmar o cadastro.");
   };
 
   return (

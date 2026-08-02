@@ -35,6 +35,7 @@ import { Route as AdministracaoRouteImport } from './routes/administracao'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProvisaoIndexRouteImport } from './routes/provisao.index'
 import { Route as ProvisaoBaseRouteImport } from './routes/provisao.base'
+import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 
 const UsuariosRoute = UsuariosRouteImport.update({
   id: '/usuarios',
@@ -166,6 +167,11 @@ const ProvisaoBaseRoute = ProvisaoBaseRouteImport.update({
   path: '/base',
   getParentRoute: () => ProvisaoRoute,
 } as any)
+const AuthCallbackRoute = AuthCallbackRouteImport.update({
+  id: '/callback',
+  path: '/callback',
+  getParentRoute: () => AuthRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -174,7 +180,7 @@ export interface FileRoutesByFullPath {
   '/anexos': typeof AnexosRoute
   '/aprovacao': typeof AprovacaoRoute
   '/auditoria': typeof AuditoriaRoute
-  '/auth': typeof AuthRoute
+  '/auth': typeof AuthRouteWithChildren
   '/base': typeof BaseRoute
   '/conciliacao': typeof ConciliacaoRoute
   '/configuracoes': typeof ConfiguracoesRoute
@@ -192,6 +198,7 @@ export interface FileRoutesByFullPath {
   '/registros-excluidos': typeof RegistrosExcluidosRoute
   '/reset-password': typeof ResetPasswordRoute
   '/usuarios': typeof UsuariosRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/provisao/base': typeof ProvisaoBaseRoute
   '/provisao/': typeof ProvisaoIndexRoute
 }
@@ -202,7 +209,7 @@ export interface FileRoutesByTo {
   '/anexos': typeof AnexosRoute
   '/aprovacao': typeof AprovacaoRoute
   '/auditoria': typeof AuditoriaRoute
-  '/auth': typeof AuthRoute
+  '/auth': typeof AuthRouteWithChildren
   '/base': typeof BaseRoute
   '/conciliacao': typeof ConciliacaoRoute
   '/configuracoes': typeof ConfiguracoesRoute
@@ -219,6 +226,7 @@ export interface FileRoutesByTo {
   '/registros-excluidos': typeof RegistrosExcluidosRoute
   '/reset-password': typeof ResetPasswordRoute
   '/usuarios': typeof UsuariosRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/provisao/base': typeof ProvisaoBaseRoute
   '/provisao': typeof ProvisaoIndexRoute
 }
@@ -230,7 +238,7 @@ export interface FileRoutesById {
   '/anexos': typeof AnexosRoute
   '/aprovacao': typeof AprovacaoRoute
   '/auditoria': typeof AuditoriaRoute
-  '/auth': typeof AuthRoute
+  '/auth': typeof AuthRouteWithChildren
   '/base': typeof BaseRoute
   '/conciliacao': typeof ConciliacaoRoute
   '/configuracoes': typeof ConfiguracoesRoute
@@ -248,6 +256,7 @@ export interface FileRoutesById {
   '/registros-excluidos': typeof RegistrosExcluidosRoute
   '/reset-password': typeof ResetPasswordRoute
   '/usuarios': typeof UsuariosRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/provisao/base': typeof ProvisaoBaseRoute
   '/provisao/': typeof ProvisaoIndexRoute
 }
@@ -278,6 +287,7 @@ export interface FileRouteTypes {
     | '/registros-excluidos'
     | '/reset-password'
     | '/usuarios'
+    | '/auth/callback'
     | '/provisao/base'
     | '/provisao/'
   fileRoutesByTo: FileRoutesByTo
@@ -305,6 +315,7 @@ export interface FileRouteTypes {
     | '/registros-excluidos'
     | '/reset-password'
     | '/usuarios'
+    | '/auth/callback'
     | '/provisao/base'
     | '/provisao'
   id:
@@ -333,6 +344,7 @@ export interface FileRouteTypes {
     | '/registros-excluidos'
     | '/reset-password'
     | '/usuarios'
+    | '/auth/callback'
     | '/provisao/base'
     | '/provisao/'
   fileRoutesById: FileRoutesById
@@ -344,7 +356,7 @@ export interface RootRouteChildren {
   AnexosRoute: typeof AnexosRoute
   AprovacaoRoute: typeof AprovacaoRoute
   AuditoriaRoute: typeof AuditoriaRoute
-  AuthRoute: typeof AuthRoute
+  AuthRoute: typeof AuthRouteWithChildren
   BaseRoute: typeof BaseRoute
   ConciliacaoRoute: typeof ConciliacaoRoute
   ConfiguracoesRoute: typeof ConfiguracoesRoute
@@ -548,8 +560,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProvisaoBaseRouteImport
       parentRoute: typeof ProvisaoRoute
     }
+    '/auth/callback': {
+      id: '/auth/callback'
+      path: '/callback'
+      fullPath: '/auth/callback'
+      preLoaderRoute: typeof AuthCallbackRouteImport
+      parentRoute: typeof AuthRoute
+    }
   }
 }
+
+interface AuthRouteChildren {
+  AuthCallbackRoute: typeof AuthCallbackRoute
+}
+
+const AuthRouteChildren: AuthRouteChildren = {
+  AuthCallbackRoute: AuthCallbackRoute,
+}
+
+const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
 interface ProvisaoRouteChildren {
   ProvisaoBaseRoute: typeof ProvisaoBaseRoute
@@ -572,7 +601,7 @@ const rootRouteChildren: RootRouteChildren = {
   AnexosRoute: AnexosRoute,
   AprovacaoRoute: AprovacaoRoute,
   AuditoriaRoute: AuditoriaRoute,
-  AuthRoute: AuthRoute,
+  AuthRoute: AuthRouteWithChildren,
   BaseRoute: BaseRoute,
   ConciliacaoRoute: ConciliacaoRoute,
   ConfiguracoesRoute: ConfiguracoesRoute,
@@ -594,13 +623,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
