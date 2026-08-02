@@ -85,7 +85,9 @@ const mainItems: MenuItem[] = [
   { title: "Central de Divergências", url: "/divergencias", icon: AlertTriangle, match: (p) => p.startsWith("/divergencias") },
   { title: "Despesas Fixas", url: "/despesas-fixas", icon: Wallet, match: (p) => p.startsWith("/despesas-fixas") },
   { title: "Exportação de Relatórios", url: "/exportacao", icon: Download, match: (p) => p.startsWith("/exportacao") },
+  { title: "Material de Apoio", url: "/material-apoio", icon: BookOpen, match: (p) => p.startsWith("/material-apoio") },
   { title: "Busca Inteligente (IA)", url: "#", icon: Search, match: () => false, action: "search" },
+
 ];
 
 const advancedItems: MenuItem[] = [
