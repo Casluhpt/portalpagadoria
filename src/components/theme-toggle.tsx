@@ -6,6 +6,9 @@ import {
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Label } from "@/components/ui/label";
 import {
@@ -26,26 +29,34 @@ export function ThemeMenuSection() {
   return (
     <>
       <DropdownMenuSeparator />
-      <DropdownMenuLabel className="flex items-center justify-between text-[10px] uppercase tracking-wide text-muted-foreground">
-        <span>Aparência</span>
-        <span className="normal-case tracking-normal">
-          {resolved === "noturno" ? "Noturno ativo" : "Claro ativo"}
-        </span>
-      </DropdownMenuLabel>
-      <DropdownMenuRadioGroup value={config.mode} onValueChange={(v) => setMode(v as never)}>
-        <DropdownMenuRadioItem value="claro" className="gap-2">
-          <Sun className="h-3.5 w-3.5" /> Modo claro
-        </DropdownMenuRadioItem>
-        <DropdownMenuRadioItem value="noturno" className="gap-2">
-          <Moon className="h-3.5 w-3.5" /> Modo noturno
-        </DropdownMenuRadioItem>
-        <DropdownMenuRadioItem value="sistema" className="gap-2">
-          <Laptop className="h-3.5 w-3.5" /> Do usuário (sistema)
-        </DropdownMenuRadioItem>
-        <DropdownMenuRadioItem value="automatico" className="gap-2">
-          <Clock3 className="h-3.5 w-3.5" /> Automático por horário
-        </DropdownMenuRadioItem>
-      </DropdownMenuRadioGroup>
+      <DropdownMenuSub>
+        <DropdownMenuSubTrigger className="flex items-center justify-between gap-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground">
+          <div className="flex items-center gap-2">
+            <span>Aparência</span>
+          </div>
+          <span className="normal-case tracking-normal">
+            {config.mode === "claro" ? "Modo claro" :
+             config.mode === "noturno" ? "Modo noturno" :
+             config.mode === "sistema" ? "Do usuário" : "Automático"}
+          </span>
+        </DropdownMenuSubTrigger>
+        <DropdownMenuSubContent className="w-56">
+          <DropdownMenuRadioGroup value={config.mode} onValueChange={(v) => setMode(v as never)}>
+            <DropdownMenuRadioItem value="claro" className="gap-2 text-xs">
+              <Sun className="h-3.5 w-3.5" /> Modo claro
+            </DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="noturno" className="gap-2 text-xs">
+              <Moon className="h-3.5 w-3.5" /> Modo noturno
+            </DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="sistema" className="gap-2 text-xs">
+              <Laptop className="h-3.5 w-3.5" /> Do usuário (sistema)
+            </DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="automatico" className="gap-2 text-xs">
+              <Clock3 className="h-3.5 w-3.5" /> Automático por horário
+            </DropdownMenuRadioItem>
+          </DropdownMenuRadioGroup>
+        </DropdownMenuSubContent>
+      </DropdownMenuSub>
 
       {config.mode === "automatico" && (
         <div
