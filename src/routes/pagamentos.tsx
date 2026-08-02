@@ -1,11 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import * as XLSX from "xlsx";
 import {
   Loader2, Plus, Search, Trash2, ArrowUpDown, ArrowUp, ArrowDown,
   Upload, Download, LayoutGrid, Table as TableIcon,
-  Scissors, Palette, X,
+  Scissors, Palette, X, Lock, Unlock, Users, Timer, LogOut
 } from "lucide-react";
 import {
   Dialog, DialogContent, DialogDescription, DialogFooter,
@@ -23,6 +24,7 @@ import {
 import { AppSidebar } from "@/components/app-sidebar";
 import { HeaderActions } from "@/components/header-actions";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { entrarFila, sairFila, getFilaStatus } from "@/lib/concorrencia.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -140,6 +142,38 @@ function PagamentosPage() {
 function LancamentosTab({ colaboradorNome, userId }: { colaboradorNome: string; userId: string | null }) {
   const qc = useQueryClient();
   const fileRef = useRef<HTMLInputElement>(null);
+  
+  // Fila de Concorrência
+  const { data: queue = [] } = useQuery({
+    queryKey: ['concorrencia-fila', 'pagamentos_diversos'],
+    queryFn: () => getFilaStatus({ data: { modulo: 'pagamentos_diversos' } }),
+    refetchInterval: 3000,
+  });
+
+  const entrarFilaFn = useServerFn(entrarFila);
+  const sairFilaFn = useServerFn(sairFila);
+
+  const currentUserQueue = queue.find(q => q.user_id === userId);
+  const activeUser = queue.find(q => q.status === 'ativo');
+  const isEditingEnabled = activeUser?.user_id === userId;
+  const nextUser = queue.filter(q => q.status === 'aguardando').sort((a, b) => new Date(a.entrou_em).getTime() - new Date(b.entrou_em).getTime())[0];
+
+  const entrarMut = useMutation({
+    mutationFn: () => entrarFilaFn({ data: { userId: userId!, userNome: colaboradorNome, modulo: 'pagamentos_diversos' } }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['concorrencia-fila'] });
+      toast.success("Você entrou na fila de acesso.");
+    }
+  });
+
+  const sairMut = useMutation({
+    mutationFn: () => sairFilaFn({ data: { userId: userId!, modulo: 'pagamentos_diversos' } }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['concorrencia-fila'] });
+      toast.info("Você saiu da fila/sessão de edição.");
+    }
+  });
+
   const { data = [], isLoading } = useQuery({
     queryKey: pagamentosQueryKey,
     queryFn: fetchPagamentos,
