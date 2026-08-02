@@ -1,5 +1,5 @@
 import React from 'react';
-import logoAsset from "@/assets/logo-pagadoria-clean.png.asset.json";
+import logoAsset from "@/assets/profarma-logo.png.asset.json";
 
 export function AppLogo({ className }: { className?: string }) {
   // We use the cleaned image asset which has a transparent background and high quality
