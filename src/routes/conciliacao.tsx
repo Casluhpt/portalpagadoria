@@ -1,93 +1,112 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { AppSidebar } from "@/components/app-sidebar";
+import { createFileRoute } from '@tanstack/react-router';
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { ShieldCheck, ArrowLeft, CheckCircle2, AlertTriangle, Percent, Clock, ShieldAlert } from "lucide-react";
-import { useRoles } from "@/hooks/use-roles";
+import { AppSidebar } from "@/components/app-sidebar";
+import { HeaderActions } from "@/components/header-actions";
+import profarmaLogo from "@/assets/profarma-logo.png.asset.json";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { LayoutDashboard, ShieldCheck, History, AlertTriangle } from "lucide-react";
 
-export const Route = createFileRoute("/conciliacao")({
-  component: ConciliacaoPage,
+export const Route = createFileRoute('/conciliacao')({
+  component: BankReconciliationPage
 });
 
-function ConciliacaoPage() {
-  const { isAdmin, loading } = useRoles();
-  const kpis = [
-    { label: "Total conciliado", value: "—", icon: CheckCircle2, tone: "text-emerald-600" },
-    { label: "Total pendente", value: "—", icon: Clock, tone: "text-amber-600" },
-    { label: "Divergências", value: "—", icon: AlertTriangle, tone: "text-rose-600" },
-    { label: "% de conciliação", value: "—", icon: Percent, tone: "text-violet-600" },
-  ];
+function BankReconciliationPage() {
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full bg-slate-50">
         <AppSidebar />
         <div className="flex flex-1 flex-col">
-          <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b bg-white/80 px-4 backdrop-blur">
+          <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-slate-200 bg-white/80 px-4 backdrop-blur">
             <SidebarTrigger />
-            <Button asChild variant="ghost" size="sm">
-              <Link to="/"><ArrowLeft className="mr-1 h-4 w-4" /> Portal</Link>
-            </Button>
-            <h1 className="ml-2 font-semibold text-slate-800">Conciliação Bancária</h1>
+            <img src={profarmaLogo.url} alt="Profarma" className="h-7" />
+            <div className="ml-2 flex flex-col leading-tight">
+              <span className="text-sm font-semibold text-slate-800">Conciliação Bancária</span>
+              <span className="text-[11px] text-slate-500">Validação multi-fonte</span>
+            </div>
+            <div className="ml-auto flex items-center gap-3">
+              <HeaderActions />
+            </div>
           </header>
-          {loading ? (
-            <div className="flex flex-1 items-center justify-center text-sm text-muted-foreground">
-              Carregando…
-            </div>
-          ) : !isAdmin ? (
-            <div className="flex flex-1 items-center justify-center p-6">
-              <div className="max-w-md rounded-lg border border-border bg-card p-8 text-center shadow-sm">
-                <ShieldAlert className="mx-auto h-10 w-10 text-amber-600" />
-                <h2 className="mt-3 text-lg font-semibold text-foreground">Acesso restrito</h2>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  A Conciliação Bancária é visível apenas para colaboradores com perfil{" "}
-                  <strong>Administrador</strong>.
-                </p>
-              </div>
-            </div>
-          ) : (
+
           <main className="flex-1 space-y-6 p-6">
-            <Card className="border-slate-200">
-              <CardContent className="flex items-center gap-4 p-6">
-                <div className="grid h-12 w-12 place-items-center rounded-xl bg-gradient-to-br from-purple-700 to-fuchsia-800 text-white shadow">
-                  <ShieldCheck className="h-6 w-6" />
-                </div>
-                <div>
-                  <h2 className="text-lg font-bold text-slate-900">Validação de pagamentos</h2>
-                  <p className="text-sm text-slate-600">
-                    Monitoramento de divergências entre pagamentos executados e retornos bancários.
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+            <Tabs defaultValue="dashboard" className="w-full">
+              <TabsList className="mb-4">
+                <TabsTrigger value="dashboard" className="gap-2">
+                  <LayoutDashboard className="h-4 w-4" /> Dashboard
+                </TabsTrigger>
+                <TabsTrigger value="conciliacao" className="gap-2">
+                  <ShieldCheck className="h-4 w-4" /> Conciliar
+                </TabsTrigger>
+                <TabsTrigger value="historico" className="gap-2">
+                  <History className="h-4 w-4" /> Histórico
+                </TabsTrigger>
+                <TabsTrigger value="pendencias" className="gap-2 text-red-600">
+                  <AlertTriangle className="h-4 w-4" /> Pendências
+                </TabsTrigger>
+              </TabsList>
 
-            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-              {kpis.map((k) => (
-                <Card key={k.label} className="border-slate-200">
-                  <CardContent className="flex items-center gap-3 p-5">
-                    <k.icon className={`h-8 w-8 ${k.tone}`} />
-                    <div>
-                      <p className="text-xs uppercase tracking-wider text-slate-500">{k.label}</p>
-                      <p className="text-2xl font-bold text-slate-900">{k.value}</p>
+              <TabsContent value="dashboard" className="space-y-4">
+                <div className="grid gap-4 md:grid-cols-3">
+                  <div className="rounded-xl border bg-white p-6 shadow-sm">
+                    <h3 className="text-sm font-medium text-slate-500">Status Geral</h3>
+                    <p className="mt-2 text-3xl font-bold text-slate-900">92.4%</p>
+                    <p className="text-xs text-emerald-600 mt-1">Conciliado (Junho/2026)</p>
+                  </div>
+                  <div className="rounded-xl border bg-white p-6 shadow-sm">
+                    <h3 className="text-sm font-medium text-slate-500">Divergências</h3>
+                    <p className="mt-2 text-3xl font-bold text-amber-600">12</p>
+                    <p className="text-xs text-slate-500 mt-1">Aguardando ajuste</p>
+                  </div>
+                  <div className="rounded-xl border bg-white p-6 shadow-sm">
+                    <h3 className="text-sm font-medium text-slate-500">Pendências Críticas</h3>
+                    <p className="mt-2 text-3xl font-bold text-red-600">2</p>
+                    <p className="text-xs text-slate-500 mt-1">Sem retorno bancário</p>
+                  </div>
+                </div>
+
+                <div className="rounded-xl border bg-white p-8 text-center">
+                  <p className="text-slate-500">Módulo de Conciliação em fase de implementação (v1.6.0).</p>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="conciliacao" className="space-y-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <div className="rounded-xl border bg-white p-6 shadow-sm space-y-4">
+                    <h3 className="font-bold text-slate-800 flex items-center gap-2">
+                      <div className="h-8 w-8 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-xs font-bold">1</div>
+                      Varejo (Itaú)
+                    </h3>
+                    <p className="text-xs text-slate-500">Importe o arquivo de retorno consolidado do Varejo para processamento.</p>
+                    <div className="border-2 border-dashed border-slate-200 rounded-lg p-10 text-center hover:border-blue-400 transition-colors cursor-pointer bg-slate-50/50">
+                      <p className="text-sm text-slate-600 font-medium">Clique ou arraste o arquivo do Varejo</p>
+                      <p className="text-[10px] text-slate-400 mt-1">Formatos suportados: .XLSX, .CSV, .TXT (Retorno)</p>
                     </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+                  </div>
 
-            <Card className="border-dashed border-slate-300">
-              <CardContent className="p-8 text-center">
-                <p className="text-sm text-slate-600">
-                  Base de Conciliação ainda não configurada. Importe o retorno bancário para iniciar
-                  a validação automática.
-                </p>
-                <Button className="mt-4 bg-gradient-to-r from-purple-700 to-fuchsia-800 text-white">
-                  Configurar base
-                </Button>
-              </CardContent>
-            </Card>
+                  <div className="rounded-xl border bg-white p-6 shadow-sm space-y-4">
+                    <h3 className="font-bold text-slate-800 flex items-center gap-2">
+                      <div className="h-8 w-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs font-bold">2</div>
+                      Distribuição (Itaú)
+                    </h3>
+                    <p className="text-xs text-slate-500">Importe o arquivo de retorno da Distribuição para conciliação.</p>
+                    <div className="border-2 border-dashed border-slate-200 rounded-lg p-10 text-center hover:border-indigo-400 transition-colors cursor-pointer bg-slate-50/50">
+                      <p className="text-sm text-slate-600 font-medium">Clique ou arraste o arquivo da Distribuição</p>
+                      <p className="text-[10px] text-slate-400 mt-1">Formatos suportados: .XLSX, .CSV, .TXT (Retorno)</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="rounded-xl border bg-white p-6 shadow-sm space-y-4">
+                  <h3 className="font-bold text-slate-800 flex items-center gap-2">
+                    <ShieldCheck className="h-5 w-5 text-emerald-600" /> Comparativo Bankmanager
+                  </h3>
+                  <div className="h-48 flex items-center justify-center text-slate-400 border border-dashed rounded-lg bg-slate-50/50">
+                    Aguardando arquivos para processar o cruzamento multi-fonte
+                  </div>
+                </div>
+              </TabsContent>
+            </Tabs>
           </main>
-          )}
         </div>
       </div>
     </SidebarProvider>

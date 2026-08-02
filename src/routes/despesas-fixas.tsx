@@ -3,9 +3,11 @@ import { useMemo, useState } from "react";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 import {
   Loader2, Plus, Trash2, Wallet, Filter, LayoutDashboard, Table2,
-  Building2, CalendarClock, CheckCircle2, Clock, TrendingUp,
+  Building2, CalendarClock, CheckCircle2, Clock, TrendingUp, Search
 } from "lucide-react";
 
 import { AppSidebar } from "@/components/app-sidebar";
@@ -64,8 +66,13 @@ type LinhaAgrupada = {
     conta: string | null;
     centro_custo: string | null;
     numero_pedido: string | null;
+    sap_code: string | null;
+    valor_previsto_anual: number | null;
+    saldo_inicial_pedido: number | null;
     nome_real: string | null;
     notas: string | null;
+    suspensa: boolean;
+    motivo_suspensao: string | null;
   };
 };
 
@@ -73,6 +80,7 @@ function DespesasFixasPage() {
   const [ano, setAno] = useState<number>(2026);
   const [tab, setTab] = useState<"dashboard" | GrupoDespesa>("dashboard");
   const [busca, setBusca] = useState("");
+  const [showSuspended, setShowSuspended] = useState(false);
   const [novaLinha, setNovaLinha] = useState<{ categoria: CategoriaDespesa; descricao: string } | null>(null);
   const [confirmDel, setConfirmDel] = useState<LinhaAgrupada | null>(null);
   const [editandoRegistro, setEditandoRegistro] = useState<{
@@ -123,8 +131,13 @@ function DespesasFixasPage() {
             conta: r.conta,
             centro_custo: r.centro_custo,
             numero_pedido: r.numero_pedido,
+            sap_code: (r as any).sap_code ?? null,
+            valor_previsto_anual: (r as any).valor_previsto_anual ?? null,
+            saldo_inicial_pedido: (r as any).saldo_inicial_pedido ?? null,
             nome_real: (r as any).nome_real ?? null,
             notas: (r as any).notas ?? null,
+            suspensa: !!(r as any).suspensa,
+            motivo_suspensao: (r as any).motivo_suspensao ?? null,
           },
         };
         map.set(key, l);
@@ -133,8 +146,8 @@ function DespesasFixasPage() {
       const v = Number(r.valor) || 0;
       l.totalPrevisto += v;
       if (r.lancado) l.totalLancado += v;
-      (["empresa_codigo","empresa_nome","conta","centro_custo","numero_pedido","nome_real","notas"] as const).forEach((k) => {
-        if (!l!.meta[k] && (r as any)[k]) l!.meta[k] = (r as any)[k];
+      (["empresa_codigo","empresa_nome","conta","centro_custo","numero_pedido","sap_code","valor_previsto_anual","saldo_inicial_pedido","nome_real","notas","suspensa","motivo_suspensao"] as const).forEach((k) => {
+        if (!l!.meta[k as keyof typeof l.meta] && (r as any)[k]) (l!.meta as any)[k] = (r as any)[k];
       });
     });
     return Array.from(map.values()).sort(
@@ -144,11 +157,14 @@ function DespesasFixasPage() {
 
   const linhasFiltradas = useMemo(() => {
     const q = busca.trim().toLowerCase();
-    if (!q) return linhas;
-    return linhas.filter((l) =>
+    const lins = showSuspended ? linhas : linhas.filter(l => !l.meta.suspensa);
+    if (!q) return lins;
+    return lins.filter((l) =>
       l.descricao.toLowerCase().includes(q) ||
       (l.meta.empresa_nome ?? "").toLowerCase().includes(q) ||
-      (l.meta.empresa_codigo ?? "").includes(q),
+      (l.meta.empresa_codigo ?? "").includes(q) ||
+      (l.meta.numero_pedido ?? "").includes(q) ||
+      (l.meta.sap_code ?? "").includes(q)
     );
   }, [linhas, busca]);
 
@@ -249,8 +265,15 @@ function DespesasFixasPage() {
                 placeholder="Buscar por descrição, empresa ou código…"
                 value={busca} onChange={(e) => setBusca(e.target.value)} className="w-80"
               />
+              <div className="flex items-center gap-2 rounded-md border px-3 text-xs bg-white h-10">
+                <Checkbox id="suspended" checked={showSuspended} onCheckedChange={(v) => setShowSuspended(!!v)} />
+                <Label htmlFor="suspended" className="cursor-pointer">Ver suspensos</Label>
+              </div>
+              <Button variant="outline" size="sm" className="gap-2">
+                <Search className="h-4 w-4" /> Busca Centralizada
+              </Button>
               {tab !== "dashboard" && (
-                <Button size="sm" className="ml-auto"
+                <Button size="sm" className="ml-auto bg-indigo-600 hover:bg-indigo-700"
                   onClick={() => setNovaLinha({
                     categoria: tab === "PJ" ? "PJ" : tab === "Fornecedores" ? "Fornecedores" : "Pensão",
                     descricao: "",
@@ -487,6 +510,28 @@ function GrupoTabela({
   onOpenDescricao: (l: LinhaAgrupada) => void;
   onExcluir: (l: LinhaAgrupada) => void;
 }) {
+  const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
+
+  const toggleSelect = (key: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const newSelected = new Set(selectedKeys);
+    if (e.ctrlKey || e.metaKey) {
+      if (newSelected.has(key)) newSelected.delete(key); else newSelected.add(key);
+    } else {
+      newSelected.clear();
+      newSelected.add(key);
+    }
+    setSelectedKeys(newSelected);
+  };
+
+  const allSelected = linhas.length > 0 && selectedKeys.size === linhas.length;
+  const someSelected = selectedKeys.size > 0 && selectedKeys.size < linhas.length;
+
+  const toggleAll = () => {
+    if (allSelected) setSelectedKeys(new Set());
+    else setSelectedKeys(new Set(linhas.map(l => l.key)));
+  };
+
   if (linhas.length === 0) {
     return (
       <div className="rounded-md border border-dashed border-border p-12 text-center text-sm text-muted-foreground">
@@ -499,18 +544,32 @@ function GrupoTabela({
       <table className="w-full min-w-[1200px] border-collapse text-sm">
         <thead className="sticky top-0 bg-slate-50">
           <tr>
+            <th className="w-8 border-b border-border px-2 py-2">
+              <Checkbox checked={allSelected ? true : someSelected ? "indeterminate" : false} onCheckedChange={toggleAll} />
+            </th>
             <th className="border-b border-border px-3 py-2 text-left font-semibold">Descrição / Empresa</th>
             {MESES.map((m) => (
               <th key={m} className="border-b border-border px-2 py-2 text-right font-semibold">{m}</th>
             ))}
-            <th className="border-b border-border px-3 py-2 text-right font-semibold">Previsto</th>
-            <th className="border-b border-border px-3 py-2 text-right font-semibold">Lançado</th>
+            <th className="border-b border-border px-3 py-2 text-right font-semibold">Orçado/Saldo</th>
+            <th className="border-b border-border px-3 py-2 text-right font-semibold">Previsto/Realizado</th>
             <th className="border-b border-border px-2 py-2" />
           </tr>
         </thead>
         <tbody>
           {linhas.map((l) => (
-            <tr key={l.key} className="hover:bg-slate-50/60">
+            <tr 
+              key={l.key} 
+              className={cn(
+                "hover:bg-slate-50/60 cursor-pointer", 
+                l.meta.suspensa && "opacity-50 grayscale bg-slate-100/50",
+                selectedKeys.has(l.key) && "bg-blue-50"
+              )}
+              onClick={(e) => toggleSelect(l.key, e)}
+            >
+              <td className="border-b border-border px-2 py-1">
+                <Checkbox checked={selectedKeys.has(l.key)} onCheckedChange={() => {}} onClick={(e) => e.stopPropagation()} />
+              </td>
               <td className="border-b border-border px-3 py-2">
                 <button
                   className="group flex flex-col items-start text-left"
@@ -525,6 +584,11 @@ function GrupoTabela({
                     {l.meta.numero_pedido ? (
                       <span className="ml-2 rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-semibold text-slate-600">
                         Pedido {l.meta.numero_pedido}
+                      </span>
+                    ) : null}
+                    {l.meta.sap_code ? (
+                      <span className="ml-2 rounded bg-indigo-100 px-1.5 py-0.5 text-[10px] font-semibold text-indigo-700">
+                        SAP {l.meta.sap_code}
                       </span>
                     ) : null}
                   </span>
@@ -542,11 +606,17 @@ function GrupoTabela({
                   <CelulaMes registro={r} onClick={() => onOpenCelula(l, i + 1)} />
                 </td>
               ))}
-              <td className="border-b border-border px-3 py-2 text-right font-semibold text-slate-700 tabular-nums">
-                {brl(l.totalPrevisto)}
+              <td className="border-b border-border px-3 py-2 text-right tabular-nums">
+                <div className="flex flex-col items-end">
+                  <span className="font-semibold text-slate-700">{brl(l.meta.valor_previsto_anual || 0)}</span>
+                  <span className="text-[10px] text-muted-foreground">Saldo {brl((l.meta.valor_previsto_anual || 0) - l.totalLancado)}</span>
+                </div>
               </td>
-              <td className="border-b border-border px-3 py-2 text-right font-semibold text-emerald-700 tabular-nums">
-                {brl(l.totalLancado)}
+              <td className="border-b border-border px-3 py-2 text-right tabular-nums">
+                <div className="flex flex-col items-end">
+                  <span className="font-semibold text-slate-700">{brl(l.totalPrevisto)}</span>
+                  <span className="text-[10px] text-emerald-700 font-medium">{brl(l.totalLancado)}</span>
+                </div>
               </td>
               <td className="border-b border-border px-2 py-1 text-right">
                 <Button size="icon" variant="ghost" onClick={() => onExcluir(l)} aria-label="Excluir linha">
@@ -594,11 +664,13 @@ function RegistroDialog({
   const [valor, setValor] = useState<string>(
     existente?.valor ? String(existente.valor).replace(".", ",") : "",
   );
-  const [tipo, setTipo] = useState<"mensal" | "adiantamento">((existente?.tipo as any) ?? "mensal");
+  const [tipo, setTipo] = useState<"mensal" | "adiantamento" | "antecipação" | "ppr">((existente?.tipo as any) ?? "mensal");
   const [numeroPedido, setNumeroPedido] = useState(existente?.numero_pedido ?? linha.meta.numero_pedido ?? "");
   const [numeroNf, setNumeroNf] = useState(existente?.numero_nf ?? "");
-  const [dataLanc, setDataLanc] = useState(existente?.data_lancamento ?? "");
+  const [dataLanc, setDataLanc] = useState(existente?.data_lancamento ?? format(new Date(), "yyyy-MM-dd"));
   const [dataVenc, setDataVenc] = useState(existente?.data_vencimento ?? "");
+  const [dataEmissao, setDataEmissao] = useState((existente as any)?.data_emissao ?? "");
+  const [competencia, setCompetencia] = useState((existente as any)?.competencia ?? (mes > 1 ? MESES[mes - 2] : MESES[11]));
   const [lancado, setLancado] = useState(!!existente?.lancado);
   const [saving, setSaving] = useState(false);
 
@@ -615,6 +687,8 @@ function RegistroDialog({
         numero_nf: numeroNf || null,
         data_lancamento: dataLanc || null,
         data_vencimento: dataVenc || null,
+        data_emissao: dataEmissao || null,
+        competencia: competencia || null,
         lancado,
       });
     } finally { setSaving(false); }
@@ -641,6 +715,8 @@ function RegistroDialog({
               <SelectContent>
                 <SelectItem value="mensal">Mensal</SelectItem>
                 <SelectItem value="adiantamento">Adiantamento</SelectItem>
+                <SelectItem value="antecipação">Antecipação</SelectItem>
+                <SelectItem value="ppr">PPR</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -655,6 +731,19 @@ function RegistroDialog({
           <div>
             <Label>Nº da NF fiscal</Label>
             <Input value={numeroNf} onChange={(e) => setNumeroNf(e.target.value)} placeholder="ex.: 000123" />
+          </div>
+          <div>
+            <Label><CalendarClock className="mr-1 inline h-3 w-3" /> Data Emissão NF</Label>
+            <Input type="date" value={dataEmissao} onChange={(e) => setDataEmissao(e.target.value)} />
+          </div>
+          <div>
+            <Label>Competência</Label>
+            <Select value={competencia} onValueChange={setCompetencia}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                {MESES.map(m => <SelectItem key={m} value={m}>{m}</SelectItem>)}
+              </SelectContent>
+            </Select>
           </div>
           <div>
             <Label><CalendarClock className="mr-1 inline h-3 w-3" /> Data de lançamento</Label>
@@ -701,6 +790,8 @@ function DescricaoDialog({
   const [sapCode, setSapCode] = useState(linha.meta.sap_code ?? "");
   const [valorPrevistoAnual, setValorPrevistoAnual] = useState(linha.meta.valor_previsto_anual ?? 0);
   const [saldoInicialPedido, setSaldoInicialPedido] = useState(linha.meta.saldo_inicial_pedido ?? 0);
+  const [suspensa, setSuspensa] = useState(linha.meta.suspensa);
+  const [motivoSuspensao, setMotivoSuspensao] = useState(linha.meta.motivo_suspensao ?? "");
   const [notas, setNotas] = useState(linha.meta.notas ?? "");
   const [saving, setSaving] = useState(false);
 
@@ -720,6 +811,8 @@ function DescricaoDialog({
         valor_previsto_anual: valorPrevistoAnual || null,
         saldo_inicial_pedido: saldoInicialPedido || null,
         nome_real: nomeReal || null,
+        suspensa,
+        motivo_suspensao: suspensa ? motivoSuspensao || null : null,
         notas: notas || null,
       });
     } finally { setSaving(false); }
@@ -788,10 +881,22 @@ function DescricaoDialog({
             <textarea
               value={notas}
               onChange={(e) => setNotas(e.target.value)}
-              rows={4}
+              rows={3}
               placeholder="Anotações livres sobre este PJ / fornecedor / lançamento…"
               className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             />
+          </div>
+          <div className="col-span-3 space-y-3 rounded-md border border-red-100 bg-red-50/50 p-3">
+            <div className="flex items-center gap-2">
+              <Checkbox id="suspensa-meta" checked={suspensa} onCheckedChange={(v) => setSuspensa(!!v)} />
+              <Label htmlFor="suspensa-meta" className="cursor-pointer font-semibold text-red-800">Suspender registro</Label>
+            </div>
+            {suspensa && (
+              <div className="space-y-1">
+                <Label className="text-xs text-red-700">Motivo da suspensão (Obrigatório)</Label>
+                <Input value={motivoSuspensao} onChange={(e) => setMotivoSuspensao(e.target.value)} placeholder="Descreva o motivo..." className="border-red-200" />
+              </div>
+            )}
           </div>
         </div>
         <DialogFooter>
