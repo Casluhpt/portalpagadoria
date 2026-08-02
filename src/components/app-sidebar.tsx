@@ -96,21 +96,21 @@ const navigationGroups = [
 const mainItems: MenuItem[] = [
   { title: "Início", url: "/", icon: Home, match: (p) => p === "/", group: "geral" },
   
-  { title: "Resultados Principais", url: "/principal", icon: LayoutDashboard, match: (p) => p === "/principal", restricted: true, adminOnly: true, group: "operacao" },
-  { title: "Base de Resultados", url: "/base", icon: Database, match: (p) => p === "/base", restricted: true, adminOnly: true, group: "operacao" },
-  { title: "Provisão Diária", url: "/provisao", icon: Wallet, match: (p) => p === "/provisao", restricted: true, adminOnly: true, group: "operacao" },
+  { title: "Resultados Principais", url: "/principal", icon: LayoutDashboard, match: (p: string) => p === "/principal", restricted: true, adminOnly: true, group: "operacao" },
+  { title: "Base de Resultados", url: "/base", icon: Database, match: (p: string) => p === "/base", restricted: true, adminOnly: true, group: "operacao" },
+  { title: "Provisão Diária", url: "/provisao", icon: Wallet, match: (p: string) => p === "/provisao", restricted: true, adminOnly: true, group: "operacao" },
   
-  { title: "Conciliação Bancária", url: "/conciliacao", icon: ShieldCheck, match: (p) => p.startsWith("/conciliacao"), restricted: true, adminOnly: true, group: "financeiro" },
-  { title: "Pagamentos Diversos", url: "/pagamentos", icon: Banknote, match: (p) => p.startsWith("/pagamentos"), group: "financeiro" },
-  { title: "Despesas Fixas", url: "/despesas-fixas", icon: Wallet, match: (p) => p.startsWith("/despesas-fixas"), group: "financeiro" },
-  { title: "Controle E-Social", url: "/esocial", icon: FileSpreadsheet, match: (p) => p.startsWith("/esocial"), group: "financeiro" },
+  { title: "Conciliação Bancária", url: "/conciliacao", icon: ShieldCheck, match: (p: string) => p.startsWith("/conciliacao"), restricted: true, adminOnly: true, group: "financeiro" },
+  { title: "Pagamentos Diversos", url: "/pagamentos", icon: Banknote, match: (p: string) => p.startsWith("/pagamentos"), group: "financeiro" },
+  { title: "Despesas Fixas", url: "/despesas-fixas", icon: Wallet, match: (p: string) => p.startsWith("/despesas-fixas"), group: "financeiro" },
+  { title: "Controle E-Social", url: "/esocial", icon: FileSpreadsheet, match: (p: string) => p.startsWith("/esocial"), group: "financeiro" },
 
-  { title: "[anexo]", url: "/anexos", icon: FileArchive, match: (p) => p.startsWith("/anexos"), group: "base_anexos" },
-  { title: "Exportação de Relatórios", url: "/exportacao", icon: Download, match: (p) => p.startsWith("/exportacao"), group: "base_anexos" },
+  { title: "[anexo]", url: "/anexos", icon: FileArchive, match: (p: string) => p.startsWith("/anexos"), group: "base_anexos" },
+  { title: "Exportação de Relatórios", url: "/exportacao", icon: Download, match: (p: string) => p.startsWith("/exportacao"), group: "base_anexos" },
 
-  { title: "Administração de Comunicados", url: "/administracao", icon: Settings, match: (p) => p.startsWith("/administracao"), adminOnly: true, group: "geral" },
-  { title: "Fechamento de Competência", url: "/fechamento", icon: FileCheck2, match: (p) => p.startsWith("/fechamento"), group: "geral" },
-  { title: "Central de Divergências", url: "/divergencias", icon: AlertTriangle, match: (p) => p.startsWith("/divergencias"), group: "geral" },
+  { title: "Administração de Comunicados", url: "/administracao", icon: Settings, match: (p: string) => p.startsWith("/administracao"), adminOnly: true, group: "geral" },
+  { title: "Fechamento de Competência", url: "/fechamento", icon: FileCheck2, match: (p: string) => p.startsWith("/fechamento"), group: "geral" },
+  { title: "Central de Divergências", url: "/divergencias", icon: AlertTriangle, match: (p: string) => p.startsWith("/divergencias"), group: "geral" },
 
   { title: "Material de Apoio", url: "/material-apoio", icon: BookOpen, match: (p) => p.startsWith("/material-apoio"), group: "apoio" },
   { title: "Busca Inteligente (IA)", url: "#", icon: Search, match: () => false, action: "search", group: "apoio" },
