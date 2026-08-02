@@ -119,7 +119,7 @@ function RootShell({ children }: { children: ReactNode }) {
       </head>
       <body className="group/body">
         <div className="sr-only" aria-hidden="true">
-          Portal Corporativo Pagadoria - Sistema de Gestão Financeira e Operacional
+          boa noite
         </div>
         {children}
         <Scripts />
