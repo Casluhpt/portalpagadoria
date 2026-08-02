@@ -202,3 +202,56 @@ export const updateDescricaoMeta = createServerFn({ method: "POST" })
     if (error) throw error;
     return { ok: true };
   });
+
+export const getPedidoOrcamentoStatus = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => z.object({ numero_pedido: z.string() }).parse(d))
+  .handler(async ({ context, data }) => {
+    // 1. Get initial budget
+    const { data: pedido } = await context.supabase
+      .from("pedidos_orcamento")
+      .select("*")
+      .eq("numero_pedido", data.numero_pedido)
+      .single();
+
+    // 2. Sum all expenses for this order
+    const { data: expenses } = await context.supabase
+      .from("despesas_fixas")
+      .select("valor, lancado")
+      .eq("numero_pedido", data.numero_pedido);
+
+    const totalPrevisto = (expenses ?? []).reduce((acc, curr) => acc + (Number(curr.valor) || 0), 0);
+    const totalRealizado = (expenses ?? []).filter(e => e.lancado).reduce((acc, curr) => acc + (Number(curr.valor) || 0), 0);
+    const saldoInicial = Number(pedido?.saldo_inicial) || 0;
+
+    return {
+      numero_pedido: data.numero_pedido,
+      saldo_inicial: saldoInicial,
+      total_previsto: totalPrevisto,
+      total_realizado: totalRealizado,
+      saldo_remanescente: saldoInicial - totalRealizado,
+      excedido: totalRealizado > saldoInicial
+    };
+  });
+
+export const updatePedidoOrcamento = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => z.object({
+    numero_pedido: z.string(),
+    saldo_inicial: z.number().optional(),
+    descricao: z.string().optional(),
+  }).parse(d))
+  .handler(async ({ context, data }) => {
+    const { error } = await context.supabase
+      .from("pedidos_orcamento")
+      .upsert({
+        numero_pedido: data.numero_pedido,
+        saldo_inicial: data.saldo_inicial,
+        descricao: data.descricao,
+        updated_at: new Date().toISOString()
+      }, { onConflict: 'numero_pedido' });
+
+    if (error) throw error;
+    return { ok: true };
+  });
+

@@ -187,6 +187,36 @@ export type Database = {
         }
         Relationships: []
       }
+      concorrencia_fila: {
+        Row: {
+          ativo_desde: string | null
+          entrou_em: string | null
+          id: string
+          modulo: string
+          status: string | null
+          user_id: string | null
+          user_nome: string | null
+        }
+        Insert: {
+          ativo_desde?: string | null
+          entrou_em?: string | null
+          id?: string
+          modulo: string
+          status?: string | null
+          user_id?: string | null
+          user_nome?: string | null
+        }
+        Update: {
+          ativo_desde?: string | null
+          entrou_em?: string | null
+          id?: string
+          modulo?: string
+          status?: string | null
+          user_id?: string | null
+          user_nome?: string | null
+        }
+        Relationships: []
+      }
       despesas_fixas: {
         Row: {
           ano: number
@@ -196,6 +226,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           created_by_nome: string | null
+          data_emissao: string | null
           data_lancamento: string | null
           data_vencimento: string | null
           descricao: string
@@ -204,15 +235,19 @@ export type Database = {
           id: string
           lancado: boolean
           mes: number
+          motivo_suspensao: string | null
           nome_real: string | null
           notas: string | null
           numero_nf: string | null
           numero_pedido: string | null
           observacao: string | null
           ordem: number
+          suspensa: boolean | null
           tipo: string
+          tipo_pj: string | null
           updated_at: string
           valor: number
+          valor_realizado: number | null
         }
         Insert: {
           ano?: number
@@ -222,6 +257,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           created_by_nome?: string | null
+          data_emissao?: string | null
           data_lancamento?: string | null
           data_vencimento?: string | null
           descricao: string
@@ -230,15 +266,19 @@ export type Database = {
           id?: string
           lancado?: boolean
           mes: number
+          motivo_suspensao?: string | null
           nome_real?: string | null
           notas?: string | null
           numero_nf?: string | null
           numero_pedido?: string | null
           observacao?: string | null
           ordem?: number
+          suspensa?: boolean | null
           tipo?: string
+          tipo_pj?: string | null
           updated_at?: string
           valor?: number
+          valor_realizado?: number | null
         }
         Update: {
           ano?: number
@@ -248,6 +288,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           created_by_nome?: string | null
+          data_emissao?: string | null
           data_lancamento?: string | null
           data_vencimento?: string | null
           descricao?: string
@@ -256,15 +297,19 @@ export type Database = {
           id?: string
           lancado?: boolean
           mes?: number
+          motivo_suspensao?: string | null
           nome_real?: string | null
           notas?: string | null
           numero_nf?: string | null
           numero_pedido?: string | null
           observacao?: string | null
           ordem?: number
+          suspensa?: boolean | null
           tipo?: string
+          tipo_pj?: string | null
           updated_at?: string
           valor?: number
+          valor_realizado?: number | null
         }
         Relationships: []
       }
@@ -526,6 +571,42 @@ export type Database = {
         }
         Relationships: []
       }
+      pedidos_orcamento: {
+        Row: {
+          centro_custo: string | null
+          conta: string | null
+          created_at: string | null
+          descricao: string | null
+          empresa_codigo: string | null
+          id: string
+          numero_pedido: string
+          saldo_inicial: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          centro_custo?: string | null
+          conta?: string | null
+          created_at?: string | null
+          descricao?: string | null
+          empresa_codigo?: string | null
+          id?: string
+          numero_pedido: string
+          saldo_inicial?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          centro_custo?: string | null
+          conta?: string | null
+          created_at?: string | null
+          descricao?: string | null
+          empresa_codigo?: string | null
+          id?: string
+          numero_pedido?: string
+          saldo_inicial?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           atualizado_em: string
@@ -734,6 +815,39 @@ export type Database = {
           solicitante_nome?: string
           status?: Database["public"]["Enums"]["solicitacao_status"]
           tipo?: Database["public"]["Enums"]["solicitacao_tipo"]
+        }
+        Relationships: []
+      }
+      suporte_tecnico: {
+        Row: {
+          anexo_url: string | null
+          assunto: string
+          comentario: string | null
+          created_at: string | null
+          id: string
+          user_email: string | null
+          user_id: string | null
+          user_nome: string | null
+        }
+        Insert: {
+          anexo_url?: string | null
+          assunto: string
+          comentario?: string | null
+          created_at?: string | null
+          id?: string
+          user_email?: string | null
+          user_id?: string | null
+          user_nome?: string | null
+        }
+        Update: {
+          anexo_url?: string | null
+          assunto?: string
+          comentario?: string | null
+          created_at?: string | null
+          id?: string
+          user_email?: string | null
+          user_id?: string | null
+          user_nome?: string | null
         }
         Relationships: []
       }

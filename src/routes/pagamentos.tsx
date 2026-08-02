@@ -1,11 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import * as XLSX from "xlsx";
 import {
   Loader2, Plus, Search, Trash2, ArrowUpDown, ArrowUp, ArrowDown,
   Upload, Download, LayoutGrid, Table as TableIcon,
-  Scissors, Palette, X,
+  Scissors, Palette, X, Lock, Unlock, Users, Timer, LogOut
 } from "lucide-react";
 import {
   Dialog, DialogContent, DialogDescription, DialogFooter,
@@ -23,6 +24,7 @@ import {
 import { AppSidebar } from "@/components/app-sidebar";
 import { HeaderActions } from "@/components/header-actions";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { entrarFila, sairFila, getFilaStatus } from "@/lib/concorrencia.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -140,6 +142,42 @@ function PagamentosPage() {
 function LancamentosTab({ colaboradorNome, userId }: { colaboradorNome: string; userId: string | null }) {
   const qc = useQueryClient();
   const fileRef = useRef<HTMLInputElement>(null);
+  
+  // Fila de Concorrência
+  const { data: queue = [] } = useQuery({
+    queryKey: ['concorrencia-fila', 'pagamentos_diversos'],
+    queryFn: () => getFilaStatus({ data: { modulo: 'pagamentos_diversos' } }),
+    refetchInterval: 3000,
+  });
+
+  const entrarFilaFn = useServerFn(entrarFila);
+  const sairFilaFn = useServerFn(sairFila);
+
+  const currentUserQueue = userId ? queue.find(q => q.user_id === userId) : undefined;
+  const activeUser = queue.find(q => q.status === 'ativo');
+  const isEditingEnabled = !!userId && activeUser?.user_id === userId;
+  const nextUser = queue.filter(q => q.status === 'aguardando').sort((a, b) => {
+    const da = a.entrou_em ? new Date(a.entrou_em).getTime() : 0;
+    const db = b.entrou_em ? new Date(b.entrou_em).getTime() : 0;
+    return da - db;
+  })[0];
+
+  const entrarMut = useMutation({
+    mutationFn: () => entrarFilaFn({ data: { userId: userId as string, userNome: colaboradorNome, modulo: 'pagamentos_diversos' } }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['concorrencia-fila'] });
+      toast.success("Você entrou na fila de acesso.");
+    }
+  });
+
+  const sairMut = useMutation({
+    mutationFn: () => sairFilaFn({ data: { userId: userId as string, modulo: 'pagamentos_diversos' } }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['concorrencia-fila'] });
+      toast.info("Você saiu da fila/sessão de edição.");
+    }
+  });
+
   const { data = [], isLoading } = useQuery({
     queryKey: pagamentosQueryKey,
     queryFn: fetchPagamentos,
@@ -497,7 +535,7 @@ function LancamentosTab({ colaboradorNome, userId }: { colaboradorNome: string; 
               e.target.value = "";
             }}
           />
-          <Button size="sm" variant="outline" className="gap-1" onClick={() => fileRef.current?.click()} disabled={importMut.isPending}>
+          <Button size="sm" variant="outline" className="gap-1" onClick={() => fileRef.current?.click()} disabled={importMut.isPending || !isEditingEnabled}>
             {importMut.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
             Importar Excel
           </Button>
@@ -505,11 +543,11 @@ function LancamentosTab({ colaboradorNome, userId }: { colaboradorNome: string; 
             <Download className="h-4 w-4" />
             Exportar Excel
           </Button>
-          <FechamentoCompetenciaButton onComplete={invalidate} />
+          <FechamentoCompetenciaButton onComplete={invalidate} disabled={!isEditingEnabled} />
           <Button
             size="sm"
             className="gap-1"
-            disabled={createMut.isPending}
+            disabled={createMut.isPending || !isEditingEnabled}
             onClick={() => createMut.mutate(1)}
           >
             {createMut.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
@@ -523,7 +561,7 @@ function LancamentosTab({ colaboradorNome, userId }: { colaboradorNome: string; 
           <span className="text-xs font-medium text-foreground">
             {selected.size} selecionada(s)
           </span>
-          <Button size="sm" variant="outline" className="gap-1" onClick={cutSelected} disabled={bulkDeleteMut.isPending}>
+          <Button size="sm" variant="outline" className="gap-1" onClick={cutSelected} disabled={bulkDeleteMut.isPending || !isEditingEnabled}>
             <Scissors className="h-4 w-4" /> Recortar
           </Button>
           <DropdownMenu>
@@ -549,7 +587,7 @@ function LancamentosTab({ colaboradorNome, userId }: { colaboradorNome: string; 
             variant="destructive"
             className="gap-1"
             onClick={() => setBulkPendingDelete(true)}
-            disabled={bulkDeleteMut.isPending}
+            disabled={bulkDeleteMut.isPending || !isEditingEnabled}
           >
             {bulkDeleteMut.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
             Excluir
@@ -702,12 +740,13 @@ function LancamentosTab({ colaboradorNome, userId }: { colaboradorNome: string; 
 }
 
 const EditableCell = React.memo(function EditableCell({
-  rowId, row, col, onSave,
+  rowId, row, col, onSave, disabled,
 }: {
   rowId: string;
   row: Pagamento;
   col: typeof PAGAMENTO_CAMPOS[number];
   onSave: (id: string, patch: PagamentoInput) => void;
+  disabled?: boolean;
 }) {
   const raw = row[col.key];
   const editable = col.editable !== false && !col.computed;
@@ -723,6 +762,7 @@ const EditableCell = React.memo(function EditableCell({
   const [value, setValue] = useState("");
 
   const startEdit = () => {
+    if (disabled) return;
     setValue(raw == null ? "" : String(raw));
     setEditing(true);
   };
@@ -1139,7 +1179,7 @@ function FilterSelect({
   );
 }
 
-function FechamentoCompetenciaButton({ onComplete }: { onComplete: () => void }) {
+function FechamentoCompetenciaButton({ onComplete, disabled }: { onComplete: () => void; disabled?: boolean }) {
   const [open, setOpen] = useState(false);
   const [nome, setNome] = useState("");
   const { user } = useSession();
@@ -1160,7 +1200,7 @@ function FechamentoCompetenciaButton({ onComplete }: { onComplete: () => void })
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="sm" variant="outline" className="gap-1 border-emerald-600 text-emerald-700 hover:bg-emerald-50">
+        <Button size="sm" variant="outline" className="gap-1 border-emerald-600 text-emerald-700 hover:bg-emerald-50" disabled={disabled}>
           <TableIcon className="h-4 w-4" /> Fechamento de Competência
         </Button>
       </DialogTrigger>
