@@ -70,6 +70,8 @@ type LinhaAgrupada = {
     saldo_inicial_pedido: number | null;
     nome_real: string | null;
     notas: string | null;
+    suspensa: boolean;
+    motivo_suspensao: string | null;
   };
 };
 
@@ -132,6 +134,8 @@ function DespesasFixasPage() {
             saldo_inicial_pedido: (r as any).saldo_inicial_pedido ?? null,
             nome_real: (r as any).nome_real ?? null,
             notas: (r as any).notas ?? null,
+            suspensa: !!(r as any).suspensa,
+            motivo_suspensao: (r as any).motivo_suspensao ?? null,
           },
         };
         map.set(key, l);
@@ -140,8 +144,8 @@ function DespesasFixasPage() {
       const v = Number(r.valor) || 0;
       l.totalPrevisto += v;
       if (r.lancado) l.totalLancado += v;
-      (["empresa_codigo","empresa_nome","conta","centro_custo","numero_pedido","sap_code","valor_previsto_anual","saldo_inicial_pedido","nome_real","notas"] as const).forEach((k) => {
-        if (!l!.meta[k] && (r as any)[k]) l!.meta[k] = (r as any)[k];
+      (["empresa_codigo","empresa_nome","conta","centro_custo","numero_pedido","sap_code","valor_previsto_anual","saldo_inicial_pedido","nome_real","notas","suspensa","motivo_suspensao"] as const).forEach((k) => {
+        if (!l!.meta[k as keyof typeof l.meta] && (r as any)[k]) (l!.meta as any)[k] = (r as any)[k];
       });
     });
     return Array.from(map.values()).sort(
