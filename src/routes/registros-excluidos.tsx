@@ -263,7 +263,7 @@ function Board() {
   });
 
   return (
-    <div className="flex-1 space-y-4 p-6 pb-32">
+    <div className="flex-1 space-y-4 pb-32">
       <div>
         <p className="text-sm text-muted-foreground">
           Área restrita ao Administrador — histórico dos registros apagados, organizados por empresa.
