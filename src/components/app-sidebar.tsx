@@ -174,9 +174,6 @@ export function AppSidebar() {
           <Link to={item.url} className="flex items-center gap-2">
             <item.icon className="h-4 w-4 shrink-0" />
             <span className="truncate">{item.title}</span>
-            {item.restricted && (
-              <Lock className="ml-auto h-3 w-3 shrink-0 text-amber-500" aria-label="Área restrita" />
-            )}
           </Link>
         )}
       </SidebarMenuButton>
