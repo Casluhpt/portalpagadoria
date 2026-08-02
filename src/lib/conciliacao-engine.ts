@@ -212,7 +212,7 @@ export async function exportarConciliacaoSemanal(
   const { notificarArquivoPronto } = await import("./notificacoes-arquivos");
   await notificarArquivoPronto(
     "Relatório de Conciliação Pronto",
-    `O arquivo filtrado de ${dataIni} a ${dataFim} foi gerado. Disponível em Base de Anexos > Conciliação Bancária.`,
+    `O arquivo filtrado de ${dataIni} a ${dataFim} foi gerado. Disponível em [anexo] > Conciliação Bancária.`,
     userId
   );
   

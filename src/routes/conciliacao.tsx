@@ -163,7 +163,7 @@ function ConciliacaoSemanalView() {
           <h4 className="text-sm font-semibold text-foreground">Resumo da Operação</h4>
           <ul className="text-xs text-muted-foreground space-y-2 list-disc pl-4">
             <li>Os títulos das colunas seguirão o padrão da base de <b>Pagamentos Diversos</b>.</li>
-            <li>O arquivo será baixado localmente e uma cópia será vinculada à <b>Base de Anexos</b>.</li>
+            <li>O arquivo será baixado localmente e uma cópia será vinculada à <b>[anexo]</b>.</li>
             <li>Uma notificação será enviada para o sino com atalho de download direto.</li>
           </ul>
         </div>
