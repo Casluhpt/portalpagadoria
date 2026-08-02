@@ -44,12 +44,15 @@ function ConfiguracoesPage() {
                   <h2 className="text-2xl font-bold text-foreground">Acesso Rápido</h2>
                   <p className="text-sm text-muted-foreground">Gerencie o portal e solicite suporte técnico.</p>
                 </div>
-                <TabsList className="bg-muted/50 border border-border p-1 h-auto grid grid-cols-2 md:grid-cols-4 w-full md:w-auto">
+                <TabsList className="bg-muted/50 border border-border p-1 h-auto grid grid-cols-2 md:grid-cols-5 w-full md:w-auto">
                   <TabsTrigger value="suporte" className="py-2.5 px-4 text-xs font-semibold data-[state=active]:bg-background data-[state=active]:shadow-sm">
                     <HelpCircle className="h-3.5 w-3.5 mr-2" /> Suporte
                   </TabsTrigger>
                   <TabsTrigger value="administracao" className="py-2.5 px-4 text-xs font-semibold data-[state=active]:bg-background data-[state=active]:shadow-sm">
                     <Users className="h-3.5 w-3.5 mr-2" /> Usuários
+                  </TabsTrigger>
+                  <TabsTrigger value="documentacao" className="py-2.5 px-4 text-xs font-semibold data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                    <Code className="h-3.5 w-3.5 mr-2" /> Documentação
                   </TabsTrigger>
                   <TabsTrigger value="diagnostico" className="py-2.5 px-4 text-xs font-semibold data-[state=active]:bg-background data-[state=active]:shadow-sm">
                     <Activity className="h-3.5 w-3.5 mr-2" /> Diagnóstico
