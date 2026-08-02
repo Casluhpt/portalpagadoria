@@ -509,8 +509,8 @@ function GrupoTabela({
             {MESES.map((m) => (
               <th key={m} className="border-b border-border px-2 py-2 text-right font-semibold">{m}</th>
             ))}
-            <th className="border-b border-border px-3 py-2 text-right font-semibold">Previsto</th>
-            <th className="border-b border-border px-3 py-2 text-right font-semibold">Lançado</th>
+            <th className="border-b border-border px-3 py-2 text-right font-semibold">Orçado/Saldo</th>
+            <th className="border-b border-border px-3 py-2 text-right font-semibold">Previsto/Realizado</th>
             <th className="border-b border-border px-2 py-2" />
           </tr>
         </thead>
@@ -553,11 +553,17 @@ function GrupoTabela({
                   <CelulaMes registro={r} onClick={() => onOpenCelula(l, i + 1)} />
                 </td>
               ))}
-              <td className="border-b border-border px-3 py-2 text-right font-semibold text-slate-700 tabular-nums">
-                {brl(l.totalPrevisto)}
+              <td className="border-b border-border px-3 py-2 text-right tabular-nums">
+                <div className="flex flex-col items-end">
+                  <span className="font-semibold text-slate-700">{brl(l.meta.valor_previsto_anual || 0)}</span>
+                  <span className="text-[10px] text-muted-foreground">Saldo {brl((l.meta.valor_previsto_anual || 0) - l.totalLancado)}</span>
+                </div>
               </td>
-              <td className="border-b border-border px-3 py-2 text-right font-semibold text-emerald-700 tabular-nums">
-                {brl(l.totalLancado)}
+              <td className="border-b border-border px-3 py-2 text-right tabular-nums">
+                <div className="flex flex-col items-end">
+                  <span className="font-semibold text-slate-700">{brl(l.totalPrevisto)}</span>
+                  <span className="text-[10px] text-emerald-700 font-medium">{brl(l.totalLancado)}</span>
+                </div>
               </td>
               <td className="border-b border-border px-2 py-1 text-right">
                 <Button size="icon" variant="ghost" onClick={() => onExcluir(l)} aria-label="Excluir linha">
