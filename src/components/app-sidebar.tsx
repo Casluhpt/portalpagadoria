@@ -91,12 +91,13 @@ const advancedItems: MenuItem[] = [
 ];
 
 const roleLabel: Record<AppRole, string> = {
-  administrador: "Administrador",
+  administrador: "Administração",
   criador_competencia: "Criador de Competência",
   operacional: "Operacional",
   consulta: "Consulta",
   auditor: "Auditor",
   viewer: "Visualizador",
+  visitante: "Visitante",
 };
 
 export function AppSidebar() {
