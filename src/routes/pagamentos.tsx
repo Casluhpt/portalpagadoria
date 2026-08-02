@@ -94,6 +94,7 @@ function fmtDateTime(iso: string | null | undefined) {
 
 function PagamentosPage() {
   const { user } = useSession();
+  const { isAdmin } = useRoles();
   const colaboradorNome =
     (user?.user_metadata?.nome as string) ||
     (user?.user_metadata?.full_name as string) ||
@@ -139,7 +140,7 @@ function PagamentosPage() {
 
 /* ---------------- LANÇAMENTOS ---------------- */
 
-function LancamentosTab({ colaboradorNome, userId }: { colaboradorNome: string; userId: string | null }) {
+function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome: string; userId: string | null; isAdmin: boolean }) {
   const qc = useQueryClient();
   const fileRef = useRef<HTMLInputElement>(null);
   
