@@ -37,6 +37,7 @@ import {
   Search,
   BookOpen,
   ChevronRight,
+  FileSpreadsheet,
 } from "lucide-react";
 import { toast } from "sonner";
 import type { ComponentType } from "react";
