@@ -313,7 +313,7 @@ type BaseProps = {
   ano: number;
   isLoading: boolean;
   onUpsert: (r: Partial<Aprovacao> & { ano: number }) => Promise<void>;
-  onBulkInsert: (rows: any[]) => Promise<{ inserted: number }>;
+  onBulkInsert: (data: { rows: any[]; replaceAll?: boolean }) => Promise<{ inserted: number }>;
   onDelete: (ids: string[]) => Promise<void>;
 };
 
