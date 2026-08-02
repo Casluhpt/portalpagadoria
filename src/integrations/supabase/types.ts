@@ -57,8 +57,12 @@ export type Database = {
         Row: {
           ano: number
           created_at: string
+          deleted_at: string | null
+          deleted_by: string | null
+          deleted_by_nome: string | null
           empresa: string | null
           id: string
+          motivo_exclusao: string | null
           ordem: number
           ordem_pagamento: string | null
           status: string
@@ -69,8 +73,12 @@ export type Database = {
         Insert: {
           ano?: number
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deleted_by_nome?: string | null
           empresa?: string | null
           id?: string
+          motivo_exclusao?: string | null
           ordem?: number
           ordem_pagamento?: string | null
           status?: string
@@ -81,14 +89,69 @@ export type Database = {
         Update: {
           ano?: number
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deleted_by_nome?: string | null
           empresa?: string | null
           id?: string
+          motivo_exclusao?: string | null
           ordem?: number
           ordem_pagamento?: string | null
           status?: string
           tipo?: string
           updated_at?: string
           valor?: number
+        }
+        Relationships: []
+      }
+      audit_log: {
+        Row: {
+          acao: string
+          created_at: string
+          descricao: string | null
+          id: string
+          justificativa: string | null
+          metadata: Json | null
+          modulo: string | null
+          registro_id: string | null
+          severidade: string
+          snapshot: Json | null
+          tabela: string | null
+          user_email: string | null
+          user_id: string | null
+          user_nome: string | null
+        }
+        Insert: {
+          acao: string
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          justificativa?: string | null
+          metadata?: Json | null
+          modulo?: string | null
+          registro_id?: string | null
+          severidade?: string
+          snapshot?: Json | null
+          tabela?: string | null
+          user_email?: string | null
+          user_id?: string | null
+          user_nome?: string | null
+        }
+        Update: {
+          acao?: string
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          justificativa?: string | null
+          metadata?: Json | null
+          modulo?: string | null
+          registro_id?: string | null
+          severidade?: string
+          snapshot?: Json | null
+          tabela?: string | null
+          user_email?: string | null
+          user_id?: string | null
+          user_nome?: string | null
         }
         Relationships: []
       }
@@ -232,12 +295,16 @@ export type Database = {
           data_emissao: string | null
           data_lancamento: string | null
           data_vencimento: string | null
+          deleted_at: string | null
+          deleted_by: string | null
+          deleted_by_nome: string | null
           descricao: string
           empresa_codigo: string | null
           empresa_nome: string | null
           id: string
           lancado: boolean
           mes: number
+          motivo_exclusao: string | null
           motivo_suspensao: string | null
           nome_real: string | null
           notas: string | null
@@ -267,12 +334,16 @@ export type Database = {
           data_emissao?: string | null
           data_lancamento?: string | null
           data_vencimento?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deleted_by_nome?: string | null
           descricao: string
           empresa_codigo?: string | null
           empresa_nome?: string | null
           id?: string
           lancado?: boolean
           mes: number
+          motivo_exclusao?: string | null
           motivo_suspensao?: string | null
           nome_real?: string | null
           notas?: string | null
@@ -302,12 +373,16 @@ export type Database = {
           data_emissao?: string | null
           data_lancamento?: string | null
           data_vencimento?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deleted_by_nome?: string | null
           descricao?: string
           empresa_codigo?: string | null
           empresa_nome?: string | null
           id?: string
           lancado?: boolean
           mes?: number
+          motivo_exclusao?: string | null
           motivo_suspensao?: string | null
           nome_real?: string | null
           notas?: string | null
@@ -382,9 +457,13 @@ export type Database = {
           cnpj: string | null
           criado_em: string | null
           dcomp_compensado: boolean | null
+          deleted_at: string | null
+          deleted_by: string | null
+          deleted_by_nome: string | null
           empresa: string | null
           id: string
           mes_ano: string
+          motivo_exclusao: string | null
           nome_coligada: string | null
           notificado: boolean | null
           num_empresa: string | null
@@ -401,9 +480,13 @@ export type Database = {
           cnpj?: string | null
           criado_em?: string | null
           dcomp_compensado?: boolean | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deleted_by_nome?: string | null
           empresa?: string | null
           id?: string
           mes_ano: string
+          motivo_exclusao?: string | null
           nome_coligada?: string | null
           notificado?: boolean | null
           num_empresa?: string | null
@@ -420,9 +503,13 @@ export type Database = {
           cnpj?: string | null
           criado_em?: string | null
           dcomp_compensado?: boolean | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deleted_by_nome?: string | null
           empresa?: string | null
           id?: string
           mes_ano?: string
+          motivo_exclusao?: string | null
           nome_coligada?: string | null
           notificado?: boolean | null
           num_empresa?: string | null
@@ -511,6 +598,9 @@ export type Database = {
           center: string | null
           company: number | null
           created_at: string
+          deleted_at: string | null
+          deleted_by: string | null
+          deleted_by_nome: string | null
           desc_status: string | null
           due_date: string | null
           empresa: string | null
@@ -519,6 +609,7 @@ export type Database = {
           invoice_number: string | null
           issuer: string | null
           log: string | null
+          motivo_exclusao: string | null
           pre_pedido: number | null
           register_date: string | null
           supplier: string | null
@@ -531,6 +622,9 @@ export type Database = {
           center?: string | null
           company?: number | null
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deleted_by_nome?: string | null
           desc_status?: string | null
           due_date?: string | null
           empresa?: string | null
@@ -539,6 +633,7 @@ export type Database = {
           invoice_number?: string | null
           issuer?: string | null
           log?: string | null
+          motivo_exclusao?: string | null
           pre_pedido?: number | null
           register_date?: string | null
           supplier?: string | null
@@ -551,6 +646,9 @@ export type Database = {
           center?: string | null
           company?: number | null
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deleted_by_nome?: string | null
           desc_status?: string | null
           due_date?: string | null
           empresa?: string | null
@@ -559,6 +657,7 @@ export type Database = {
           invoice_number?: string | null
           issuer?: string | null
           log?: string | null
+          motivo_exclusao?: string | null
           pre_pedido?: number | null
           register_date?: string | null
           supplier?: string | null
@@ -761,6 +860,9 @@ export type Database = {
           competencia: string | null
           created_at: string
           data_credito: string | null
+          deleted_at: string | null
+          deleted_by: string | null
+          deleted_by_nome: string | null
           descricao_pagamento: string | null
           diferenca_bank_itau: number | null
           diferenca_lg_finnet: number | null
@@ -768,6 +870,7 @@ export type Database = {
           ev_saida_folha_mensal: number | null
           folha: string | null
           id: string
+          motivo_exclusao: string | null
           natureza_pagamento: string | null
           observacao: string | null
           qtde_colaboradores: number | null
@@ -789,6 +892,9 @@ export type Database = {
           competencia?: string | null
           created_at?: string
           data_credito?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deleted_by_nome?: string | null
           descricao_pagamento?: string | null
           diferenca_bank_itau?: number | null
           diferenca_lg_finnet?: number | null
@@ -796,6 +902,7 @@ export type Database = {
           ev_saida_folha_mensal?: number | null
           folha?: string | null
           id?: string
+          motivo_exclusao?: string | null
           natureza_pagamento?: string | null
           observacao?: string | null
           qtde_colaboradores?: number | null
@@ -817,6 +924,9 @@ export type Database = {
           competencia?: string | null
           created_at?: string
           data_credito?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deleted_by_nome?: string | null
           descricao_pagamento?: string | null
           diferenca_bank_itau?: number | null
           diferenca_lg_finnet?: number | null
@@ -824,6 +934,7 @@ export type Database = {
           ev_saida_folha_mensal?: number | null
           folha?: string | null
           id?: string
+          motivo_exclusao?: string | null
           natureza_pagamento?: string | null
           observacao?: string | null
           qtde_colaboradores?: number | null
@@ -1216,8 +1327,26 @@ export type Database = {
       is_provisao_fechada: { Args: { _data: string }; Returns: boolean }
       mark_password_changed: { Args: never; Returns: undefined }
       reabrir_provisao_diaria: { Args: { _data: string }; Returns: undefined }
+      registrar_acao_critica: {
+        Args: {
+          _acao: string
+          _descricao?: string
+          _justificativa?: string
+          _metadata?: Json
+          _modulo?: string
+          _registro_id?: string
+          _severidade?: string
+          _snapshot?: Json
+          _tabela?: string
+        }
+        Returns: string
+      }
       rejeitar_solicitacao_provisao: {
         Args: { _id: string; _motivo?: string }
+        Returns: undefined
+      }
+      restaurar_registro: {
+        Args: { _id: string; _justificativa: string; _tabela: string }
         Returns: undefined
       }
       set_presence: { Args: { _status: string }; Returns: undefined }

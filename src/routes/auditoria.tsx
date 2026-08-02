@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
-import { Loader2, Search, ShieldAlert, ScrollText, Trash2 } from "lucide-react";
+import { Loader2, Search, ShieldAlert, ScrollText, Trash2, ShieldCheck } from "lucide-react";
 
 import { AppSidebar } from "@/components/app-sidebar";
 import { HeaderActions } from "@/components/header-actions";
@@ -18,10 +18,14 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { useRoles } from "@/hooks/use-roles";
 import { RegistrosExcluidosView } from "@/routes/registros-excluidos";
+import { RestrictedArea } from "@/components/role-gate";
+import { AcoesCriticasView } from "@/components/acoes-criticas-view";
+
+type AuditTab = "log" | "criticas" | "excluidos";
 
 export const Route = createFileRoute("/auditoria")({
   validateSearch: (s: Record<string, unknown>) => ({
-    tab: (s.tab === "excluidos" ? "excluidos" : "log") as "log" | "excluidos",
+    tab: (s.tab === "excluidos" || s.tab === "criticas" ? s.tab : "log") as AuditTab,
   }),
   component: AuditoriaPage,
 });
@@ -79,28 +83,36 @@ function AuditoriaPage() {
               <HeaderActions />
             </div>
           </header>
-          <Tabs
-            value={tab}
-            onValueChange={(v) => navigate({ search: { tab: v as "log" | "excluidos" }, replace: true })}
-            className="flex flex-1 flex-col"
-          >
-            <div className="border-b border-border bg-background px-4 pt-3">
-              <TabsList>
-                <TabsTrigger value="log" className="gap-1.5">
-                  <ScrollText className="h-3.5 w-3.5" /> Log de Auditoria
-                </TabsTrigger>
-                <TabsTrigger value="excluidos" className="gap-1.5">
-                  <Trash2 className="h-3.5 w-3.5" /> Registros Excluídos
-                </TabsTrigger>
-              </TabsList>
-            </div>
-            <TabsContent value="log" className="mt-0 flex-1">
-              <AuditoriaContent />
-            </TabsContent>
-            <TabsContent value="excluidos" className="mt-0 flex-1">
-              <RegistrosExcluidosView />
-            </TabsContent>
-          </Tabs>
+          <RestrictedArea area="Auditoria" anyOf={["administrador", "auditor"]}>
+            <Tabs
+              value={tab}
+              onValueChange={(v) => navigate({ search: { tab: v as AuditTab }, replace: true })}
+              className="flex flex-1 flex-col"
+            >
+              <div className="border-b border-border bg-background px-4 pt-3">
+                <TabsList>
+                  <TabsTrigger value="log" className="gap-1.5">
+                    <ScrollText className="h-3.5 w-3.5" /> Log de Auditoria
+                  </TabsTrigger>
+                  <TabsTrigger value="criticas" className="gap-1.5">
+                    <ShieldCheck className="h-3.5 w-3.5" /> Ações Críticas
+                  </TabsTrigger>
+                  <TabsTrigger value="excluidos" className="gap-1.5">
+                    <Trash2 className="h-3.5 w-3.5" /> Registros Excluídos
+                  </TabsTrigger>
+                </TabsList>
+              </div>
+              <TabsContent value="log" className="mt-0 flex-1">
+                <AuditoriaContent />
+              </TabsContent>
+              <TabsContent value="criticas" className="mt-0 flex-1">
+                <AcoesCriticasView />
+              </TabsContent>
+              <TabsContent value="excluidos" className="mt-0 flex-1">
+                <RegistrosExcluidosView />
+              </TabsContent>
+            </Tabs>
+          </RestrictedArea>
         </div>
       </div>
     </SidebarProvider>

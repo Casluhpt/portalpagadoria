@@ -6,7 +6,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { format, formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Loader2, KeyRound, ShieldAlert, Search, ShieldCheck, Eye, UserPlus, Trash2, List, LayoutGrid } from "lucide-react";
+import { Loader2, KeyRound, Search, ShieldCheck, Eye, UserPlus, Trash2, List, LayoutGrid } from "lucide-react";
 
 import { AppSidebar } from "@/components/app-sidebar";
 import { HeaderActions } from "@/components/header-actions";
@@ -23,7 +23,8 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import { useRoles } from "@/hooks/use-roles";
+import { RestrictedArea } from "@/components/role-gate";
+import { logAcaoCritica } from "@/lib/audit-critico";
 import { useSession } from "@/hooks/use-session";
 import { useQueryClient } from "@tanstack/react-query";
 import { listAdminUsers, resetUserPassword, setUserRole, setUserSetor, inviteUser, deleteUser, ALLOWED_SETORES, type AdminUserRow, type Setor } from "@/lib/admin-users.functions";
@@ -57,26 +58,11 @@ function UsuariosPage() {
 }
 
 function UsuariosContent() {
-  const { isAdmin, loading } = useRoles();
-  if (loading) {
-    return (
-      <div className="flex flex-1 items-center justify-center">
-        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-      </div>
-    );
-  }
-  if (!isAdmin) {
-    return (
-      <div className="flex flex-1 flex-col items-center justify-center gap-3 p-8 text-center">
-        <ShieldAlert className="h-10 w-10 text-muted-foreground" />
-        <h2 className="text-lg font-semibold">Acesso restrito</h2>
-        <p className="max-w-md text-sm text-muted-foreground">
-          Somente administradores podem gerenciar usuários.
-        </p>
-      </div>
-    );
-  }
-  return <UsuariosTable />;
+  return (
+    <RestrictedArea area="Administração de Usuários" role="administrador">
+      <UsuariosTable />
+    </RestrictedArea>
+  );
 }
 
 function roleLabel(r: string) {
@@ -370,6 +356,8 @@ function UsuariosTable() {
 }
 function UserTableRow({ u, user, roleMut, setorMut, deleteMut, resetMut, compact }: any) {
   const isSelf = user?.id === u.id;
+  const [pendingRole, setPendingRole] = useState<"administrador" | "viewer" | "visitante" | null>(null);
+  const [justificativa, setJustificativa] = useState("");
   return (
     <tr className="hover:bg-muted/40">
       {!compact && (
@@ -403,9 +391,11 @@ function UserTableRow({ u, user, roleMut, setorMut, deleteMut, resetMut, compact
                 <Select
                   value={current}
                   disabled={roleMut.isPending || isSelf}
-                  onValueChange={(v) =>
-                    roleMut.mutate({ userId: u.id, role: v as "administrador" | "viewer" | "visitante" })
-                  }
+                  onValueChange={(v) => {
+                    if (v === current) return;
+                    setJustificativa("");
+                    setPendingRole(v as "administrador" | "viewer" | "visitante");
+                  }}
                 >
                   <SelectTrigger className="h-8 w-[160px] text-xs">
                     <SelectValue />
@@ -428,6 +418,49 @@ function UserTableRow({ u, user, roleMut, setorMut, deleteMut, resetMut, compact
                     </SelectItem>
                   </SelectContent>
                 </Select>
+                <AlertDialog open={!!pendingRole} onOpenChange={(o) => !o && setPendingRole(null)}>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Alterar permissão</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Ação administrativa crítica. Informe a justificativa — ela será registrada
+                        na trilha de auditoria com data, hora e usuário responsável.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <div className="space-y-1.5">
+                      <Label htmlFor={`just-${u.id}`} className="text-xs">Justificativa</Label>
+                      <Input
+                        id={`just-${u.id}`}
+                        value={justificativa}
+                        onChange={(e) => setJustificativa(e.target.value)}
+                        placeholder={`De ${roleLabel(current)} para ${pendingRole ? roleLabel(pendingRole) : ""}`}
+                      />
+                    </div>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                      <AlertDialogAction
+                        disabled={justificativa.trim().length < 5}
+                        onClick={() => {
+                          const novo = pendingRole!;
+                          roleMut.mutate({ userId: u.id, role: novo });
+                          void logAcaoCritica({
+                            acao: "alteracao_permissao",
+                            modulo: "Administração de Usuários",
+                            tabela: "user_roles",
+                            registro_id: u.id,
+                            descricao: `Permissão de ${u.email ?? u.id} alterada de ${roleLabel(current)} para ${roleLabel(novo)}`,
+                            justificativa: justificativa.trim(),
+                            metadata: { anterior: current, novo },
+                            severidade: "critico",
+                          });
+                          setPendingRole(null);
+                        }}
+                      >
+                        Confirmar alteração
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
                 {otherRoles.map((r: any) => (
                   <Badge key={r} variant={roleVariant(r)}>{roleLabel(r)}</Badge>
                 ))}

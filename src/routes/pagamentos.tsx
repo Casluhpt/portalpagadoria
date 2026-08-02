@@ -44,6 +44,7 @@ import { format, parseISO } from "date-fns";
 import type { DateRange } from "react-day-picker";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { logAcaoCritica } from "@/lib/audit-critico";
 
 import { useSession } from "@/hooks/use-session";
 import { useRoles } from "@/hooks/use-roles";
@@ -303,7 +304,18 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
 
   const importMut = useMutation({
     mutationFn: (rows: PagamentoInput[]) => createPagamentosBulk(rows, colaboradorNome, userId, importMode === "replace"),
-    onSuccess: (n) => { invalidate(); toast.success(`${n} lançamento(s) importado(s)`); },
+    onSuccess: (n) => {
+      invalidate();
+      toast.success(`${n} lançamento(s) importado(s)`);
+      void logAcaoCritica({
+        acao: "importacao_excel",
+        modulo: "Pagamentos Diversos",
+        tabela: "pagamentos_diversos",
+        descricao: `Importação Excel de ${n} lançamento(s) — modo ${importMode === "replace" ? "substituição da base" : "incremental"}`,
+        metadata: { registros: n, modo: importMode },
+        severidade: "alerta",
+      });
+    },
     onError: (e: Error) => toast.error("Falha na importação: " + e.message),
   });
 
@@ -347,6 +359,13 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Pagamentos");
     XLSX.writeFile(wb, `pagamentos-diversos-${new Date().toISOString().slice(0,10)}.xlsx`);
+    void logAcaoCritica({
+      acao: "exportacao_relatorio",
+      modulo: "Pagamentos Diversos",
+      tabela: "pagamentos_diversos",
+      descricao: `Exportação de relatório com ${exportRows.length} registro(s)`,
+      metadata: { registros: exportRows.length },
+    });
   };
 
   const handleFile = async (f: File) => {
@@ -1238,6 +1257,14 @@ function FechamentoCompetenciaButton({ onComplete, disabled, data }: { onComplet
       // Database closure and cleanup
       const { fecharCompetenciaPagamentos } = await import("@/lib/fechamento-pagamentos");
       await fecharCompetenciaPagamentos(nome, user.id, data);
+      await logAcaoCritica({
+        acao: "fechamento_competencia",
+        modulo: "Pagamentos Diversos",
+        tabela: "fechamento_pagamentos",
+        descricao: `Competência "${nome}" fechada e arquivada com ${data.length} registro(s); base limpa para novo ciclo`,
+        metadata: { registros: data.length, competencia: nome },
+        severidade: "critico",
+      });
     },
     onSuccess: () => {
       toast.success("Competência de Pagamentos Diversos fechada e base limpa.");

@@ -44,12 +44,31 @@ export async function fetchFechamentoDia(data: string): Promise<ProvisaoFechamen
 export async function fecharProvisaoDia(data: string = todayISO()): Promise<ProvisaoFechamento> {
   const { data: row, error } = await supabase.rpc("fechar_provisao_diaria" as never, { _data: data } as never);
   if (error) throw error;
+  const { logAcaoCritica } = await import("./audit-critico");
+  await logAcaoCritica({
+    acao: "fechamento_competencia",
+    modulo: "Provisão Diária",
+    tabela: "provisao_fechamentos",
+    registro_id: data,
+    descricao: `Fechamento da provisão do dia ${data}`,
+    severidade: "alerta",
+  });
   return row as unknown as ProvisaoFechamento;
 }
 
-export async function reabrirProvisaoDia(data: string): Promise<void> {
+export async function reabrirProvisaoDia(data: string, justificativa?: string): Promise<void> {
   const { error } = await supabase.rpc("reabrir_provisao_diaria" as never, { _data: data } as never);
   if (error) throw error;
+  const { logAcaoCritica } = await import("./audit-critico");
+  await logAcaoCritica({
+    acao: "reabertura_competencia",
+    modulo: "Provisão Diária",
+    tabela: "provisao_fechamentos",
+    registro_id: data,
+    descricao: `Reabertura da provisão do dia ${data}`,
+    justificativa: justificativa,
+    severidade: "critico",
+  });
 }
 
 export async function criarSolicitacaoProvisao(input: {
