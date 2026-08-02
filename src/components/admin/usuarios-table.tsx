@@ -1,17 +1,11 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { AppLogo } from "@/components/app-logo";
+import { Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { TechnicalSpec } from "@/components/technical-spec";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { format, formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Loader2, KeyRound, Search, ShieldCheck, Eye, UserPlus, Trash2, List, LayoutGrid } from "lucide-react";
 
-import { AppSidebar } from "@/components/app-sidebar";
-import { HeaderActions } from "@/components/header-actions";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -27,44 +21,14 @@ import { toast } from "sonner";
 import { RestrictedArea } from "@/components/role-gate";
 import { logAcaoCritica } from "@/lib/audit-critico";
 import { useSession } from "@/hooks/use-session";
-import { useQueryClient } from "@tanstack/react-query";
 import { listAdminUsers, resetUserPassword, setUserRole, setUserSetor, inviteUser, deleteUser, ALLOWED_SETORES, type AdminUserRow, type Setor } from "@/lib/admin-users.functions";
 import {
   Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { TechnicalSpec } from "@/components/technical-spec";
 
-export const Route = createFileRoute("/usuarios")({
-  component: UsuariosPage,
-});
-
-function UsuariosPage() {
-  return (
-    <SidebarProvider>
-      <div className="flex min-h-screen w-full bg-background">
-        <AppSidebar />
-        <div className="flex flex-1 flex-col">
-          <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-border bg-background/80 px-4 backdrop-blur">
-            <SidebarTrigger />
-            <Link to="/" className="flex flex-1 items-center gap-2 hover:opacity-80 transition-opacity">
-              <AppLogo className="h-6 w-auto shrink-0 sm:h-7" />
-              <div className="min-w-0">
-                <h1 className="truncate text-sm font-semibold text-foreground">Administração de Usuários</h1>
-                <p className="hidden truncate text-[10px] text-muted-foreground sm:block">Gestão de acessos e permissões</p>
-              </div>
-            </Link>
-            <div className="ml-auto">
-              <HeaderActions />
-            </div>
-          </header>
-          <UsuariosContent />
-        </div>
-      </div>
-    </SidebarProvider>
-  );
-}
-
-function UsuariosContent() {
+export function UsuariosTableWrapper() {
   return (
     <RestrictedArea area="Administração de Usuários" role="administrador">
       <UsuariosTable />
