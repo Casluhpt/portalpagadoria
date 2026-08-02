@@ -139,23 +139,31 @@ export function HeaderActions() {
             </div>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuLabel className="text-[10px] uppercase tracking-wide text-muted-foreground">
-            Status
-          </DropdownMenuLabel>
-          <DropdownMenuRadioGroup
-            value={status}
-            onValueChange={(v) => setStatus(v as PresenceStatus)}
-          >
-            {(Object.keys(presenceMeta) as PresenceStatus[]).map((s) => {
-              const m = presenceMeta[s];
-              return (
-                <DropdownMenuRadioItem key={s} value={s} className="gap-2">
-                  <span className={`h-2 w-2 rounded-full ${m.dot}`} aria-hidden />
-                  {m.label}
-                </DropdownMenuRadioItem>
-              );
-            })}
-          </DropdownMenuRadioGroup>
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger className="flex items-center gap-2 text-[10px] uppercase tracking-wide text-muted-foreground">
+              <span>Status</span>
+              <span className="ml-auto flex items-center gap-1.5 normal-case tracking-normal">
+                <span className={`h-2 w-2 rounded-full ${meta.dot}`} aria-hidden />
+                {meta.label}
+              </span>
+            </DropdownMenuSubTrigger>
+            <DropdownMenuSubContent className="w-48">
+              <DropdownMenuRadioGroup
+                value={status}
+                onValueChange={(v) => setStatus(v as PresenceStatus)}
+              >
+                {(Object.keys(presenceMeta) as PresenceStatus[]).map((s) => {
+                  const m = presenceMeta[s];
+                  return (
+                    <DropdownMenuRadioItem key={s} value={s} className="gap-2 text-xs">
+                      <span className={`h-2 w-2 rounded-full ${m.dot}`} aria-hidden />
+                      {m.label}
+                    </DropdownMenuRadioItem>
+                  );
+                })}
+              </DropdownMenuRadioGroup>
+            </DropdownMenuSubContent>
+          </DropdownMenuSub>
           <ThemeMenuSection />
         </DropdownMenuContent>
       </DropdownMenu>
