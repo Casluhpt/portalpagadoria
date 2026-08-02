@@ -75,7 +75,7 @@ const mainItems: MenuItem[] = [
   { title: "Base de Anexos", url: "/anexos", icon: FileArchive, match: (p) => p.startsWith("/anexos") },
   { title: "Conciliação Bancária", url: "/conciliacao", icon: ShieldCheck, match: (p) => p.startsWith("/conciliacao"), restricted: true, adminOnly: true },
   { title: "Pagamentos Diversos", url: "/pagamentos", icon: Banknote, match: (p) => p.startsWith("/pagamentos") },
-  { title: "Administração do Portal", url: "/administracao", icon: Settings, match: (p) => p.startsWith("/administracao"), adminOnly: true },
+  { title: "Administração de Comunicados", url: "/administracao", icon: Settings, match: (p) => p.startsWith("/administracao"), adminOnly: true },
   { title: "Fechamento de Competência", url: "/fechamento", icon: FileCheck2, match: (p) => p.startsWith("/fechamento") },
   { title: "Central de Divergências", url: "/divergencias", icon: AlertTriangle, match: (p) => p.startsWith("/divergencias") },
   
