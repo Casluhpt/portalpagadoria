@@ -126,12 +126,15 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <PasswordExpirationGuard />
-      <PresenceHeartbeat />
-      <BackButton />
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
+      <AuthGate>
+        <PasswordExpirationGuard />
+        <PresenceHeartbeat />
+        <BackButton />
+        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+        <Outlet />
+      </AuthGate>
       <Toaster position="top-right" richColors closeButton />
     </QueryClientProvider>
   );
 }
+
