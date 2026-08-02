@@ -160,13 +160,13 @@ export async function executarConciliacao(
   XLSX.utils.book_append_sheet(wb, ws1, tipo);
 
   // Sheet 2: Somente Divergências (Nível 5) ou Diferenças
-  const ws2Data = resultados.filter(r => r.nivel >= 3).map(r => ({
+  const ws2Data = resultados.filter(r => r.nivel >= 3).map((r: any) => ({
     "Empresa": r.empresa,
     "Data": r.data,
     "Valor": r.valor,
     "Nível": r.nivel,
     "Diferença": r.diferenca,
-    "Sugestão": r.sugestao?.map(s => `ID:${s.id} (R$ ${s.valor})`).join(", ") || "Nenhuma"
+    "Sugestão": r.sugestao?.map((s: any) => `ID:${s.id} (R$ ${s.valor})`).join(", ") || "Nenhuma"
   }));
   const ws2 = XLSX.utils.json_to_sheet(ws2Data);
   XLSX.utils.book_append_sheet(wb, ws2, "Divergências e Sugestões");
