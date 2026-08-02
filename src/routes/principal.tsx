@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppLogo } from "@/components/app-logo";
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Check, ChevronDown, Database, Filter, Loader2, RotateCcw } from "lucide-react";
+import { Check, ChevronDown, Database, Filter, LayoutDashboard, Loader2, RotateCcw } from "lucide-react";
 import {
   Bar,
   BarChart,
