@@ -25,7 +25,6 @@ import {
   Settings,
   FileCheck2,
   AlertTriangle,
-  
   Download,
   BarChart3,
   History,
@@ -36,6 +35,7 @@ import {
   Lock,
   Clock,
   Search,
+  ChevronRight,
 } from "lucide-react";
 import { toast } from "sonner";
 import type { ComponentType } from "react";
@@ -56,7 +56,11 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 type MenuItem = {
   title: string;
@@ -87,6 +91,12 @@ const mainItems: MenuItem[] = [
 const advancedItems: MenuItem[] = [
   { title: "Dashboard Gerencial", url: "/dashboard-gerencial", icon: BarChart3, match: (p) => p === "/dashboard-gerencial" },
   { title: "Auditoria", url: "/auditoria", icon: ScrollText, match: (p) => p === "/auditoria" || p === "/registros-excluidos", allowedRoles: ["administrador", "auditor"] },
+];
+
+const settingItems: MenuItem[] = [
+  { title: "Administração de usuários", url: "/usuarios", icon: Users, match: (p) => p === "/usuarios", adminOnly: true },
+  { title: "Histórico de versões", url: "/historico", icon: History, match: (p) => p === "/historico", adminOnly: true },
+  { title: "Configurações Técnicas", url: "/configuracoes", icon: Cog, match: (p) => p === "/configuracoes", adminOnly: true },
 ];
 
 const roleLabel: Record<AppRole, string> = {
@@ -191,12 +201,40 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {advancedItems.filter(canSee).length > 0 && (
+        {(advancedItems.filter(canSee).length > 0 || isAdmin) && (
           <SidebarGroup>
-            <SidebarGroupLabel>Governança</SidebarGroupLabel>
+            <SidebarGroupLabel>Governança & Sistema</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 {advancedItems.filter(canSee).map(renderItem)}
+                
+                {isAdmin && (
+                  <Collapsible asChild className="group/collapsible">
+                    <SidebarMenuItem>
+                      <CollapsibleTrigger asChild>
+                        <SidebarMenuButton tooltip="Configurações avançadas">
+                          <Settings className="h-4 w-4 shrink-0" />
+                          <span>Configurações avançadas</span>
+                          <ChevronRight className="ml-auto h-4 w-4 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                        </SidebarMenuButton>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent>
+                        <SidebarMenuSub>
+                          {settingItems.map((item) => (
+                            <SidebarMenuSubItem key={item.title}>
+                              <SidebarMenuSubButton asChild isActive={item.match(currentPath)}>
+                                <Link to={item.url}>
+                                  <item.icon className="h-4 w-4" />
+                                  <span>{item.title}</span>
+                                </Link>
+                              </SidebarMenuSubButton>
+                            </SidebarMenuSubItem>
+                          ))}
+                        </SidebarMenuSub>
+                      </CollapsibleContent>
+                    </SidebarMenuItem>
+                  </Collapsible>
+                )}
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>

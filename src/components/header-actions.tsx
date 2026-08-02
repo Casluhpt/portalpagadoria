@@ -172,15 +172,22 @@ export function HeaderActions() {
           {isAdmin && (
             <>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => navigate({ to: "/usuarios" })}>
-                <Users className="mr-2 h-4 w-4" /> Administração de usuários
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate({ to: "/historico" })}>
-                <History className="mr-2 h-4 w-4" /> Histórico de versões
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate({ to: "/configuracoes" })}>
-                <Cog className="mr-2 h-4 w-4" /> Configurações avançadas
-              </DropdownMenuItem>
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger>
+                  <Cog className="mr-2 h-4 w-4" /> Configurações avançadas
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent className="w-56">
+                  <DropdownMenuItem onClick={() => navigate({ to: "/usuarios" })}>
+                    <Users className="mr-2 h-4 w-4" /> Administração de usuários
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate({ to: "/historico" })}>
+                    <History className="mr-2 h-4 w-4" /> Histórico de versões
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate({ to: "/configuracoes" })}>
+                    <Settings className="mr-2 h-4 w-4" /> Painel Técnico
+                  </DropdownMenuItem>
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
             </>
           )}
           <DropdownMenuSeparator />
