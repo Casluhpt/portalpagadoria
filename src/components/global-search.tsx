@@ -211,9 +211,6 @@ export function GlobalSearch({ variant = "compact" }: { variant?: "compact" | "h
         <span className="hidden text-xs font-medium text-muted-foreground xl:inline-flex">
           Busca + IA…
         </span>
-        <kbd className="pointer-events-none absolute right-1.5 top-2 hidden h-6 select-none items-center rounded border bg-muted px-1.5 font-mono text-[10px] xl:flex">
-          ⌘K
-        </kbd>
       </Button>
     );
 
