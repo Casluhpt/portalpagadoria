@@ -3,6 +3,16 @@ import { useEffect, useState, useMemo } from "react";
 import logoPagadoria from "@/assets/logo-pagadoria.png.asset.json";
 import { AppLogo } from "./app-logo";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   LayoutDashboard,
   Database,
   Sparkles,
