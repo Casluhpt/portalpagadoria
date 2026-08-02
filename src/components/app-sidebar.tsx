@@ -55,6 +55,7 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchMateriais, materialApoioQueryKey } from "@/lib/material-apoio";
 import { perguntarIa } from "@/lib/ia.functions";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 import {
   Sidebar,
@@ -412,7 +413,7 @@ export function AppSidebar() {
           <div className="border-t p-3 bg-muted/30">
             <form 
               className="flex gap-2" 
-              onSubmit={(e) => {
+              onSubmit={(e: React.FormEvent) => {
                 e.preventDefault();
                 handleSendMessage();
               }}
@@ -421,7 +422,7 @@ export function AppSidebar() {
                 placeholder="Sua dúvida..." 
                 className="h-9 text-xs" 
                 value={chatInput} 
-                onChange={(e) => setChatInput(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setChatInput(e.target.value)}
               />
               <Button type="submit" size="icon" className="h-9 w-9 shrink-0 bg-violet-600 hover:bg-violet-700" disabled={isTyping}>
                 <Send className="h-4 w-4" />
