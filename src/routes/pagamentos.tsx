@@ -46,6 +46,7 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
 import { useSession } from "@/hooks/use-session";
+import { useRoles } from "@/hooks/use-roles";
 import { supabase } from "@/integrations/supabase/client";
 import {
   createPagamento, createPagamentosBulk, deletePagamento,
@@ -94,6 +95,7 @@ function fmtDateTime(iso: string | null | undefined) {
 
 function PagamentosPage() {
   const { user } = useSession();
+  const { isAdmin } = useRoles();
   const { isAdmin } = useRoles();
   const colaboradorNome =
     (user?.user_metadata?.nome as string) ||
