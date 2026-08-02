@@ -467,25 +467,26 @@ function BaseView({ rows, ano, isLoading, onUpsert, onBulkInsert, onDelete }: Ba
       const file = new File([excelBuffer], `aprovacao_${nome}_${Date.now()}.xlsx`, { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
 
       const filePath = `processo-aprovacao/fechamento_${Date.now()}.xlsx`;
-      const { data: uploadData, error: uploadError } = await supabase.storage
+      const { error: uploadError } = await supabase.storage
         .from('suporte_anexos')
         .upload(filePath, file);
 
       if (uploadError) throw uploadError;
 
-      const { data: urlData } = await supabase.storage
+      const { data: urlData } = supabase.storage
         .from('suporte_anexos')
         .getPublicUrl(filePath);
 
       const totalValor = rows.reduce((s, r) => s + Number(r.valor || 0), 0);
+      const { data: { user } } = await supabase.auth.getUser();
 
       const { error: dbError } = await supabase.from("fechamento_aprovacoes").insert({
         nome,
         ano,
         arquivo_url: urlData.publicUrl,
         total_registros: rows.length,
-        total_valor,
-        usuario_id: (await supabase.auth.getUser()).data.user?.id
+        total_valor: totalValor,
+        usuario_id: user?.id
       });
 
       if (dbError) throw dbError;
