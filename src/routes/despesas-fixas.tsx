@@ -1010,7 +1010,7 @@ function DescricaoDialog({
           </div>
           <div>
             <Label>Nº pedido Novo</Label>
-            <Input value={linha.meta.pedido_novo || ""} onChange={(e) => setEditandoDescricao({ ...linha, meta: { ...linha.meta, pedido_novo: e.target.value } })}
+            <Input value={meta.pedido_novo || ""} onChange={(e) => setMeta({ ...meta, pedido_novo: e.target.value })}
               placeholder="Novo" />
           </div>
           <div>
