@@ -533,6 +533,11 @@ function GrupoTabela({
                         Pedido {l.meta.numero_pedido}
                       </span>
                     ) : null}
+                    {l.meta.sap_code ? (
+                      <span className="ml-2 rounded bg-indigo-100 px-1.5 py-0.5 text-[10px] font-semibold text-indigo-700">
+                        SAP {l.meta.sap_code}
+                      </span>
+                    ) : null}
                   </span>
                   <span className="mt-0.5 flex items-center gap-1 text-[11px] text-muted-foreground">
                     <Building2 className="h-3 w-3" />
