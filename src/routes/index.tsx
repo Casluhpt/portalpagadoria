@@ -290,6 +290,26 @@ function PortalPage() {
       ],
       updated: "v1.6.0",
     },
+    {
+      key: "ia-assistente",
+      title: "IA Assistente",
+      subtitle: "Central de inteligência artificial e governança de dados.",
+      objetivo: "Orientar o usuário, explicar erros e garantir a segurança das operações do portal.",
+      base: "Configuração de IA",
+      baseTo: "#",
+      to: "#",
+      cta: "Conhecer Assistente",
+      icon: Sparkles,
+      accent: "from-violet-700 to-fuchsia-900",
+      chip: "bg-fuchsia-100 text-fuchsia-800",
+      bullets: [
+        "Respostas baseadas em materiais autorizados",
+        "Ações críticas exigem aceite do administrador",
+        "Orientação passo a passo e suporte",
+        "Feedback direto sobre as respostas",
+      ],
+      updated: "v1.7.0",
+    },
   ];
 
   return (
