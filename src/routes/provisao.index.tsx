@@ -307,6 +307,7 @@ function ProvisaoDashboard() {
             Provisão de hoje ainda aberta para lançamentos.
           </div>
         )}
+        <FechamentoCompetenciaButton />
         <Button
           onClick={() => notificar.mutate()}
           disabled={notificar.isPending || !user}
@@ -320,6 +321,73 @@ function ProvisaoDashboard() {
 
     </main>
 
+  );
+}
+
+function FechamentoCompetenciaButton() {
+  const [open, setOpen] = useState(false);
+  const [nome, setNome] = useState("");
+  const { user } = useSession();
+  const qc = useQueryClient();
+  const fecharFn = useServerFn(fecharCompetenciaProvisao);
+
+  const mutation = useMutation({
+    mutationFn: async () => {
+      const now = new Date();
+      const mes = format(now, "yyyy-MM");
+      const ano = format(now, "yyyy");
+      return fecharFn({ data: { nome, mes, ano, usuarioId: user!.id } });
+    },
+    onSuccess: () => {
+      toast.success("Competência fechada com sucesso.");
+      setOpen(false);
+      qc.invalidateQueries({ queryKey: provisaoQueryKey });
+      qc.invalidateQueries({ queryKey: provisaoArchivedQueryKey });
+    },
+    onError: (e: any) => toast.error(e.message),
+  });
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant="outline" size="lg" className="gap-2 border-emerald-600 text-emerald-700 hover:bg-emerald-50">
+          <FileCheck2 className="h-4 w-4" /> Fechamento de Competência
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Fechamento de Competência</DialogTitle>
+          <DialogDescription className="bg-red-50 p-3 text-red-800 border border-red-200 rounded-md flex items-start gap-2">
+            <Info className="h-4 w-4 mt-0.5 shrink-0" />
+            <span>
+              Ao realizar o fechamento, os dados do mês atual serão arquivados e a base de 
+              <b> Provisão Diária </b> será limpa para o próximo ciclo.
+            </span>
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-4 py-4">
+          <div className="space-y-2">
+            <Label htmlFor="nome-fechamento">Nome do Fechamento (Ex: Julho/2026)</Label>
+            <Input
+              id="nome-fechamento"
+              placeholder="Digite um nome para o arquivo..."
+              value={nome}
+              onChange={(e) => setNome(e.target.value)}
+            />
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setOpen(false)}>Cancelar</Button>
+          <Button 
+            className="bg-red-600 hover:bg-red-700 text-white"
+            onClick={() => mutation.mutate()}
+            disabled={!nome || mutation.isPending}
+          >
+            {mutation.isPending ? "Processando..." : "Realizar Fechamento"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 
