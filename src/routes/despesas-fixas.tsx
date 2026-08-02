@@ -977,33 +977,12 @@ function DescricaoDialog({
             </div>
           )}
           <div className="col-span-3">
-            <Label>Empresa</Label>
-            <Select value={empresaCodigo || "__none__"} onValueChange={(v) => setEmpresaCodigo(v === "__none__" ? "" : v)}>
-              <SelectTrigger><SelectValue placeholder="Selecione…" /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="__none__">— sem empresa —</SelectItem>
-                {EMPRESAS.map((e) => (
-                  <SelectItem key={e.codigo} value={e.codigo}>{e.codigo} — {e.nome}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div>
-            <Label>Conta</Label>
-            <Input value={conta} onChange={(e) => setConta(e.target.value)} placeholder="ex.: 4.01.001" />
-          </div>
-          <div className="col-span-2">
-            <Label>Centro de custo</Label>
-            <Input value={centroCusto} onChange={(e) => setCentroCusto(e.target.value)} placeholder="ex.: ADM" />
-          </div>
-          <div className="col-span-3">
-            <Label>Bloco de notas</Label>
-            <textarea
-              value={notas}
-              onChange={(e) => setNotas(e.target.value)}
-              rows={3}
-              placeholder="Anotações livres sobre este PJ / fornecedor / lançamento…"
-              className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            <Label>Notas / Observações Internas</Label>
+            <Textarea 
+              value={notas} 
+              onChange={(e) => setNotas(e.target.value)} 
+              placeholder="Detalhes adicionais sobre esta despesa..." 
+              className="h-20" 
             />
           </div>
           <div className="col-span-3 space-y-3 rounded-md border border-red-100 bg-red-50/50 p-3">
