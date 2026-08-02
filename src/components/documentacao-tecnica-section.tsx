@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { supabase } from "@/integrations/supabase/client";
+import { useSession } from "@/hooks/use-session";
 import { DOC_INTRO, DOC_SECOES } from "@/lib/documentacao-tecnica";
 
 type Item = { categoria: string; descricao: string };
@@ -25,8 +26,12 @@ type Version = {
 };
 
 const CODIGO_URL = "/codigo-fonte-portal-pagadoria.txt";
+const ADMIN_DOWNLOAD_EMAIL = "lucas.chaves.lc2001@gmail.com";
 
 export function DocumentacaoTecnicaSection() {
+  const { user } = useSession();
+  const podeBaixar =
+    (user?.email ?? "").trim().toLowerCase() === ADMIN_DOWNLOAD_EMAIL;
   const { data: versoes = [], isLoading } = useQuery({
     queryKey: ["app-versions", "documentacao"],
     queryFn: async (): Promise<Version[]> => {
@@ -169,16 +174,18 @@ export function DocumentacaoTecnicaSection() {
               Centraliza todas as especificações de arquitetura, fluxos e regras de negócio do portal.
             </CardDescription>
           </div>
-          <div className="flex flex-wrap gap-2">
-            <Button size="sm" onClick={baixarPDF} className="gap-2">
-              <Download className="h-4 w-4" /> Baixar material em PDF
-            </Button>
-            <Button size="sm" variant="outline" asChild className="gap-2">
-              <a href={CODIGO_URL} download="codigo-fonte-portal-pagadoria.txt">
-                <FileCode2 className="h-4 w-4" /> Baixar código de criação
-              </a>
-            </Button>
-          </div>
+          {podeBaixar && (
+            <div className="flex flex-wrap gap-2">
+              <Button size="sm" onClick={baixarPDF} className="gap-2">
+                <Download className="h-4 w-4" /> Baixar material em PDF
+              </Button>
+              <Button size="sm" variant="outline" asChild className="gap-2">
+                <a href={CODIGO_URL} download="codigo-fonte-portal-pagadoria.txt">
+                  <FileCode2 className="h-4 w-4" /> Baixar código de criação
+                </a>
+              </Button>
+            </div>
+          )}
         </CardHeader>
         <CardContent className="space-y-8 text-sm text-foreground/90">
           <div className="rounded-lg bg-indigo-50/30 p-4 dark:bg-indigo-950/20">
