@@ -84,13 +84,16 @@ function AuditoriaPage() {
           </header>
           <Tabs
             value={tab}
-            onValueChange={(v) => navigate({ search: { tab: v as "log" | "excluidos" }, replace: true })}
+            onValueChange={(v) => navigate({ search: { tab: v as AuditTab }, replace: true })}
             className="flex flex-1 flex-col"
           >
             <div className="border-b border-border bg-background px-4 pt-3">
               <TabsList>
                 <TabsTrigger value="log" className="gap-1.5">
                   <ScrollText className="h-3.5 w-3.5" /> Log de Auditoria
+                </TabsTrigger>
+                <TabsTrigger value="criticas" className="gap-1.5">
+                  <ShieldCheck className="h-3.5 w-3.5" /> Ações Críticas
                 </TabsTrigger>
                 <TabsTrigger value="excluidos" className="gap-1.5">
                   <Trash2 className="h-3.5 w-3.5" /> Registros Excluídos
@@ -99,6 +102,9 @@ function AuditoriaPage() {
             </div>
             <TabsContent value="log" className="mt-0 flex-1">
               <AuditoriaContent />
+            </TabsContent>
+            <TabsContent value="criticas" className="mt-0 flex-1">
+              <AcoesCriticasView />
             </TabsContent>
             <TabsContent value="excluidos" className="mt-0 flex-1">
               <RegistrosExcluidosView />
