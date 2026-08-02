@@ -80,8 +80,9 @@ function ConfiguracoesPage() {
                 <UsuariosTable />
               </TabsContent>
               <TabsContent value="documentacao" className="m-0 focus-visible:outline-none">
-                <DocumentationSection />
+                <DocumentacaoTecnicaSection />
               </TabsContent>
+
 
 
               <TabsContent value="diagnostico" className="m-0 focus-visible:outline-none">
