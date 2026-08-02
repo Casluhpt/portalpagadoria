@@ -15,6 +15,8 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { PasswordExpirationGuard } from "@/components/password-expiration-guard";
 import { PresenceHeartbeat } from "@/components/presence-heartbeat";
 import { BackButton } from "@/components/back-button";
+import { AuthGate } from "@/components/auth-gate";
+
 
 function NotFoundComponent() {
   return (
@@ -126,12 +128,15 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <PasswordExpirationGuard />
-      <PresenceHeartbeat />
-      <BackButton />
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
+      <AuthGate>
+        <PasswordExpirationGuard />
+        <PresenceHeartbeat />
+        <BackButton />
+        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+        <Outlet />
+      </AuthGate>
       <Toaster position="top-right" richColors closeButton />
     </QueryClientProvider>
   );
 }
+
