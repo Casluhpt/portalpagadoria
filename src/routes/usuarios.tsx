@@ -392,9 +392,11 @@ function UserTableRow({ u, user, roleMut, setorMut, deleteMut, resetMut, compact
                 <Select
                   value={current}
                   disabled={roleMut.isPending || isSelf}
-                  onValueChange={(v) =>
-                    roleMut.mutate({ userId: u.id, role: v as "administrador" | "viewer" | "visitante" })
-                  }
+                  onValueChange={(v) => {
+                    if (v === current) return;
+                    setJustificativa("");
+                    setPendingRole(v as "administrador" | "viewer" | "visitante");
+                  }}
                 >
                   <SelectTrigger className="h-8 w-[160px] text-xs">
                     <SelectValue />
