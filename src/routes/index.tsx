@@ -22,6 +22,7 @@ import {
   Wallet,
   Landmark,
   FileSpreadsheet,
+  Search,
 } from "lucide-react";
 
 
