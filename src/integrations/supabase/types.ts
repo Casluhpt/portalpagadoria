@@ -521,6 +521,7 @@ export type Database = {
           data: string | null
           empresa: string | null
           id: string
+          mes: string | null
           pagamento_id: string | null
           updated_at: string
           valor: number | null
@@ -531,6 +532,7 @@ export type Database = {
           data?: string | null
           empresa?: string | null
           id?: string
+          mes?: string | null
           pagamento_id?: string | null
           updated_at?: string
           valor?: number | null
@@ -541,6 +543,7 @@ export type Database = {
           data?: string | null
           empresa?: string | null
           id?: string
+          mes?: string | null
           pagamento_id?: string | null
           updated_at?: string
           valor?: number | null
@@ -554,6 +557,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      provisao_fechamento_competencia: {
+        Row: {
+          ano: string
+          arquivo_url: string | null
+          data_fechamento: string | null
+          fechado_por: string | null
+          id: string
+          mes: string
+          nome: string
+          snapshot: Json
+        }
+        Insert: {
+          ano: string
+          arquivo_url?: string | null
+          data_fechamento?: string | null
+          fechado_por?: string | null
+          id?: string
+          mes: string
+          nome: string
+          snapshot: Json
+        }
+        Update: {
+          ano?: string
+          arquivo_url?: string | null
+          data_fechamento?: string | null
+          fechado_por?: string | null
+          id?: string
+          mes?: string
+          nome?: string
+          snapshot?: Json
+        }
+        Relationships: []
       }
       provisao_fechamentos: {
         Row: {
@@ -705,6 +741,10 @@ export type Database = {
         Returns: string
       }
       ensure_viewer_role: { Args: never; Returns: undefined }
+      fechar_competencia_provisao: {
+        Args: { _ano: string; _mes: string; _nome: string; _usuario_id: string }
+        Returns: string
+      }
       fechar_provisao_diaria: {
         Args: { _data?: string }
         Returns: {
@@ -727,6 +767,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      integrar_pagamentos_na_provisao: { Args: never; Returns: undefined }
       is_provisao_fechada: { Args: { _data: string }; Returns: boolean }
       mark_password_changed: { Args: never; Returns: undefined }
       reabrir_provisao_diaria: { Args: { _data: string }; Returns: undefined }

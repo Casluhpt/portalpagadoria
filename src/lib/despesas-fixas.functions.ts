@@ -32,17 +32,24 @@ export type DespesaFixa = {
   observacao: string | null;
   numero_pedido: string | null;
   numero_nf: string | null;
-  tipo: "mensal" | "adiantamento";
+  tipo: "mensal" | "adiantamento" | "antecipação" | "ppr";
   data_lancamento: string | null;
   data_vencimento: string | null;
+  data_emissao: string | null;
+  competencia: string | null;
   conta: string | null;
   centro_custo: string | null;
   empresa_codigo: string | null;
   empresa_nome: string | null;
   lancado: boolean;
+  suspensa: boolean;
+  motivo_suspensao: string | null;
   nome_real: string | null;
   notas: string | null;
   ordem: number;
+  valor_previsto_anual: number | null;
+  saldo_inicial_pedido: number | null;
+  sap_code: string | null;
   created_by: string | null;
   created_by_nome: string | null;
   created_at: string;
@@ -75,10 +82,14 @@ const upsertSchema = z.object({
   observacao: z.string().max(500).nullable().optional(),
   numero_pedido: z.string().max(60).nullable().optional(),
   numero_nf: z.string().max(60).nullable().optional(),
-  tipo: z.enum(["mensal", "adiantamento"]).optional(),
+  tipo: z.enum(["mensal", "adiantamento", "antecipação", "ppr"]).optional(),
   data_lancamento: z.string().nullable().optional(),
   data_vencimento: z.string().nullable().optional(),
+  data_emissao: z.string().nullable().optional(),
+  competencia: z.string().nullable().optional(),
   lancado: z.boolean().optional(),
+  suspensa: z.boolean().optional(),
+  motivo_suspensao: z.string().max(500).nullable().optional(),
 });
 
 export const upsertDespesaFixa = createServerFn({ method: "POST" })
@@ -102,7 +113,11 @@ export const upsertDespesaFixa = createServerFn({ method: "POST" })
       tipo: data.tipo ?? "mensal",
       data_lancamento: data.data_lancamento ?? null,
       data_vencimento: data.data_vencimento ?? null,
+      data_emissao: data.data_emissao ?? null,
+      competencia: data.competencia ?? null,
       lancado: data.lancado ?? false,
+      suspensa: data.suspensa ?? false,
+      motivo_suspensao: data.motivo_suspensao ?? null,
     };
 
     if (data.id) {
@@ -151,6 +166,9 @@ export const updateDescricaoMeta = createServerFn({ method: "POST" })
       nova_descricao: z.string().min(1).max(200).optional(),
       nome_real: z.string().max(200).nullable().optional(),
       notas: z.string().max(2000).nullable().optional(),
+      valor_previsto_anual: z.number().nullable().optional(),
+      saldo_inicial_pedido: z.number().nullable().optional(),
+      sap_code: z.string().max(60).nullable().optional(),
     }).parse(d),
   )
   .handler(async ({ context, data }) => {
@@ -163,6 +181,9 @@ export const updateDescricaoMeta = createServerFn({ method: "POST" })
     if (data.numero_pedido !== undefined) patch.numero_pedido = data.numero_pedido ?? null;
     if (data.nome_real !== undefined) patch.nome_real = data.nome_real ?? null;
     if (data.notas !== undefined) patch.notas = data.notas ?? null;
+    if (data.valor_previsto_anual !== undefined) patch.valor_previsto_anual = data.valor_previsto_anual;
+    if (data.saldo_inicial_pedido !== undefined) patch.saldo_inicial_pedido = data.saldo_inicial_pedido;
+    if (data.sap_code !== undefined) patch.sap_code = data.sap_code;
     if (data.nova_descricao && data.nova_descricao !== data.descricao) {
       patch.descricao = data.nova_descricao;
     }

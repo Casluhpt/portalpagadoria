@@ -7,6 +7,10 @@ import {
   Upload, Download, LayoutGrid, Table as TableIcon,
   Scissors, Palette, X,
 } from "lucide-react";
+import {
+  Dialog, DialogContent, DialogDescription, DialogFooter,
+  DialogHeader, DialogTitle, DialogTrigger,
+} from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
@@ -53,10 +57,6 @@ import {
 import {
   criarSolicitacaoProvisao, extractProvisaoFechadaDate,
 } from "@/lib/provisao-fechamento";
-import {
-  Dialog, DialogContent, DialogDescription, DialogFooter,
-  DialogHeader, DialogTitle,
-} from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 
 
@@ -469,6 +469,7 @@ function LancamentosTab({ colaboradorNome, userId }: { colaboradorNome: string; 
             <Download className="h-4 w-4" />
             Exportar Excel
           </Button>
+          <FechamentoCompetenciaButton onComplete={invalidate} />
           <Button
             size="sm"
             className="gap-1"
@@ -1101,3 +1102,66 @@ function FilterSelect({
     </div>
   );
 }
+
+function FechamentoCompetenciaButton({ onComplete }: { onComplete: () => void }) {
+  const [open, setOpen] = useState(false);
+  const [nome, setNome] = useState("");
+  const { user } = useSession();
+
+  const mutation = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase.from("pagamentos" as any).delete().neq("id", "00000000-0000-0000-0000-000000000000");
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Competência de Pagamentos Diversos fechada.");
+      setOpen(false);
+      onComplete();
+    },
+    onError: (e: any) => toast.error(e.message),
+  });
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button size="sm" variant="outline" className="gap-1 border-emerald-600 text-emerald-700 hover:bg-emerald-50">
+          <TableIcon className="h-4 w-4" /> Fechamento de Competência
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Fechamento de Competência — Pagamentos Diversos</DialogTitle>
+          <DialogDescription className="bg-red-50 p-3 text-red-800 border border-red-200 rounded-md flex items-start gap-2">
+            <span className="text-sm">
+              Ao realizar o fechamento, os dados de <b>Pagamentos Diversos</b> serão arquivados 
+              e a base será limpa para o próximo ciclo.
+            </span>
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-4 py-4">
+          <div className="space-y-2">
+            <Label htmlFor="nome-fechamento-pg">Nome do Fechamento (Ex: Julho/2026)</Label>
+            <Input
+              id="nome-fechamento-pg"
+              placeholder="Digite um nome para o arquivo..."
+              value={nome}
+              onChange={(e) => setNome(e.target.value)}
+            />
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setOpen(false)}>Cancelar</Button>
+          <Button 
+            className="bg-red-600 hover:bg-red-700 text-white"
+            onClick={() => mutation.mutate()}
+            disabled={!nome || mutation.isPending}
+          >
+            {mutation.isPending ? "Processando..." : "Realizar Fechamento"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+export default PagamentosPage;
