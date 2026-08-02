@@ -140,7 +140,7 @@ export function HeaderActions() {
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuSub>
-            <DropdownMenuSubTrigger className="flex h-10 items-center justify-between gap-4 px-2 py-0 text-[10px] uppercase tracking-wide text-muted-foreground outline-none">
+            <DropdownMenuSubTrigger className="flex h-10 items-center justify-between gap-4 px-2 py-0 text-[10px] uppercase tracking-wide text-muted-foreground">
               <span>Status</span>
               <span className="flex items-center gap-1.5 normal-case tracking-normal text-muted-foreground">
                 <span className={`h-2 w-2 rounded-full ${meta.dot}`} aria-hidden />
