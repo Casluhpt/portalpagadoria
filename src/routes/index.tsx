@@ -275,7 +275,7 @@ function PortalPage() {
 
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen w-full bg-gradient-to-br from-slate-50 via-slate-100 to-violet-50">
+      <div className="flex min-h-screen w-full bg-[#F8FAFC] dark:bg-background transition-colors duration-300">
         <AppSidebar />
         <div className="flex flex-1 flex-col">
           <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-slate-200 bg-white/80 px-4 backdrop-blur">
@@ -352,7 +352,7 @@ function PortalPage() {
               </div>
             </section>
 
-            <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
               <KpiCard
                 label="Total pago no mês"
                 value={brl(kpis.totalMes)}
