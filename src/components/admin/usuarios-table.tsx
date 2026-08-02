@@ -26,7 +26,6 @@ import {
   Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { TechnicalSpec } from "@/components/technical-spec";
 
 export function UsuariosTableWrapper() {
   return (
@@ -170,7 +169,6 @@ function UsuariosTable() {
 
   return (
     <div className="flex flex-1 flex-col gap-3 p-4">
-      <TechnicalSpec className="mb-4" />
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <p className="text-xs text-muted-foreground">

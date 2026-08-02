@@ -50,7 +50,6 @@ import { logAcaoCritica } from "@/lib/audit-critico";
 import { useSession } from "@/hooks/use-session";
 import { useRoles } from "@/hooks/use-roles";
 import { supabase } from "@/integrations/supabase/client";
-import { TechnicalSpec } from "@/components/technical-spec";
 import {
   createPagamento, createPagamentosBulk, deletePagamento,
   fetchPagamentos, pagamentosQueryKey, updatePagamento,
@@ -125,7 +124,6 @@ function PagamentosPage() {
           </header>
           <Tabs defaultValue="dashboard" className="flex flex-1 flex-col">
             <div className="border-b border-border bg-background px-4">
-              <TechnicalSpec className="mt-2" />
               <TabsList className="h-11 bg-transparent">
                 <TabsTrigger value="dashboard" className="gap-2">
                   <LayoutGrid className="h-4 w-4" /> Dashboard
