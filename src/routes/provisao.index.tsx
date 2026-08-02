@@ -192,16 +192,33 @@ function ProvisaoDashboard() {
       <Card className="overflow-hidden border-emerald-200 shadow-sm">
 
 
-        <CardHeader className="flex flex-row items-center justify-between gap-4 bg-emerald-700 py-4 text-emerald-50">
-          <div className="flex items-center gap-3">
-            <img
-              src={profarmaLogo.url}
-              alt="Profarma"
-              className="h-8 rounded bg-card/90 px-2 py-1"
-            />
-            <CardTitle className="text-lg font-bold tracking-wide">
-              ADP - PAGADORIA
-            </CardTitle>
+        <CardHeader className="flex flex-col md:flex-row items-center justify-between gap-4 bg-emerald-700 py-4 text-emerald-50">
+          <div className="flex flex-col gap-4 w-full md:w-auto">
+            <div className="flex items-center gap-3">
+              <img
+                src={profarmaLogo.url}
+                alt="Profarma"
+                className="h-8 rounded bg-card/90 px-2 py-1"
+              />
+              <CardTitle className="text-lg font-bold tracking-wide">
+                ADP - PAGADORIA
+              </CardTitle>
+            </div>
+            
+            <div className="flex items-center bg-white/10 rounded-lg p-1 border border-white/20 w-fit">
+              <Button asChild size="sm" variant="ghost" className="h-8 px-4 text-white hover:bg-white/10 bg-white/10 shadow-sm">
+                <Link to="/provisao" className="flex items-center gap-2">
+                  <LayoutDashboard className="h-3.5 w-3.5" />
+                  <span className="text-xs font-semibold">Dashboard</span>
+                </Link>
+              </Button>
+              <Button asChild size="sm" variant="ghost" className="h-8 px-4 text-white/70 hover:bg-white/10 hover:text-white">
+                <Link to="/base" className="flex items-center gap-2">
+                  <Database className="h-3.5 w-3.5" />
+                  <span className="text-xs font-semibold">Base da Provisão</span>
+                </Link>
+              </Button>
+            </div>
           </div>
           <div className="flex flex-wrap items-center gap-3">
             <Label
