@@ -28,6 +28,7 @@ import {
 
 import { AppSidebar } from "@/components/app-sidebar";
 import { HeaderActions } from "@/components/header-actions";
+import { useRoles } from "@/hooks/use-roles";
 import { GlobalSearch } from "@/components/global-search";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { Card, CardContent } from "@/components/ui/card";
@@ -51,6 +52,7 @@ const today = () => new Date().toISOString().slice(0, 10);
 const currentMonth = () => new Date().toISOString().slice(0, 7);
 
 function PortalPage() {
+  const { isAdmin } = useRoles();
   const { data: lanc = [] } = useQuery({
     queryKey: lancamentosQueryKey,
     queryFn: fetchAllLancamentos,
@@ -387,15 +389,17 @@ function PortalPage() {
                       </p>
                     </div>
                   </div>
-                  <Button asChild variant="outline" size="sm">
-                    <Link to="/historico">Ver histórico completo</Link>
-                  </Button>
+                  {isAdmin && (
+                    <Button asChild variant="outline" size="sm">
+                      <Link to="/historico">Ver histórico completo</Link>
+                    </Button>
+                  )}
                 </div>
 
                 <div className="relative overflow-hidden">
                   {(() => {
                     const v = visibleVersoes[carouselIdx];
-                    if (!v) return null;
+                    if (!v || !isAdmin) return null;
                     const isLatest = latest?.versao === v.versao;
                     const itens = Array.isArray(v.itens)
                       ? (v.itens as Array<{ categoria: string; descricao: string }>)
