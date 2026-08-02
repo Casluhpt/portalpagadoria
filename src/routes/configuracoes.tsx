@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { HelpCircle, Bug, AlertCircle, MessageSquare, Send, CheckCircle2, Paperclip, X, Loader2, Settings, Users, History } from "lucide-react";
+import { HelpCircle, Bug, AlertCircle, MessageSquare, Send, CheckCircle2, Paperclip, X, Loader2, Settings, Users, History, ChevronRight } from "lucide-react";
 import { useState, useRef } from "react";
 import { useSession } from "@/hooks/use-session";
 import { useMutation } from "@tanstack/react-query";
@@ -38,81 +38,81 @@ function ConfiguracoesPage() {
           </header>
           
           <main className="flex-1 p-6">
-            <Tabs defaultValue="geral" className="w-full flex flex-col md:flex-row gap-6">
-              <TabsList className="flex flex-col h-auto bg-transparent border-none p-0 gap-1 w-full md:w-64 shrink-0">
-                <TabsTrigger 
-                  value="geral" 
-                  className="justify-start gap-3 px-4 py-3 h-auto w-full data-[state=active]:bg-white data-[state=active]:shadow-sm border border-transparent data-[state=active]:border-border rounded-lg transition-all"
-                >
-                  <div className="flex h-8 w-8 items-center justify-center rounded-md bg-slate-100 text-slate-600 group-data-[state=active]:bg-indigo-100 group-data-[state=active]:text-indigo-600">
-                    <Settings className="h-4 w-4" />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* Card Administração de Usuários */}
+              <Card 
+                className="group hover:shadow-lg transition-all border-slate-200 cursor-pointer overflow-hidden flex flex-col"
+                onClick={() => navigate({ to: "/usuarios" })}
+              >
+                <div className="p-6 flex flex-col h-full">
+                  <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                    <Users className="h-6 w-6" />
                   </div>
-                  <div className="flex flex-col items-start text-left">
-                    <span className="text-sm font-medium">Geral</span>
-                    <span className="text-[10px] text-muted-foreground font-normal">Preferências do sistema</span>
+                  <h3 className="text-lg font-bold text-slate-900 mb-2">Administração de usuários</h3>
+                  <p className="text-sm text-muted-foreground flex-1">
+                    Gestão completa de acessos, permissões e perfis de usuários do portal.
+                  </p>
+                  <div className="mt-6 flex items-center text-xs font-semibold text-indigo-600 uppercase tracking-wider">
+                    Acessar Módulo <ChevronRight className="ml-1 h-3 w-3" />
                   </div>
-                </TabsTrigger>
+                </div>
+              </Card>
 
-                <TabsTrigger 
-                  value="usuarios" 
-                  onClick={() => navigate({ to: "/usuarios" })}
-                  className="justify-start gap-3 px-4 py-3 h-auto w-full data-[state=active]:bg-white data-[state=active]:shadow-sm border border-transparent data-[state=active]:border-border rounded-lg transition-all"
-                >
-                  <div className="flex h-8 w-8 items-center justify-center rounded-md bg-slate-100 text-slate-600">
-                    <Users className="h-4 w-4" />
+              {/* Card Histórico de Versões */}
+              <Card 
+                className="group hover:shadow-lg transition-all border-slate-200 cursor-pointer overflow-hidden flex flex-col"
+                onClick={() => navigate({ to: "/historico" })}
+              >
+                <div className="p-6 flex flex-col h-full">
+                  <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-amber-50 text-amber-600 group-hover:bg-amber-600 group-hover:text-white transition-colors">
+                    <History className="h-6 w-6" />
                   </div>
-                  <div className="flex flex-col items-start text-left">
-                    <span className="text-sm font-medium">Administração de usuários</span>
-                    <span className="text-[10px] text-muted-foreground font-normal">Gestão de acessos e perfis</span>
+                  <h3 className="text-lg font-bold text-slate-900 mb-2">Histórico de versões</h3>
+                  <p className="text-sm text-muted-foreground flex-1">
+                    Visualize o log detalhado de atualizações, melhorias e correções aplicadas ao sistema.
+                  </p>
+                  <div className="mt-6 flex items-center text-xs font-semibold text-amber-600 uppercase tracking-wider">
+                    Ver Histórico <ChevronRight className="ml-1 h-3 w-3" />
                   </div>
-                </TabsTrigger>
+                </div>
+              </Card>
 
-                <TabsTrigger 
-                  value="historico" 
-                  onClick={() => navigate({ to: "/historico" })}
-                  className="justify-start gap-3 px-4 py-3 h-auto w-full data-[state=active]:bg-white data-[state=active]:shadow-sm border border-transparent data-[state=active]:border-border rounded-lg transition-all"
-                >
-                  <div className="flex h-8 w-8 items-center justify-center rounded-md bg-slate-100 text-slate-600">
-                    <History className="h-4 w-4" />
+              {/* Card Suporte Técnico */}
+              <Card 
+                className="group hover:shadow-lg transition-all border-slate-200 cursor-pointer overflow-hidden flex flex-col"
+                onClick={() => {
+                  const tabs = document.querySelector('[role="tablist"]');
+                  const supportTrigger = tabs?.querySelector('[value="suporte"]') as HTMLElement;
+                  supportTrigger?.click();
+                }}
+              >
+                <div className="p-6 flex flex-col h-full">
+                  <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                    <HelpCircle className="h-6 w-6" />
                   </div>
-                  <div className="flex flex-col items-start text-left">
-                    <span className="text-sm font-medium">Histórico de versões</span>
-                    <span className="text-[10px] text-muted-foreground font-normal">Logs de atualização e mudanças</span>
+                  <h3 className="text-lg font-bold text-slate-900 mb-2">Suporte Técnico</h3>
+                  <p className="text-sm text-muted-foreground flex-1">
+                    Central de ajuda para relatar bugs, sugerir melhorias ou tirar dúvidas técnicas.
+                  </p>
+                  <div className="mt-6 flex items-center text-xs font-semibold text-emerald-600 uppercase tracking-wider">
+                    Abrir Chamado <ChevronRight className="ml-1 h-3 w-3" />
                   </div>
-                </TabsTrigger>
+                </div>
+              </Card>
+            </div>
 
-                <TabsTrigger 
-                  value="suporte" 
-                  className="justify-start gap-3 px-4 py-3 h-auto w-full data-[state=active]:bg-white data-[state=active]:shadow-sm border border-transparent data-[state=active]:border-border rounded-lg transition-all"
-                >
-                  <div className="flex h-8 w-8 items-center justify-center rounded-md bg-slate-100 text-slate-600 group-data-[state=active]:bg-indigo-100 group-data-[state=active]:text-indigo-600">
-                    <HelpCircle className="h-4 w-4" />
-                  </div>
-                  <div className="flex flex-col items-start text-left">
-                    <span className="text-sm font-medium">Suporte Técnico</span>
-                    <span className="text-[10px] text-muted-foreground font-normal">Dúvidas, sugestões e erros</span>
-                  </div>
-                </TabsTrigger>
-              </TabsList>
-              
-              <div className="flex-1 min-w-0">
-                <TabsContent value="geral" className="mt-0">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Configurações Gerais</CardTitle>
-                      <CardDescription>Gerencie as preferências globais do portal.</CardDescription>
-                    </CardHeader>
-                    <CardContent className="h-[200px] flex items-center justify-center text-muted-foreground">
-                      Módulo em desenvolvimento
-                    </CardContent>
-                  </Card>
-                </TabsContent>
-                
-                <TabsContent value="suporte" className="mt-0">
+            <div className="mt-12 border-t pt-8">
+              <Tabs defaultValue="suporte" className="w-full">
+                <TabsList className="mb-6">
+                  <TabsTrigger value="suporte" className="gap-2">
+                    <HelpCircle className="h-4 w-4" /> Formulário de Suporte
+                  </TabsTrigger>
+                </TabsList>
+                <TabsContent value="suporte">
                   <SupportForm />
                 </TabsContent>
-              </div>
-            </Tabs>
+              </Tabs>
+            </div>
           </main>
         </div>
       </div>
