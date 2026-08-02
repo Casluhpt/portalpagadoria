@@ -44,7 +44,7 @@ const roleLabel: Record<string, string> = {
   consulta: "Consulta",
   auditor: "Auditor",
   viewer: "Visualizador",
-  visitante: "Visitante",
+  visitante: "Gerência/Visitante",
 };
 
 const presenceMeta: Record<PresenceStatus, { label: string; dot: string; Icon: typeof Circle }> = {

@@ -173,7 +173,7 @@ function SignInForm() {
   );
 }
 
-const SETORES = ["FOLHA/FÉRIAS", "RESCISÃO", "BENEFICIOS", "PAGADORIA", "GERÊNCIA/VISITANTE", "VISITANTE"] as const;
+const SETORES = ["FOLHA/FÉRIAS", "RESCISÃO", "BENEFICIOS", "PAGADORIA", "GERÊNCIA/VISITANTE"] as const;
 type Setor = (typeof SETORES)[number];
 
 function SignUpForm() {
