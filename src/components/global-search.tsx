@@ -398,7 +398,7 @@ export function GlobalSearch({ variant = "compact" }: { variant?: "compact" | "h
             </span>
           </div>
           <div className="flex items-center gap-1 font-medium text-violet-600">
-            <Sparkles className="h-3 w-3" /> Busca total + IA da Pagadoria
+            <Sparkles className="h-3 w-3" /> IA da Pagadoria
           </div>
         </div>
       </CommandDialog>
