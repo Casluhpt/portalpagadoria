@@ -91,7 +91,7 @@ const navigationGroups = [
   { id: "geral", label: "Navegação Geral" },
   { id: "operacao", label: "Operação e Resultados" },
   { id: "financeiro", label: "Financeiro e Controle" },
-  { id: "base_anexos", label: "Base de Anexos e Relatórios" },
+  { id: "base_anexos", label: "[anexo] e Relatórios" },
   { id: "apoio", label: "Suporte e IA" }
 ];
 
