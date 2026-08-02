@@ -14,7 +14,7 @@ import { useRoles } from "@/hooks/use-roles";
 import { ACOES_CRITICAS, fetchAuditCritico, type AuditLogRow } from "@/lib/audit-critico";
 
 const severidadeTone: Record<string, string> = {
-  info: "bg-slate-100 text-slate-700 border-slate-200",
+  info: "bg-muted text-foreground border-border",
   alerta: "bg-amber-100 text-amber-800 border-amber-200",
   critico: "bg-rose-100 text-rose-800 border-rose-200",
 };

@@ -12,7 +12,7 @@ interface ModuleStubProps {
 
 export function ModuleStub({ title, description, phase, adminOnly }: ModuleStubProps) {
   return (
-    <div className="min-h-[calc(100vh-3.5rem)] bg-gradient-to-br from-slate-50 via-white to-violet-50/40 p-6">
+    <div className="min-h-[calc(100vh-3.5rem)] bg-gradient-to-br from-muted via-white to-violet-50/40 p-6">
       <div className="mx-auto max-w-3xl space-y-4">
         <Button variant="ghost" size="sm" asChild>
           <Link to="/">
@@ -20,19 +20,19 @@ export function ModuleStub({ title, description, phase, adminOnly }: ModuleStubP
             Voltar ao Portal
           </Link>
         </Button>
-        <Card className="border-slate-200 shadow-sm">
+        <Card className="border-border shadow-sm">
           <CardHeader>
             <div className="flex items-center gap-3">
               <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-violet-100 text-violet-700">
                 {adminOnly ? <Lock className="h-5 w-5" /> : <Construction className="h-5 w-5" />}
               </div>
               <div>
-                <CardTitle className="text-xl text-slate-800">{title}</CardTitle>
-                <p className="text-sm text-slate-500">{description}</p>
+                <CardTitle className="text-xl text-foreground">{title}</CardTitle>
+                <p className="text-sm text-muted-foreground">{description}</p>
               </div>
             </div>
           </CardHeader>
-          <CardContent className="space-y-3 text-sm text-slate-600">
+          <CardContent className="space-y-3 text-sm text-muted-foreground">
             <p>
               Este módulo faz parte do escopo do Portal Pagadoria e será entregue{" "}
               {phase ? <strong>na {phase}</strong> : "em uma próxima fase"} do plano de construção.
@@ -43,7 +43,7 @@ export function ModuleStub({ title, description, phase, adminOnly }: ModuleStubP
                 módulo estiver disponível.
               </div>
             )}
-            <p className="text-slate-500">
+            <p className="text-muted-foreground">
               Integração futura disponível para Excel, SharePoint e Power BI.
             </p>
           </CardContent>

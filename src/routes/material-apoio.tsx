@@ -434,12 +434,12 @@ function MaterialApoioPage() {
                         if (e.key === "Enter") perguntar(busca);
                       }}
                       placeholder="Ex.: como fechar a competência? como importar pagamentos?"
-                      className="h-11 border-0 bg-white pl-9 text-sm text-slate-800 placeholder:text-slate-400"
+                      className="h-11 border-0 bg-card pl-9 text-sm text-foreground placeholder:text-muted-foreground"
                       aria-label="Pesquisar no material de apoio"
                     />
                   </div>
                   <Button
-                    className="h-11 gap-2 bg-white text-violet-700 hover:bg-white/90"
+                    className="h-11 gap-2 bg-card text-violet-700 hover:bg-card/90"
                     onClick={() => perguntar(busca)}
                     disabled={iaCarregando}
                   >
@@ -504,9 +504,9 @@ function MaterialApoioPage() {
                   { key: 'A', label: 'Base Anexos' },
                   { key: 'F', label: 'Fechamento' },
                 ].map(s => (
-                  <div key={s.key} className="flex flex-col items-center justify-center p-3 bg-white rounded-lg border border-blue-100 shadow-sm text-center">
-                    <kbd className="mb-1 rounded bg-slate-100 px-2 py-0.5 font-mono text-xs font-bold border border-slate-300">Ctrl + {s.key}</kbd>
-                    <span className="text-[9px] text-slate-500 uppercase font-bold tracking-tighter">{s.label}</span>
+                  <div key={s.key} className="flex flex-col items-center justify-center p-3 bg-card rounded-lg border border-blue-100 shadow-sm text-center">
+                    <kbd className="mb-1 rounded bg-muted px-2 py-0.5 font-mono text-xs font-bold border border-border">Ctrl + {s.key}</kbd>
+                    <span className="text-[9px] text-muted-foreground uppercase font-bold tracking-tighter">{s.label}</span>
                   </div>
                 ))}
               </div>
@@ -537,7 +537,7 @@ function MaterialApoioPage() {
                   <Star className={`mr-2 h-4 w-4 ${somenteFavoritos ? "fill-white" : "text-amber-500"}`} />
                   Favoritos
                 </Button>
-                <div className="h-6 w-[1px] bg-slate-200 mx-1 hidden sm:block" />
+                <div className="h-6 w-[1px] bg-muted mx-1 hidden sm:block" />
                 <Button
                   size="sm"
                   variant={categoria === null && !somenteFavoritos ? "default" : "outline"}
@@ -617,7 +617,7 @@ function MaterialApoioPage() {
                 {filtrados.map((m) => {
                   const open = aberto === m.id;
                   return (
-                    <Card key={m.id} className="flex flex-col border-slate-200 transition-shadow hover:shadow-md">
+                    <Card key={m.id} className="flex flex-col border-border transition-shadow hover:shadow-md">
                       <CardHeader className="pb-3">
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex items-start gap-3">

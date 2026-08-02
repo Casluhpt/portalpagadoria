@@ -50,7 +50,7 @@ const roleLabel: Record<string, string> = {
 const presenceMeta: Record<PresenceStatus, { label: string; dot: string; Icon: typeof Circle }> = {
   online: { label: "Online", dot: "bg-emerald-500", Icon: Circle },
   ausente: { label: "Ausente", dot: "bg-amber-500", Icon: MinusCircle },
-  offline: { label: "Offline", dot: "bg-slate-400", Icon: XCircle },
+  offline: { label: "Offline", dot: "bg-muted-foreground/60", Icon: XCircle },
 };
 
 export function HeaderActions() {
@@ -107,7 +107,7 @@ export function HeaderActions() {
         <DropdownMenuTrigger asChild>
           <Button
             variant="ghost"
-            className="h-9 gap-2 px-1.5 hover:bg-slate-100"
+            className="h-9 gap-2 px-1.5 hover:bg-muted"
             aria-label="Perfil do usuário"
           >
             <div className="relative">
@@ -119,7 +119,7 @@ export function HeaderActions() {
                 aria-label={meta.label}
               />
             </div>
-            <span className="hidden max-w-[140px] truncate text-xs font-medium text-slate-700 sm:inline">
+            <span className="hidden max-w-[140px] truncate text-xs font-medium text-foreground sm:inline">
               {user.email}
             </span>
           </Button>
@@ -130,7 +130,7 @@ export function HeaderActions() {
               <span className="truncate text-sm font-semibold">{user.email}</span>
               <span className="text-[10px] uppercase tracking-wide text-muted-foreground">
                 {primary ? roleLabel[primary] : "Sem perfil atribuído"}
-                {setor ? <span className="ml-1 normal-case text-slate-500">· {setor}</span> : null}
+                {setor ? <span className="ml-1 normal-case text-muted-foreground">· {setor}</span> : null}
               </span>
               <span className="mt-1 inline-flex items-center gap-1.5 text-[11px] text-muted-foreground">
                 <span className={`h-2 w-2 rounded-full ${meta.dot}`} aria-hidden />
@@ -163,7 +163,7 @@ export function HeaderActions() {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="icon" className="h-9 w-9" aria-label="Configurações">
-            <Settings className="h-4 w-4 text-slate-600" />
+            <Settings className="h-4 w-4 text-muted-foreground" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-60">

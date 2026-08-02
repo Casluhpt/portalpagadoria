@@ -259,7 +259,7 @@ function Content() {
             <span className={`absolute -left-[33px] top-2 grid h-5 w-5 place-items-center rounded-full border-2 ${
               v.versao === versaoAtual ? "border-violet-600 bg-violet-600" : "border-border bg-card"
             }`}>
-              {v.versao === versaoAtual && <span className="h-1.5 w-1.5 rounded-full bg-white" />}
+              {v.versao === versaoAtual && <span className="h-1.5 w-1.5 rounded-full bg-card" />}
             </span>
             <article className="rounded-lg border border-border bg-card p-4 shadow-sm">
               <header className="flex flex-wrap items-start justify-between gap-2">

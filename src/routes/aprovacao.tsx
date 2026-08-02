@@ -47,7 +47,7 @@ const STATUS_CHIP: Record<AprovacaoStatus, string> = {
   Pago: "bg-emerald-100 text-emerald-800 border-emerald-200",
   Recusado: "bg-red-100 text-red-800 border-red-200",
   Pendente: "bg-amber-100 text-amber-800 border-amber-200",
-  Cancelado: "bg-slate-200 text-slate-700 border-slate-300",
+  Cancelado: "bg-muted text-foreground border-border",
 };
 
 const empresaNome = (codigo: string | null) => {

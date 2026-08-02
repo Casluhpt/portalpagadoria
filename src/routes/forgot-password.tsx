@@ -33,12 +33,12 @@ function ForgotPasswordPage() {
   };
 
   return (
-    <div className="grid min-h-dvh place-items-center bg-gradient-to-br from-slate-100 via-slate-100 to-violet-100 p-4">
-      <Card className="w-full max-w-md border-slate-200 shadow-lg">
+    <div className="grid min-h-dvh place-items-center bg-background p-4">
+      <Card className="w-full max-w-md border-border shadow-lg">
         <CardHeader className="items-center text-center">
           <img src={profarmaLogo.url} alt="Profarma" className="mb-2 h-10" />
-          <CardTitle className="text-xl text-slate-800">Recuperar senha</CardTitle>
-          <p className="text-sm text-slate-500">
+          <CardTitle className="text-xl text-foreground">Recuperar senha</CardTitle>
+          <p className="text-sm text-muted-foreground">
             Informe o e-mail cadastrado e enviaremos um link de recuperação.
           </p>
         </CardHeader>

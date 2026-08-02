@@ -138,9 +138,9 @@ export function NotificationBell() {
           aria-label={`Notificações${totalBadge ? ` (${totalBadge} não lidas)` : ""}`}
         >
           {isSnoozed ? (
-            <BellOff className="h-5 w-5 text-slate-400" />
+            <BellOff className="h-5 w-5 text-muted-foreground" />
           ) : (
-            <Bell className="h-5 w-5 text-slate-600" />
+            <Bell className="h-5 w-5 text-muted-foreground" />
           )}
           {totalBadge > 0 && !isSnoozed && (
             <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-semibold text-white ring-2 ring-white">
@@ -150,17 +150,17 @@ export function NotificationBell() {
         </Button>
       </PopoverTrigger>
       <PopoverContent align="end" className="w-96 p-0">
-        <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3">
+        <div className="flex items-center justify-between border-b border-border px-4 py-3">
           <div>
             <div className="flex items-center gap-2">
-              <p className="text-sm font-semibold text-slate-900">Notificações</p>
+              <p className="text-sm font-semibold text-foreground">Notificações</p>
               {isSnoozed && (
                 <span className="flex items-center gap-1 rounded bg-amber-50 px-1 py-0.5 text-[9px] font-bold text-amber-700">
                   <BellOff className="h-2.5 w-2.5" /> Mudo
                 </span>
               )}
             </div>
-            <p className="text-[11px] text-slate-500">
+            <p className="text-[11px] text-muted-foreground">
               {naoLidos.length > 0
                 ? `${naoLidos.length} comunicado(s) não lido(s)`
                 : "Nenhum comunicado não lido"}
@@ -169,13 +169,13 @@ export function NotificationBell() {
           <div className="flex items-center gap-1">
             <Popover>
               <PopoverTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400">
+                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground">
                   <Clock className="h-4 w-4" />
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-40 p-1" side="left" align="start">
                 <div className="grid gap-1">
-                  <p className="px-2 py-1 text-[10px] font-semibold text-slate-500 uppercase tracking-wider">Silenciar</p>
+                  <p className="px-2 py-1 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Silenciar</p>
                   {isSnoozed ? (
                     <Button variant="ghost" className="justify-start h-8 text-xs font-medium text-indigo-600" onClick={clearSnooze}>
                       Tirar do silencioso
@@ -224,11 +224,11 @@ export function NotificationBell() {
                     Nova versão
                   </span>
                 </div>
-                <p className="mt-1 truncate text-sm font-semibold text-slate-900">
+                <p className="mt-1 truncate text-sm font-semibold text-foreground">
                   {latestVersion.titulo}
                 </p>
                 {latestVersion.resumo && (
-                  <p className="mt-0.5 line-clamp-2 text-xs text-slate-600">{latestVersion.resumo}</p>
+                  <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">{latestVersion.resumo}</p>
                 )}
                 <Link
                   to="/historico"
@@ -273,23 +273,23 @@ function NotifList({
   return (
     <ScrollArea className="max-h-96">
       {items.length === 0 ? (
-        <div className="px-4 py-8 text-center text-xs text-slate-500">{emptyLabel}</div>
+        <div className="px-4 py-8 text-center text-xs text-muted-foreground">{emptyLabel}</div>
       ) : (
-        <ul className="divide-y divide-slate-100">
+        <ul className="divide-y divide-border">
           {items.map((c) => (
             <li
               key={c.id}
-              className={`group relative flex gap-3 px-4 py-3 pr-9 text-sm ${c.lido ? "bg-white" : "bg-violet-50/60"}`}
+              className={`group relative flex gap-3 px-4 py-3 pr-9 text-sm ${c.lido ? "bg-card" : "bg-violet-50/60"}`}
             >
               <span
-                className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${c.lido ? "bg-slate-300" : "bg-violet-600"}`}
+                className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${c.lido ? "bg-muted-foreground/40" : "bg-violet-600"}`}
               />
               <div className="min-w-0 flex-1">
                 <div className="flex items-start justify-between gap-2">
-                  <p className="truncate font-semibold text-slate-900">{c.titulo}</p>
-                  <span className="shrink-0 text-[10px] text-slate-400">{rel(c.criado_em)}</span>
+                  <p className="truncate font-semibold text-foreground">{c.titulo}</p>
+                  <span className="shrink-0 text-[10px] text-muted-foreground">{rel(c.criado_em)}</span>
                 </div>
-                <p className="mt-0.5 whitespace-pre-wrap text-xs text-slate-600">
+                <p className="mt-0.5 whitespace-pre-wrap text-xs text-muted-foreground">
                   {c.mensagem}
                   {c.mensagem.includes("http") && (
                     <a 
@@ -315,7 +315,7 @@ function NotifList({
                 <button
                   onClick={() => onMark(c.id)}
                   aria-label="Fechar notificação"
-                  className="absolute right-2 top-2 rounded-full p-1 text-slate-400 opacity-0 transition hover:bg-slate-100 hover:text-slate-700 group-hover:opacity-100 focus:opacity-100"
+                  className="absolute right-2 top-2 rounded-full p-1 text-muted-foreground opacity-0 transition hover:bg-muted hover:text-foreground group-hover:opacity-100 focus:opacity-100"
                 >
                   <X className="h-3.5 w-3.5" />
                 </button>

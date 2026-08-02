@@ -255,7 +255,7 @@ function DashboardConteudo() {
 
               {/* Top row: logo + total geral + filters trigger */}
               <div className="relative grid grid-cols-1 items-center gap-4 lg:grid-cols-[auto_1fr_auto]">
-                <div className="flex items-center gap-3 rounded-2xl bg-white/95 px-4 py-3 shadow-lg">
+                <div className="flex items-center gap-3 rounded-2xl bg-card/90 px-4 py-3 shadow-lg">
                   <img
                     src={logoAsset.url}
                     alt="Grupo Profarma 65 anos"

@@ -48,12 +48,12 @@ function AuthPage() {
 
 
   return (
-    <div className="grid min-h-dvh place-items-center bg-gradient-to-br from-slate-100 via-slate-100 to-violet-100 p-4">
-      <Card className="w-full max-w-md border-slate-200 shadow-lg">
+    <div className="grid min-h-dvh place-items-center bg-background p-4">
+      <Card className="w-full max-w-md border-border shadow-lg">
         <CardHeader className="items-center text-center">
           <img src={profarmaLogo.url} alt="Profarma" className="mb-2 h-10" />
-          <CardTitle className="text-xl text-slate-800">Portal Pagadoria</CardTitle>
-          <p className="text-sm text-slate-500">Acesse para editar as bases de dados.</p>
+          <CardTitle className="text-xl text-foreground">Portal Pagadoria</CardTitle>
+          <p className="text-sm text-muted-foreground">Acesse para editar as bases de dados.</p>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="signin">
@@ -297,7 +297,7 @@ function SignUpForm() {
         {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <UserPlus className="mr-2 h-4 w-4" />}
         Criar conta
       </Button>
-      <p className="text-center text-xs text-slate-500">
+      <p className="text-center text-xs text-muted-foreground">
         <KeyRound className="mr-1 inline h-3 w-3" />
         Ao criar conta você recebe acesso de consulta; um administrador libera edição.
       </p>
