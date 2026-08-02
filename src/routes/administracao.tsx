@@ -12,7 +12,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/hooks/use-session";
 import { useRoles } from "@/hooks/use-roles";
@@ -34,7 +33,7 @@ function AdministracaoPage() {
         <div className="flex flex-1 flex-col">
           <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-border bg-background/80 px-4 backdrop-blur">
             <SidebarTrigger />
-            <h1 className="text-sm font-semibold text-slate-700">Administração de Comunicados</h1>
+            <h1 className="text-sm font-semibold text-slate-700">Administração do Portal</h1>
             <div className="ml-auto">
               <HeaderActions />
             </div>
@@ -54,9 +53,6 @@ function ComunicadosPanel() {
   const qc = useQueryClient();
   const [titulo, setTitulo] = useState("");
   const [mensagem, setMensagem] = useState("");
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const [sendEmail, setSendEmail] = useState(false);
-  const [sendPortal, setSendPortal] = useState(true);
 
   const { data: items = [] } = useQuery({
     queryKey: [...comunicadosQueryKey, "admin"],
@@ -75,25 +71,17 @@ function ComunicadosPanel() {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const removeBulk = useMutation({
-    mutationFn: async (ids: string[]) => {
-      const { error } = await supabase.from("comunicados").delete().in("id", ids);
+  const remove = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("comunicados").delete().eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Comunicados removidos com sucesso");
-      setSelectedIds(new Set());
+      toast.success("Comunicado removido");
       qc.invalidateQueries({ queryKey: comunicadosQueryKey });
     },
     onError: (e: Error) => toast.error(e.message),
   });
-
-  const toggleSelection = (id: string) => {
-    const next = new Set(selectedIds);
-    if (next.has(id)) next.delete(id);
-    else next.add(id);
-    setSelectedIds(next);
-  };
 
   if (loading) return null;
 
@@ -148,16 +136,6 @@ function ComunicadosPanel() {
               maxLength={2000}
             />
           </div>
-          <div className="flex items-center gap-6 py-2">
-            <div className="flex items-center space-x-2">
-              <Checkbox id="portal" checked={sendPortal} onCheckedChange={(v) => setSendPortal(!!v)} />
-              <Label htmlFor="portal" className="text-xs">Enviar pelo Portal</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Checkbox id="email" checked={sendEmail} onCheckedChange={(v) => setSendEmail(!!v)} />
-              <Label htmlFor="email" className="text-xs">Enviar por E-mail</Label>
-            </div>
-          </div>
           <Button
             className="w-full"
             disabled={!canSubmit}
@@ -169,22 +147,9 @@ function ComunicadosPanel() {
       </Card>
 
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <div className="space-y-1">
-            <CardTitle className="text-base">Histórico de comunicados</CardTitle>
-            <p className="text-xs text-slate-500">Últimos 100 comunicados publicados.</p>
-          </div>
-          {selectedIds.size > 0 && (
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={() => removeBulk.mutate(Array.from(selectedIds))}
-              disabled={removeBulk.isPending}
-            >
-              <Trash2 className="mr-2 h-4 w-4" />
-              Excluir ({selectedIds.size})
-            </Button>
-          )}
+        <CardHeader>
+          <CardTitle className="text-base">Histórico de comunicados</CardTitle>
+          <p className="text-xs text-slate-500">Últimos 100 comunicados publicados.</p>
         </CardHeader>
         <CardContent>
           {items.length === 0 ? (
@@ -192,13 +157,8 @@ function ComunicadosPanel() {
           ) : (
             <ul className="divide-y divide-slate-100">
               {items.map((c) => (
-                <li key={c.id} className="flex items-start gap-3 py-3">
-                  <Checkbox
-                    checked={selectedIds.has(c.id)}
-                    onCheckedChange={() => toggleSelection(c.id)}
-                    className="mt-1"
-                  />
-                  <div className="min-w-0 flex-1">
+                <li key={c.id} className="flex items-start justify-between gap-3 py-3">
+                  <div className="min-w-0">
                     <p className="truncate text-sm font-semibold text-slate-900">{c.titulo}</p>
                     <p className="mt-0.5 whitespace-pre-wrap text-xs text-slate-600">
                       {c.mensagem}
@@ -207,6 +167,18 @@ function ComunicadosPanel() {
                       {new Date(c.criado_em).toLocaleString("pt-BR")}
                     </p>
                   </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-slate-500 hover:text-red-600"
+                    aria-label="Remover comunicado"
+                    disabled={remove.isPending}
+                    onClick={() => {
+                      if (confirm("Remover este comunicado?")) remove.mutate(c.id);
+                    }}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
                 </li>
               ))}
             </ul>
