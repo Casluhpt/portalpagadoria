@@ -575,34 +575,27 @@ function StatCard({ title, value, icon, tone, isCount }: { title: string; value:
 }
 
 function GrupoTabela({
-  linhas, onOpenCelula, onOpenDescricao, onExcluir,
+  linhas, showClosedMonths, selectedKeys, onToggleSelect, onToggleAll, onOpenCelula, onOpenDescricao, onExcluir,
 }: {
   linhas: LinhaAgrupada[];
+  showClosedMonths: boolean;
+  selectedKeys: Set<string>;
+  onToggleSelect: (key: string, e: React.MouseEvent) => void;
+  onToggleAll: (keys: string[]) => void;
   onOpenCelula: (l: LinhaAgrupada, mes: number) => void;
   onOpenDescricao: (l: LinhaAgrupada) => void;
   onExcluir: (l: LinhaAgrupada) => void;
 }) {
-  const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
+  const currentMonthIdx = new Date().getMonth(); // 0-11
+  const visibleMonths = useMemo(() => {
+    if (showClosedMonths) return MESES;
+    return MESES.filter((_, i) => i >= currentMonthIdx - 1);
+  }, [showClosedMonths, currentMonthIdx]);
 
-  const toggleSelect = (key: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    const newSelected = new Set(selectedKeys);
-    if (e.ctrlKey || e.metaKey) {
-      if (newSelected.has(key)) newSelected.delete(key); else newSelected.add(key);
-    } else {
-      newSelected.clear();
-      newSelected.add(key);
-    }
-    setSelectedKeys(newSelected);
-  };
+  const allSelected = linhas.length > 0 && linhas.every(l => selectedKeys.has(l.key));
+  const someSelected = !allSelected && linhas.some(l => selectedKeys.has(l.key));
 
-  const allSelected = linhas.length > 0 && selectedKeys.size === linhas.length;
-  const someSelected = selectedKeys.size > 0 && selectedKeys.size < linhas.length;
-
-  const toggleAll = () => {
-    if (allSelected) setSelectedKeys(new Set());
-    else setSelectedKeys(new Set(linhas.map(l => l.key)));
-  };
+  const handleToggleAll = () => onToggleAll(linhas.map(l => l.key));
 
   if (linhas.length === 0) {
     return (
@@ -1009,12 +1002,12 @@ function DescricaoDialog({
           </div>
           <div>
             <Label>Nº pedido Antigo</Label>
-            <Input value={linha.meta.pedido_antigo || ""} onChange={(e) => updateMetaMut.mutate({ ...linha.meta, categoria: linha.categoria, descricao: linha.descricao, ano, pedido_antigo: e.target.value })}
+            <Input value={linha.meta.pedido_antigo || ""} onChange={(e) => setEditandoDescricao({ ...linha, meta: { ...linha.meta, pedido_antigo: e.target.value } })}
               placeholder="Antigo" />
           </div>
           <div>
             <Label>Nº pedido Novo</Label>
-            <Input value={linha.meta.pedido_novo || ""} onChange={(e) => updateMetaMut.mutate({ ...linha.meta, categoria: linha.categoria, descricao: linha.descricao, ano, pedido_novo: e.target.value })}
+            <Input value={linha.meta.pedido_novo || ""} onChange={(e) => setEditandoDescricao({ ...linha, meta: { ...linha.meta, pedido_novo: e.target.value } })}
               placeholder="Novo" />
           </div>
           <div>
