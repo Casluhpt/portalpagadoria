@@ -27,10 +27,13 @@ function AnexosPage() {
         <div className="flex flex-1 flex-col">
           <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b bg-card/90 px-4 backdrop-blur">
             <SidebarTrigger />
-            <Button asChild variant="ghost" size="sm">
-              <Link to="/"><ArrowLeft className="mr-1 h-4 w-4" /> Portal</Link>
-            </Button>
-            <h1 className="ml-2 font-semibold text-foreground">[anexo]</h1>
+            <Link to="/" className="flex flex-1 items-center gap-2 hover:opacity-80 transition-opacity">
+              <img src="/profarma.png" alt="Profarma" className="h-7 object-contain" />
+              <h1 className="text-sm font-semibold text-foreground">[anexo]</h1>
+            </Link>
+            <div className="ml-auto">
+              <HeaderActions />
+            </div>
           </header>
           <main className="flex-1 space-y-6 p-6">
             <Card className="border-border">
