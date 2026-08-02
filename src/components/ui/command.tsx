@@ -1,4 +1,5 @@
 "use client";
+// Refined for translucent minimalism and smooth feedback
 
 import * as React from "react";
 import { type DialogProps } from "@radix-ui/react-dialog";
@@ -15,7 +16,7 @@ const Command = React.forwardRef<
   <CommandPrimitive
     ref={ref}
     className={cn(
-      "flex h-full w-full flex-col overflow-hidden rounded-md bg-popover/60 backdrop-blur-xl text-popover-foreground shadow-[var(--shadow-elegant)]",
+      "flex h-full w-full flex-col overflow-hidden rounded-xl bg-popover/60 backdrop-blur-2xl text-popover-foreground shadow-[var(--shadow-elegant)] duration-500",
       className,
     )}
     {...props}
