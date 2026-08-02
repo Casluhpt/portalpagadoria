@@ -185,7 +185,7 @@ function PortalPage() {
       title: "Provisão Diária",
       subtitle: "Controle diário das provisões e evolução financeira.",
       objetivo: "Valores provisórios do dia e base utilizada para alimentação das informações.",
-      base: "Base de Provisão",
+      base: "[anexo]",
       baseTo: "/provisao/base",
       to: "/provisao",
       cta: "Consultar Provisão",
