@@ -198,7 +198,7 @@ function SupportForm() {
 
   if (success) {
     return (
-      <Card className="mx-auto max-w-2xl border-emerald-200 bg-emerald-50">
+      <Card className="mx-auto max-w-2xl border-emerald-200 bg-emerald-50 dark:bg-emerald-950/20 dark:border-emerald-900/30">
         <CardContent className="flex flex-col items-center justify-center p-12 text-center">
           <CheckCircle2 className="mb-4 h-16 w-16 text-emerald-600" />
           <h2 className="mb-2 text-2xl font-bold text-emerald-900">Enviado com sucesso!</h2>
@@ -259,7 +259,7 @@ function SupportForm() {
               <Button 
                 variant="outline" 
                 type="button"
-                className="w-full border-dashed border-border h-20 flex flex-col items-center justify-center gap-1 hover:border-indigo-400 hover:bg-indigo-50/50 transition-colors"
+                className="w-full border-dashed border-border h-20 flex flex-col items-center justify-center gap-1 hover:border-indigo-400 hover:bg-indigo-50/50 dark:hover:bg-indigo-950/20 transition-colors"
                 onClick={() => fileInputRef.current?.click()}
               >
                 <Paperclip className="h-5 w-5 text-muted-foreground" />
