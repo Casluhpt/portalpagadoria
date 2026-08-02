@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Navigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
@@ -6,6 +6,7 @@ import { ptBR } from "date-fns/locale";
 import {
   Download, GitBranch, Loader2, Search, Sparkles, ShieldCheck, Wrench, Bug,
 } from "lucide-react";
+import { useRoles } from "@/hooks/use-roles";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
@@ -62,6 +63,20 @@ function compareVersions(a: string, b: string) {
 }
 
 function HistoricoPage() {
+  const { isAdmin, loading } = useRoles();
+
+  if (loading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!isAdmin) {
+    return <Navigate to="/" />;
+  }
+
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full bg-background">
