@@ -289,11 +289,13 @@ function PortalPage() {
         <div className="flex flex-1 flex-col">
           <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-border bg-card/90 px-4 backdrop-blur">
             <SidebarTrigger />
-            <img src={profarmaLogo.url} alt="Profarma" className="h-7" />
-            <div className="ml-2 hidden flex-col leading-tight sm:flex">
-              <span className="text-sm font-semibold text-foreground">Portal Pagadoria</span>
-              <span className="text-[11px] text-muted-foreground">Central de inteligência financeira</span>
-            </div>
+            <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+              <img src={profarmaLogo.url} alt="Profarma" className="h-7" />
+              <div className="ml-2 hidden flex-col leading-tight sm:flex">
+                <span className="text-sm font-semibold text-foreground">Portal Pagadoria</span>
+                <span className="text-[11px] text-muted-foreground">Central de inteligência financeira</span>
+              </div>
+            </Link>
             <div className="ml-auto flex items-center gap-3">
               <div className="hidden items-center gap-1 text-xs text-muted-foreground md:flex">
                 <CalendarDays className="h-4 w-4" />

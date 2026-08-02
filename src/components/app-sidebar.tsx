@@ -267,8 +267,8 @@ export function AppSidebar() {
     <Sidebar collapsible="icon">
       <SidebarHeader className="border-b border-sidebar-border">
         <Link to="/" className="flex items-center gap-2 px-2 py-3 rounded-md hover:bg-sidebar-accent/50 transition-colors">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-card/50 overflow-hidden shadow-sm border border-border">
-            <AppLogo className="h-7 w-7" />
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg overflow-hidden">
+            <AppLogo className="h-9 w-9" />
           </div>
           <div className="flex flex-col leading-tight group-data-[collapsible=icon]:hidden">
             <span className="text-sm font-semibold text-sidebar-foreground">Pagadoria</span>
