@@ -323,11 +323,11 @@ export function GlobalSearch({ variant = "compact" }: { variant?: "compact" | "h
                       </Button>
                     </div>
                   )}
-                </div>
               </div>
             </div>
           </div>
         )}
+
 
         {!isAiMode && (
           <CommandList className="max-h-[460px]">
