@@ -7,6 +7,10 @@ import {
   Upload, Download, LayoutGrid, Table as TableIcon,
   Scissors, Palette, X,
 } from "lucide-react";
+import {
+  Dialog, DialogContent, DialogDescription, DialogFooter,
+  DialogHeader, DialogTitle, DialogTrigger,
+} from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
@@ -469,6 +473,7 @@ function LancamentosTab({ colaboradorNome, userId }: { colaboradorNome: string; 
             <Download className="h-4 w-4" />
             Exportar Excel
           </Button>
+          <FechamentoCompetenciaButton onComplete={invalidate} />
           <Button
             size="sm"
             className="gap-1"
