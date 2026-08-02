@@ -131,7 +131,7 @@ export function GlobalSearch({ variant = "compact" }: { variant?: "compact" | "h
       { title: "Central de Divergências", url: "/divergencias", icon: AlertTriangle, module: "Financeiro" },
       { title: "Despesas Fixas", url: "/despesas-fixas", icon: Wallet, module: "Financeiro" },
       { title: "Exportação de Relatórios", url: "/exportacao", icon: Download, module: "Geral" },
-      { title: "Dashboard Gerencial", url: "/dashboard-gerencial", icon: BarChart3, module: "Indicadores" },
+      
       { title: "Auditoria", url: "/auditoria", icon: ScrollText, module: "Governança", allowedRoles: ["administrador", "auditor"] },
       { title: "Usuários", url: "/usuarios", icon: Users, module: "Gestão", adminOnly: true },
       { title: "Histórico de Versões", url: "/historico", icon: History, module: "Sistema" },
