@@ -1,0 +1,720 @@
+import { createFileRoute } from "@tanstack/react-router";
+import { useMemo, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import jsPDF from "jspdf";
+import {
+  BookOpen,
+  Download,
+  FileText,
+  Loader2,
+  Pencil,
+  Plus,
+  Search,
+  Sparkles,
+  Trash2,
+  LifeBuoy,
+  ShieldCheck,
+} from "lucide-react";
+import { toast } from "sonner";
+
+import { AppSidebar } from "@/components/app-sidebar";
+import { HeaderActions } from "@/components/header-actions";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+
+import { useRoles } from "@/hooks/use-roles";
+import { useProfile } from "@/hooks/use-profile";
+import { useSession } from "@/hooks/use-session";
+import { perguntarIa } from "@/lib/ia.functions";
+import {
+  createMaterial,
+  deleteMaterial,
+  fetchMateriais,
+  materialApoioQueryKey,
+  rankMateriais,
+  updateMaterial,
+  type MaterialApoio,
+} from "@/lib/material-apoio";
+
+export const Route = createFileRoute("/material-apoio")({
+  head: () => ({
+    meta: [
+      { title: "Material de Apoio — Portal da Pagadoria" },
+      {
+        name: "description",
+        content:
+          "Central de ajuda do Portal da Pagadoria: materiais de suporte, busca por dúvidas, IA assistente e download em PDF.",
+      },
+      { property: "og:title", content: "Material de Apoio — Portal da Pagadoria" },
+      {
+        property: "og:description",
+        content:
+          "Materiais de suporte do portal, busca inteligente de dúvidas e download do conteúdo em PDF.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
+  component: MaterialApoioPage,
+});
+
+/** Renderizador leve de markdown (títulos, listas, negrito e tabelas simples). */
+function Markdown({ text }: { text: string }) {
+  const blocks = text.split("\n");
+  const inline = (s: string) =>
+    s.split(/(\*\*[^*]+\*\*)/g).map((part, i) =>
+      part.startsWith("**") && part.endsWith("**") ? (
+        <strong key={i} className="font-semibold text-foreground">
+          {part.slice(2, -2)}
+        </strong>
+      ) : (
+        <span key={i}>{part}</span>
+      ),
+    );
+
+  return (
+    <div className="space-y-2 text-sm leading-relaxed text-muted-foreground">
+      {blocks.map((line, i) => {
+        const l = line.trimEnd();
+        if (!l.trim()) return <div key={i} className="h-1" />;
+        if (l.startsWith("### ")) return <h4 key={i} className="pt-2 text-sm font-semibold text-foreground">{inline(l.slice(4))}</h4>;
+        if (l.startsWith("## ")) return <h3 key={i} className="pt-3 text-base font-semibold text-foreground">{inline(l.slice(3))}</h3>;
+        if (l.startsWith("# ")) return <h2 key={i} className="pt-1 text-lg font-bold text-foreground">{inline(l.slice(2))}</h2>;
+        if (/^\|/.test(l)) {
+          const cells = l.split("|").slice(1, -1).map((c) => c.trim());
+          if (cells.every((c) => /^:?-{2,}:?$/.test(c))) return null;
+          return (
+            <div key={i} className="grid gap-2" style={{ gridTemplateColumns: `repeat(${cells.length}, minmax(0,1fr))` }}>
+              {cells.map((c, j) => (
+                <span key={j} className="rounded bg-muted/60 px-2 py-1 text-xs">
+                  {inline(c)}
+                </span>
+              ))}
+            </div>
+          );
+        }
+        if (/^\d+\.\s/.test(l))
+          return (
+            <div key={i} className="flex gap-2 pl-1">
+              <span className="font-semibold text-violet-600">{l.match(/^\d+/)![0]}.</span>
+              <span>{inline(l.replace(/^\d+\.\s/, ""))}</span>
+            </div>
+          );
+        if (l.startsWith("- ") || l.startsWith("* "))
+          return (
+            <div key={i} className="flex gap-2 pl-1">
+              <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-violet-500" />
+              <span>{inline(l.slice(2))}</span>
+            </div>
+          );
+        return <p key={i}>{inline(l)}</p>;
+      })}
+    </div>
+  );
+}
+
+function baixarPdf(materiais: MaterialApoio[], titulo: string) {
+  const doc = new jsPDF({ unit: "pt", format: "a4" });
+  const margem = 48;
+  const largura = doc.internal.pageSize.getWidth() - margem * 2;
+  let y = margem;
+
+  const quebra = (altura: number) => {
+    if (y + altura > doc.internal.pageSize.getHeight() - margem) {
+      doc.addPage();
+      y = margem;
+    }
+  };
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(18);
+  doc.text("Portal da Pagadoria", margem, y);
+  y += 22;
+  doc.setFontSize(12);
+  doc.setFont("helvetica", "normal");
+  doc.text(titulo, margem, y);
+  y += 14;
+  doc.setFontSize(9);
+  doc.setTextColor(120);
+  doc.text(`Gerado em ${new Date().toLocaleString("pt-BR")}`, margem, y);
+  y += 24;
+  doc.setTextColor(0);
+
+  materiais.forEach((m) => {
+    quebra(40);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(13);
+    doc.text(m.titulo, margem, y);
+    y += 16;
+    doc.setFont("helvetica", "italic");
+    doc.setFontSize(9);
+    doc.setTextColor(110);
+    doc.text(`Categoria: ${m.categoria}`, margem, y);
+    y += 16;
+    doc.setTextColor(0);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    const linhas = doc.splitTextToSize(
+      m.conteudo.replace(/\*\*/g, "").replace(/^#+\s?/gm, ""),
+      largura,
+    ) as string[];
+    linhas.forEach((linha) => {
+      quebra(14);
+      doc.text(linha, margem, y);
+      y += 14;
+    });
+    y += 16;
+  });
+
+  doc.save(`portal-pagadoria-material-apoio.pdf`);
+}
+
+const CATEGORIAS_SUGERIDAS = [
+  "Introdução",
+  "Pagamentos",
+  "Provisão",
+  "Conciliação",
+  "Despesas Fixas",
+  "Governança",
+  "Suporte",
+];
+
+const vazio = {
+  titulo: "",
+  categoria: "Geral",
+  resumo: "",
+  conteudo: "",
+  palavras_chave: "",
+  publicado: true,
+  ordem: 0,
+};
+
+function MaterialApoioPage() {
+  const { isAdmin } = useRoles();
+  const { nome } = useProfile();
+  const { user } = useSession();
+  const qc = useQueryClient();
+
+  const { data: materiais = [], isLoading } = useQuery({
+    queryKey: materialApoioQueryKey,
+    queryFn: fetchMateriais,
+    staleTime: 60_000,
+  });
+
+  const [busca, setBusca] = useState("");
+  const [categoria, setCategoria] = useState<string | null>(null);
+  const [aberto, setAberto] = useState<string | null>(null);
+
+  const [iaPergunta, setIaPergunta] = useState("");
+  const [iaResposta, setIaResposta] = useState<string | null>(null);
+  const [iaCarregando, setIaCarregando] = useState(false);
+
+  const [editando, setEditando] = useState<MaterialApoio | null>(null);
+  const [criando, setCriando] = useState(false);
+  const [form, setForm] = useState({ ...vazio });
+  const [salvando, setSalvando] = useState(false);
+  const [excluir, setExcluir] = useState<MaterialApoio | null>(null);
+
+  const categorias = useMemo(
+    () => Array.from(new Set(materiais.map((m) => m.categoria))).sort(),
+    [materiais],
+  );
+
+  const filtrados = useMemo(() => {
+    let base = materiais;
+    if (categoria) base = base.filter((m) => m.categoria === categoria);
+    return rankMateriais(base, busca);
+  }, [materiais, busca, categoria]);
+
+  const sugestoes = useMemo(() => {
+    if (busca.trim().length < 2) {
+      return materiais.slice(0, 5).map((m) => `Como funciona: ${m.titulo}?`);
+    }
+    const ranked = rankMateriais(materiais, busca).slice(0, 5);
+    return ranked.map((m) => m.titulo);
+  }, [materiais, busca]);
+
+  const contextoIa = useMemo(
+    () =>
+      materiais
+        .filter((m) => m.publicado)
+        .map(
+          (m) =>
+            `### ${m.titulo} (categoria: ${m.categoria})\nPalavras-chave: ${(m.palavras_chave ?? []).join(", ")}\n${m.conteudo}`,
+        )
+        .join("\n\n---\n\n")
+        .slice(0, 55_000),
+    [materiais],
+  );
+
+  const perguntar = async (pergunta?: string) => {
+    const q = (pergunta ?? iaPergunta ?? busca).trim();
+    if (q.length < 2) {
+      toast.info("Escreva sua dúvida para a IA Assistente.");
+      return;
+    }
+    setIaPergunta(q);
+    setIaCarregando(true);
+    setIaResposta(null);
+    try {
+      const r = await perguntarIa({ data: { pergunta: q, contexto: contextoIa } });
+      if (r.erro) toast.error(r.erro);
+      setIaResposta(r.resposta ?? null);
+    } catch (e) {
+      toast.error("Falha ao consultar a IA Assistente.");
+    } finally {
+      setIaCarregando(false);
+    }
+  };
+
+  const abrirCriacao = () => {
+    setForm({ ...vazio, ordem: materiais.length + 1 });
+    setCriando(true);
+  };
+
+  const abrirEdicao = (m: MaterialApoio) => {
+    setForm({
+      titulo: m.titulo,
+      categoria: m.categoria,
+      resumo: m.resumo ?? "",
+      conteudo: m.conteudo,
+      palavras_chave: (m.palavras_chave ?? []).join(", "),
+      publicado: m.publicado,
+      ordem: m.ordem,
+    });
+    setEditando(m);
+  };
+
+  const salvar = async () => {
+    if (!form.titulo.trim() || !form.conteudo.trim()) {
+      toast.error("Título e conteúdo são obrigatórios.");
+      return;
+    }
+    setSalvando(true);
+    const payload = {
+      titulo: form.titulo.trim(),
+      categoria: form.categoria.trim() || "Geral",
+      resumo: form.resumo.trim(),
+      conteudo: form.conteudo,
+      palavras_chave: form.palavras_chave
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean),
+      publicado: form.publicado,
+      ordem: Number(form.ordem) || 0,
+    };
+    try {
+      if (editando) {
+        await updateMaterial(editando.id, payload);
+        toast.success("Material atualizado.");
+      } else {
+        await createMaterial(payload, nome ?? user?.email ?? null);
+        toast.success("Material publicado.");
+      }
+      await qc.invalidateQueries({ queryKey: materialApoioQueryKey });
+      setEditando(null);
+      setCriando(false);
+    } catch (e: any) {
+      toast.error(e?.message ?? "Não foi possível salvar o material.");
+    } finally {
+      setSalvando(false);
+    }
+  };
+
+  const confirmarExclusao = async () => {
+    if (!excluir) return;
+    try {
+      await deleteMaterial(excluir.id);
+      await qc.invalidateQueries({ queryKey: materialApoioQueryKey });
+      toast.success("Material removido.");
+    } catch (e: any) {
+      toast.error(e?.message ?? "Não foi possível remover.");
+    } finally {
+      setExcluir(null);
+    }
+  };
+
+  return (
+    <SidebarProvider>
+      <div className="flex min-h-screen w-full bg-background">
+        <AppSidebar />
+        <div className="flex flex-1 flex-col">
+          <header className="flex h-14 items-center justify-between border-b bg-background/80 px-4 backdrop-blur">
+            <div className="flex items-center gap-3">
+              <SidebarTrigger />
+              <div className="flex items-center gap-2">
+                <div className="grid h-8 w-8 place-items-center rounded-lg bg-gradient-to-br from-violet-600 to-indigo-700 text-white">
+                  <BookOpen className="h-4 w-4" />
+                </div>
+                <h1 className="text-sm font-semibold">Material de Apoio</h1>
+              </div>
+            </div>
+            <HeaderActions />
+          </header>
+
+          <main className="mx-auto w-full max-w-6xl flex-1 space-y-6 p-4 md:p-6">
+            <Card className="overflow-hidden border-violet-200/70">
+              <div className="bg-gradient-to-br from-violet-600 to-indigo-700 px-6 py-6 text-white">
+                <h2 className="text-lg font-semibold">Qual é a sua dúvida?</h2>
+                <p className="mt-1 text-xs text-white/80">
+                  Pesquise no material de apoio do portal ou pergunte à IA Assistente da Pagadoria.
+                </p>
+                <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+                  <div className="relative flex-1">
+                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-violet-500" />
+                    <Input
+                      value={busca}
+                      onChange={(e) => setBusca(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") perguntar(busca);
+                      }}
+                      placeholder="Ex.: como fechar a competência? como importar pagamentos?"
+                      className="h-11 border-0 bg-white pl-9 text-sm text-slate-800 placeholder:text-slate-400"
+                      aria-label="Pesquisar no material de apoio"
+                    />
+                  </div>
+                  <Button
+                    className="h-11 gap-2 bg-white text-violet-700 hover:bg-white/90"
+                    onClick={() => perguntar(busca)}
+                    disabled={iaCarregando}
+                  >
+                    {iaCarregando ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Sparkles className="h-4 w-4" />
+                    )}
+                    Perguntar à IA
+                  </Button>
+                </div>
+
+                {sugestoes.length > 0 && (
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <span className="text-[11px] text-white/70">Sugestões:</span>
+                    {sugestoes.map((s) => (
+                      <button
+                        key={s}
+                        onClick={() => setBusca(s)}
+                        className="rounded-full bg-white/15 px-3 py-1 text-[11px] text-white transition hover:bg-white/25"
+                      >
+                        {s}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {(iaResposta || iaCarregando) && (
+                <CardContent className="border-t bg-violet-50/50 p-5 dark:bg-violet-950/20">
+                  <div className="flex items-center gap-2 text-xs font-semibold text-violet-700 dark:text-violet-300">
+                    <Sparkles className="h-3.5 w-3.5" /> IA Assistente da Pagadoria
+                  </div>
+                  <div className="mt-3">
+                    {iaCarregando ? (
+                      <p className="flex items-center gap-2 text-xs italic text-muted-foreground">
+                        <Loader2 className="h-3 w-3 animate-spin" /> Consultando o material autorizado…
+                      </p>
+                    ) : (
+                      <Markdown text={iaResposta ?? ""} />
+                    )}
+                  </div>
+                  <p className="mt-3 flex items-center gap-1 text-[10px] text-muted-foreground">
+                    <ShieldCheck className="h-3 w-3" /> Respostas baseadas somente no material de apoio
+                    publicado pelo administrador.
+                  </p>
+                </CardContent>
+              )}
+            </Card>
+
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex flex-wrap items-center gap-2">
+                <Button
+                  size="sm"
+                  variant={categoria === null ? "default" : "outline"}
+                  onClick={() => setCategoria(null)}
+                >
+                  Todos ({materiais.length})
+                </Button>
+                {categorias.map((c) => (
+                  <Button
+                    key={c}
+                    size="sm"
+                    variant={categoria === c ? "default" : "outline"}
+                    onClick={() => setCategoria(c)}
+                  >
+                    {c}
+                  </Button>
+                ))}
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="gap-2"
+                  onClick={() =>
+                    filtrados.length
+                      ? baixarPdf(filtrados, categoria ? `Material de apoio — ${categoria}` : "Material de apoio completo")
+                      : toast.info("Nenhum material para exportar.")
+                  }
+                >
+                  <Download className="h-4 w-4" /> Baixar PDF
+                </Button>
+                {isAdmin && (
+                  <Button size="sm" className="gap-2" onClick={abrirCriacao}>
+                    <Plus className="h-4 w-4" /> Novo material
+                  </Button>
+                )}
+              </div>
+            </div>
+
+            {isLoading ? (
+              <div className="flex items-center gap-2 p-8 text-sm text-muted-foreground">
+                <Loader2 className="h-4 w-4 animate-spin" /> Carregando materiais…
+              </div>
+            ) : filtrados.length === 0 ? (
+              <Card>
+                <CardContent className="flex flex-col items-center gap-2 py-12 text-center">
+                  <LifeBuoy className="h-10 w-10 text-muted-foreground/50" />
+                  <p className="text-sm font-medium">Nenhum material encontrado</p>
+                  <p className="max-w-sm text-xs text-muted-foreground">
+                    Ajuste a pesquisa ou pergunte à IA Assistente. Se a dúvida continuar, abra um
+                    chamado em Configurações &gt; Canal de Suporte Técnico.
+                  </p>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="grid gap-4 md:grid-cols-2">
+                {filtrados.map((m) => {
+                  const open = aberto === m.id;
+                  return (
+                    <Card key={m.id} className="flex flex-col border-slate-200 transition-shadow hover:shadow-md">
+                      <CardHeader className="pb-3">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex items-start gap-3">
+                            <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300">
+                              <FileText className="h-4 w-4" />
+                            </div>
+                            <div>
+                              <CardTitle className="text-sm">{m.titulo}</CardTitle>
+                              <div className="mt-1 flex flex-wrap items-center gap-1">
+                                <Badge variant="secondary" className="text-[10px]">
+                                  {m.categoria}
+                                </Badge>
+                                {!m.publicado && (
+                                  <Badge variant="outline" className="text-[10px] text-amber-600">
+                                    Rascunho
+                                  </Badge>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                          {isAdmin && (
+                            <div className="flex gap-1">
+                              <Button
+                                size="icon"
+                                variant="ghost"
+                                className="h-7 w-7"
+                                aria-label="Editar material"
+                                onClick={() => abrirEdicao(m)}
+                              >
+                                <Pencil className="h-3.5 w-3.5" />
+                              </Button>
+                              <Button
+                                size="icon"
+                                variant="ghost"
+                                className="h-7 w-7 text-destructive"
+                                aria-label="Excluir material"
+                                onClick={() => setExcluir(m)}
+                              >
+                                <Trash2 className="h-3.5 w-3.5" />
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+                      </CardHeader>
+                      <CardContent className="flex flex-1 flex-col justify-between gap-3">
+                        {m.resumo && <p className="text-xs text-muted-foreground">{m.resumo}</p>}
+                        {open && (
+                          <ScrollArea className="max-h-72 rounded-md border bg-muted/30 p-3">
+                            <Markdown text={m.conteudo} />
+                          </ScrollArea>
+                        )}
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            variant={open ? "outline" : "default"}
+                            className="flex-1"
+                            onClick={() => setAberto(open ? null : m.id)}
+                          >
+                            {open ? "Fechar" : "Ler material"}
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="gap-1"
+                            onClick={() => baixarPdf([m], m.titulo)}
+                          >
+                            <Download className="h-3.5 w-3.5" /> PDF
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+            )}
+
+            <p className="pb-6 text-center text-[11px] text-muted-foreground">
+              Somente o administrador pode publicar ou alterar materiais. Todos os usuários podem
+              consultar e baixar em PDF.
+            </p>
+          </main>
+        </div>
+      </div>
+
+      <Dialog
+        open={criando || !!editando}
+        onOpenChange={(v) => {
+          if (!v) {
+            setCriando(false);
+            setEditando(null);
+          }
+        }}
+      >
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>{editando ? "Editar material" : "Novo material de apoio"}</DialogTitle>
+            <DialogDescription>
+              O conteúdo aceita markdown simples (#, ##, listas, **negrito** e tabelas).
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="space-y-1">
+                <Label className="text-xs">Título</Label>
+                <Input
+                  value={form.titulo}
+                  onChange={(e) => setForm({ ...form, titulo: e.target.value })}
+                  placeholder="Como registrar um pagamento diverso"
+                />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs">Categoria</Label>
+                <Input
+                  value={form.categoria}
+                  onChange={(e) => setForm({ ...form, categoria: e.target.value })}
+                  list="categorias-material"
+                />
+                <datalist id="categorias-material">
+                  {[...new Set([...CATEGORIAS_SUGERIDAS, ...categorias])].map((c) => (
+                    <option key={c} value={c} />
+                  ))}
+                </datalist>
+              </div>
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs">Resumo</Label>
+              <Input
+                value={form.resumo}
+                onChange={(e) => setForm({ ...form, resumo: e.target.value })}
+                placeholder="Uma linha explicando o material"
+              />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs">Conteúdo</Label>
+              <Textarea
+                value={form.conteudo}
+                onChange={(e) => setForm({ ...form, conteudo: e.target.value })}
+                rows={12}
+                className="font-mono text-xs"
+                placeholder={"# Título\n\n1. Primeiro passo\n- Observação **importante**"}
+              />
+            </div>
+            <div className="grid gap-3 sm:grid-cols-3">
+              <div className="space-y-1 sm:col-span-2">
+                <Label className="text-xs">Palavras-chave (separadas por vírgula)</Label>
+                <Input
+                  value={form.palavras_chave}
+                  onChange={(e) => setForm({ ...form, palavras_chave: e.target.value })}
+                  placeholder="pagamento, importação, excel"
+                />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs">Ordem</Label>
+                <Input
+                  type="number"
+                  value={form.ordem}
+                  onChange={(e) => setForm({ ...form, ordem: Number(e.target.value) })}
+                />
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <Switch
+                checked={form.publicado}
+                onCheckedChange={(v) => setForm({ ...form, publicado: v })}
+                id="publicado"
+              />
+              <Label htmlFor="publicado" className="text-xs">
+                Publicado (visível para todos os usuários)
+              </Label>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setCriando(false);
+                setEditando(null);
+              }}
+            >
+              Cancelar
+            </Button>
+            <Button onClick={salvar} disabled={salvando}>
+              {salvando && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Salvar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <AlertDialog open={!!excluir} onOpenChange={(v) => !v && setExcluir(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remover material?</AlertDialogTitle>
+            <AlertDialogDescription>
+              “{excluir?.titulo}” deixará de ficar disponível para os usuários do portal.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmarExclusao}>Remover</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </SidebarProvider>
+  );
+}
