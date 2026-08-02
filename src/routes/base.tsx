@@ -229,7 +229,7 @@ function BasePage() {
               <img src="/profarma.png" alt="Profarma" className="h-7 object-contain" />
               <div>
                 <h1 className="text-sm font-semibold text-foreground">Base de Resultados Principais</h1>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-[10px] text-muted-foreground">
                   {isLoading
                     ? "Carregando…"
                     : error
