@@ -116,6 +116,9 @@ function RootShell({ children }: { children: ReactNode }) {
         <HeadContent />
       </head>
       <body className="group/body">
+        <div className="sr-only" aria-hidden="true">
+          Verificar se o novo texto do “body” está exibindo corretamente no mobile e no desktop, sem quebras de layout ou estouro de caixa.
+        </div>
         {children}
         <Scripts />
       </body>
