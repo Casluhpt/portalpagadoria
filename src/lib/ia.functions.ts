@@ -19,7 +19,6 @@ export const perguntarIa = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const key = process.env["LOVABLE_API_KEY"];
     
-    // Injected logging for diagnosis
     console.log("[IA] Iniciando consulta:", {
       pergunta: data.pergunta.substring(0, 50) + "...",
       hasContexto: !!data.contexto,
@@ -65,9 +64,6 @@ export const perguntarIa = createServerFn({ method: "POST" })
         if (res.status === 402) {
           return { resposta: null, erro: "IA de Suporte da Pagadoria: Limite de créditos atingido (402). Contate o administrador lucas.chaves.lc2001@gmail.com." };
         }
-        if (res.status === 401 || res.status === 403) {
-          return { resposta: null, erro: "IA de Suporte da Pagadoria: Falha de autenticação na API (${res.status}). Verifique as credenciais." };
-        }
         
         return { 
           resposta: null, 
@@ -75,9 +71,7 @@ export const perguntarIa = createServerFn({ method: "POST" })
         };
       }
 
-    let texto = "";
-
-    try {
+      let texto = "";
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
       let buffer = "";
@@ -96,7 +90,6 @@ export const perguntarIa = createServerFn({ method: "POST" })
             if (!payload || payload === "[DONE]") continue;
             try {
               const evt = JSON.parse(payload);
-              // Handle multiple potential event formats (direct delta, choices array, etc.)
               const delta = evt.choices?.[0]?.delta?.content || 
                             evt.delta || 
                             (evt.type === "response.output_text.delta" ? evt.delta : "") ||
@@ -109,38 +102,21 @@ export const perguntarIa = createServerFn({ method: "POST" })
           }
         }
       }
-    } catch (err) {
-      console.error("[IA] Erro na leitura do stream:", err);
-      return { resposta: null, erro: "IA de Suporte da Pagadoria: Erro ao processar resposta em tempo real. Tente novamente." };
-    }
-  } catch (err) {
-    console.error("[IA] Erro fatal na requisição:", err);
-    return { 
-      resposta: null, 
-      erro: "IA de Suporte da Pagadoria: Falha crítica de rede ou servidor. Verifique a conexão." 
-    };
-  }
 
-    if (!texto.trim()) {
-      try {
-        const fullText = await res.text();
-        const json = JSON.parse(fullText);
-        texto = json.choices?.[0]?.message?.content || 
-                json.response?.output_text || 
-                json.output_text || 
-                "";
-      } catch {
-        /* ignore */
+      if (!texto.trim()) {
+        return {
+          resposta: "Não encontrei material autorizado suficiente para responder com segurança. Abra um chamado em **Configurações > Canal de Suporte Técnico**.",
+          erro: null,
+        };
       }
-    }
 
-    if (!texto.trim()) {
-      return {
-        resposta:
-          "Não encontrei material autorizado suficiente para responder com segurança. Abra um chamado em **Configurações > Canal de Suporte Técnico**.",
-        erro: null,
+      return { resposta: texto.trim(), erro: null };
+
+    } catch (err) {
+      console.error("[IA] Erro crítico na operação:", err);
+      return { 
+        resposta: null, 
+        erro: "IA de Suporte da Pagadoria: Falha técnica de rede ou processamento de stream. Tente novamente." 
       };
     }
-
-    return { resposta: texto.trim(), erro: null };
   });
