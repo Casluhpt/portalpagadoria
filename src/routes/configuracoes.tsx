@@ -571,6 +571,7 @@ function SmartConfigPanel() {
 }
 
 function AdvancedSecuritySettings() {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [settings, setSettings] = useState({
