@@ -26,7 +26,7 @@ import {
   provisaoFechamentosKey, todayISO,
 } from "@/lib/provisao-fechamento";
 import { useSession } from "@/hooks/use-session";
-import { fecharCompetenciaProvisao, integrarPagamentosNaProvisao, fetchArchivedProvisao, provisaoArchivedQueryKey } from "@/lib/provisao-fechamento-competencia";
+import { integrarPagamentosNaProvisao, fetchArchivedProvisao, provisaoArchivedQueryKey } from "@/lib/provisao-fechamento-competencia";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import profarmaLogo from "@/assets/profarma-logo.png.asset.json";
