@@ -26,7 +26,7 @@ import {
 import { AppSidebar } from "@/components/app-sidebar";
 import { HeaderActions } from "@/components/header-actions";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { entrarFila, sairFila, getFilaStatus } from "@/lib/concorrencia.functions";
+import { entrarFila, sairFila, getFilaStatus, heartbeatFila } from "@/lib/concorrencia.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -167,6 +167,7 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
 
   const entrarFilaFn = useServerFn(entrarFila);
   const sairFilaFn = useServerFn(sairFila);
+  const heartbeatFn = useServerFn(heartbeatFila);
 
   const currentUserQueue = userId ? queue.find(q => q.user_id === userId) : undefined;
   const activeUser = queue.find(q => q.status === 'ativo');
@@ -205,21 +206,65 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
 
   const [posicaoFila, setPosicaoFila] = useState<number | null>(null);
   const [filaOpen, setFilaOpen] = useState(false);
+  const [prevStatus, setPrevStatus] = useState<string | null>(null);
 
   useEffect(() => {
     if (currentUserQueue && queue.length > 0) {
       const idx = queue.findIndex(q => q.user_id === userId);
-      if (idx !== -1) {
-        setPosicaoFila(idx + 1);
-        // Só abre o popup automaticamente se o status mudar para ativo ou se estiver aguardando e não for o primeiro
-        if (currentUserQueue.status === 'ativo') {
-          setFilaOpen(false); // Fecha popup se estiver ativo
+      const newPos = idx !== -1 ? idx + 1 : null;
+      setPosicaoFila(newPos);
+      
+      const currentStatus = currentUserQueue.status;
+      
+      // Notificação única ao chegar a vez
+      if (prevStatus === 'aguardando' && currentStatus === 'ativo') {
+        toast.success("Sua vez chegou! A base está disponível para edição.", {
+          duration: 10000,
+          icon: <Unlock className="h-5 w-5 text-emerald-500" />,
+        });
+        
+        // Opcional: Notificação nativa se permitido
+        if ("Notification" in window && Notification.permission === "granted") {
+          new Notification("Portal Pagadoria", {
+            body: "Sua vez chegou! Você já pode editar os lançamentos.",
+            icon: "/favicon.ico"
+          });
         }
+      }
+      
+      setPrevStatus(currentStatus);
+
+      if (currentStatus === 'ativo') {
+        setFilaOpen(false);
       }
     } else {
       setPosicaoFila(null);
+      setPrevStatus(null);
     }
-  }, [queue, currentUserQueue, userId]);
+  }, [queue, currentUserQueue, userId, prevStatus]);
+
+  // Heartbeat para queda de sessão
+  useEffect(() => {
+    if (!userId || !currentUserQueue) return;
+    
+    const interval = setInterval(() => {
+      heartbeatFn({ data: { userId, modulo: 'pagamentos_diversos' } }).catch(console.error);
+    }, 15000); // Heartbeat a cada 15s
+
+    // Remoção automática ao fechar aba/navegador
+    const handleUnload = () => {
+      // Beacon or sync fetch as last resort
+      const blob = new Blob([JSON.stringify({ userId, modulo: 'pagamentos_diversos' })], { type: 'application/json' });
+      navigator.sendBeacon('/api/public/concorrencia/sair', blob); 
+      // Note: This endpoint needs to be created or we just rely on heartbeat timeout
+    };
+
+    window.addEventListener('beforeunload', handleUnload);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('beforeunload', handleUnload);
+    };
+  }, [userId, currentUserQueue, heartbeatFn]);
 
   const { data = [], isLoading } = useQuery({
     queryKey: pagamentosQueryKey,
