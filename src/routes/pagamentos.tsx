@@ -50,6 +50,7 @@ import { logAcaoCritica } from "@/lib/audit-critico";
 import { useSession } from "@/hooks/use-session";
 import { useRoles } from "@/hooks/use-roles";
 import { supabase } from "@/integrations/supabase/client";
+import { useAppPermissions } from "@/hooks/use-app-permissions";
 import {
   createPagamento, createPagamentosBulk, deletePagamento,
   fetchPagamentos, pagamentosQueryKey, updatePagamento,
@@ -151,6 +152,7 @@ function PagamentosPage() {
 
 function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome: string; userId: string | null; isAdmin: boolean }) {
   const qc = useQueryClient();
+  const { hasPermission } = useAppPermissions();
   const fileRef = useRef<HTMLInputElement>(null);
   
   // Fila de Concorrência
@@ -171,10 +173,11 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
   const isViewer = roles.includes("viewer");
   const isVisitante = roles.includes("visitante");
   
-  const isEditingEnabled = !!userId && activeUser?.user_id === userId && !isViewer && !isVisitante;
-  // Inclusão/exclusão liberadas a qualquer usuário autorizado (independe da fila),
-  // com confirmação prévia e registro automático em Auditoria.
-  const canMutate = !!userId && !isViewer && !isVisitante;
+  const isEditingEnabled = !!userId && activeUser?.user_id === userId && hasPermission('pagamentos', 'edit');
+  const canMutate = !!userId && hasPermission('pagamentos', 'create');
+  const canDelete = !!userId && hasPermission('pagamentos', 'delete');
+  const canImport = !!userId && hasPermission('pagamentos', 'import');
+  const canExport = !!userId && hasPermission('pagamentos', 'export');
 
   const nextUser = queue.filter(q => q.status === 'aguardando').sort((a, b) => {
     const da = a.entrou_em ? new Date(a.entrou_em).getTime() : 0;
