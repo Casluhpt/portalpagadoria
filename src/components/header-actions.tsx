@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { Circle, Cog, History, KeyRound, LogIn, LogOut, MinusCircle, Settings, User, Users, XCircle } from "lucide-react";
+import { Circle, Cog, History, KeyRound, LogIn, LogOut, Mail, MinusCircle, Settings, User, Users, XCircle } from "lucide-react";
 import { toast } from "sonner";
 import {
   AlertDialog,
@@ -120,14 +120,14 @@ export function HeaderActions() {
               />
             </div>
             <span className="hidden max-w-[140px] truncate text-xs font-medium text-foreground sm:inline">
-              {user.email}
+              {user.user_metadata?.nome || user.user_metadata?.full_name || user.email}
             </span>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-64">
           <DropdownMenuLabel>
             <div className="flex flex-col">
-              <span className="truncate text-sm font-semibold">{user.email}</span>
+              <span className="truncate text-sm font-semibold">{user.user_metadata?.nome || user.user_metadata?.full_name || user.email}</span>
               <span className="text-[10px] uppercase tracking-wide text-muted-foreground">
                 {primary ? roleLabel[primary] : "Sem perfil atribuído"}
                 {setor ? <span className="ml-1 normal-case text-muted-foreground">· {setor}</span> : null}
@@ -138,6 +138,10 @@ export function HeaderActions() {
               </span>
             </div>
           </DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem className="text-[10px] text-muted-foreground pointer-events-none">
+            <Mail className="mr-2 h-3.5 w-3.5" /> {user.email}
+          </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuSub>
             <DropdownMenuSubTrigger className="flex h-10 items-center justify-between gap-4 px-2 py-0 text-[10px] uppercase tracking-wide text-muted-foreground">
