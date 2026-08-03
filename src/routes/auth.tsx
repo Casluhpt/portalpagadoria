@@ -53,27 +53,27 @@ function AuthPage() {
   const toggleTheme = () => setMode(isDark ? "claro" : "noturno");
 
   return (
-    <div className="relative grid min-h-dvh place-items-center bg-gradient-auth p-4">
+    <div className="relative flex min-h-dvh items-center justify-center bg-gradient-auth px-4 py-10 sm:p-6">
       <button
         type="button"
         onClick={toggleTheme}
         aria-label={isDark ? "Ativar modo claro" : "Ativar modo noturno"}
-        className="fixed right-4 top-4 z-50 flex h-10 w-10 items-center justify-center rounded-full border border-border/40 bg-card/60 text-foreground shadow-[var(--shadow-elegant)] backdrop-blur-md transition-all hover:bg-card/90 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-ring"
+        className="fixed right-3 top-3 z-50 flex h-10 w-10 items-center justify-center rounded-full border border-border/50 bg-card/70 text-foreground shadow-[var(--shadow-elegant)] backdrop-blur-md transition-all hover:scale-105 hover:bg-card/95 focus:outline-none focus:ring-2 focus:ring-ring sm:right-5 sm:top-5"
       >
         {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
       </button>
 
-      <Card className="w-full max-w-md border-border/60 bg-card/80 shadow-[var(--shadow-elegant)] backdrop-blur-md">
-        <CardHeader className="items-center text-center">
-          <AppLogo area="login" className="mb-2 h-10 object-contain" />
-          <CardTitle className="text-xl text-foreground">Portal Pagadoria</CardTitle>
-          <p className="text-sm text-muted-foreground">Acesse para editar as bases de dados.</p>
+      <Card className="w-full max-w-md border-border/70 bg-card/90 shadow-[var(--shadow-elegant)] backdrop-blur-xl">
+        <CardHeader className="items-center px-5 text-center sm:px-6">
+          <AppLogo area="login" className="mb-2 h-9 object-contain sm:h-10" />
+          <CardTitle className="text-lg text-foreground sm:text-xl">Portal Pagadoria</CardTitle>
+          <p className="text-sm text-foreground/70">Acesse para editar as bases de dados.</p>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-5 sm:px-6">
           <Tabs defaultValue="signin">
-            <TabsList className="grid w-full grid-cols-2 bg-muted/50">
-              <TabsTrigger value="signin">Entrar</TabsTrigger>
-              <TabsTrigger value="signup">Criar conta</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2 bg-muted/70">
+              <TabsTrigger value="signin" className="text-foreground/80 data-[state=active]:text-foreground">Entrar</TabsTrigger>
+              <TabsTrigger value="signup" className="text-foreground/80 data-[state=active]:text-foreground">Criar conta</TabsTrigger>
             </TabsList>
             <TabsContent value="signin"><SignInForm /></TabsContent>
             <TabsContent value="signup"><SignUpForm /></TabsContent>
@@ -81,6 +81,7 @@ function AuthPage() {
         </CardContent>
       </Card>
     </div>
+
   );
 }
 
@@ -160,15 +161,17 @@ function SignInForm() {
       {errorMsg && (
         <div
           role="alert"
-          className="flex items-start gap-2 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800"
+          className="flex items-start gap-2 rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive"
         >
           <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
           <span>{errorMsg}</span>
         </div>
       )}
+
       <div className="space-y-1.5">
-        <Label htmlFor="si-email">E-mail</Label>
+        <Label className="text-foreground" htmlFor="si-email">E-mail</Label>
         <Input
+          className="bg-background/80 text-foreground placeholder:text-muted-foreground"
           id="si-email"
           type="email"
           required
@@ -183,15 +186,16 @@ function SignInForm() {
       </div>
       <div className="space-y-1.5">
         <div className="flex items-center justify-between">
-          <Label htmlFor="si-pw">Senha</Label>
+          <Label className="text-foreground" htmlFor="si-pw">Senha</Label>
           <Link
             to="/forgot-password"
-            className="text-xs font-medium text-violet-700 hover:underline"
+            className="text-xs font-medium text-primary hover:underline"
           >
             Esqueci minha senha
           </Link>
         </div>
         <PasswordInput
+          className="bg-background/80 text-foreground"
           id="si-pw"
           required
           autoComplete="current-password"
@@ -202,7 +206,7 @@ function SignInForm() {
           }}
         />
       </div>
-      <Button type="submit" disabled={loading} className="w-full bg-primary/80 hover:bg-primary/90 transition-colors">
+      <Button type="submit" disabled={loading} className="w-full bg-primary/95 text-primary-foreground transition-colors hover:bg-primary">
 
 
         {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <LogIn className="mr-2 h-4 w-4" />}
@@ -258,8 +262,9 @@ function SignUpForm() {
   return (
     <form onSubmit={submit} className="mt-4 space-y-3">
       <div className="space-y-1.5">
-        <Label htmlFor="su-nome">Nome completo</Label>
+        <Label className="text-foreground" htmlFor="su-nome">Nome completo</Label>
         <Input
+          className="bg-background/80 text-foreground placeholder:text-muted-foreground"
           id="su-nome"
           type="text"
           required
@@ -273,11 +278,12 @@ function SignUpForm() {
           onBlur={() => setNomeError(validateNome(nome))}
           aria-invalid={!!nomeError}
         />
-        {nomeError && <p className="text-xs text-red-600">{nomeError}</p>}
+        {nomeError && <p className="text-xs text-destructive">{nomeError}</p>}
       </div>
       <div className="space-y-1.5">
-        <Label htmlFor="su-email">E-mail</Label>
+        <Label className="text-foreground" htmlFor="su-email">E-mail</Label>
         <Input
+          className="bg-background/80 text-foreground placeholder:text-muted-foreground"
           id="su-email"
           type="email"
           required
@@ -288,9 +294,9 @@ function SignUpForm() {
         />
       </div>
       <div className="space-y-1.5">
-        <Label htmlFor="su-setor">Setor</Label>
+        <Label className="text-foreground" htmlFor="su-setor">Setor</Label>
         <Select value={setor} onValueChange={(v) => setSetor(v as Setor)}>
-          <SelectTrigger id="su-setor">
+          <SelectTrigger id="su-setor" className="bg-background/80 text-foreground">
             <SelectValue placeholder="Selecione o setor" />
           </SelectTrigger>
           <SelectContent>
@@ -301,8 +307,9 @@ function SignUpForm() {
         </Select>
       </div>
       <div className="space-y-1.5">
-        <Label htmlFor="su-pw">Senha (mín. 8)</Label>
+        <Label className="text-foreground" htmlFor="su-pw">Senha (mín. 8)</Label>
         <PasswordInput
+          className="bg-background/80 text-foreground"
           id="su-pw"
           required
           minLength={8}
@@ -311,11 +318,11 @@ function SignUpForm() {
           onChange={(e) => setPassword(e.target.value)}
         />
       </div>
-      <Button type="submit" disabled={loading} className="w-full bg-primary/80 hover:bg-primary/90 transition-colors">
+      <Button type="submit" disabled={loading} className="w-full bg-primary/95 text-primary-foreground transition-colors hover:bg-primary">
         {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <UserPlus className="mr-2 h-4 w-4" />}
         Criar conta
       </Button>
-      <p className="text-center text-xs text-muted-foreground">
+      <p className="text-center text-xs text-foreground/70">
         <KeyRound className="mr-1 inline h-3 w-3" />
         Ao criar conta você recebe acesso de consulta; um administrador libera edição.
       </p>

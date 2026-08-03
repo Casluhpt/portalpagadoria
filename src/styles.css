@@ -185,4 +185,24 @@
 @utility bg-gradient-auth {
   background-image: var(--gradient-auth);
   background-attachment: fixed;
+  background-size: 160% 160%, 160% 160%, 200% 200%;
+  background-position: 0% 0%, 100% 100%, 0% 50%;
+  animation: auth-gradient-drift 24s ease-in-out infinite alternate;
+  will-change: background-position;
 }
+
+@keyframes auth-gradient-drift {
+  0% {
+    background-position: 0% 0%, 100% 100%, 0% 50%;
+  }
+  100% {
+    background-position: 30% 20%, 70% 80%, 100% 50%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bg-gradient-auth {
+    animation: none;
+  }
+}
+
