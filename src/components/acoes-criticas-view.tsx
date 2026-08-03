@@ -87,12 +87,63 @@ function AcoesCriticasTable({ isAdmin }: { isAdmin: boolean }) {
     });
   }, [data, busca, acao, severidade, de, ate]);
 
+  const qc = useQueryClient();
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [justificativa, setJustificativa] = useState("");
+
+  const visibleIds = rows.map((r) => r.id);
+  const allSelected = visibleIds.length > 0 && visibleIds.every((id) => selected.has(id));
+
+  const toggle = (id: string) =>
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+
+  const toggleAll = () =>
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (allSelected) visibleIds.forEach((id) => next.delete(id));
+      else visibleIds.forEach((id) => next.add(id));
+      return next;
+    });
+
+  const purge = useMutation({
+    mutationFn: async () => {
+      const ids = visibleIds.filter((id) => selected.has(id));
+      const { data: n, error: err } = await supabase.rpc("purgar_acoes_criticas", {
+        _ids: ids,
+        _justificativa: justificativa.trim(),
+      });
+      if (err) throw err;
+      return (n as number) ?? 0;
+    },
+    onSuccess: (n) => {
+      toast.success(`${n} registro(s) excluído(s) permanentemente.`);
+      setSelected(new Set());
+      setJustificativa("");
+      setConfirmOpen(false);
+      qc.invalidateQueries({ queryKey: ["audit_log_criticas"] });
+    },
+    onError: (e: unknown) => {
+      toast.error(e instanceof Error ? e.message : "Não foi possível excluir os registros.");
+    },
+  });
+
+  const selectedCount = visibleIds.filter((id) => selected.has(id)).length;
+
   return (
     <div className="flex flex-1 flex-col p-4">
       <div className="mb-3 flex items-center gap-2 rounded-lg border border-indigo-200 bg-indigo-50/60 px-3 py-2 text-xs text-indigo-900">
         <ShieldAlert className="h-3.5 w-3.5" />
-        Trilha imutável — nenhum usuário, inclusive Administração, pode editar ou apagar estes registros.
+        {isAdmin
+          ? "Trilha protegida — a exclusão permanente é exclusiva da Administração e exige justificativa registrada."
+          : "Trilha imutável — nenhum usuário, exceto a Administração autorizada, pode editar ou apagar estes registros."}
       </div>
+
 
       <div className="mb-3 grid grid-cols-1 gap-2 rounded-lg border border-border bg-card p-3 md:grid-cols-3 lg:grid-cols-5">
         <div className="lg:col-span-2">
