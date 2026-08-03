@@ -32,7 +32,11 @@ const uniqBy = <T,>(arr: T[], key: (t: T) => string) => {
 export async function buscarNoPortal(term: string): Promise<PortalHit[]> {
   const q = term.trim();
   if (q.length < 2) return [];
-  const like = `%${q}%`;
+  // Sanitiza caracteres com significado especial na sintaxe de filtros do PostgREST
+  // (`,` separa condições, `()` agrupa, `%`/`*` são curingas) antes de interpolar.
+  const safe = q.replace(/[,()%*\\"']/g, " ").replace(/\s+/g, " ").trim();
+  if (safe.length < 2) return [];
+  const like = `%${safe}%`;
 
   const [usuarios, pagamentos, fornecedores, despesas, materiais] = await Promise.all([
     supabase
