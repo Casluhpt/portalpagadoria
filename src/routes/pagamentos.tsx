@@ -1311,6 +1311,16 @@ function FechamentoCompetenciaButton({ onComplete, disabled, data }: { onComplet
   const mutation = useMutation({
     mutationFn: async () => {
       if (!user) throw new Error("Usuário não autenticado");
+
+      // Validar pendências: status_itau ou status_bankmanager vazios em lançamentos com valor
+      const pendencias = data.filter(r => 
+        (r.valor_lg && !r.status_bankmanager) || 
+        (r.valor_itau && !r.status_itau)
+      );
+
+      if (pendencias.length > 0) {
+        throw new Error(`Não é possível fechar: existem ${pendencias.length} lançamentos com status pendente.`);
+      }
       
       // Export current data to Excel before clearing
       const exportRows = data.map((r) => {
@@ -1334,7 +1344,11 @@ function FechamentoCompetenciaButton({ onComplete, disabled, data }: { onComplet
         modulo: "Pagamentos Diversos",
         tabela: "fechamento_pagamentos",
         descricao: `Competência "${nome}" fechada e arquivada com ${data.length} registro(s); base limpa para novo ciclo`,
-        metadata: { registros: data.length, competencia: nome },
+        metadata: { 
+          registros: data.length, 
+          competencia: nome,
+          data_fechamento: new Date().toISOString()
+        },
         severidade: "critico",
       });
     },
