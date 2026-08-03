@@ -207,12 +207,39 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
     }
   });
 
+  const [confirmSaidaFila, setConfirmSaidaFila] = useState(false);
+
   const sairMut = useMutation({
-    mutationFn: () => sairFilaFn({ data: { userId: userId as string, modulo: 'pagamentos_diversos' } }),
+    mutationFn: async () => {
+      const posicaoAnterior = queue.findIndex((q) => q.user_id === userId) + 1;
+      const statusAnterior = currentUserQueue?.status ?? null;
+      await sairFilaFn({ data: { userId: userId as string, modulo: 'pagamentos_diversos' } });
+      const { logAcaoCritica } = await import("@/lib/audit-critico");
+      await logAcaoCritica({
+        acao: "saida_fila",
+        modulo: "Pagamentos Diversos",
+        tabela: "concorrencia_fila",
+        registro_id: userId ?? undefined,
+        descricao: `Saída voluntária da fila virtual (posição ${posicaoAnterior || "-"}, status ${statusAnterior ?? "-"})`,
+        metadata: {
+          modulo_fila: "pagamentos_diversos",
+          posicao_anterior: posicaoAnterior || null,
+          status_anterior: statusAnterior,
+          total_na_fila: queue.length,
+          saiu_em: new Date().toISOString(),
+        },
+        severidade: "info",
+      });
+    },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['concorrencia-fila'] });
-      toast.info("Você saiu da fila/sessão de edição.");
-    }
+      setConfirmSaidaFila(false);
+      setFilaOpen(false);
+      setPosicaoFila(null);
+      setPrevStatus(null);
+      toast.info("Você saiu da fila. Sua posição foi liberada — entre novamente quando desejar.");
+    },
+    onError: (e: Error) => toast.error("Não foi possível sair da fila: " + e.message),
   });
 
   const [posicaoFila, setPosicaoFila] = useState<number | null>(null);
@@ -769,12 +796,27 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
                           </div>
                         ))}
                       </div>
-                      <Button size="sm" variant="ghost" className="w-full h-7 text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/20 text-[10px] font-bold" onClick={() => sairMut.mutate()}>
+                      <Button
+                        size="sm"
+                        className="w-full h-7 bg-red-600 text-white hover:bg-red-700 text-[10px] font-bold"
+                        onClick={() => setConfirmSaidaFila(true)}
+                      >
                         <LogOut className="h-3 w-3 mr-1.5" /> Sair da Fila
                       </Button>
                     </div>
                   </PopoverContent>
                 </Popover>
+
+                <Button
+                  size="sm"
+                  className="h-7 gap-1.5 bg-red-600 text-xs font-bold text-white hover:bg-red-700"
+                  disabled={sairMut.isPending}
+                  onClick={() => setConfirmSaidaFila(true)}
+                  title="Desistir da fila e liberar sua posição"
+                >
+                  {sairMut.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <LogOut className="h-3.5 w-3.5" />}
+                  Sair da Fila
+                </Button>
               </div>
             )}
           </div>
@@ -1160,12 +1202,41 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
             <Button variant="outline" className="w-full border-amber-300 text-amber-800 hover:bg-amber-100" onClick={() => setFilaOpen(false)}>
               Aguardar em Segundo Plano
             </Button>
-            <Button variant="ghost" className="w-full text-rose-600 hover:bg-rose-100/50" onClick={() => sairMut.mutate()}>
-              Sair da Fila
+            <Button
+              className="w-full gap-2 bg-red-600 font-bold text-white hover:bg-red-700"
+              onClick={() => { setFilaOpen(false); setConfirmSaidaFila(true); }}
+            >
+              <LogOut className="h-4 w-4" /> Sair da Fila
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Confirmação de saída da fila */}
+      <AlertDialog open={confirmSaidaFila} onOpenChange={setConfirmSaidaFila}>
+        <AlertDialogContent className="border-red-200 bg-card/95 backdrop-blur-md">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2 text-red-600">
+              <LogOut className="h-5 w-5" /> Sair da fila?
+            </AlertDialogTitle>
+            <AlertDialogDescription className="leading-relaxed">
+              Você deseja realmente sair da fila? Ao confirmar, sua posição será liberada e será
+              necessário entrar novamente caso deseje realizar o pagamento posteriormente.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={sairMut.isPending}>Permanecer na fila</AlertDialogCancel>
+            <AlertDialogAction
+              className="gap-2 bg-red-600 text-white hover:bg-red-700"
+              disabled={sairMut.isPending}
+              onClick={(e) => { e.preventDefault(); sairMut.mutate(); }}
+            >
+              {sairMut.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <LogOut className="h-4 w-4" />}
+              Confirmar saída
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
