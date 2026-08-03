@@ -1,9 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/hooks/use-session";
 import { useServerFn } from "@tanstack/react-start";
-import { registrarSessaoUnica, verificarSessaoAtiva, heartbeatSessao } from "@/lib/session.functions";
-import { toast } from "sonner";
+import { heartbeatSessao } from "@/lib/session.functions";
+
 
 export type PresenceStatus = "online" | "ausente" | "offline";
 
