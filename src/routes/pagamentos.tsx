@@ -351,7 +351,11 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
         modulo: "Pagamentos Diversos",
         tabela: "pagamentos_diversos",
         descricao: `Importação Excel de ${n} lançamento(s) — modo ${importMode === "replace" ? "substituição da base" : "incremental"}`,
-        metadata: { registros: n, modo: importMode },
+        metadata: { 
+          registros: n, 
+          modo: importMode,
+          data_importacao: new Date().toISOString()
+        },
         severidade: "alerta",
       });
     },
