@@ -415,6 +415,15 @@ function BasePage() {
                 <table className="min-w-full border-collapse text-sm">
                   <thead className="sticky top-0 z-10 bg-muted/95 backdrop-blur">
                     <tr>
+                      <th className="w-10 border-b border-border px-2 py-2">
+                        <Checkbox
+                          checked={rows.length > 0 && selectedIds.size === rows.length}
+                          onCheckedChange={(checked) => {
+                            if (checked) setSelectedIds(new Set(rows.map((r) => r.id)));
+                            else setSelectedIds(new Set());
+                          }}
+                        />
+                      </th>
                       <th className="w-10 border-b border-border px-2 py-2 text-left text-xs font-semibold text-muted-foreground">
                         #
                       </th>
