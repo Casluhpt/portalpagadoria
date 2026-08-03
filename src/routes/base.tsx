@@ -125,12 +125,14 @@ function BasePage() {
 
   const deleteMut = useMutation({
     mutationFn: async (ids: string[]) => {
-      // Registrar na auditoria antes de excluir (mesmo que a trigger faça log, o manual pede registro conforme regras existentes)
       const count = ids.length;
       await logAcaoCritica({
-        acao: "Exclusão na Base de Resultados",
-        detalhes: `Usuário excluiu ${count} registro(s) da base de provisão diária. IDs: ${ids.join(", ")}`,
-        nivel: "medio",
+        acao: "exclusao_logica",
+        modulo: "Provisão Diária",
+        tabela: "lancamentos",
+        descricao: `Usuário excluiu ${count} registro(s) da base de provisão diária.`,
+        metadata: { ids, count },
+        severidade: "alerta",
       });
       return deleteLancamentosBulk(ids);
     },
@@ -138,6 +140,7 @@ function BasePage() {
       invalidate();
       setSelectedIds(new Set());
       toast.success("Registros excluídos com sucesso");
+      setPendingDelete(null);
       setPurgeOpen(false);
     },
     onError: (e: Error) => toast.error("Falha ao excluir: " + e.message),
