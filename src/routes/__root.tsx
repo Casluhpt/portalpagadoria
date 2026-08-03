@@ -17,6 +17,8 @@ import { PresenceHeartbeat } from "@/components/presence-heartbeat";
 import { BackButton } from "@/components/back-button";
 import { PlanilhaOnboarding } from "@/components/planilha-onboarding";
 import { FaviconManager } from "@/components/favicon-manager";
+import { PortalFooter } from "@/components/portal-footer";
+
 
 import { AuthGate } from "@/components/auth-gate";
 import { ThemeProvider } from "@/components/theme-provider";
