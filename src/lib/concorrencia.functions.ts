@@ -92,6 +92,47 @@ export const getFilaStatus = createServerFn({ method: "GET" })
     modulo: z.string(),
   }).parse(data))
   .handler(async ({ data }) => {
+    // 1. Clean up "dead" sessions (inactive for more than 45 seconds)
+    // Threshold calculation: 45 seconds ago
+    const threshold = new Date(Date.now() - 45000).toISOString();
+    
+    // Find who we're about to remove due to timeout
+    const { data: expired } = await supabase
+      .from('concorrencia_fila')
+      .select('user_id, status')
+      .eq('modulo', data.modulo)
+      .lt('entrou_em', threshold);
+
+    if (expired && expired.length > 0) {
+      const expiredIds = expired.map(e => e.user_id);
+      const wasActiveExpired = expired.some(e => e.status === 'ativo');
+      
+      await supabase
+        .from('concorrencia_fila')
+        .delete()
+        .in('user_id', expiredIds)
+        .eq('modulo', data.modulo);
+        
+      if (wasActiveExpired) {
+        // Promote next if active person timed out
+        const { data: next } = await supabase
+          .from('concorrencia_fila')
+          .select('id')
+          .eq('modulo', data.modulo)
+          .eq('status', 'aguardando')
+          .order('entrou_em', { ascending: true })
+          .limit(1)
+          .maybeSingle();
+
+        if (next) {
+          await supabase
+            .from('concorrencia_fila')
+            .update({ status: 'ativo', ativo_desde: new Date().toISOString() })
+            .eq('id', next.id);
+        }
+      }
+    }
+    
     const { data: queue, error } = await supabase
       .from('concorrencia_fila')
       .select('*')
@@ -100,4 +141,23 @@ export const getFilaStatus = createServerFn({ method: "GET" })
 
     if (error) throw new Error(error.message);
     return queue;
+  });
+
+export const heartbeatFila = createServerFn({ method: "POST" })
+  .validator((data) => z.object({
+    userId: z.string(),
+    modulo: z.string(),
+  }).parse(data))
+  .handler(async ({ data }) => {
+    // Update 'entrou_em' as a heartbeat for simplicity, 
+    // or we could add a last_seen column if we wanted to be cleaner.
+    // The current table 'concorrencia_fila' has 'entrou_em', 'status', 'user_id', 'modulo', 'user_nome', 'ativo_desde'.
+    const { error } = await supabase
+      .from('concorrencia_fila')
+      .update({ entrou_em: new Date().toISOString() })
+      .eq('user_id', data.userId)
+      .eq('modulo', data.modulo);
+      
+    if (error) throw new Error(error.message);
+    return { success: true };
   });
