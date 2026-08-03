@@ -621,7 +621,7 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
               e.target.value = "";
             }}
           />
-          <Button size="sm" variant="outline" className="gap-1" onClick={() => fileRef.current?.click()} disabled={importMut.isPending || !isEditingEnabled}>
+          <Button size="sm" variant="outline" className="gap-1" onClick={() => fileRef.current?.click()} disabled={importMut.isPending || !canImport}>
             {importMut.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
             Importar Excel
           </Button>
@@ -636,7 +636,7 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
                 );
               });
             }
-          }} disabled={!rows.length}>
+          }} disabled={!rows.length || !canExport}>
             <Download className="h-4 w-4" />
             Exportar Excel
           </Button>
@@ -711,7 +711,7 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
             variant="destructive"
             className="gap-1"
             onClick={() => setBulkPendingDelete(true)}
-            disabled={bulkDeleteMut.isPending || !canMutate}
+            disabled={bulkDeleteMut.isPending || !canDelete}
           >
             {bulkDeleteMut.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
             Excluir
@@ -782,6 +782,7 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
                           row={r}
                           col={c}
                           onSave={stableCellSave}
+                          disabled={!isEditingEnabled}
                         />
                       ))}
                     </tr>
