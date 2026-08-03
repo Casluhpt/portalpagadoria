@@ -54,21 +54,21 @@ function AuthPage() {
 
   return (
     <div className="relative flex min-h-dvh items-center justify-center bg-gradient-auth px-4 py-10 sm:p-6">
-      <button
-        type="button"
-        onClick={toggleTheme}
-        aria-label={isDark ? "Ativar modo claro" : "Ativar modo noturno"}
-        className="group fixed right-3 top-3 z-50 flex h-10 w-10 items-center justify-center rounded-full bg-background/60 text-foreground shadow-[var(--shadow-elegant)] ring-1 ring-border/40 backdrop-blur-2xl transition-all duration-500 hover:bg-background/80 hover:text-primary hover:shadow-[var(--shadow-glow)] active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:right-5 sm:top-5"
-      >
-        {isDark ? (
-          <Sun className="h-5 w-5 transition-transform duration-500 group-hover:rotate-45" />
-        ) : (
-          <Moon className="h-5 w-5 transition-transform duration-500 group-hover:-rotate-12" />
-        )}
-      </button>
+      <Card className="relative w-full max-w-md animate-in rounded-2xl border-none bg-background/70 shadow-[var(--shadow-elegant)] backdrop-blur-2xl duration-500 fade-in-0 zoom-in-95">
+        <button
+          type="button"
+          onClick={toggleTheme}
+          aria-label={isDark ? "Ativar modo claro" : "Ativar modo noturno"}
+          className="group absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-background/60 text-foreground shadow-[var(--shadow-elegant)] ring-1 ring-border/40 backdrop-blur-2xl transition-all duration-500 hover:bg-background/80 hover:text-primary hover:shadow-[var(--shadow-glow)] active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:right-4 sm:top-4"
+        >
+          {isDark ? (
+            <Sun className="h-4 w-4 transition-transform duration-500 group-hover:rotate-45" />
+          ) : (
+            <Moon className="h-4 w-4 transition-transform duration-500 group-hover:-rotate-12" />
+          )}
+        </button>
 
-      <Card className="w-full max-w-md animate-in rounded-2xl border-none bg-background/70 shadow-[var(--shadow-elegant)] backdrop-blur-2xl duration-500 fade-in-0 zoom-in-95">
-        <CardHeader className="items-center px-5 text-center sm:px-6">
+        <CardHeader className="items-center px-5 pt-10 text-center sm:px-6 sm:pt-11">
           <AppLogo area="login" className="mb-2 h-9 object-contain sm:h-10" />
           <CardTitle className="text-lg text-foreground sm:text-xl">Portal Pagadoria</CardTitle>
           <p className="text-sm text-muted-foreground">Acesse para editar as bases de dados.</p>
