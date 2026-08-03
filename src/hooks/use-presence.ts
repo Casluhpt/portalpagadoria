@@ -5,8 +5,11 @@ import { useServerFn } from "@tanstack/react-start";
 import { registrarSessaoUnica, verificarSessaoAtiva, heartbeatSessao } from "@/lib/session.functions";
 import { toast } from "sonner";
 
+export type PresenceStatus = "online" | "ausente" | "offline";
+
 // Gerador simples de ID de sessão para esta aba/instância
 const getSessionId = () => {
+  if (typeof window === 'undefined') return '';
   const existing = window.sessionStorage.getItem('portal_session_id');
   if (existing) return existing;
   const newId = Math.random().toString(36).substring(2) + Date.now().toString(36);
@@ -21,6 +24,10 @@ export function usePresence() {
   const verificarFn = useServerFn(verificarSessaoAtiva);
   const heartbeatFn = useServerFn(heartbeatSessao);
   const [sessionValida, setSessionValida] = useState(true);
+  
+  // Status de presença (mantido para compatibilidade de UI)
+  const [status, setStatusState] = useState<PresenceStatus>("online");
+  const setStatus = (next: PresenceStatus) => setStatusState(next);
 
   useEffect(() => {
     if (!user) return;
@@ -66,6 +73,5 @@ export function usePresence() {
     return () => clearInterval(interval);
   }, [user?.id, registrarFn, verificarFn, heartbeatFn]);
 
-  return { sessionValida, sessionId: sessionId.current };
+  return { sessionValida, sessionId: sessionId.current, status, setStatus };
 }
-
