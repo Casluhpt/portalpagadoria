@@ -356,13 +356,13 @@ function ESocialPage() {
                   <tbody className="divide-y dark:divide-border">
                     {isLoading ? (
                       <tr>
-                        <td colSpan={7} className="px-4 py-8 text-center text-muted-foreground">
+                        <td colSpan={11} className="px-4 py-8 text-center text-muted-foreground">
                           Carregando base...
                         </td>
                       </tr>
                     ) : filteredData.length === 0 ? (
                       <tr>
-                        <td colSpan={7} className="px-4 py-8 text-center text-muted-foreground">
+                        <td colSpan={11} className="px-4 py-8 text-center text-muted-foreground">
                           Nenhum registro encontrado para {mesFiltro}.
                         </td>
                       </tr>
@@ -371,35 +371,26 @@ function ESocialPage() {
                         const isOk = item.num_fopag || item.dcomp_compensado;
                         return (
                           <tr key={item.id} className={`hover:bg-muted/50 dark:hover:bg-muted/50 transition-colors ${!isOk ? 'bg-red-50/30 dark:bg-red-900/10' : ''}`}>
+                            <td className="px-4 py-3 font-medium text-foreground dark:text-foreground">{item.empresa}</td>
+                            <td className="px-4 py-3 text-muted-foreground text-xs uppercase">{item.nome_coligada}</td>
+                            <td className="px-4 py-3 text-muted-foreground font-mono text-xs">{item.cnpj}</td>
+                            <td className="px-4 py-3 text-right text-xs">{Number(item.valor_inss).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
+                            <td className="px-4 py-3 text-right text-xs">{Number(item.valor_irrf).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
+                            <td className="px-4 py-3 text-right text-xs">{Number(item.valor_fgts).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
+                            <td className="px-4 py-3 text-right text-xs">{Number(item.valor_pis).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
                             <td className="px-4 py-3">
-                              <div className="font-medium text-foreground dark:text-foreground">{item.empresa}</div>
-                              <div className="text-[10px] text-muted-foreground uppercase">{item.nome_coligada} · {item.bandeira}</div>
+                              <Badge variant="outline" className={item.status_lancamento === 'Concluído' ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-muted text-muted-foreground"}>
+                                {item.status_lancamento}
+                              </Badge>
                             </td>
-                            <td className="px-4 py-3 text-muted-foreground dark:text-muted-foreground font-mono text-xs">{item.cnpj}</td>
-                            <td className="px-4 py-3 text-right">
-                              <div className="text-xs"><span className="text-muted-foreground">INSS:</span> {Number(item.valor_inss).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
-                              <div className="text-xs"><span className="text-muted-foreground">IRRF:</span> {Number(item.valor_irrf).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
-                            </td>
-                            <td className="px-4 py-3 text-right">
-                              <div className="text-xs"><span className="text-muted-foreground">FGTS:</span> {Number(item.valor_fgts).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
-                              <div className="text-xs"><span className="text-muted-foreground">PIS:</span> {Number(item.valor_pis).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
-                            </td>
-                            <td className="px-4 py-3">
-                              {item.num_fopag ? (
-                                <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200 gap-1 font-mono">
-                                  <CheckCircle2 className="h-3 w-3" /> {item.num_fopag}
-                                </Badge>
-                              ) : (
-                                <Badge variant="outline" className="bg-muted text-muted-foreground border-border gap-1">
-                                  Pendente
-                                </Badge>
-                              )}
+                            <td className="px-4 py-3 font-mono text-xs">
+                              {item.num_fopag || <span className="text-muted-foreground opacity-50">—</span>}
                             </td>
                             <td className="px-4 py-3">
                               {item.dcomp_compensado ? (
-                                <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-100 border-none">DCOMP = Compensado</Badge>
+                                <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-100 border-none text-[10px]">SIM (DCOMP)</Badge>
                               ) : (
-                                <span className="text-xs text-muted-foreground">—</span>
+                                <span className="text-xs text-muted-foreground opacity-50">NÃO</span>
                               )}
                             </td>
                             <td className="px-4 py-3 text-center">
@@ -411,6 +402,7 @@ function ESocialPage() {
                         );
                       })
                     )}
+
                   </tbody>
                 </table>
               </CardContent>
