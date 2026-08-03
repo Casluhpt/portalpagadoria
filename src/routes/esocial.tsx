@@ -268,12 +268,62 @@ function ESocialPage() {
                   onChange={(e) => setBusca(e.target.value)}
                 />
               </div>
-              <div className="flex gap-2">
-                <Button variant="outline" size="sm">
-                  <Download className="mr-2 h-4 w-4" /> Exportar Base
+              <div className="flex items-center gap-3">
+                <div className="flex items-center rounded-lg border border-border bg-card p-1">
+                  <Button 
+                    variant={importMode === 'incremental' ? "secondary" : "ghost"} 
+                    size="sm" 
+                    className="h-7 text-[10px] uppercase font-bold"
+                    onClick={() => setImportMode('incremental')}
+                  >
+                    Incremental
+                  </Button>
+                  <Button 
+                    variant={importMode === 'replace' ? "secondary" : "ghost"} 
+                    size="sm" 
+                    className="h-7 text-[10px] uppercase font-bold"
+                    onClick={() => setImportMode('replace')}
+                  >
+                    Substituir
+                  </Button>
+                </div>
+
+                <input 
+                  type="file" 
+                  ref={fileRef} 
+                  className="hidden" 
+                  accept=".xlsx,.xls" 
+                  onChange={(e) => e.target.files?.[0] && handleImport(e.target.files[0])} 
+                />
+
+                <Button variant="outline" size="sm" onClick={() => {
+                  const ws = XLSX.utils.json_to_sheet([{
+                    "Empresa": "Exemplo LTDA",
+                    "Coligadas": "Coligada A",
+                    "CNPJ": "00.000.000/0000-00",
+                    "INSS": 1500.50,
+                    "IRRF": 300.20,
+                    "FGTS": 800.00,
+                    "PIS": 150.00,
+                    "Lancamento": "Pendente",
+                    "FUPAG": "12345",
+                    "Compensado": "Não"
+                  }]);
+                  const wb = XLSX.utils.book_new();
+                  XLSX.utils.book_append_sheet(wb, ws, "Modelo");
+                  XLSX.writeFile(wb, "modelo_esocial.xlsx");
+                }}>
+                  <Download className="mr-2 h-4 w-4" /> Modelo
                 </Button>
-                <Button className="bg-indigo-600 hover:bg-indigo-700" size="sm">
-                  <FileSpreadsheet className="mr-2 h-4 w-4" /> Importar Excel
+                
+                <Button 
+                  className="bg-indigo-600 hover:bg-indigo-700" 
+                  size="sm" 
+                  onClick={() => fileRef.current?.click()}
+                  disabled={importMut.isPending}
+                >
+                  {importMut.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <FileSpreadsheet className="mr-2 h-4 w-4" />}
+                  Importar Excel
                 </Button>
               </div>
             </div>
@@ -289,15 +339,20 @@ function ESocialPage() {
                 <table className="w-full text-sm text-left">
                   <thead className="text-xs text-muted-foreground uppercase bg-muted dark:bg-card dark:text-muted-foreground border-b dark:border-border">
                     <tr>
-                      <th className="px-4 py-3 font-semibold">Empresa / Coligada</th>
+                      <th className="px-4 py-3 font-semibold">Empresa</th>
+                      <th className="px-4 py-3 font-semibold">Coligadas</th>
                       <th className="px-4 py-3 font-semibold">CNPJ</th>
-                      <th className="px-4 py-3 font-semibold text-right">INSS / IRRF</th>
-                      <th className="px-4 py-3 font-semibold text-right">FGTS / PIS</th>
-                      <th className="px-4 py-3 font-semibold">Lançamento / FOPAG</th>
+                      <th className="px-4 py-3 font-semibold text-right">INSS</th>
+                      <th className="px-4 py-3 font-semibold text-right">IRRF</th>
+                      <th className="px-4 py-3 font-semibold text-right">FGTS</th>
+                      <th className="px-4 py-3 font-semibold text-right">PIS</th>
+                      <th className="px-4 py-3 font-semibold">Lançamento</th>
+                      <th className="px-4 py-3 font-semibold">FUPAG</th>
                       <th className="px-4 py-3 font-semibold">Compensado</th>
                       <th className="px-4 py-3 font-semibold text-center">Ações</th>
                     </tr>
                   </thead>
+
                   <tbody className="divide-y dark:divide-border">
                     {isLoading ? (
                       <tr>
