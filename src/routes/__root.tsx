@@ -140,6 +140,8 @@ function RootComponent() {
         <PresenceHeartbeat />
         <GlobalShortcutManager />
         <PlanilhaOnboarding />
+        <FaviconManager />
+
         <BackButton />
         {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
         <Outlet />
