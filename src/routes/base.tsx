@@ -3,7 +3,7 @@ import { useMemo, useRef, useState } from "react";
 import { AppLogo } from "@/components/app-logo";
 import * as XLSX from "xlsx";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Loader2, Plus, Search, Trash2, ArrowUpDown, ArrowUp, ArrowDown, Upload, Download, FileSpreadsheet, LayoutDashboard, Database } from "lucide-react";
+import { Loader2, Plus, Search, Trash2, ArrowUpDown, ArrowUp, ArrowDown, Upload, Download, FileSpreadsheet, LayoutDashboard, Database, X, Scissors } from "lucide-react";
 
 import { AppSidebar } from "@/components/app-sidebar";
 import { useSession } from "@/hooks/use-session";
@@ -24,6 +24,8 @@ import { toast } from "sonner";
 
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Checkbox } from "@/components/ui/checkbox";
+import { logAcaoCritica } from "@/lib/audit-critico";
 import {
   Dialog,
   DialogContent,
@@ -39,6 +41,7 @@ import {
   importLancamentosBulk,
   createLancamento,
   deleteLancamento,
+  deleteLancamentosBulk,
   fetchAllLancamentos,
   lancamentosQueryKey,
   updateLancamento,
@@ -91,6 +94,8 @@ function BasePage() {
   const [sortKey, setSortKey] = useState<keyof Lancamento>("dueDate");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
   const [pendingDelete, setPendingDelete] = useState<Lancamento | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [purgeOpen, setPurgeOpen] = useState(false);
 
   const invalidate = () => qc.invalidateQueries({ queryKey: lancamentosQueryKey });
 
@@ -119,10 +124,24 @@ function BasePage() {
   });
 
   const deleteMut = useMutation({
-    mutationFn: (id: string) => deleteLancamento(id),
+    mutationFn: async (ids: string[]) => {
+      const count = ids.length;
+      await logAcaoCritica({
+        acao: "exclusao_logica",
+        modulo: "Provisão Diária",
+        tabela: "lancamentos",
+        descricao: `Usuário excluiu ${count} registro(s) da base de provisão diária.`,
+        metadata: { ids, count },
+        severidade: "alerta",
+      });
+      return deleteLancamentosBulk(ids);
+    },
     onSuccess: () => {
       invalidate();
-      toast.success("Registro excluído");
+      setSelectedIds(new Set());
+      toast.success("Registros excluídos com sucesso");
+      setPendingDelete(null);
+      setPurgeOpen(false);
     },
     onError: (e: Error) => toast.error("Falha ao excluir: " + e.message),
   });
@@ -263,6 +282,19 @@ function BasePage() {
                 className="pl-8"
               />
             </div>
+
+            {selectedIds.size > 0 && (
+              <Button
+                size="sm"
+                variant="destructive"
+                className="gap-1 animate-in fade-in zoom-in duration-200"
+                onClick={() => setPurgeOpen(true)}
+              >
+                <Trash2 className="h-4 w-4" />
+                Excluir Selecionados ({selectedIds.size})
+              </Button>
+            )}
+
             <Button size="sm" variant="outline" className="gap-1" onClick={() => setImportOpen(true)}>
               <Upload className="h-4 w-4" /> Importar Excel
             </Button>
@@ -383,6 +415,15 @@ function BasePage() {
                 <table className="min-w-full border-collapse text-sm">
                   <thead className="sticky top-0 z-10 bg-muted/95 backdrop-blur">
                     <tr>
+                      <th className="w-10 border-b border-border px-2 py-2">
+                        <Checkbox
+                          checked={rows.length > 0 && selectedIds.size === rows.length}
+                          onCheckedChange={(checked) => {
+                            if (checked) setSelectedIds(new Set(rows.map((r) => r.id)));
+                            else setSelectedIds(new Set());
+                          }}
+                        />
+                      </th>
                       <th className="w-10 border-b border-border px-2 py-2 text-left text-xs font-semibold text-muted-foreground">
                         #
                       </th>
@@ -413,6 +454,17 @@ function BasePage() {
                   <tbody>
                     {rows.map((r, i) => (
                       <tr key={r.id} className="group hover:bg-muted/40">
+                        <td className="border-b border-border px-2 py-1">
+                          <Checkbox
+                            checked={selectedIds.has(r.id)}
+                            onCheckedChange={(checked) => {
+                              const next = new Set(selectedIds);
+                              if (checked) next.add(r.id);
+                              else next.delete(r.id);
+                              setSelectedIds(next);
+                            }}
+                          />
+                        </td>
                         <td className="border-b border-border px-2 py-1 text-xs text-muted-foreground">
                           {i + 1}
                         </td>
@@ -441,7 +493,7 @@ function BasePage() {
                     {rows.length === 0 && (
                       <tr>
                         <td
-                          colSpan={COLS.length + 2}
+                          colSpan={COLS.length + 3}
                           className="px-4 py-16 text-center text-sm text-muted-foreground"
                         >
                           Nenhum registro. Clique em "Nova linha" para começar.
@@ -457,23 +509,31 @@ function BasePage() {
       </div>
 
       <AlertDialog
-        open={!!pendingDelete}
-        onOpenChange={(o) => !o && setPendingDelete(null)}
+        open={!!pendingDelete || purgeOpen}
+        onOpenChange={(o) => {
+          if (!o) {
+            setPendingDelete(null);
+            setPurgeOpen(false);
+          }
+        }}
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Excluir registro?</AlertDialogTitle>
+            <AlertDialogTitle>
+              {purgeOpen ? `Excluir ${selectedIds.size} registros?` : "Excluir registro?"}
+            </AlertDialogTitle>
             <AlertDialogDescription>
-              Essa ação é permanente e removerá a linha da Base. O dashboard
-              Principal será atualizado automaticamente.
+              Essa ação é permanente e removerá as linhas da Base. O dashboard
+              Principal será atualizado automaticamente. A ação será registrada na auditoria.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               onClick={() => {
-                if (pendingDelete) deleteMut.mutate(pendingDelete.id);
-                setPendingDelete(null);
+                const ids = purgeOpen ? Array.from(selectedIds) : (pendingDelete ? [pendingDelete.id] : []);
+                if (ids.length > 0) deleteMut.mutate(ids);
               }}
             >
               Excluir

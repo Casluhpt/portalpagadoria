@@ -125,6 +125,11 @@ export async function deleteLancamento(id: string): Promise<void> {
   if (error) throw error;
 }
 
+export async function deleteLancamentosBulk(ids: string[]): Promise<void> {
+  const { error } = await supabase.from("lancamentos").delete().in("id", ids);
+  if (error) throw error;
+}
+
 export const lancamentosQueryKey = ["lancamentos"] as const;
 
 /** Cabeçalhos aceitos na importação Excel (rótulo → campo do modelo). */
