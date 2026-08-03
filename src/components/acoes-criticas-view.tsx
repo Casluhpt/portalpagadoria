@@ -51,10 +51,11 @@ export function AcoesCriticasView() {
     );
   }
 
-  return <AcoesCriticasTable />;
+  return <AcoesCriticasTable isAdmin={isAdmin} />;
 }
 
-function AcoesCriticasTable() {
+function AcoesCriticasTable({ isAdmin }: { isAdmin: boolean }) {
+
   const { data = [], isLoading, error } = useQuery({
     queryKey: ["audit_log_criticas"],
     queryFn: fetchAuditCritico,
