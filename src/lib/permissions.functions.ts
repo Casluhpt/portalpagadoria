@@ -2,7 +2,6 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
-// Fallback types if not yet in database types
 export interface AppPermission {
   id: string;
   role: string;
@@ -16,8 +15,9 @@ export const getPermissions = createServerFn({ method: "GET" })
     const { data, error } = await supabaseAdmin
       .from("app_permissions" as any)
       .select("*");
+    
     if (error) throw error;
-    return data as AppPermission[];
+    return (data as any) as AppPermission[];
   });
 
 export const updatePermission = createServerFn({ method: "POST" })
