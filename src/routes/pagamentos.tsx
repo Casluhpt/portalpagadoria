@@ -172,6 +172,10 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
   const isVisitante = roles.includes("visitante");
   
   const isEditingEnabled = !!userId && activeUser?.user_id === userId && !isViewer && !isVisitante;
+  // Inclusão/exclusão liberadas a qualquer usuário autorizado (independe da fila),
+  // com confirmação prévia e registro automático em Auditoria.
+  const canMutate = !!userId && !isViewer && !isVisitante;
+
   const nextUser = queue.filter(q => q.status === 'aguardando').sort((a, b) => {
     const da = a.entrou_em ? new Date(a.entrou_em).getTime() : 0;
     const db = b.entrou_em ? new Date(b.entrou_em).getTime() : 0;
