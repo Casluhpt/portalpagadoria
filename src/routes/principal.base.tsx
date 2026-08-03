@@ -128,7 +128,7 @@ function BasePage() {
       const count = ids.length;
       await logAcaoCritica({
         acao: "exclusao_logica",
-        modulo: "Provisão Diária",
+        modulo: "Resultados Principais",
         tabela: "lancamentos",
         descricao: `Usuário excluiu ${count} registro(s) da base de provisão diária.`,
         metadata: { ids, count },
