@@ -51,7 +51,7 @@ function AuthPage() {
     <div className="grid min-h-dvh place-items-center bg-background p-4">
       <Card className="w-full max-w-md border-border shadow-lg">
         <CardHeader className="items-center text-center">
-          <img src="/profarma.png" alt="Profarma" className="mb-2 h-10 object-contain" />
+          <AppLogo area="login" className="mb-2 h-10 object-contain" />
           <CardTitle className="text-xl text-foreground">Portal Pagadoria</CardTitle>
           <p className="text-sm text-muted-foreground">Acesse para editar as bases de dados.</p>
         </CardHeader>
