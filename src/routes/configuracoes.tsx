@@ -9,8 +9,9 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { HelpCircle, Bug, AlertCircle, MessageSquare, Send, CheckCircle2, Paperclip, X, Loader2, Settings, Users, History, ChevronRight, Activity, Cloud, ShieldCheck, Mail, Save, Code, Zap, Database, ShieldAlert, Cpu, Sparkles, RefreshCw, Trash2 } from "lucide-react";
+import { HelpCircle, Bug, AlertCircle, MessageSquare, Send, CheckCircle2, Paperclip, X, Loader2, Settings, Users, History, ChevronRight, Activity, Cloud, ShieldCheck, Mail, Save, Code, Zap, Database, ShieldAlert, Cpu, Sparkles, RefreshCw, Trash2, Lock } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { useSession } from "@/hooks/use-session";
 import { useMutation } from "@tanstack/react-query";
@@ -659,6 +660,23 @@ function AdvancedSecuritySettings() {
           >
             Ver logs de auditoria <ChevronRight className="h-3 w-3 ml-1" />
           </Button>
+        </div>
+
+        <div className="rounded-lg border border-border p-4 bg-muted/30 space-y-4">
+          <div className="flex items-center gap-2">
+            <Lock className="h-4 w-4 text-indigo-600" />
+            <h4 className="text-sm font-bold">Política de Sessão Única</h4>
+          </div>
+          <p className="text-[11px] text-muted-foreground leading-relaxed">
+            Garante que cada usuário possua apenas uma sessão ativa simultaneamente, preservando a integridade da fila virtual e segurança do login.
+          </p>
+          <div className="flex items-center justify-between py-1 border-t border-border pt-4">
+            <div className="space-y-0.5">
+              <Label className="text-[12px] font-semibold">Encerrar sessão anterior automaticamente</Label>
+              <p className="text-[10px] text-muted-foreground">Novos logins derrubam acessos antigos no mesmo usuário.</p>
+            </div>
+            <Switch checked={true} disabled className="data-[state=checked]:bg-indigo-600" />
+          </div>
         </div>
 
         <div className="flex items-center justify-between rounded-lg border border-border p-4 bg-muted/50">
