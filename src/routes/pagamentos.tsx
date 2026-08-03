@@ -67,10 +67,11 @@ import {
 } from "@/lib/provisao-fechamento";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  APRENDIZADO_KEY, aprendizadoAtivo, construirModelo, diagnosticarBase,
+  construirModelo, diagnosticarBase,
   sugerirPreenchimento, sugerirValores, sugestoesParaPatch,
   type AlertaLinha, type ModeloInteligente,
 } from "@/lib/planilha-inteligente";
+import { usePlanilhaModo } from "@/hooks/use-planilha-modo";
 
 
 
