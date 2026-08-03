@@ -1246,22 +1246,35 @@ const EditableCell = React.memo(function EditableCell({
     );
   }
 
+  // Assistência: valores recorrentes para este campo/contexto (texto livre).
+  const listId = `sug-${col.key}-${rowId}`;
+  const opcoesSugeridas =
+    editing && suggest && col.kind === "text" ? suggest(col.key, row).filter(Boolean) : [];
+
   return (
     <td style={{ minWidth: width }} className="border-b border-r border-border p-0">
       {editing ? (
-        <input
-          autoFocus
-          type={col.kind === "date" ? "date" : "text"}
-          inputMode={col.kind === "number" || col.kind === "currency" ? "decimal" : undefined}
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
-          onBlur={commit}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") (e.target as HTMLInputElement).blur();
-            if (e.key === "Escape") { setEditing(false); }
-          }}
-          className="w-full bg-background px-2 py-1.5 text-xs outline-none ring-2 ring-primary/60"
-        />
+        <>
+          <input
+            autoFocus
+            type={col.kind === "date" ? "date" : "text"}
+            inputMode={col.kind === "number" || col.kind === "currency" ? "decimal" : undefined}
+            list={opcoesSugeridas.length ? listId : undefined}
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            onBlur={commit}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") (e.target as HTMLInputElement).blur();
+              if (e.key === "Escape") { setEditing(false); }
+            }}
+            className="w-full bg-background px-2 py-1.5 text-xs outline-none ring-2 ring-primary/60"
+          />
+          {opcoesSugeridas.length > 0 && (
+            <datalist id={listId}>
+              {opcoesSugeridas.map((o) => <option key={o} value={o} />)}
+            </datalist>
+          )}
+        </>
       ) : (
         <button
           type="button"
@@ -1281,10 +1294,134 @@ const EditableCell = React.memo(function EditableCell({
   return (
     prev.col === next.col &&
     prev.onSave === next.onSave &&
+    prev.suggest === next.suggest &&
     prev.row[prev.col.key] === next.row[next.col.key] &&
     (prev.col.key === "descricao_pagamento" ? prev.row.celula === next.row.celula : true)
   );
 });
+
+/* ---------------- PLANILHA INTELIGENTE — célula de assistência por linha ---------------- */
+
+function SmartRowCell({
+  row, alertas, modelo, rotulos, disabled, onApply,
+}: {
+  row: Pagamento;
+  alertas: AlertaLinha[];
+  modelo: ModeloInteligente;
+  rotulos: Record<string, string>;
+  disabled?: boolean;
+  onApply: (patch: PagamentoInput) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const sugestoes = useMemo(
+    () => (open ? sugerirPreenchimento(modelo, row, rotulos) : []),
+    [open, modelo, row, rotulos],
+  );
+
+  const incompletos = alertas.filter((a) => a.tipo === "incompleto").length;
+  const inconsistencias = alertas.filter((a) => a.tipo === "inconsistencia").length;
+
+  const cor =
+    inconsistencias > 0 ? "text-rose-500" :
+    incompletos > 0 ? "text-amber-500" :
+    "text-emerald-500/70";
+
+  return (
+    <td className="border-b border-r border-border p-0 text-center align-middle">
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <button
+            type="button"
+            className="flex h-full w-full items-center justify-center px-2 py-1.5 hover:bg-violet-500/10"
+            title={
+              alertas.length
+                ? `${alertas.length} ponto(s) de atenção`
+                : "Linha consistente — ver sugestões"
+            }
+          >
+            {alertas.length > 0
+              ? <AlertTriangle className={cn("h-3.5 w-3.5", cor)} />
+              : <CheckCircle2 className={cn("h-3.5 w-3.5", cor)} />}
+          </button>
+        </PopoverTrigger>
+        <PopoverContent align="start" className="w-80 space-y-3 border-border bg-card/95 p-3 text-left shadow-xl backdrop-blur-md">
+          <div className="flex items-center gap-2 border-b border-border pb-2">
+            <Sparkles className="h-3.5 w-3.5 text-violet-500" />
+            <span className="text-xs font-bold text-foreground">Assistência da linha</span>
+          </div>
+
+          {alertas.length > 0 ? (
+            <div className="space-y-1.5">
+              {alertas.map((a, i) => (
+                <div key={i} className="flex items-start gap-2 rounded-md border border-border bg-muted/40 p-2">
+                  <AlertTriangle className={cn("mt-0.5 h-3 w-3 shrink-0", a.tipo === "inconsistencia" ? "text-rose-500" : "text-amber-500")} />
+                  <span className="text-[10px] leading-relaxed text-foreground">
+                    {a.mensagem}
+                  </span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-[10px] text-muted-foreground">
+              Nenhuma inconsistência ou campo obrigatório em falta nesta linha.
+            </p>
+          )}
+
+          {sugestoes.length > 0 && (
+            <div className="space-y-2 border-t border-border pt-2">
+              <span className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">
+                Sugestões com base no histórico
+              </span>
+              <div className="space-y-1.5">
+                {sugestoes.map((s) => (
+                  <div key={String(s.campo)} className="flex items-center gap-2 rounded-md border border-violet-200/60 bg-violet-500/5 p-2 dark:border-violet-900/60">
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-[10px] font-semibold text-foreground">
+                        {s.label}: {s.valor}
+                      </p>
+                      <p className="truncate text-[9px] text-muted-foreground">
+                        {s.confianca}% · {s.origem}
+                      </p>
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-6 shrink-0 px-2 text-[10px] text-violet-700 hover:bg-violet-500/10 dark:text-violet-300"
+                      disabled={disabled}
+                      onClick={() => {
+                        onApply(sugestoesParaPatch([s]));
+                        toast.success(`${s.label} preenchido — você pode alterar a qualquer momento.`);
+                      }}
+                    >
+                      Aplicar
+                    </Button>
+                  </div>
+                ))}
+              </div>
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-7 w-full gap-1.5 text-[11px]"
+                disabled={disabled}
+                onClick={() => {
+                  onApply(sugestoesParaPatch(sugestoes));
+                  setOpen(false);
+                  toast.success(`${sugestoes.length} campo(s) preenchido(s) por sugestão — revise se necessário.`);
+                }}
+              >
+                <Wand2 className="h-3 w-3" /> Aplicar todas as sugestões
+              </Button>
+            </div>
+          )}
+
+          <p className="text-[9px] italic leading-relaxed text-muted-foreground">
+            As recomendações são apenas assistência — você mantém total controle sobre os lançamentos.
+          </p>
+        </PopoverContent>
+      </Popover>
+    </td>
+  );
+}
 
 
 /* ---------------- DASHBOARD ---------------- */
