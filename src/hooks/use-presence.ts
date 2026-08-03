@@ -19,10 +19,9 @@ const getSessionId = () => {
 export function usePresence() {
   const { user } = useSession();
   const sessionId = useRef<string | null>(null);
-  const registrarFn = useServerFn(registrarSessaoUnica);
-  const verificarFn = useServerFn(verificarSessaoAtiva);
   const heartbeatFn = useServerFn(heartbeatSessao);
-  const [sessionValida, setSessionValida] = useState(true);
+  const [sessionValida] = useState(true);
+
   
   // Status de presença (mantido para compatibilidade de UI)
   const [status, setStatusState] = useState<PresenceStatus>("online");
