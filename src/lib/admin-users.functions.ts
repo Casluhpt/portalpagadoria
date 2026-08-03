@@ -190,6 +190,8 @@ export const setUserSetor = createServerFn({ method: "POST" })
     if (input.setor !== null && !(ALLOWED_SETORES as readonly string[]).includes(input.setor)) {
       throw new Error("Setor inválido");
     }
+    // O setor PAGADORIA é restrito e a função já possui middleware requireSupabaseAuth + assertAdmin
+    return input;
     return input;
   })
   .handler(async ({ data, context }) => {
