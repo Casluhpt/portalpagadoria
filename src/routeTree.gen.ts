@@ -25,7 +25,6 @@ import { Route as DivergenciasRouteImport } from './routes/divergencias'
 import { Route as DespesasFixasRouteImport } from './routes/despesas-fixas'
 import { Route as ConfiguracoesRouteImport } from './routes/configuracoes'
 import { Route as ConciliacaoRouteImport } from './routes/conciliacao'
-import { Route as BaseRouteImport } from './routes/base'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuditoriaRouteImport } from './routes/auditoria'
 import { Route as AprovacaoRouteImport } from './routes/aprovacao'
@@ -34,7 +33,9 @@ import { Route as AlertasRouteImport } from './routes/alertas'
 import { Route as AdministracaoRouteImport } from './routes/administracao'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProvisaoIndexRouteImport } from './routes/provisao.index'
+import { Route as PrincipalIndexRouteImport } from './routes/principal.index'
 import { Route as ProvisaoBaseRouteImport } from './routes/provisao.base'
+import { Route as PrincipalBaseRouteImport } from './routes/principal.base'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 
 const UsuariosRoute = UsuariosRouteImport.update({
@@ -117,11 +118,6 @@ const ConciliacaoRoute = ConciliacaoRouteImport.update({
   path: '/conciliacao',
   getParentRoute: () => rootRouteImport,
 } as any)
-const BaseRoute = BaseRouteImport.update({
-  id: '/base',
-  path: '/base',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
@@ -162,10 +158,20 @@ const ProvisaoIndexRoute = ProvisaoIndexRouteImport.update({
   path: '/',
   getParentRoute: () => ProvisaoRoute,
 } as any)
+const PrincipalIndexRoute = PrincipalIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => PrincipalRoute,
+} as any)
 const ProvisaoBaseRoute = ProvisaoBaseRouteImport.update({
   id: '/base',
   path: '/base',
   getParentRoute: () => ProvisaoRoute,
+} as any)
+const PrincipalBaseRoute = PrincipalBaseRouteImport.update({
+  id: '/base',
+  path: '/base',
+  getParentRoute: () => PrincipalRoute,
 } as any)
 const AuthCallbackRoute = AuthCallbackRouteImport.update({
   id: '/callback',
@@ -181,7 +187,6 @@ export interface FileRoutesByFullPath {
   '/aprovacao': typeof AprovacaoRoute
   '/auditoria': typeof AuditoriaRoute
   '/auth': typeof AuthRouteWithChildren
-  '/base': typeof BaseRoute
   '/conciliacao': typeof ConciliacaoRoute
   '/configuracoes': typeof ConfiguracoesRoute
   '/despesas-fixas': typeof DespesasFixasRoute
@@ -193,13 +198,15 @@ export interface FileRoutesByFullPath {
   '/historico': typeof HistoricoRoute
   '/material-apoio': typeof MaterialApoioRoute
   '/pagamentos': typeof PagamentosRoute
-  '/principal': typeof PrincipalRoute
+  '/principal': typeof PrincipalRouteWithChildren
   '/provisao': typeof ProvisaoRouteWithChildren
   '/registros-excluidos': typeof RegistrosExcluidosRoute
   '/reset-password': typeof ResetPasswordRoute
   '/usuarios': typeof UsuariosRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/principal/base': typeof PrincipalBaseRoute
   '/provisao/base': typeof ProvisaoBaseRoute
+  '/principal/': typeof PrincipalIndexRoute
   '/provisao/': typeof ProvisaoIndexRoute
 }
 export interface FileRoutesByTo {
@@ -210,7 +217,6 @@ export interface FileRoutesByTo {
   '/aprovacao': typeof AprovacaoRoute
   '/auditoria': typeof AuditoriaRoute
   '/auth': typeof AuthRouteWithChildren
-  '/base': typeof BaseRoute
   '/conciliacao': typeof ConciliacaoRoute
   '/configuracoes': typeof ConfiguracoesRoute
   '/despesas-fixas': typeof DespesasFixasRoute
@@ -222,12 +228,13 @@ export interface FileRoutesByTo {
   '/historico': typeof HistoricoRoute
   '/material-apoio': typeof MaterialApoioRoute
   '/pagamentos': typeof PagamentosRoute
-  '/principal': typeof PrincipalRoute
   '/registros-excluidos': typeof RegistrosExcluidosRoute
   '/reset-password': typeof ResetPasswordRoute
   '/usuarios': typeof UsuariosRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/principal/base': typeof PrincipalBaseRoute
   '/provisao/base': typeof ProvisaoBaseRoute
+  '/principal': typeof PrincipalIndexRoute
   '/provisao': typeof ProvisaoIndexRoute
 }
 export interface FileRoutesById {
@@ -239,7 +246,6 @@ export interface FileRoutesById {
   '/aprovacao': typeof AprovacaoRoute
   '/auditoria': typeof AuditoriaRoute
   '/auth': typeof AuthRouteWithChildren
-  '/base': typeof BaseRoute
   '/conciliacao': typeof ConciliacaoRoute
   '/configuracoes': typeof ConfiguracoesRoute
   '/despesas-fixas': typeof DespesasFixasRoute
@@ -251,13 +257,15 @@ export interface FileRoutesById {
   '/historico': typeof HistoricoRoute
   '/material-apoio': typeof MaterialApoioRoute
   '/pagamentos': typeof PagamentosRoute
-  '/principal': typeof PrincipalRoute
+  '/principal': typeof PrincipalRouteWithChildren
   '/provisao': typeof ProvisaoRouteWithChildren
   '/registros-excluidos': typeof RegistrosExcluidosRoute
   '/reset-password': typeof ResetPasswordRoute
   '/usuarios': typeof UsuariosRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/principal/base': typeof PrincipalBaseRoute
   '/provisao/base': typeof ProvisaoBaseRoute
+  '/principal/': typeof PrincipalIndexRoute
   '/provisao/': typeof ProvisaoIndexRoute
 }
 export interface FileRouteTypes {
@@ -270,7 +278,6 @@ export interface FileRouteTypes {
     | '/aprovacao'
     | '/auditoria'
     | '/auth'
-    | '/base'
     | '/conciliacao'
     | '/configuracoes'
     | '/despesas-fixas'
@@ -288,7 +295,9 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/usuarios'
     | '/auth/callback'
+    | '/principal/base'
     | '/provisao/base'
+    | '/principal/'
     | '/provisao/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -299,7 +308,6 @@ export interface FileRouteTypes {
     | '/aprovacao'
     | '/auditoria'
     | '/auth'
-    | '/base'
     | '/conciliacao'
     | '/configuracoes'
     | '/despesas-fixas'
@@ -311,12 +319,13 @@ export interface FileRouteTypes {
     | '/historico'
     | '/material-apoio'
     | '/pagamentos'
-    | '/principal'
     | '/registros-excluidos'
     | '/reset-password'
     | '/usuarios'
     | '/auth/callback'
+    | '/principal/base'
     | '/provisao/base'
+    | '/principal'
     | '/provisao'
   id:
     | '__root__'
@@ -327,7 +336,6 @@ export interface FileRouteTypes {
     | '/aprovacao'
     | '/auditoria'
     | '/auth'
-    | '/base'
     | '/conciliacao'
     | '/configuracoes'
     | '/despesas-fixas'
@@ -345,7 +353,9 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/usuarios'
     | '/auth/callback'
+    | '/principal/base'
     | '/provisao/base'
+    | '/principal/'
     | '/provisao/'
   fileRoutesById: FileRoutesById
 }
@@ -357,7 +367,6 @@ export interface RootRouteChildren {
   AprovacaoRoute: typeof AprovacaoRoute
   AuditoriaRoute: typeof AuditoriaRoute
   AuthRoute: typeof AuthRouteWithChildren
-  BaseRoute: typeof BaseRoute
   ConciliacaoRoute: typeof ConciliacaoRoute
   ConfiguracoesRoute: typeof ConfiguracoesRoute
   DespesasFixasRoute: typeof DespesasFixasRoute
@@ -369,7 +378,7 @@ export interface RootRouteChildren {
   HistoricoRoute: typeof HistoricoRoute
   MaterialApoioRoute: typeof MaterialApoioRoute
   PagamentosRoute: typeof PagamentosRoute
-  PrincipalRoute: typeof PrincipalRoute
+  PrincipalRoute: typeof PrincipalRouteWithChildren
   ProvisaoRoute: typeof ProvisaoRouteWithChildren
   RegistrosExcluidosRoute: typeof RegistrosExcluidosRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
@@ -490,13 +499,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConciliacaoRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/base': {
-      id: '/base'
-      path: '/base'
-      fullPath: '/base'
-      preLoaderRoute: typeof BaseRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/auth': {
       id: '/auth'
       path: '/auth'
@@ -553,12 +555,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProvisaoIndexRouteImport
       parentRoute: typeof ProvisaoRoute
     }
+    '/principal/': {
+      id: '/principal/'
+      path: '/'
+      fullPath: '/principal/'
+      preLoaderRoute: typeof PrincipalIndexRouteImport
+      parentRoute: typeof PrincipalRoute
+    }
     '/provisao/base': {
       id: '/provisao/base'
       path: '/base'
       fullPath: '/provisao/base'
       preLoaderRoute: typeof ProvisaoBaseRouteImport
       parentRoute: typeof ProvisaoRoute
+    }
+    '/principal/base': {
+      id: '/principal/base'
+      path: '/base'
+      fullPath: '/principal/base'
+      preLoaderRoute: typeof PrincipalBaseRouteImport
+      parentRoute: typeof PrincipalRoute
     }
     '/auth/callback': {
       id: '/auth/callback'
@@ -579,6 +595,20 @@ const AuthRouteChildren: AuthRouteChildren = {
 }
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
+
+interface PrincipalRouteChildren {
+  PrincipalBaseRoute: typeof PrincipalBaseRoute
+  PrincipalIndexRoute: typeof PrincipalIndexRoute
+}
+
+const PrincipalRouteChildren: PrincipalRouteChildren = {
+  PrincipalBaseRoute: PrincipalBaseRoute,
+  PrincipalIndexRoute: PrincipalIndexRoute,
+}
+
+const PrincipalRouteWithChildren = PrincipalRoute._addFileChildren(
+  PrincipalRouteChildren,
+)
 
 interface ProvisaoRouteChildren {
   ProvisaoBaseRoute: typeof ProvisaoBaseRoute
@@ -602,7 +632,6 @@ const rootRouteChildren: RootRouteChildren = {
   AprovacaoRoute: AprovacaoRoute,
   AuditoriaRoute: AuditoriaRoute,
   AuthRoute: AuthRouteWithChildren,
-  BaseRoute: BaseRoute,
   ConciliacaoRoute: ConciliacaoRoute,
   ConfiguracoesRoute: ConfiguracoesRoute,
   DespesasFixasRoute: DespesasFixasRoute,
@@ -614,7 +643,7 @@ const rootRouteChildren: RootRouteChildren = {
   HistoricoRoute: HistoricoRoute,
   MaterialApoioRoute: MaterialApoioRoute,
   PagamentosRoute: PagamentosRoute,
-  PrincipalRoute: PrincipalRoute,
+  PrincipalRoute: PrincipalRouteWithChildren,
   ProvisaoRoute: ProvisaoRouteWithChildren,
   RegistrosExcluidosRoute: RegistrosExcluidosRoute,
   ResetPasswordRoute: ResetPasswordRoute,
