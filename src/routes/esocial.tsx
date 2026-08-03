@@ -45,6 +45,9 @@ export const Route = createFileRoute('/esocial')({
 function ESocialPage() {
   const [mesFiltro, setMesFiltro] = useState("01/2026");
   const [busca, setBusca] = useState("");
+  const qc = useQueryClient();
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [importMode, setImportMode] = useState<"incremental" | "replace">("incremental");
 
   const { data: base = [], isLoading } = useQuery({
     queryKey: ['esocial_base', mesFiltro],
@@ -52,11 +55,88 @@ function ESocialPage() {
       const { data, error } = await supabase
         .from('esocial_base')
         .select('*')
-        .eq('mes_ano', mesFiltro);
+        .eq('mes_ano', mesFiltro)
+        .order('empresa', { ascending: true });
       if (error) throw error;
       return data || [];
     }
   });
+
+  const importMut = useMutation({
+    mutationFn: async (rows: any[]) => {
+      if (importMode === 'replace') {
+        const { error: delError } = await supabase
+          .from('esocial_base')
+          .delete()
+          .eq('mes_ano', mesFiltro);
+        if (delError) throw delError;
+      }
+      
+      const { data, error } = await supabase
+        .from('esocial_base')
+        .insert(rows);
+      if (error) throw error;
+      return rows.length;
+    },
+    onSuccess: (n) => {
+      qc.invalidateQueries({ queryKey: ['esocial_base'] });
+      toast.success(`${n} registro(s) importado(s) com sucesso.`);
+    },
+    onError: (e: any) => {
+      toast.error(`Falha na importação: ${e.message}`);
+    }
+  });
+
+  const handleImport = async (file: File) => {
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      try {
+        const data = new Uint8Array(e.target?.result as ArrayBuffer);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+        const json = XLSX.utils.sheet_to_json(worksheet);
+
+        if (json.length === 0) {
+          toast.error("O arquivo está vazio.");
+          return;
+        }
+
+        // Mapping and Validation
+        const expectedFields = [
+          "Empresa", "Coligadas", "CNPJ", "INSS", "IRRF", "FGTS", "PIS", 
+          "Lancamento", "FUPAG", "Compensado"
+        ];
+        
+        const firstRow = json[0] as any;
+        const missingFields = expectedFields.filter(f => !(f in firstRow));
+        
+        if (missingFields.length > 0) {
+          toast.error(`Layout inválido. Campos ausentes: ${missingFields.join(", ")}. Por favor, utilize o modelo padrão.`);
+          return;
+        }
+
+        const mappedRows = json.map((row: any) => ({
+          empresa: row["Empresa"],
+          nome_coligada: row["Coligadas"],
+          cnpj: row["CNPJ"]?.toString(),
+          valor_inss: parseFloat(row["INSS"]) || 0,
+          valor_irrf: parseFloat(row["IRRF"]) || 0,
+          valor_fgts: parseFloat(row["FGTS"]) || 0,
+          valor_pis: parseFloat(row["PIS"]) || 0,
+          status_lancamento: row["Lancamento"] || "Pendente",
+          num_fopag: row["FUPAG"]?.toString(),
+          dcomp_compensado: row["Compensado"] === "Sim" || row["Compensado"] === true,
+          mes_ano: mesFiltro
+        }));
+
+        importMut.mutate(mappedRows);
+      } catch (err: any) {
+        toast.error(`Erro ao processar arquivo: ${err.message}`);
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  };
 
   const filteredData = useMemo(() => {
     return base.filter(item => 
@@ -77,6 +157,7 @@ function ESocialPage() {
     const totalMes = inss + irrf + fgts + pis;
     return { pendentes, totalMes, inss, irrf, fgts, pis };
   }, [base]);
+
 
   return (
     <SidebarProvider>
