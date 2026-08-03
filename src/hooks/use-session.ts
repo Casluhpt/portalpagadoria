@@ -38,6 +38,7 @@ export function useSession() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return { session, loading, user: session?.user ?? null };
+  const role = session?.user?.user_metadata?.role || 'user';
+  return { session, loading, user: session?.user ?? null, role };
 }
 

@@ -12,17 +12,22 @@ export function useAppPermissions() {
   const { data: permissions, isLoading } = useQuery({
     queryKey: ["app-permissions"],
     queryFn: () => getPermsFn(),
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: 1000 * 60 * 5, // 5 minutos
   });
 
   const hasPermission = (resource: string, action: PermissionAction): boolean => {
-    if (!role) return false;
-    
-    // Admin tem tudo por padrão se não houver regra restritiva
-    if (role === 'admin') {
-      const explicitDeny = permissions?.find(p => p.role === 'admin' && p.resource === resource && p.action === action && p.is_allowed === false);
+    // Admin tem tudo por padrão a menos que haja bloqueio explícito
+    if (role === 'administrador' || role === 'admin') {
+      const explicitDeny = permissions?.find(p => 
+        (p.role === 'administrador' || p.role === 'admin') && 
+        p.resource === resource && 
+        p.action === action && 
+        p.is_allowed === false
+      );
       return !explicitDeny;
     }
+
+    if (!role) return false;
 
     const perm = permissions?.find(p => p.role === role && p.resource === resource && p.action === action);
     return perm ? perm.is_allowed : false;
