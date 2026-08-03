@@ -282,6 +282,19 @@ function BasePage() {
                 className="pl-8"
               />
             </div>
+
+            {selectedIds.size > 0 && (
+              <Button
+                size="sm"
+                variant="destructive"
+                className="gap-1 animate-in fade-in zoom-in duration-200"
+                onClick={() => setPurgeOpen(true)}
+              >
+                <Trash2 className="h-4 w-4" />
+                Excluir Selecionados ({selectedIds.size})
+              </Button>
+            )}
+
             <Button size="sm" variant="outline" className="gap-1" onClick={() => setImportOpen(true)}>
               <Upload className="h-4 w-4" /> Importar Excel
             </Button>
