@@ -221,6 +221,11 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
   }, [queue, currentUserQueue, userId]);
 
   const { data = [], isLoading } = useQuery({
+    queryKey: pagamentosQueryKey,
+    queryFn: fetchPagamentos,
+    enabled: !!userId,
+    staleTime: 30_000,
+  });
 
   const [search, setSearch] = useState("");
   const [importMode, setImportMode] = useState<"incremental" | "replace">("incremental");
@@ -229,12 +234,21 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [highlights, setHighlights] = useState<Record<string, string>>(() => {
     if (typeof window === "undefined") return {};
-    try { return JSON.parse(localStorage.getItem("pagamentos:highlights") || "{}"); } catch { return {}; }
-
+    try {
+      return JSON.parse(localStorage.getItem("pagamentos:highlights") || "{}");
+    } catch {
+      return {};
+    }
   });
+
   useEffect(() => {
-    try { localStorage.setItem("pagamentos:highlights", JSON.stringify(highlights)); } catch { /* noop */ }
+    try {
+      localStorage.setItem("pagamentos:highlights", JSON.stringify(highlights));
+    } catch {
+      /* noop */
+    }
   }, [highlights]);
+
   const [bulkPendingDelete, setBulkPendingDelete] = useState(false);
 
 
@@ -667,6 +681,30 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
             )}
           </div>
         </div>
+
+        <div className="relative ml-2 w-48">
+          <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input placeholder="Pesquisar…" value={search} onChange={(e) => setSearch(e.target.value)} className="pl-8 h-8 text-xs bg-background/50" />
+        </div>
+                              </span>
+                              <span className="text-[9px] text-muted-foreground">
+                                {q.status === 'ativo' ? 'Editando agora' : 'Aguardando vez'}
+                              </span>
+                            </div>
+                            {q.status === 'ativo' && <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />}
+                          </div>
+                        ))}
+                      </div>
+                      <Button size="xs" variant="ghost" className="w-full h-7 text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/20 text-[10px] font-bold" onClick={() => sairMut.mutate()}>
+                        <LogOut className="h-3 w-3 mr-1.5" /> Sair da Fila
+                      </Button>
+                    </div>
+                  </PopoverContent>
+                </Popover>
+              </div>
+            )}
+          </div>
+        </div>
         
         <div className="relative ml-2 w-48">
           <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -933,7 +971,6 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
             </Button>
           </DialogFooter>
         </DialogContent>
-      </Dialog>
       </Dialog>
 
       <Dialog open={entrarMut.isPending || (!!currentUserQueue && currentUserQueue.status === 'aguardando' && filaOpen)} onOpenChange={setFilaOpen}>
