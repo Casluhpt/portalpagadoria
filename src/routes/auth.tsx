@@ -202,7 +202,8 @@ function SignInForm() {
           }}
         />
       </div>
-      <Button type="submit" disabled={loading} className="w-full">
+      <Button type="submit" disabled={loading} className="w-full bg-primary/85 hover:bg-primary/95 transition-colors">
+
         {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <LogIn className="mr-2 h-4 w-4" />}
         Entrar
       </Button>
