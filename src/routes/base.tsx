@@ -41,6 +41,7 @@ import {
   importLancamentosBulk,
   createLancamento,
   deleteLancamento,
+  deleteLancamentosBulk,
   fetchAllLancamentos,
   lancamentosQueryKey,
   updateLancamento,
