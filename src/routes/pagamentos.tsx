@@ -160,7 +160,7 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
     queryKey: ['concorrencia-fila', 'pagamentos_diversos'],
     queryFn: () => getFilaStatus({ data: { modulo: 'pagamentos_diversos' } }),
     enabled: !!userId,
-    refetchInterval: 3000,
+    refetchInterval: 2000, // Mais frequente para fila fluida
     refetchIntervalInBackground: false,
   });
 
@@ -189,6 +189,7 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
     mutationFn: () => entrarFilaFn({ data: { userId: userId as string, userNome: colaboradorNome, modulo: 'pagamentos_diversos' } }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['concorrencia-fila'] });
+      setFilaOpen(true);
       toast.success("Você entrou na fila de acesso.");
     }
   });
@@ -201,12 +202,25 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
     }
   });
 
+  const [posicaoFila, setPosicaoFila] = useState<number | null>(null);
+  const [filaOpen, setFilaOpen] = useState(false);
+
+  useEffect(() => {
+    if (currentUserQueue && queue.length > 0) {
+      const idx = queue.findIndex(q => q.user_id === userId);
+      if (idx !== -1) {
+        setPosicaoFila(idx + 1);
+        // Só abre o popup automaticamente se o status mudar para ativo ou se estiver aguardando e não for o primeiro
+        if (currentUserQueue.status === 'ativo') {
+          setFilaOpen(false); // Fecha popup se estiver ativo
+        }
+      }
+    } else {
+      setPosicaoFila(null);
+    }
+  }, [queue, currentUserQueue, userId]);
+
   const { data = [], isLoading } = useQuery({
-    queryKey: pagamentosQueryKey,
-    queryFn: fetchPagamentos,
-    enabled: !!userId,
-    staleTime: 30_000,
-  });
 
   const [search, setSearch] = useState("");
   const [importMode, setImportMode] = useState<"incremental" | "replace">("incremental");
@@ -591,12 +605,72 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
   return (
     <div className="flex flex-col">
       <div className="sticky top-14 z-[5] flex flex-wrap items-center gap-2 border-b border-border bg-background/80 px-4 py-2 backdrop-blur">
-        <div className="text-xs text-muted-foreground">
-          {isLoading ? "Carregando…" : `${rows.length.toLocaleString("pt-BR")} lançamento(s)`}
+        <div className="flex items-center gap-3">
+          <div className="text-xs text-muted-foreground">
+            {isLoading ? "Carregando…" : `${rows.length.toLocaleString("pt-BR")} lançamento(s)`}
+          </div>
+          
+          {/* Fila Virtual UI */}
+          <div className="flex items-center gap-2 border-l border-border pl-3">
+            {!currentUserQueue ? (
+              <Button size="xs" variant="outline" className="h-7 gap-1.5 bg-indigo-500/10 text-indigo-600 hover:bg-indigo-500/20 border-indigo-200" onClick={() => entrarMut.mutate()}>
+                <Users className="h-3.5 w-3.5" /> Entrar na Fila
+              </Button>
+            ) : (
+              <div className="flex items-center gap-2">
+                <Badge variant={currentUserQueue.status === 'ativo' ? "default" : "secondary"} className={`h-6 gap-1.5 px-2 ${currentUserQueue.status === 'ativo' ? 'bg-emerald-500 hover:bg-emerald-600' : 'bg-amber-100 text-amber-700 border-amber-200'}`}>
+                  {currentUserQueue.status === 'ativo' ? (
+                    <>
+                      <Lock className="h-3 w-3" /> Editando
+                    </>
+                  ) : (
+                    <>
+                      <Timer className="h-3 w-3" /> {posicaoFila}º na Fila
+                    </>
+                  )}
+                </Badge>
+                
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button size="icon" variant="ghost" className="h-7 w-7 text-muted-foreground">
+                      <Info className="h-4 w-4" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-64 p-3 shadow-xl border-border bg-card/95 backdrop-blur-md">
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between border-b border-border pb-2">
+                        <span className="text-xs font-bold text-foreground">Usuários na Fila</span>
+                        <Badge variant="outline" className="text-[10px]">{queue.length}</Badge>
+                      </div>
+                      <div className="space-y-2 max-h-48 overflow-y-auto pr-1 custom-scrollbar">
+                        {queue.map((q, idx) => (
+                          <div key={q.id} className={`flex items-center justify-between p-2 rounded-md border ${q.user_id === userId ? 'bg-indigo-500/5 border-indigo-200' : 'bg-muted/30 border-transparent'}`}>
+                            <div className="flex flex-col gap-0.5 min-w-0">
+                              <span className={`text-[11px] font-semibold truncate ${q.user_id === userId ? 'text-indigo-600' : 'text-foreground'}`}>
+                                {idx + 1}. {q.user_nome}
+                              </span>
+                              <span className="text-[9px] text-muted-foreground">
+                                {q.status === 'ativo' ? 'Editando agora' : 'Aguardando vez'}
+                              </span>
+                            </div>
+                            {q.status === 'ativo' && <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />}
+                          </div>
+                        ))}
+                      </div>
+                      <Button size="xs" variant="ghost" className="w-full h-7 text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/20 text-[10px] font-bold" onClick={() => sairMut.mutate()}>
+                        <LogOut className="h-3 w-3 mr-1.5" /> Sair da Fila
+                      </Button>
+                    </div>
+                  </PopoverContent>
+                </Popover>
+              </div>
+            )}
+          </div>
         </div>
-        <div className="relative ml-2 w-64">
+        
+        <div className="relative ml-2 w-48">
           <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input placeholder="Pesquisar…" value={search} onChange={(e) => setSearch(e.target.value)} className="pl-8 h-9" />
+          <Input placeholder="Pesquisar…" value={search} onChange={(e) => setSearch(e.target.value)} className="pl-8 h-8 text-xs bg-background/50" />
         </div>
         <div className="flex items-center gap-2 border-l border-border pl-2">
           <Select value={importMode} onValueChange={(v: any) => setImportMode(v)}>
@@ -856,6 +930,44 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
               className="bg-amber-600 text-white hover:bg-amber-700"
             >
               {solicitacaoMut.isPending ? "Enviando..." : "Enviar solicitação"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      </Dialog>
+
+      <Dialog open={entrarMut.isPending || (!!currentUserQueue && currentUserQueue.status === 'aguardando' && filaOpen)} onOpenChange={setFilaOpen}>
+        <DialogContent className="max-w-sm border-amber-200 bg-amber-50/95 dark:bg-amber-950/20 backdrop-blur-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-amber-700">
+              <Timer className="h-5 w-5 animate-pulse" /> Fila de Edição
+            </DialogTitle>
+            <DialogDescription className="text-amber-800/80">
+              Sua posição atual é <b>{posicaoFila}º</b> na fila.
+              <br /><br />
+              Atualmente <b>{activeUser?.user_nome}</b> está editando a base. Você terá permissão automaticamente assim que chegar sua vez.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3 py-2">
+            <div className="rounded-lg border border-amber-200 bg-amber-100/50 p-3 space-y-2">
+              <span className="text-xs font-bold text-amber-900 flex items-center gap-2">
+                <Users className="h-3.5 w-3.5" /> Pessoas à frente: {posicaoFila ? posicaoFila - 1 : 0}
+              </span>
+              <div className="flex flex-col gap-1.5">
+                {queue.slice(0, (posicaoFila || 1) - 1).map((q, i) => (
+                  <span key={q.id} className="text-[10px] text-amber-800/70 flex items-center gap-1.5">
+                    <ChevronRight className="h-2.5 w-2.5" /> {q.user_nome} {i === 0 ? '(Editando)' : ''}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+          <DialogFooter className="flex-col sm:flex-col gap-2">
+            <Button variant="outline" className="w-full border-amber-300 text-amber-800 hover:bg-amber-100" onClick={() => setFilaOpen(false)}>
+              Aguardar em Segundo Plano
+            </Button>
+            <Button variant="ghost" className="w-full text-rose-600 hover:bg-rose-100/50" onClick={() => sairMut.mutate()}>
+              Sair da Fila
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -12,10 +12,10 @@ export const entrarFila = createServerFn({ method: "POST" })
     // Check if user already in queue
     const { data: existing } = await supabase
       .from('concorrencia_fila')
-      .select('id, status')
+      .select('id, status, entrou_em')
       .eq('user_id', data.userId)
       .eq('modulo', data.modulo)
-      .single();
+      .maybeSingle();
 
     if (existing) return existing;
 
@@ -55,7 +55,7 @@ export const sairFila = createServerFn({ method: "POST" })
       .select('status')
       .eq('user_id', data.userId)
       .eq('modulo', data.modulo)
-      .single();
+      .maybeSingle();
 
     const { error } = await supabase
       .from('concorrencia_fila')
@@ -74,7 +74,7 @@ export const sairFila = createServerFn({ method: "POST" })
         .eq('status', 'aguardando')
         .order('entrou_em', { ascending: true })
         .limit(1)
-        .single();
+        .maybeSingle();
 
       if (next) {
         await supabase
