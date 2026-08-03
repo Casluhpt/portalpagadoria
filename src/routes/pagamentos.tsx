@@ -161,7 +161,12 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
     queryKey: ['concorrencia-fila', 'pagamentos_diversos'],
     queryFn: () => getFilaStatus({ data: { modulo: 'pagamentos_diversos' } }),
     enabled: !!userId,
-    refetchInterval: 2000, // Mais frequente para fila fluida
+    refetchInterval: (data) => {
+      // Otimização: Se o usuário estiver ativo, consulta menos vezes.
+      // Se estiver aguardando, consulta mais para ser notificado rápido.
+      const isUserAtivo = data?.find(q => q.user_id === userId)?.status === 'ativo';
+      return isUserAtivo ? 10000 : 3000;
+    },
     refetchIntervalInBackground: false,
   });
 
