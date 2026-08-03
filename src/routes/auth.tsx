@@ -33,6 +33,7 @@ const NAME_REGEX = /^[A-ZÀ-Ý][a-zà-ÿ']+(?:\s+[A-ZÀ-Ý][a-zà-ÿ']+)+$/;
 function AuthPage() {
   const navigate = useNavigate();
   const { session } = useSession();
+  const { resolved, setMode } = useTheme();
   const search = useRouterState({ select: (s) => s.location.search }) as {
     returnTo?: string;
     redirect?: string;
@@ -48,9 +49,20 @@ function AuthPage() {
     }
   }, [session, navigate, search.returnTo, search.redirect]);
 
+  const isDark = resolved === "noturno";
+  const toggleTheme = () => setMode(isDark ? "claro" : "noturno");
 
   return (
-    <div className="grid min-h-dvh place-items-center bg-gradient-auth p-4">
+    <div className="relative grid min-h-dvh place-items-center bg-gradient-auth p-4">
+      <button
+        type="button"
+        onClick={toggleTheme}
+        aria-label={isDark ? "Ativar modo claro" : "Ativar modo noturno"}
+        className="fixed right-4 top-4 z-50 flex h-10 w-10 items-center justify-center rounded-full border border-border/40 bg-card/60 text-foreground shadow-[var(--shadow-elegant)] backdrop-blur-md transition-all hover:bg-card/90 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-ring"
+      >
+        {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+      </button>
+
       <Card className="w-full max-w-md border-border/60 bg-card/80 shadow-[var(--shadow-elegant)] backdrop-blur-md">
         <CardHeader className="items-center text-center">
           <AppLogo area="login" className="mb-2 h-10 object-contain" />
@@ -59,7 +71,7 @@ function AuthPage() {
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="signin">
-            <TabsList className="grid w-full grid-cols-2">
+            <TabsList className="grid w-full grid-cols-2 bg-muted/50">
               <TabsTrigger value="signin">Entrar</TabsTrigger>
               <TabsTrigger value="signup">Criar conta</TabsTrigger>
             </TabsList>
@@ -71,6 +83,7 @@ function AuthPage() {
     </div>
   );
 }
+
 
 function translateAuthError(msg: string): string {
   const m = msg.toLowerCase();
