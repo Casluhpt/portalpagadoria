@@ -639,7 +639,7 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
                 <Button
                   size="sm"
                   className="gap-1"
-                  disabled={createMut.isPending || !isEditingEnabled}
+                  disabled={createMut.isPending || !canMutate}
                 >
                   {createMut.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
                   Novo
@@ -678,7 +678,7 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
           <span className="text-xs font-medium text-foreground">
             {selected.size} selecionada(s)
           </span>
-          <Button size="sm" variant="outline" className="gap-1" onClick={cutSelected} disabled={bulkDeleteMut.isPending || !isEditingEnabled}>
+          <Button size="sm" variant="outline" className="gap-1" onClick={cutSelected} disabled={bulkDeleteMut.isPending || !canMutate}>
             <Scissors className="h-4 w-4" /> Recortar
           </Button>
           <DropdownMenu>
@@ -704,7 +704,7 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
             variant="destructive"
             className="gap-1"
             onClick={() => setBulkPendingDelete(true)}
-            disabled={bulkDeleteMut.isPending || !isEditingEnabled}
+            disabled={bulkDeleteMut.isPending || !canMutate}
           >
             {bulkDeleteMut.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
             Excluir
