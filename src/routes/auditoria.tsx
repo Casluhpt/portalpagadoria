@@ -233,6 +233,56 @@ function AuditoriaTable({ isAdmin }: { isAdmin: boolean }) {
     setAcao("all"); setSearch("");
   };
 
+  const qc = useQueryClient();
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [justificativa, setJustificativa] = useState("");
+
+  const visibleIds = useMemo(() => rows.map((r) => r.id), [rows]);
+  const selectedCount = visibleIds.filter((id) => selected.has(id)).length;
+  const allSelected = visibleIds.length > 0 && selectedCount === visibleIds.length;
+
+  const toggle = (id: string) =>
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+
+  const toggleAll = () =>
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (allSelected) visibleIds.forEach((id) => next.delete(id));
+      else visibleIds.forEach((id) => next.add(id));
+      return next;
+    });
+
+  const purge = useMutation({
+    mutationFn: async () => {
+      const ids = visibleIds.filter((id) => selected.has(id));
+      const { data: n, error: err } = await supabase.rpc("purgar_logs_auditoria", {
+        _ids: ids,
+        _justificativa: justificativa.trim(),
+      });
+      if (err) throw err;
+      return (n as number) ?? 0;
+    },
+    onSuccess: (n) => {
+      toast.success(`${n} registro(s) de log excluído(s) permanentemente.`);
+      setSelected(new Set());
+      setJustificativa("");
+      setConfirmOpen(false);
+      qc.invalidateQueries({ queryKey: ["pagamentos_audit"] });
+      qc.invalidateQueries({ queryKey: ["audit_log_criticas"] });
+    },
+    onError: (e: unknown) => {
+      toast.error(e instanceof Error ? e.message : "Não foi possível excluir os registros.");
+    },
+  });
+
+
+
   return (
     <div className="flex flex-1 flex-col p-4">
       {/* Filters */}
