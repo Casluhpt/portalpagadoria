@@ -23,6 +23,8 @@ import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { UsuariosTableWrapper as UsuariosTable } from "@/components/admin/usuarios-table";
 import { PermissoesManagement } from "@/components/admin/permissoes-management";
+import { IdentidadeVisualPanel } from "@/components/admin/identidade-visual";
+
 import { DocumentacaoTecnicaSection } from "@/components/documentacao-tecnica-section";
 
 
