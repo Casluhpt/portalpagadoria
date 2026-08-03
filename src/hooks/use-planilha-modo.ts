@@ -70,7 +70,9 @@ export function usePlanilhaModo() {
   const salvar = useMutation({
     mutationFn: async ({ modo, registrarApresentacao }: { modo: PlanilhaModo; registrarApresentacao?: boolean }) => {
       if (!uid) throw new Error("Usuário não autenticado");
-      const patch: Record<string, unknown> = { planilha_inteligente: modo === "inteligente" };
+      const patch: { planilha_inteligente: boolean; planilha_onboarding_em?: string } = {
+        planilha_inteligente: modo === "inteligente",
+      };
       if (registrarApresentacao) patch.planilha_onboarding_em = new Date().toISOString();
       const { error } = await supabase.from("profiles").update(patch).eq("id", uid);
       if (error) throw error;
