@@ -242,14 +242,14 @@ export function AppSidebar() {
       "/auditoria": "auditoria",
     };
 
-    const resource = resourceMap[item.url];
-    if (resource) {
-      return hasPermission(resource, 'view');
-    }
-
+    if (isAdmin) return true;
     if (isViewer) return isViewerAllowed(item.url);
     if (item.adminOnly) return isAdmin;
     if (item.allowedRoles && item.allowedRoles.length > 0) return hasAny(item.allowedRoles);
+
+    const resource = resourceMap[item.url];
+    if (resource) return hasPermission(resource, 'view');
+
     return true;
   };
 
