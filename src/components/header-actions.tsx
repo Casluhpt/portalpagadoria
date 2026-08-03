@@ -139,6 +139,10 @@ export function HeaderActions() {
             </div>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
+          <DropdownMenuItem className="text-[10px] text-muted-foreground pointer-events-none">
+            <Mail className="mr-2 h-3.5 w-3.5" /> {user.email}
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
           <DropdownMenuSub>
             <DropdownMenuSubTrigger className="flex h-10 items-center justify-between gap-4 px-2 py-0 text-[10px] uppercase tracking-wide text-muted-foreground">
               <span>Status</span>
