@@ -6,7 +6,7 @@ export type ConciliacaoItem = {
   empresa: string;
   data: string;
   valor: number;
-  tipo: "Varejo" | "Distribuição";
+  tipo: "Varejo" | "Distribuição" | "Diferenças";
   origem: "importado" | "base";
   id?: string;
   matchId?: string;
@@ -63,10 +63,22 @@ export async function fetchPagamentosParaConciliacao(competencias: string[]) {
 }
 
 export async function executarConciliacao(
-  tipo: "Varejo" | "Distribuição", 
+  tipo: "Varejo" | "Distribuição" | "Diferenças", 
   importados: any[], 
   userId: string
 ) {
+  // Validação de colunas obrigatórias
+  const colunasObrigatorias = ["empresa", "data", "valor"];
+  if (importados.length > 0) {
+    const firstRowKeys = Object.keys(importados[0]).map(k => k.toLowerCase());
+    const faltantes = colunasObrigatorias.filter(col => 
+      !firstRowKeys.some(key => key.includes(col))
+    );
+    if (faltantes.length > 0) {
+      throw new Error(`Arquivo inválido. Colunas obrigatórias faltantes: ${faltantes.join(", ")}`);
+    }
+  }
+
   // 1. Buscar a base de referência (Pagamentos Diversos ativos + Competências recentes)
   const { data: baseRows, error } = await supabase
     .from("pagamentos_diversos")

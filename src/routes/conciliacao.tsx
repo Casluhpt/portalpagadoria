@@ -192,7 +192,7 @@ import { executarConciliacao } from "@/lib/conciliacao-engine";
 function ConciliacaoAtivaView() {
   const { user } = useSession();
   const [loading, setLoading] = useState(false);
-  const [tipo, setTipo] = useState<"Varejo" | "Distribuição" | null>(null);
+  const [tipo, setTipo] = useState<"Varejo" | "Distribuição" | "Diferenças" | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -241,7 +241,7 @@ function ConciliacaoAtivaView() {
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-bold flex items-center gap-2">
               <div className="h-6 w-6 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-[10px] font-bold">1</div>
-              Varejo (Itaú)
+              Varejo
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -262,7 +262,7 @@ function ConciliacaoAtivaView() {
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-bold flex items-center gap-2">
               <div className="h-6 w-6 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-[10px] font-bold">2</div>
-              Distribuição (Itaú)
+              Distribuição
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -275,6 +275,27 @@ function ConciliacaoAtivaView() {
             >
               {loading && tipo === "Distribuição" ? <Loader2 className="h-5 w-5 animate-spin" /> : <Upload className="h-5 w-5 text-indigo-500" />}
               <span className="text-xs font-medium">Selecionar arquivo Distribuição</span>
+            </Button>
+          </CardContent>
+        </Card>
+        
+        <Card className="border-amber-100 hover:shadow-md transition-shadow lg:col-span-2">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-bold flex items-center gap-2">
+              <div className="h-6 w-6 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center text-[10px] font-bold">3</div>
+              Conciliação de Diferenças
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-xs text-muted-foreground">Importe Excel ou CSV para identificar discrepâncias de valores, datas e IDs.</p>
+            <Button 
+              variant="outline" 
+              className="w-full h-24 border-dashed border-2 hover:border-amber-400 hover:bg-amber-50/50 flex-col gap-2"
+              onClick={() => { setTipo("Diferenças"); fileRef.current?.click(); }}
+              disabled={loading}
+            >
+              {loading && tipo === "Diferenças" ? <Loader2 className="h-5 w-5 animate-spin" /> : <Upload className="h-5 w-5 text-amber-500" />}
+              <span className="text-xs font-medium">Importar Base de Divergências (Excel/CSV)</span>
             </Button>
           </CardContent>
         </Card>
