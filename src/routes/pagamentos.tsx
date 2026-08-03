@@ -309,11 +309,12 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
       await Promise.all(
         snapshots.map((r) =>
           logAcaoCritica({
-            acao: "exclusao_lancamento",
+            acao: "exclusao_logica",
             modulo: "Pagamentos Diversos",
             tabela: "pagamentos_diversos",
-            registroId: r.id,
+            registro_id: r.id,
             descricao: `Exclusão de lançamento — ${r.empresa ?? "sem empresa"} · ${r.descricao_pagamento ?? "sem descrição"} · ${brl(r.valor_lg)}`,
+
             metadata: {
               excluido_em: new Date().toISOString(),
               usuario: colaboradorNome,
