@@ -19,17 +19,24 @@ import {
   Filter, 
   ArrowRight,
   Download,
-  Bell
+  Bell,
+  Upload,
+  AlertTriangle,
+  Loader2
 } from "lucide-react";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import * as XLSX from "xlsx";
+import { toast } from "sonner";
+import { format } from "date-fns";
+
 
 export const Route = createFileRoute('/esocial')({
   component: ESocialPage
