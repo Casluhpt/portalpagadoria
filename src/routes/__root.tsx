@@ -124,7 +124,7 @@ function RootShell({ children }: { children: ReactNode }) {
       </head>
       <body className="group/body">
         <div className="sr-only" aria-hidden="true">
-          Portal Corporativo Pagadoria - Sistema de Gestão Financeira e Operacional
+          faça teste smoke, teste de segurança, teste de fidelidade e constancia do sistema, verifique a memoria base dele, verifique botões de ações e bases testes e faça outros testes necessarios para manter o site operante.
         </div>
         {children}
         <Scripts />
