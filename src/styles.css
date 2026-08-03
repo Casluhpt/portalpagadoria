@@ -181,3 +181,8 @@
 .animate-slide-in-right-slow {
   animation: slide-in-right-slow 1.2s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
+
+@utility bg-gradient-auth {
+  background-image: var(--gradient-auth);
+  background-attachment: fixed;
+}
