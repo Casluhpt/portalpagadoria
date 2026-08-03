@@ -361,14 +361,41 @@ function AuditoriaTable({ isAdmin }: { isAdmin: boolean }) {
         </div>
       </div>
 
-      <div className="mb-2 text-xs text-muted-foreground">
-        {isLoading ? "Carregando…" : error ? "Erro ao carregar." : `${rows.length.toLocaleString("pt-BR")} registro(s)`}
+      <div className="mb-2 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
+        <span>
+          {isLoading ? "Carregando…" : error ? "Erro ao carregar." : `${rows.length.toLocaleString("pt-BR")} registro(s)`}
+        </span>
+        {isAdmin && rows.length > 0 && (
+          <Button variant="ghost" size="sm" onClick={toggleAll}>
+            {allSelected ? "Desmarcar todos" : "Selecionar todos os disponíveis"}
+          </Button>
+        )}
+        {isAdmin && selectedCount > 0 && (
+          <div className="ml-auto flex items-center gap-2">
+            <span className="font-medium text-foreground">{selectedCount} selecionado(s)</span>
+            <Button variant="ghost" size="sm" onClick={() => setSelected(new Set())}>
+              Limpar seleção
+            </Button>
+            <Button variant="destructive" size="sm" className="gap-1.5" onClick={() => setConfirmOpen(true)}>
+              <Trash2 className="h-3.5 w-3.5" /> Excluir permanentemente
+            </Button>
+          </div>
+        )}
       </div>
 
       <div className="relative flex-1 overflow-auto rounded-lg border border-border bg-card">
         <table className="min-w-full border-collapse text-xs">
           <thead className="sticky top-0 z-10 bg-muted/95 backdrop-blur">
             <tr>
+              {isAdmin && (
+                <th className="w-10 border-b border-border px-2 py-2 text-left">
+                  <Checkbox
+                    checked={allSelected}
+                    onCheckedChange={toggleAll}
+                    aria-label="Selecionar todos os registros filtrados"
+                  />
+                </th>
+              )}
               <th className="border-b border-border px-2 py-2 text-left font-semibold">Data / Hora</th>
               <th className="border-b border-border px-2 py-2 text-left font-semibold">Ação</th>
               <th className="border-b border-border px-2 py-2 text-left font-semibold">Colaborador</th>
@@ -392,6 +419,15 @@ function AuditoriaTable({ isAdmin }: { isAdmin: boolean }) {
                 r.acao === "INSERT" ? "Criado" : r.acao;
               return (
                 <tr key={r.id} className="hover:bg-muted/40">
+                  {isAdmin && (
+                    <td className="border-b border-border px-2 py-1">
+                      <Checkbox
+                        checked={selected.has(r.id)}
+                        onCheckedChange={() => toggle(r.id)}
+                        aria-label="Selecionar registro"
+                      />
+                    </td>
+                  )}
                   <td className="whitespace-nowrap border-b border-border px-2 py-1">
                     {format(new Date(r.created_at), "dd/MM/yyyy HH:mm:ss")}
                   </td>
@@ -416,7 +452,7 @@ function AuditoriaTable({ isAdmin }: { isAdmin: boolean }) {
             })}
             {!isLoading && rows.length === 0 && (
               <tr>
-                <td colSpan={9} className="px-4 py-16 text-center text-sm text-muted-foreground">
+                <td colSpan={isAdmin ? 10 : 9} className="px-4 py-16 text-center text-sm text-muted-foreground">
                   Nenhum registro encontrado com os filtros atuais.
                 </td>
               </tr>
@@ -424,6 +460,40 @@ function AuditoriaTable({ isAdmin }: { isAdmin: boolean }) {
           </tbody>
         </table>
       </div>
+
+      <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+        <AlertDialogContent className="bg-background/85 backdrop-blur-md">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir permanentemente {selectedCount} registro(s)?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta ação é irreversível e remove os logs de auditoria selecionados. Informe uma
+              justificativa — ela será registrada na trilha de ações críticas.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="space-y-1.5">
+            <Label className="text-xs">Justificativa</Label>
+            <Textarea
+              value={justificativa}
+              onChange={(e) => setJustificativa(e.target.value)}
+              placeholder="Motivo da exclusão permanente…"
+              rows={3}
+            />
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={purge.isPending}>Cancelar</AlertDialogCancel>
+            <Button
+              variant="destructive"
+              disabled={justificativa.trim().length < 5 || purge.isPending}
+              onClick={() => purge.mutate()}
+              className="gap-1.5"
+            >
+              {purge.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
+              Confirmar exclusão
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
     </div>
   );
 }
