@@ -336,7 +336,7 @@ export function GlobalSearch({ variant = "compact" }: { variant?: "compact" | "h
 
         {!isAiMode && (
           <CommandList className="max-h-[460px]">
-            <CommandEmpty>
+            <div className="py-6 text-center text-sm">
               <div className="flex flex-col items-center justify-center gap-1 py-6 text-center">
                 <Bot className="mb-2 h-10 w-10 text-violet-300" />
                 <p className="text-sm font-medium">Nenhum resultado direto no portal.</p>
@@ -352,7 +352,7 @@ export function GlobalSearch({ variant = "compact" }: { variant?: "compact" | "h
                   Perguntar à IA Assistente da Pagadoria
                 </button>
               </div>
-            </CommandEmpty>
+            </div>
             <>
               {history.length > 0 && !search && (
                 <CommandGroup
