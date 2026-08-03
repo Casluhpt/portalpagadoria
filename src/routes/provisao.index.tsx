@@ -336,7 +336,12 @@ function ProvisaoDashboard() {
             Provisão de hoje ainda aberta para lançamentos.
           </div>
         )}
-        <FechamentoCompetenciaButton />
+        <FechamentoCompetenciaButton
+          dateFrom={dateFrom}
+          dateTo={dateTo}
+          registros={filtered.length}
+          total={totalGeral}
+        />
         <Button
           onClick={async () => {
             try {
