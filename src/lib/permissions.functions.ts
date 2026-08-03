@@ -2,13 +2,22 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
+// Fallback types if not yet in database types
+export interface AppPermission {
+  id: string;
+  role: string;
+  resource: string;
+  action: string;
+  is_allowed: boolean;
+}
+
 export const getPermissions = createServerFn({ method: "GET" })
   .handler(async () => {
-    // Usando any para contornar temporariamente a falta de sincronização do type-gen
-    const { data, error } = await (supabaseAdmin.from("app_permissions") as any)
+    const { data, error } = await supabaseAdmin
+      .from("app_permissions" as any)
       .select("*");
     if (error) throw error;
-    return data;
+    return data as AppPermission[];
   });
 
 export const updatePermission = createServerFn({ method: "POST" })
@@ -19,7 +28,8 @@ export const updatePermission = createServerFn({ method: "POST" })
     is_allowed: z.boolean()
   }))
   .handler(async ({ data }) => {
-    const { error } = await (supabaseAdmin.from("app_permissions") as any)
+    const { error } = await supabaseAdmin
+      .from("app_permissions" as any)
       .upsert({
         role: data.role,
         resource: data.resource,
