@@ -309,16 +309,6 @@ export function AppSidebar() {
               <SidebarMenu>
                 {advancedItems.filter(canSee).map(renderItem)}
                 
-                {isAdmin && (
-                  <SidebarMenuItem>
-                    <SidebarMenuButton asChild isActive={currentPath.startsWith("/configuracoes")} tooltip="Configurações">
-                      <Link to="/configuracoes">
-                        <Settings className="h-4 w-4 shrink-0" />
-                        <span>Configurações</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                )}
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
