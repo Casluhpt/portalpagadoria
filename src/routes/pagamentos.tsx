@@ -796,12 +796,27 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
                           </div>
                         ))}
                       </div>
-                      <Button size="sm" variant="ghost" className="w-full h-7 text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/20 text-[10px] font-bold" onClick={() => sairMut.mutate()}>
+                      <Button
+                        size="sm"
+                        className="w-full h-7 bg-red-600 text-white hover:bg-red-700 text-[10px] font-bold"
+                        onClick={() => setConfirmSaidaFila(true)}
+                      >
                         <LogOut className="h-3 w-3 mr-1.5" /> Sair da Fila
                       </Button>
                     </div>
                   </PopoverContent>
                 </Popover>
+
+                <Button
+                  size="sm"
+                  className="h-7 gap-1.5 bg-red-600 text-xs font-bold text-white hover:bg-red-700"
+                  disabled={sairMut.isPending}
+                  onClick={() => setConfirmSaidaFila(true)}
+                  title="Desistir da fila e liberar sua posição"
+                >
+                  {sairMut.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <LogOut className="h-3.5 w-3.5" />}
+                  Sair da Fila
+                </Button>
               </div>
             )}
           </div>
