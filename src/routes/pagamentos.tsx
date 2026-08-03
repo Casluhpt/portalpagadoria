@@ -7,7 +7,8 @@ import * as XLSX from "xlsx";
 import {
   Loader2, Plus, Search, Trash2, ArrowUpDown, ArrowUp, ArrowDown,
   Upload, Download, LayoutGrid, Table as TableIcon,
-  Scissors, Palette, X, Lock, Unlock, Users, Timer, LogOut, Info, ChevronRight
+  Scissors, Palette, X, Lock, Unlock, Users, Timer, LogOut, Info, ChevronRight,
+  Sparkles, AlertTriangle, Wand2, CheckCircle2
 } from "lucide-react";
 import {
   Dialog, DialogContent, DialogDescription, DialogFooter,
@@ -65,6 +66,11 @@ import {
   criarSolicitacaoProvisao, extractProvisaoFechadaDate,
 } from "@/lib/provisao-fechamento";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  APRENDIZADO_KEY, aprendizadoAtivo, construirModelo, diagnosticarBase,
+  sugerirPreenchimento, sugerirValores, sugestoesParaPatch,
+  type AlertaLinha, type ModeloInteligente,
+} from "@/lib/planilha-inteligente";
 
 
 
@@ -465,6 +471,44 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
     });
   }, [data, search, sortKey, sortDir]);
 
+  /* ---------- Planilha Inteligente (assistência local, opcional) ---------- */
+  const [smartOn, setSmartOn] = useState<boolean>(() => aprendizadoAtivo());
+  const toggleSmart = (v: boolean) => {
+    setSmartOn(v);
+    try { localStorage.setItem(APRENDIZADO_KEY, String(v)); } catch { /* noop */ }
+    if (v) toast.success("Planilha Inteligente ativada — sugestões e alertas habilitados.");
+    else toast.info("Planilha Inteligente desativada.");
+  };
+  const rotulos = useMemo(
+    () => Object.fromEntries(PAGAMENTO_CAMPOS.map((c) => [c.key, c.label])) as Record<string, string>,
+    [],
+  );
+  const modelo = useMemo(() => construirModelo(data), [data]);
+  const diagnostico = useMemo(
+    () => (smartOn ? diagnosticarBase(modelo, rows) : null),
+    [smartOn, modelo, rows],
+  );
+  const modeloRef = useRef(modelo);
+  useEffect(() => { modeloRef.current = modelo; }, [modelo]);
+  const suggestFn = React.useCallback(
+    (campo: string, row: Pagamento) => sugerirValores(modeloRef.current, campo, row),
+    [],
+  );
+  const aplicarSugestoes = (ids: string[]) => {
+    let aplicadas = 0;
+    for (const id of ids) {
+      const row = data.find((r) => r.id === id);
+      if (!row) continue;
+      const sug = sugerirPreenchimento(modeloRef.current, row, rotulos);
+      if (!sug.length) continue;
+      stableCellSave(id, sugestoesParaPatch(sug));
+      aplicadas += sug.length;
+    }
+    if (aplicadas) toast.success(`${aplicadas} campo(s) preenchido(s) por sugestão — revise e ajuste se necessário.`);
+    else toast.info("Nenhum padrão recorrente encontrado para as linhas selecionadas.");
+  };
+
+
   const toggleSort = (k: keyof Pagamento) => {
     if (sortKey === k) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
     else { setSortKey(k); setSortDir("asc"); }
@@ -733,6 +777,62 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
         </div>
 
         <div className="flex items-center gap-2 border-l border-border pl-2">
+          <Button
+            size="sm"
+            variant={smartOn ? "default" : "outline"}
+            className={cn("h-7 gap-1.5 text-xs", smartOn && "bg-violet-600 text-white hover:bg-violet-700")}
+            onClick={() => toggleSmart(!smartOn)}
+            title="Assistência inteligente: aprende padrões, sugere preenchimentos e valida os dados. Você mantém o controle total."
+          >
+            <Sparkles className="h-3.5 w-3.5" /> Planilha Inteligente
+          </Button>
+          {smartOn && diagnostico && (
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button size="sm" variant="outline" className="h-7 gap-1.5 text-xs">
+                  {diagnostico.linhasComAlerta > 0 ? (
+                    <><AlertTriangle className="h-3.5 w-3.5 text-amber-500" /> {diagnostico.linhasComAlerta} linha(s) para revisar</>
+                  ) : (
+                    <><CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" /> Base consistente</>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-80 space-y-3 border-border bg-card/95 p-3 shadow-xl backdrop-blur-md">
+                <div className="space-y-1 border-b border-border pb-2">
+                  <span className="text-xs font-bold text-foreground">Assistência da Planilha</span>
+                  <p className="text-[10px] leading-relaxed text-muted-foreground">
+                    Padrões aprendidos de {modelo.amostra.toLocaleString("pt-BR")} lançamento(s) desta base,
+                    processados apenas no seu navegador.
+                  </p>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="rounded-md border border-border bg-muted/40 p-2">
+                    <p className="text-[9px] uppercase tracking-wide text-muted-foreground">Campos incompletos</p>
+                    <p className="text-sm font-bold text-amber-600">{diagnostico.incompletos}</p>
+                  </div>
+                  <div className="rounded-md border border-border bg-muted/40 p-2">
+                    <p className="text-[9px] uppercase tracking-wide text-muted-foreground">Inconsistências</p>
+                    <p className="text-sm font-bold text-rose-600">{diagnostico.inconsistencias}</p>
+                  </div>
+                </div>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="h-7 w-full gap-1.5 text-[11px]"
+                  onClick={() => aplicarSugestoes(rows.map((r) => r.id))}
+                  disabled={!isEditingEnabled}
+                >
+                  <Wand2 className="h-3 w-3" /> Sugerir preenchimento em toda a base
+                </Button>
+                <p className="text-[9px] italic leading-relaxed text-muted-foreground">
+                  As sugestões são apenas assistência — você pode alterar, corrigir ou ignorar qualquer recomendação.
+                </p>
+              </PopoverContent>
+            </Popover>
+          )}
+        </div>
+
+        <div className="flex items-center gap-2 border-l border-border pl-2">
           <Select value={importMode} onValueChange={(v: any) => setImportMode(v)}>
             <SelectTrigger className="h-9 w-[180px] text-xs">
               <SelectValue placeholder="Modo de importação" />
@@ -822,6 +922,17 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
           <Button size="sm" variant="outline" className="gap-1" onClick={cutSelected} disabled={bulkDeleteMut.isPending || !canMutate || !isEditingEnabled}>
             <Scissors className="h-4 w-4" /> Recortar
           </Button>
+          {smartOn && (
+            <Button
+              size="sm"
+              variant="outline"
+              className="gap-1 border-violet-300 text-violet-700 hover:bg-violet-50 dark:text-violet-300 dark:hover:bg-violet-950/30"
+              onClick={() => aplicarSugestoes(Array.from(selected))}
+              disabled={!isEditingEnabled}
+            >
+              <Wand2 className="h-4 w-4" /> Sugerir preenchimento
+            </Button>
+          )}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button size="sm" variant="outline" className="gap-1">
@@ -874,6 +985,11 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
                     />
                   </th>
                   <th className="w-10 border-b border-border px-2 py-2 text-left font-semibold text-muted-foreground">#</th>
+                  {smartOn && (
+                    <th className="w-9 border-b border-border px-2 py-2 text-left" title="Assistência inteligente">
+                      <Sparkles className="h-3.5 w-3.5 text-violet-500" />
+                    </th>
+                  )}
                   {VISIBLE_CAMPOS.map((c) => (
                     <th
                       key={c.key}
@@ -909,6 +1025,16 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
                       <td className="border-b border-border px-2 py-1 text-muted-foreground">
                         {i + 1}
                       </td>
+                      {smartOn && (
+                        <SmartRowCell
+                          row={r}
+                          alertas={diagnostico?.porLinha.get(r.id) ?? []}
+                          modelo={modelo}
+                          rotulos={rotulos}
+                          disabled={!isEditingEnabled}
+                          onApply={(patch) => stableCellSave(r.id, patch)}
+                        />
+                      )}
                       {VISIBLE_CAMPOS.map((c) => (
                         <EditableCell
                           key={c.key}
@@ -917,6 +1043,7 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
                           col={c}
                           onSave={stableCellSave}
                           disabled={!isEditingEnabled}
+                          suggest={smartOn ? suggestFn : undefined}
                         />
                       ))}
                     </tr>
@@ -925,7 +1052,7 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
 
                 {rows.length === 0 && (
                   <tr>
-                    <td colSpan={VISIBLE_CAMPOS.length + 2} className="px-4 py-16 text-center text-sm text-muted-foreground">
+                    <td colSpan={VISIBLE_CAMPOS.length + (smartOn ? 3 : 2)} className="px-4 py-16 text-center text-sm text-muted-foreground">
                       Nenhum lançamento. Clique em "Novo" ou importe uma planilha Excel.
                     </td>
                   </tr>
