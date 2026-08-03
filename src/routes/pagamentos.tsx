@@ -7,7 +7,7 @@ import * as XLSX from "xlsx";
 import {
   Loader2, Plus, Search, Trash2, ArrowUpDown, ArrowUp, ArrowDown,
   Upload, Download, LayoutGrid, Table as TableIcon,
-  Scissors, Palette, X, Lock, Unlock, Users, Timer, LogOut, Info
+  Scissors, Palette, X, Lock, Unlock, Users, Timer, LogOut, Info, ChevronRight
 } from "lucide-react";
 import {
   Dialog, DialogContent, DialogDescription, DialogFooter,
@@ -17,6 +17,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Badge } from "@/components/ui/badge";
 import {
   BarChart, Bar, LineChart as ReLineChart, Line, PieChart, Pie, Cell,
   ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, CartesianGrid,
@@ -627,7 +628,7 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
           {/* Fila Virtual UI */}
           <div className="flex items-center gap-2 border-l border-border pl-3">
             {!currentUserQueue ? (
-              <Button size="xs" variant="outline" className="h-7 gap-1.5 bg-indigo-500/10 text-indigo-600 hover:bg-indigo-500/20 border-indigo-200" onClick={() => entrarMut.mutate()}>
+              <Button size="sm" variant="outline" className="h-7 gap-1.5 bg-indigo-500/10 text-indigo-600 hover:bg-indigo-500/20 border-indigo-200" onClick={() => entrarMut.mutate()}>
                 <Users className="h-3.5 w-3.5" /> Entrar na Fila
               </Button>
             ) : (
@@ -671,7 +672,7 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
                           </div>
                         ))}
                       </div>
-                      <Button size="xs" variant="ghost" className="w-full h-7 text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/20 text-[10px] font-bold" onClick={() => sairMut.mutate()}>
+                      <Button size="sm" variant="ghost" className="w-full h-7 text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/20 text-[10px] font-bold" onClick={() => sairMut.mutate()}>
                         <LogOut className="h-3 w-3 mr-1.5" /> Sair da Fila
                       </Button>
                     </div>
@@ -730,7 +731,7 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
                 <Button
                   size="sm"
                   className="gap-1"
-                  disabled={createMut.isPending || !canMutate}
+                  disabled={createMut.isPending || !canMutate || !isEditingEnabled}
                 >
                   {createMut.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
                   Novo
@@ -755,7 +756,7 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
                 </div>
                 <DialogFooter>
                   <Button variant="outline" onClick={() => setNovoOpen(false)}>Cancelar</Button>
-                  <Button onClick={() => createMut.mutate(novoQty)} disabled={createMut.isPending}>
+                  <Button onClick={() => createMut.mutate(novoQty)} disabled={createMut.isPending || !isEditingEnabled}>
                     Confirmar
                   </Button>
                 </DialogFooter>
@@ -769,7 +770,7 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
           <span className="text-xs font-medium text-foreground">
             {selected.size} selecionada(s)
           </span>
-          <Button size="sm" variant="outline" className="gap-1" onClick={cutSelected} disabled={bulkDeleteMut.isPending || !canMutate}>
+          <Button size="sm" variant="outline" className="gap-1" onClick={cutSelected} disabled={bulkDeleteMut.isPending || !canMutate || !isEditingEnabled}>
             <Scissors className="h-4 w-4" /> Recortar
           </Button>
           <DropdownMenu>
@@ -795,7 +796,7 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
             variant="destructive"
             className="gap-1"
             onClick={() => setBulkPendingDelete(true)}
-            disabled={bulkDeleteMut.isPending || !canDelete}
+            disabled={bulkDeleteMut.isPending || !canDelete || !isEditingEnabled}
           >
             {bulkDeleteMut.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
             Excluir
