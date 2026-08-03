@@ -475,20 +475,17 @@ function DiagnosticPanel() {
 }
 
 function SmartConfigPanel() {
-  const [enabled, setEnabled] = useState(() => {
-    if (typeof window === "undefined") return false;
-    return localStorage.getItem("portal_smart_learning") === "true";
-  });
-  
+  const { modo, definirModo, salvando, isLoading } = usePlanilhaModo();
   const [clearing, setClearing] = useState(false);
 
-  const toggleLearning = (val: boolean) => {
-    setEnabled(val);
-    localStorage.setItem("portal_smart_learning", String(val));
-    if (val) {
-      toast.success("Aprendizado inteligente ativado!");
-    } else {
-      toast.info("Aprendizado inteligente desativado.");
+  const escolher = async (novo: "inteligente" | "tradicional") => {
+    if (novo === modo) return;
+    try {
+      await definirModo(novo);
+      if (novo === "inteligente") toast.success("Planilha Inteligente ativada.");
+      else toast.info("Modo Tradicional ativado — nenhuma funcionalidade é perdida.");
+    } catch (e) {
+      toast.error("Não foi possível salvar a preferência: " + (e as Error).message);
     }
   };
 
@@ -498,69 +495,91 @@ function SmartConfigPanel() {
       localStorage.removeItem("portal_smart_history");
       setClearing(false);
       toast.success("Histórico de aprendizado limpo com sucesso!");
-    }, 1000);
+    }, 800);
   };
+
+  const opcoes = [
+    {
+      id: "tradicional" as const,
+      titulo: "Modo Tradicional",
+      icone: TableIcon,
+      desc: "Seu fluxo atual, sem sugestões automáticas. Nenhuma perda de funcionalidade.",
+    },
+    {
+      id: "inteligente" as const,
+      titulo: "Modo Inteligente",
+      icone: Sparkles,
+      desc: "Aprende padrões, sugere preenchimentos e aponta inconsistências — sempre como assistência.",
+    },
+  ];
 
   return (
     <Card className="border-border shadow-sm">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-base">
           <Sparkles className="h-5 w-5 text-violet-600" />
-          Configuração Inteligente e Personalização
+          Planilha Inteligente
         </CardTitle>
         <CardDescription>
-          O sistema observa padrões para destacar os módulos que você mais usa.
+          Escolha como deseja trabalhar nas planilhas do portal. A alteração é imediata e reversível.
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="flex items-center justify-between rounded-lg border border-border p-4 bg-muted/50 transition-colors hover:bg-muted/80">
-          <div className="space-y-0.5">
-            <Label className="text-sm font-bold">Aprendizado Inteligente</Label>
-            <p className="text-[11px] text-muted-foreground leading-relaxed max-w-[280px]">
-              Destacar automaticamente módulos, abas e atalhos prioritários com base na sua navegação.
-            </p>
-          </div>
-          <div className="flex items-center h-6">
-             <input 
-              type="checkbox" 
-              className="h-5 w-5 rounded-md border-border text-violet-600 focus:ring-violet-600 cursor-pointer"
-              checked={enabled}
-              onChange={(e) => toggleLearning(e.target.checked)}
-            />
-          </div>
+      <CardContent className="space-y-5">
+        <div className="grid gap-3 sm:grid-cols-2">
+          {opcoes.map((o) => {
+            const ativo = modo === o.id;
+            const Icone = o.icone;
+            return (
+              <button
+                key={o.id}
+                type="button"
+                disabled={salvando || isLoading}
+                onClick={() => escolher(o.id)}
+                className={cn(
+                  "flex flex-col items-start gap-2 rounded-lg border p-4 text-left transition-all duration-300",
+                  ativo
+                    ? "border-violet-400 bg-violet-500/10 shadow-sm ring-1 ring-violet-400/40"
+                    : "border-border bg-muted/40 hover:bg-muted/70",
+                )}
+              >
+                <div className="flex w-full items-center gap-2">
+                  <Icone className={cn("h-4 w-4", ativo ? "text-violet-600" : "text-muted-foreground")} />
+                  <span className="text-sm font-bold text-foreground">{o.titulo}</span>
+                  {ativo && (
+                    <span className="ml-auto rounded-full bg-violet-600 px-2 py-0.5 text-[9px] font-bold uppercase text-white">
+                      Ativo
+                    </span>
+                  )}
+                </div>
+                <p className="text-[11px] leading-relaxed text-muted-foreground">{o.desc}</p>
+              </button>
+            );
+          })}
         </div>
 
-        <div className="space-y-3">
-          <div className="flex items-center gap-2">
-            <div className="h-2 flex-1 rounded-full bg-muted overflow-hidden">
-              <div className="h-full bg-violet-600 w-[65%]" />
-            </div>
-            <span className="text-[10px] font-bold text-muted-foreground">65% de precisão</span>
-          </div>
-          <p className="text-[10px] text-muted-foreground italic">
-            * O aprendizado é processado localmente no seu navegador para garantir privacidade total.
-          </p>
-        </div>
+        <p className="text-[10px] italic leading-relaxed text-muted-foreground">
+          * A preferência fica salva no seu perfil e pode ser alterada a qualquer momento.
+          O aprendizado é processado localmente no seu navegador para garantir privacidade total.
+        </p>
 
-        <div className="flex flex-col sm:flex-row gap-2 pt-2">
-          <Button 
-            variant="outline" 
-            className="flex-1 text-xs gap-2"
+        <div className="flex flex-col gap-2 pt-1 sm:flex-row">
+          <Button
+            variant="outline"
+            className="flex-1 gap-2 text-xs"
             onClick={clearLearning}
             disabled={clearing}
           >
             {clearing ? <Loader2 className="h-3 w-3 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
             Limpar Histórico
           </Button>
-          <Button 
-            variant="outline" 
-            className="flex-1 text-xs gap-2"
+          <Button
+            variant="outline"
+            className="flex-1 gap-2 text-xs"
             onClick={() => {
-              setEnabled(false);
-              localStorage.setItem("portal_smart_learning", "false");
+              escolher("tradicional");
               localStorage.removeItem("portal_smart_history");
-              toast.success("Padrões de sistema restaurados.");
             }}
+            disabled={salvando}
           >
             <RefreshCw className="h-3.5 w-3.5" />
             Restaurar Padrão
