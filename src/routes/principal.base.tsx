@@ -48,7 +48,7 @@ import {
   type Lancamento,
 } from "@/lib/lancamentos";
 
-export const Route = createFileRoute("/base")({
+export const Route = createFileRoute("/principal/base")({
   component: BasePage,
 });
 
