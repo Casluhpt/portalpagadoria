@@ -471,13 +471,16 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
     });
   }, [data, search, sortKey, sortDir]);
 
-  /* ---------- Planilha Inteligente (assistência local, opcional) ---------- */
-  const [smartOn, setSmartOn] = useState<boolean>(() => aprendizadoAtivo());
-  const toggleSmart = (v: boolean) => {
-    setSmartOn(v);
-    try { localStorage.setItem(APRENDIZADO_KEY, String(v)); } catch { /* noop */ }
-    if (v) toast.success("Planilha Inteligente ativada — sugestões e alertas habilitados.");
-    else toast.info("Planilha Inteligente desativada.");
+  /* ---------- Modo Tradicional / Modo Inteligente (preferência do perfil) ---------- */
+  const { inteligente: smartOn, definirModo, salvando: salvandoModo } = usePlanilhaModo();
+  const toggleSmart = async (v: boolean) => {
+    try {
+      await definirModo(v ? "inteligente" : "tradicional");
+      if (v) toast.success("Modo Inteligente ativado — sugestões e alertas habilitados.");
+      else toast.info("Modo Tradicional ativado — nenhuma perda de funcionalidade.");
+    } catch (e) {
+      toast.error("Não foi possível salvar a preferência: " + (e as Error).message);
+    }
   };
   const rotulos = useMemo(
     () => Object.fromEntries(PAGAMENTO_CAMPOS.map((c) => [c.key, c.label])) as Record<string, string>,
