@@ -351,7 +351,11 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
         modulo: "Pagamentos Diversos",
         tabela: "pagamentos_diversos",
         descricao: `Importação Excel de ${n} lançamento(s) — modo ${importMode === "replace" ? "substituição da base" : "incremental"}`,
-        metadata: { registros: n, modo: importMode },
+        metadata: { 
+          registros: n, 
+          modo: importMode,
+          data_importacao: new Date().toISOString()
+        },
         severidade: "alerta",
       });
     },
@@ -1307,6 +1311,16 @@ function FechamentoCompetenciaButton({ onComplete, disabled, data }: { onComplet
   const mutation = useMutation({
     mutationFn: async () => {
       if (!user) throw new Error("Usuário não autenticado");
+
+      // Validar pendências: status_itau ou status_bankmanager vazios em lançamentos com valor
+      const pendencias = data.filter(r => 
+        (r.valor_lg && !r.status_bankmanager) || 
+        (r.valor_itau && !r.status_itau)
+      );
+
+      if (pendencias.length > 0) {
+        throw new Error(`Não é possível fechar: existem ${pendencias.length} lançamentos com status pendente.`);
+      }
       
       // Export current data to Excel before clearing
       const exportRows = data.map((r) => {
@@ -1330,7 +1344,11 @@ function FechamentoCompetenciaButton({ onComplete, disabled, data }: { onComplet
         modulo: "Pagamentos Diversos",
         tabela: "fechamento_pagamentos",
         descricao: `Competência "${nome}" fechada e arquivada com ${data.length} registro(s); base limpa para novo ciclo`,
-        metadata: { registros: data.length, competencia: nome },
+        metadata: { 
+          registros: data.length, 
+          competencia: nome,
+          data_fechamento: new Date().toISOString()
+        },
         severidade: "critico",
       });
     },
@@ -1346,7 +1364,7 @@ function FechamentoCompetenciaButton({ onComplete, disabled, data }: { onComplet
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="sm" variant="outline" className="gap-1 border-emerald-600 text-emerald-700 hover:bg-emerald-50" disabled={disabled || !isAdmin}>
+        <Button size="sm" variant="outline" className="gap-1 border-emerald-600 text-emerald-700 hover:bg-emerald-50" disabled={disabled}>
           <TableIcon className="h-4 w-4" /> Fechamento de Competência
         </Button>
       </DialogTrigger>
