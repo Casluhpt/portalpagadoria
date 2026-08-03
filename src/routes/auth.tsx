@@ -53,27 +53,27 @@ function AuthPage() {
   const toggleTheme = () => setMode(isDark ? "claro" : "noturno");
 
   return (
-    <div className="relative grid min-h-dvh place-items-center bg-gradient-auth p-4">
+    <div className="relative flex min-h-dvh items-center justify-center bg-gradient-auth px-4 py-10 sm:p-6">
       <button
         type="button"
         onClick={toggleTheme}
         aria-label={isDark ? "Ativar modo claro" : "Ativar modo noturno"}
-        className="fixed right-4 top-4 z-50 flex h-10 w-10 items-center justify-center rounded-full border border-border/40 bg-card/60 text-foreground shadow-[var(--shadow-elegant)] backdrop-blur-md transition-all hover:bg-card/90 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-ring"
+        className="fixed right-3 top-3 z-50 flex h-10 w-10 items-center justify-center rounded-full border border-border/50 bg-card/70 text-foreground shadow-[var(--shadow-elegant)] backdrop-blur-md transition-all hover:scale-105 hover:bg-card/95 focus:outline-none focus:ring-2 focus:ring-ring sm:right-5 sm:top-5"
       >
         {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
       </button>
 
-      <Card className="w-full max-w-md border-border/60 bg-card/80 shadow-[var(--shadow-elegant)] backdrop-blur-md">
-        <CardHeader className="items-center text-center">
-          <AppLogo area="login" className="mb-2 h-10 object-contain" />
-          <CardTitle className="text-xl text-foreground">Portal Pagadoria</CardTitle>
-          <p className="text-sm text-muted-foreground">Acesse para editar as bases de dados.</p>
+      <Card className="w-full max-w-md border-border/70 bg-card/90 shadow-[var(--shadow-elegant)] backdrop-blur-xl">
+        <CardHeader className="items-center px-5 text-center sm:px-6">
+          <AppLogo area="login" className="mb-2 h-9 object-contain sm:h-10" />
+          <CardTitle className="text-lg text-foreground sm:text-xl">Portal Pagadoria</CardTitle>
+          <p className="text-sm text-foreground/70">Acesse para editar as bases de dados.</p>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-5 sm:px-6">
           <Tabs defaultValue="signin">
-            <TabsList className="grid w-full grid-cols-2 bg-muted/50">
-              <TabsTrigger value="signin">Entrar</TabsTrigger>
-              <TabsTrigger value="signup">Criar conta</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2 bg-muted/70">
+              <TabsTrigger value="signin" className="text-foreground/80 data-[state=active]:text-foreground">Entrar</TabsTrigger>
+              <TabsTrigger value="signup" className="text-foreground/80 data-[state=active]:text-foreground">Criar conta</TabsTrigger>
             </TabsList>
             <TabsContent value="signin"><SignInForm /></TabsContent>
             <TabsContent value="signup"><SignUpForm /></TabsContent>
@@ -81,6 +81,7 @@ function AuthPage() {
         </CardContent>
       </Card>
     </div>
+
   );
 }
 
