@@ -94,6 +94,8 @@ function BasePage() {
   const [sortKey, setSortKey] = useState<keyof Lancamento>("dueDate");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
   const [pendingDelete, setPendingDelete] = useState<Lancamento | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [purgeOpen, setPurgeOpen] = useState(false);
 
   const invalidate = () => qc.invalidateQueries({ queryKey: lancamentosQueryKey });
 
