@@ -682,34 +682,6 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
           </div>
         </div>
 
-        <div className="relative ml-2 w-48">
-          <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input placeholder="Pesquisar…" value={search} onChange={(e) => setSearch(e.target.value)} className="pl-8 h-8 text-xs bg-background/50" />
-        </div>
-                              </span>
-                              <span className="text-[9px] text-muted-foreground">
-                                {q.status === 'ativo' ? 'Editando agora' : 'Aguardando vez'}
-                              </span>
-                            </div>
-                            {q.status === 'ativo' && <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />}
-                          </div>
-                        ))}
-                      </div>
-                      <Button size="xs" variant="ghost" className="w-full h-7 text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/20 text-[10px] font-bold" onClick={() => sairMut.mutate()}>
-                        <LogOut className="h-3 w-3 mr-1.5" /> Sair da Fila
-                      </Button>
-                    </div>
-                  </PopoverContent>
-                </Popover>
-              </div>
-            )}
-          </div>
-        </div>
-        
-        <div className="relative ml-2 w-48">
-          <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input placeholder="Pesquisar…" value={search} onChange={(e) => setSearch(e.target.value)} className="pl-8 h-8 text-xs bg-background/50" />
-        </div>
         <div className="flex items-center gap-2 border-l border-border pl-2">
           <Select value={importMode} onValueChange={(v: any) => setImportMode(v)}>
             <SelectTrigger className="h-9 w-[180px] text-xs">
@@ -733,7 +705,7 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
               e.target.value = "";
             }}
           />
-          <Button size="sm" variant="outline" className="gap-1" onClick={() => fileRef.current?.click()} disabled={importMut.isPending || !canImport}>
+          <Button size="sm" variant="outline" className="gap-1" onClick={() => fileRef.current?.click()} disabled={importMut.isPending || !canImport || !isEditingEnabled}>
             {importMut.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
             Importar Excel
           </Button>
