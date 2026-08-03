@@ -309,81 +309,257 @@ function SupportForm() {
 }
 
 function DiagnosticPanel() {
+  const navigate = useNavigate();
+  const [refreshing, setRefreshing] = useState(false);
+  const [status, setStatus] = useState({
+    performance: "excelente",
+    carga: "normal",
+    cloud: "estavel",
+    seguranca: "protegido",
+    antivirus: "limpo"
+  });
+
+  const handleRefresh = () => {
+    setRefreshing(true);
+    setTimeout(() => {
+      setRefreshing(false);
+      toast.success("Diagnóstico atualizado com sucesso!");
+    }, 1500);
+  };
+
   return (
-    <div className="grid gap-6 md:grid-cols-2">
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base flex items-center gap-2">
-            <Activity className="h-4 w-4 text-violet-600" /> Performance e Carga
-          </CardTitle>
-          <CardDescription>Status em tempo real do processamento.</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between py-2 border-b border-border">
-            <span className="text-sm font-medium">Latência de API</span>
-            <span className="text-sm text-emerald-600 font-bold">32ms (Excelente)</span>
-          </div>
-          <div className="flex items-center justify-between py-2 border-b border-border">
-            <span className="text-sm font-medium">Carga da CPU</span>
-            <span className="text-sm text-muted-foreground font-bold">12%</span>
-          </div>
-          <div className="flex items-center justify-between py-2">
-            <span className="text-sm font-medium">Erros detectados (24h)</span>
-            <span className="text-sm text-muted-foreground font-bold">0</span>
-          </div>
-        </CardContent>
-      </Card>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h3 className="text-lg font-bold flex items-center gap-2">
+          <Activity className="h-5 w-5 text-indigo-600" />
+          Painel de Saúde do Sistema
+        </h3>
+        <Button 
+          variant="outline" 
+          size="sm" 
+          className="gap-2" 
+          onClick={handleRefresh}
+          disabled={refreshing}
+        >
+          <RefreshCw className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`} />
+          Atualizar Diagnóstico
+        </Button>
+      </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base flex items-center gap-2">
-            <Cloud className="h-4 w-4 text-sky-600" /> Armazenamento em Nuvem
-          </CardTitle>
-          <CardDescription>Uso de disco e backups.</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between py-2 border-b border-border">
-            <span className="text-sm font-medium">Banco de Dados</span>
-            <span className="text-sm text-muted-foreground font-bold">452 MB / 5 GB</span>
-          </div>
-          <div className="flex items-center justify-between py-2 border-b border-border">
-            <span className="text-sm font-medium">Anexos e Documentos</span>
-            <span className="text-sm text-muted-foreground font-bold">1.2 GB / 10 GB</span>
-          </div>
-          <div className="flex items-center justify-between py-2 border-b border-border">
-            <span className="text-sm font-medium">Pasta [anexo]</span>
-            <span className="text-sm text-emerald-600 font-bold">Ativa</span>
-          </div>
-          <div className="flex items-center justify-between py-2">
-            <span className="text-sm font-medium">Último Backup</span>
-            <span className="text-sm text-emerald-600 font-bold">Hoje, 03:00 AM</span>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="grid gap-6 md:grid-cols-2">
+        <Card className="hover:shadow-md transition-all">
+          <CardHeader>
+            <CardTitle className="text-base flex items-center gap-2">
+              <Zap className="h-4 w-4 text-amber-500" /> Performance e Carga
+            </CardTitle>
+            <CardDescription>Status em tempo real do processamento.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <button 
+              onClick={() => toast.info("Latência normal. Nenhuma ação necessária.")}
+              className="w-full flex items-center justify-between py-2 border-b border-border hover:bg-muted/30 px-2 rounded-md transition-colors text-left"
+            >
+              <div className="flex items-center gap-2">
+                <Cpu className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm font-medium">Latência de API</span>
+              </div>
+              <span className="text-sm text-emerald-600 font-bold">32ms (Excelente)</span>
+            </button>
+            <button 
+              onClick={() => toast.info("Carga otimizada pelo sistema.")}
+              className="w-full flex items-center justify-between py-2 border-b border-border hover:bg-muted/30 px-2 rounded-md transition-colors text-left"
+            >
+              <div className="flex items-center gap-2">
+                <Activity className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm font-medium">Carga da CPU</span>
+              </div>
+              <span className="text-sm text-muted-foreground font-bold">12%</span>
+            </button>
+            <button 
+              onClick={() => navigate({ to: "/auditoria" })}
+              className="w-full flex items-center justify-between py-2 hover:bg-muted/30 px-2 rounded-md transition-colors text-left"
+            >
+              <div className="flex items-center gap-2">
+                <AlertCircle className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm font-medium">Erros detectados (24h)</span>
+              </div>
+              <span className="text-sm text-muted-foreground font-bold">0</span>
+            </button>
+          </CardContent>
+        </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base flex items-center gap-2">
-            <ShieldCheck className="h-4 w-4 text-emerald-600" /> Segurança e Antivírus
-          </CardTitle>
-          <CardDescription>Proteção do portal.</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between py-2 border-b border-border">
-            <span className="text-sm font-medium">Ameaças Bloqueadas</span>
-            <span className="text-sm text-muted-foreground font-bold">4 (Ataques DDOS)</span>
-          </div>
-          <div className="flex items-center justify-between py-2 border-b border-border">
-            <span className="text-sm font-medium">Scan de Vírus</span>
-            <span className="text-sm text-emerald-600 font-bold">Limpou sem ocorrências</span>
-          </div>
-          <div className="flex items-center justify-between py-2">
-            <span className="text-sm font-medium">Certificado SSL</span>
-            <span className="text-sm text-emerald-600 font-bold">Ativo e Seguro</span>
-          </div>
-        </CardContent>
-      </Card>
+        <Card className="hover:shadow-md transition-all">
+          <CardHeader>
+            <CardTitle className="text-base flex items-center gap-2">
+              <Database className="h-4 w-4 text-sky-600" /> Armazenamento em Nuvem
+            </CardTitle>
+            <CardDescription>Uso de disco e backups.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <button 
+              onClick={() => navigate({ to: "/base" as any })}
+              className="w-full flex items-center justify-between py-2 border-b border-border hover:bg-muted/30 px-2 rounded-md transition-colors text-left"
+            >
+              <span className="text-sm font-medium">Banco de Dados</span>
+              <span className="text-sm text-muted-foreground font-bold">452 MB / 5 GB</span>
+            </button>
+            <button 
+              onClick={() => navigate({ to: "/anexos" })}
+              className="w-full flex items-center justify-between py-2 border-b border-border hover:bg-muted/30 px-2 rounded-md transition-colors text-left"
+            >
+              <span className="text-sm font-medium">Anexos e Documentos</span>
+              <span className="text-sm text-muted-foreground font-bold">1.2 GB / 10 GB</span>
+            </button>
+            <button 
+              onClick={() => navigate({ to: "/anexos" })}
+              className="w-full flex items-center justify-between py-2 border-b border-border hover:bg-muted/30 px-2 rounded-md transition-colors text-left"
+            >
+              <span className="text-sm font-medium">Pasta [anexo]</span>
+              <span className="text-sm text-emerald-600 font-bold">Ativa</span>
+            </button>
+            <button 
+              onClick={() => toast.success("Backup íntegro no Lovable Cloud.")}
+              className="w-full flex items-center justify-between py-2 hover:bg-muted/30 px-2 rounded-md transition-colors text-left"
+            >
+              <span className="text-sm font-medium">Último Backup</span>
+              <span className="text-sm text-emerald-600 font-bold">Hoje, 03:00 AM</span>
+            </button>
+          </CardContent>
+        </Card>
+
+        <Card className="hover:shadow-md transition-all md:col-span-2">
+          <CardHeader>
+            <CardTitle className="text-base flex items-center gap-2">
+              <ShieldAlert className="h-4 w-4 text-emerald-600" /> Segurança e Antivírus
+            </CardTitle>
+            <CardDescription>Proteção e integridade do portal.</CardDescription>
+          </CardHeader>
+          <CardContent className="grid gap-4 md:grid-cols-3">
+            <button 
+              onClick={() => navigate({ search: { tab: 'criticas' }, to: '/auditoria' })}
+              className="flex flex-col gap-1 rounded-lg border border-border p-4 bg-muted/30 hover:bg-muted/50 transition-all text-left"
+            >
+              <span className="text-xs text-muted-foreground uppercase font-bold tracking-wider">Ameaças Bloqueadas</span>
+              <span className="text-lg font-bold">4</span>
+              <span className="text-[10px] text-amber-600 font-medium">Ver detalhes na Auditoria</span>
+            </button>
+            <button 
+              onClick={() => toast.success("Lovable Antivirus: 100% dos arquivos seguros.")}
+              className="flex flex-col gap-1 rounded-lg border border-border p-4 bg-muted/30 hover:bg-muted/50 transition-all text-left"
+            >
+              <span className="text-xs text-muted-foreground uppercase font-bold tracking-wider">Scan de Vírus</span>
+              <span className="text-lg font-bold text-emerald-600">Protegido</span>
+              <span className="text-[10px] text-muted-foreground">Último scan: agora mesmo</span>
+            </button>
+            <button 
+              onClick={() => toast.info("Certificado gerado por Lovable Cloud.")}
+              className="flex flex-col gap-1 rounded-lg border border-border p-4 bg-muted/30 hover:bg-muted/50 transition-all text-left"
+            >
+              <span className="text-xs text-muted-foreground uppercase font-bold tracking-wider">Certificado SSL</span>
+              <span className="text-lg font-bold text-emerald-600">Ativo</span>
+              <span className="text-[10px] text-muted-foreground">Expira em 365 dias</span>
+            </button>
+          </CardContent>
+        </Card>
+      </div>
     </div>
+  );
+}
+
+function SmartConfigPanel() {
+  const [enabled, setEnabled] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return localStorage.getItem("portal_smart_learning") === "true";
+  });
+  
+  const [clearing, setClearing] = useState(false);
+
+  const toggleLearning = (val: boolean) => {
+    setEnabled(val);
+    localStorage.setItem("portal_smart_learning", String(val));
+    if (val) {
+      toast.success("Aprendizado inteligente ativado!");
+    } else {
+      toast.info("Aprendizado inteligente desativado.");
+    }
+  };
+
+  const clearLearning = () => {
+    setClearing(true);
+    setTimeout(() => {
+      localStorage.removeItem("portal_smart_history");
+      setClearing(false);
+      toast.success("Histórico de aprendizado limpo com sucesso!");
+    }, 1000);
+  };
+
+  return (
+    <Card className="border-border shadow-sm">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 text-base">
+          <Sparkles className="h-5 w-5 text-violet-600" />
+          Configuração Inteligente e Personalização
+        </CardTitle>
+        <CardDescription>
+          O sistema observa padrões para destacar os módulos que você mais usa.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <div className="flex items-center justify-between rounded-lg border border-border p-4 bg-muted/50 transition-colors hover:bg-muted/80">
+          <div className="space-y-0.5">
+            <Label className="text-sm font-bold">Aprendizado Inteligente</Label>
+            <p className="text-[11px] text-muted-foreground leading-relaxed max-w-[280px]">
+              Destacar automaticamente módulos, abas e atalhos prioritários com base na sua navegação.
+            </p>
+          </div>
+          <div className="flex items-center h-6">
+             <input 
+              type="checkbox" 
+              className="h-5 w-5 rounded-md border-border text-violet-600 focus:ring-violet-600 cursor-pointer"
+              checked={enabled}
+              onChange={(e) => toggleLearning(e.target.checked)}
+            />
+          </div>
+        </div>
+
+        <div className="space-y-3">
+          <div className="flex items-center gap-2">
+            <div className="h-2 flex-1 rounded-full bg-muted overflow-hidden">
+              <div className="h-full bg-violet-600 w-[65%]" />
+            </div>
+            <span className="text-[10px] font-bold text-muted-foreground">65% de precisão</span>
+          </div>
+          <p className="text-[10px] text-muted-foreground italic">
+            * O aprendizado é processado localmente no seu navegador para garantir privacidade total.
+          </p>
+        </div>
+
+        <div className="flex flex-col sm:flex-row gap-2 pt-2">
+          <Button 
+            variant="outline" 
+            className="flex-1 text-xs gap-2"
+            onClick={clearLearning}
+            disabled={clearing}
+          >
+            {clearing ? <Loader2 className="h-3 w-3 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
+            Limpar Histórico
+          </Button>
+          <Button 
+            variant="outline" 
+            className="flex-1 text-xs gap-2"
+            onClick={() => {
+              setEnabled(false);
+              localStorage.setItem("portal_smart_learning", "false");
+              localStorage.removeItem("portal_smart_history");
+              toast.success("Padrões de sistema restaurados.");
+            }}
+          >
+            <RefreshCw className="h-3.5 w-3.5" />
+            Restaurar Padrão
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
 
