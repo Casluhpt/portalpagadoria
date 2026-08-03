@@ -202,3 +202,29 @@ export const setUserSetor = createServerFn({ method: "POST" })
     if (error) throw error;
     return { ok: true };
   });
+
+export const setUserNome = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((input: { userId: string; nome: string | null }) => {
+    if (!input?.userId) throw new Error("userId é obrigatório");
+    return input;
+  })
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    
+    // Update profile
+    const { error: profErr } = await supabaseAdmin
+      .from("profiles")
+      .update({ nome: data.nome })
+      .eq("id", data.userId);
+    if (profErr) throw profErr;
+
+    // Update auth metadata
+    const { error: authErr } = await supabaseAdmin.auth.admin.updateUserById(data.userId, {
+      user_metadata: { nome: data.nome }
+    });
+    if (authErr) throw authErr;
+
+    return { ok: true };
+  });

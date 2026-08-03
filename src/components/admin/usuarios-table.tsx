@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { format, formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Loader2, KeyRound, Search, ShieldCheck, Eye, UserPlus, Trash2, List, LayoutGrid } from "lucide-react";
+import { Loader2, KeyRound, Search, ShieldCheck, Eye, UserPlus, Trash2, List, LayoutGrid, Edit2, CheckCircle2, X } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -21,7 +21,7 @@ import { toast } from "sonner";
 import { RestrictedArea } from "@/components/role-gate";
 import { logAcaoCritica } from "@/lib/audit-critico";
 import { useSession } from "@/hooks/use-session";
-import { listAdminUsers, resetUserPassword, setUserRole, setUserSetor, inviteUser, deleteUser, ALLOWED_SETORES, type AdminUserRow, type Setor } from "@/lib/admin-users.functions";
+import { listAdminUsers, resetUserPassword, setUserRole, setUserSetor, setUserNome, inviteUser, deleteUser, ALLOWED_SETORES, type AdminUserRow, type Setor } from "@/lib/admin-users.functions";
 import {
   Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
@@ -60,6 +60,7 @@ function UsuariosTable() {
   const resetFn = useServerFn(resetUserPassword);
   const setRoleFn = useServerFn(setUserRole);
   const setSetorFn = useServerFn(setUserSetor);
+  const setNomeFn = useServerFn(setUserNome);
   const inviteFn = useServerFn(inviteUser);
   const deleteFn = useServerFn(deleteUser);
   const qc = useQueryClient();
@@ -122,6 +123,16 @@ function UsuariosTable() {
       qc.invalidateQueries({ queryKey: ["admin-users"] });
     },
     onError: (e: any) => toast.error(e?.message ?? "Falha ao atualizar setor"),
+  });
+
+  const nomeMut = useMutation({
+    mutationFn: (vars: { userId: string; nome: string | null }) =>
+      setNomeFn({ data: vars }),
+    onSuccess: () => {
+      toast.success("Nome atualizado.");
+      qc.invalidateQueries({ queryKey: ["admin-users"] });
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Falha ao atualizar nome"),
   });
 
   const inviteMut = useMutation({
@@ -288,7 +299,7 @@ function UsuariosTable() {
             </thead>
             <tbody>
               {filtered.map((u: AdminUserRow) => (
-                <UserTableRow key={u.id} u={u} user={user} roleMut={roleMut} setorMut={setorMut} deleteMut={deleteMut} resetMut={resetMut} />
+                <UserTableRow key={u.id} u={u} user={user} roleMut={roleMut} setorMut={setorMut} nomeMut={nomeMut} deleteMut={deleteMut} resetMut={resetMut} />
               ))}
             </tbody>
           </table>
@@ -311,7 +322,7 @@ function UsuariosTable() {
                   </thead>
                   <tbody>
                     {users.map((u: AdminUserRow) => (
-                      <UserTableRow key={u.id} u={u} user={user} roleMut={roleMut} setorMut={setorMut} deleteMut={deleteMut} resetMut={resetMut} compact />
+                      <UserTableRow key={u.id} u={u} user={user} roleMut={roleMut} setorMut={setorMut} nomeMut={nomeMut} deleteMut={deleteMut} resetMut={resetMut} compact />
                     ))}
                   </tbody>
                 </table>
@@ -323,10 +334,22 @@ function UsuariosTable() {
     </div>
   );
 }
-function UserTableRow({ u, user, roleMut, setorMut, deleteMut, resetMut, compact }: any) {
+function UserTableRow({ u, user, roleMut, setorMut, nomeMut, deleteMut, resetMut, compact }: any) {
   const isSelf = user?.id === u.id;
   const [pendingRole, setPendingRole] = useState<"administrador" | "viewer" | "visitante" | null>(null);
   const [justificativa, setJustificativa] = useState("");
+  const [editingNome, setEditingNome] = useState(false);
+  const [tempNome, setTempNome] = useState(u.nome || "");
+
+  const handleSaveNome = () => {
+    if (tempNome === u.nome) {
+      setEditingNome(false);
+      return;
+    }
+    nomeMut.mutate({ userId: u.id, nome: tempNome.trim() || null });
+    setEditingNome(false);
+  };
+
   return (
     <tr className="hover:bg-muted/40">
       {!compact && (
@@ -347,7 +370,51 @@ function UserTableRow({ u, user, roleMut, setorMut, deleteMut, resetMut, compact
           })()}
         </td>
       )}
-      <td className="border-b border-border px-3 py-2">{u.nome ?? "—"}</td>
+      <td className="border-b border-border px-3 py-2">
+        {editingNome ? (
+          <div className="flex items-center gap-2">
+            <Input 
+              value={tempNome} 
+              onChange={(e) => setTempNome(e.target.value)}
+              className="h-8 text-xs min-w-[150px]"
+              autoFocus
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleSaveNome();
+                if (e.key === 'Escape') {
+                  setTempNome(u.nome || "");
+                  setEditingNome(false);
+                }
+              }}
+            />
+            <Button size="icon" variant="ghost" className="h-7 w-7 text-emerald-600" onClick={handleSaveNome}>
+              <CheckCircle2 className="h-4 w-4" />
+            </Button>
+            <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive" onClick={() => {
+              setTempNome(u.nome || "");
+              setEditingNome(false);
+            }}>
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+        ) : (
+          <div 
+            className="flex items-center gap-2 group cursor-pointer" 
+            onClick={() => {
+              if (!isSelf) {
+                setTempNome(u.nome || "");
+                setEditingNome(true);
+              }
+            }}
+          >
+            <span>{u.nome ?? "—"}</span>
+            {!isSelf && (
+              <Button variant="ghost" size="icon" className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity">
+                <Edit2 className="h-3 w-3 text-muted-foreground" />
+              </Button>
+            )}
+          </div>
+        )}
+      </td>
       <td className="border-b border-border px-3 py-2 font-mono text-xs">{u.email ?? "—"}</td>
       <td className="border-b border-border px-3 py-2">
         <div className="flex flex-wrap items-center gap-2">
