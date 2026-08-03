@@ -94,6 +94,10 @@ function ConfiguracoesPage() {
               <TabsContent value="permissoes" className="m-0 focus-visible:outline-none">
                 <PermissoesManagement />
               </TabsContent>
+              <TabsContent value="identidade" className="m-0 focus-visible:outline-none">
+                <IdentidadeVisualPanel />
+              </TabsContent>
+
               <TabsContent value="documentacao" className="m-0 focus-visible:outline-none">
                 <DocumentacaoTecnicaSection />
               </TabsContent>
