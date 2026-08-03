@@ -342,8 +342,9 @@ export function GlobalSearch({ variant = "compact" }: { variant?: "compact" | "h
                 <p className="text-sm font-medium">Nenhum resultado direto no portal.</p>
                 <button
                   type="button"
-                  onMouseDown={(e) => {
+                  onClick={(e) => {
                     e.preventDefault();
+                    e.stopPropagation();
                     void askAi();
                   }}
                   className="pointer-events-auto cursor-pointer rounded-md px-2 py-1 text-xs font-medium text-violet-600 underline-offset-2 transition-colors hover:bg-violet-100 hover:underline dark:text-violet-300 dark:hover:bg-violet-900/40"

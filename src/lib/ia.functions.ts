@@ -34,6 +34,9 @@ export const perguntarIa = createServerFn({ method: "POST" })
     }
 
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 45000); // 45s timeout
+
       const res = await fetch("https://ai.gateway.lovable.dev/v1/responses", {
         method: "POST",
         headers: {
@@ -41,6 +44,7 @@ export const perguntarIa = createServerFn({ method: "POST" })
           "Lovable-API-Key": key,
           "X-Lovable-AIG-SDK": "fetch",
         },
+        signal: controller.signal,
         body: JSON.stringify({
           model: "openai/gpt-4o",
           stream: true,
@@ -54,10 +58,15 @@ export const perguntarIa = createServerFn({ method: "POST" })
         }),
       });
 
+      clearTimeout(timeoutId);
+
       if (!res.ok || !res.body) {
         const detalhe = await res.text().catch(() => "Sem detalhes do corpo");
         console.error(`[IA] Falha no Gateway (Status: ${res.status}):`, detalhe);
         
+        // Log incident for tracking
+        console.error(`[IA][INCIDENTE] Pergunta: "${data.pergunta}" | Status: ${res.status} | Detalhe: ${detalhe.substring(0, 200)}`);
+
         if (res.status === 429) {
           return { resposta: null, erro: "IA de Suporte da Pagadoria: O serviço está temporariamente sobrecarregado (429). Tente novamente em instantes." };
         }
@@ -67,7 +76,7 @@ export const perguntarIa = createServerFn({ method: "POST" })
         
         return { 
           resposta: null, 
-          erro: `IA de Suporte da Pagadoria: Erro técnico na comunicação (${res.status}). O incidente foi registrado para análise.` 
+          erro: `IA de Suporte da Pagadoria: Erro técnico na comunicação (${res.status}). O incidente foi registrado para análise automática.` 
         };
       }
 
