@@ -87,13 +87,14 @@ function ConfiguracoesPage() {
 
 
               <TabsContent value="diagnostico" className="m-0 focus-visible:outline-none">
-                <div className="grid gap-6 md:grid-cols-2">
-                  <DiagnosticPanel />
-                </div>
+                <DiagnosticPanel />
               </TabsContent>
 
               <TabsContent value="seguranca" className="m-0 focus-visible:outline-none">
-                <AdvancedSecuritySettings />
+                <div className="grid gap-6 md:grid-cols-2">
+                  <AdvancedSecuritySettings />
+                  <SmartConfigPanel />
+                </div>
               </TabsContent>
             </Tabs>
           </main>
