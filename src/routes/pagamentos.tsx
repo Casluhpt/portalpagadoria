@@ -1346,7 +1346,7 @@ function FechamentoCompetenciaButton({ onComplete, disabled, data }: { onComplet
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="sm" variant="outline" className="gap-1 border-emerald-600 text-emerald-700 hover:bg-emerald-50" disabled={disabled || !isAdmin}>
+        <Button size="sm" variant="outline" className="gap-1 border-emerald-600 text-emerald-700 hover:bg-emerald-50" disabled={disabled}>
           <TableIcon className="h-4 w-4" /> Fechamento de Competência
         </Button>
       </DialogTrigger>
