@@ -303,16 +303,42 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
 
   const bulkDeleteMut = useMutation({
     mutationFn: async (ids: string[]) => {
+      const snapshots = data.filter((r) => ids.includes(r.id));
       await Promise.all(ids.map((id) => deletePagamento(id)));
+      // Envio automático para Auditoria com data, hora, usuário e dados relevantes
+      await Promise.all(
+        snapshots.map((r) =>
+          logAcaoCritica({
+            acao: "exclusao_lancamento",
+            modulo: "Pagamentos Diversos",
+            tabela: "pagamentos_diversos",
+            registroId: r.id,
+            descricao: `Exclusão de lançamento — ${r.empresa ?? "sem empresa"} · ${r.descricao_pagamento ?? "sem descrição"} · ${brl(r.valor_lg)}`,
+            metadata: {
+              excluido_em: new Date().toISOString(),
+              usuario: colaboradorNome,
+              usuario_id: userId,
+              empresa: r.empresa,
+              banco: r.banco,
+              data_credito: r.data_credito,
+              competencia: r.competencia,
+              valor_lg: r.valor_lg,
+              descricao_pagamento: r.descricao_pagamento,
+            },
+            severidade: "critico",
+          }),
+        ),
+      );
       return ids.length;
     },
     onSuccess: (n) => {
       invalidate();
       setSelected(new Set());
-      toast.success(`${n} registro(s) excluído(s)`);
+      toast.success(`${n} registro(s) excluído(s) e registrado(s) na Auditoria`);
     },
     onError: (e: Error) => toast.error("Falha ao excluir: " + e.message),
   });
+
 
   const importMut = useMutation({
     mutationFn: (rows: PagamentoInput[]) => createPagamentosBulk(rows, colaboradorNome, userId, importMode === "replace"),
