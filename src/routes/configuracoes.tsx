@@ -638,10 +638,28 @@ function AdvancedSecuritySettings() {
           Configurações de Segurança e Auditoria
         </CardTitle>
         <CardDescription>
-          Controles avançados para exportação e monitoramento de dados sensíveis.
+          Controles avançados para exportação, auditoria e monitoramento de dados sensíveis.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
+        <div className="rounded-lg border border-border p-4 bg-muted/30 space-y-3">
+          <div className="flex items-center gap-2">
+            <ShieldAlert className="h-4 w-4 text-amber-600" />
+            <h4 className="text-sm font-bold">Auditoria de Acesso Sensível (Pagadoria)</h4>
+          </div>
+          <p className="text-[11px] text-muted-foreground leading-relaxed">
+            Todas as alterações de acesso ao setor <strong>Pagadoria</strong> são registradas com rastreabilidade total, incluindo o administrador responsável, o usuário alvo, data/hora e o estado anterior das permissões.
+          </p>
+          <Button 
+            variant="link" 
+            size="sm" 
+            className="h-auto p-0 text-indigo-600 text-[11px]"
+            onClick={() => navigate({ search: { tab: 'criticas' }, to: '/auditoria' })}
+          >
+            Ver logs de auditoria <ChevronRight className="h-3 w-3 ml-1" />
+          </Button>
+        </div>
+
         <div className="flex items-center justify-between rounded-lg border border-border p-4 bg-muted/50">
           <div className="space-y-0.5">
             <Label className="text-base">Envio Diário da Base de Pagamentos</Label>
