@@ -454,6 +454,17 @@ function BasePage() {
                   <tbody>
                     {rows.map((r, i) => (
                       <tr key={r.id} className="group hover:bg-muted/40">
+                        <td className="border-b border-border px-2 py-1">
+                          <Checkbox
+                            checked={selectedIds.has(r.id)}
+                            onCheckedChange={(checked) => {
+                              const next = new Set(selectedIds);
+                              if (checked) next.add(r.id);
+                              else next.delete(r.id);
+                              setSelectedIds(next);
+                            }}
+                          />
+                        </td>
                         <td className="border-b border-border px-2 py-1 text-xs text-muted-foreground">
                           {i + 1}
                         </td>
