@@ -1202,12 +1202,41 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
             <Button variant="outline" className="w-full border-amber-300 text-amber-800 hover:bg-amber-100" onClick={() => setFilaOpen(false)}>
               Aguardar em Segundo Plano
             </Button>
-            <Button variant="ghost" className="w-full text-rose-600 hover:bg-rose-100/50" onClick={() => sairMut.mutate()}>
-              Sair da Fila
+            <Button
+              className="w-full gap-2 bg-red-600 font-bold text-white hover:bg-red-700"
+              onClick={() => { setFilaOpen(false); setConfirmSaidaFila(true); }}
+            >
+              <LogOut className="h-4 w-4" /> Sair da Fila
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Confirmação de saída da fila */}
+      <AlertDialog open={confirmSaidaFila} onOpenChange={setConfirmSaidaFila}>
+        <AlertDialogContent className="border-red-200 bg-card/95 backdrop-blur-md">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2 text-red-600">
+              <LogOut className="h-5 w-5" /> Sair da fila?
+            </AlertDialogTitle>
+            <AlertDialogDescription className="leading-relaxed">
+              Você deseja realmente sair da fila? Ao confirmar, sua posição será liberada e será
+              necessário entrar novamente caso deseje realizar o pagamento posteriormente.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={sairMut.isPending}>Permanecer na fila</AlertDialogCancel>
+            <AlertDialogAction
+              className="gap-2 bg-red-600 text-white hover:bg-red-700"
+              disabled={sairMut.isPending}
+              onClick={(e) => { e.preventDefault(); sairMut.mutate(); }}
+            >
+              {sairMut.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <LogOut className="h-4 w-4" />}
+              Confirmar saída
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
