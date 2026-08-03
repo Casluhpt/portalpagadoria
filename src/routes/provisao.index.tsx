@@ -361,57 +361,82 @@ function ProvisaoDashboard() {
   );
 }
 
-function FechamentoCompetenciaButton() {
+function FechamentoCompetenciaButton({
+  dateFrom,
+  dateTo,
+  registros,
+  total,
+}: {
+  dateFrom: string;
+  dateTo: string;
+  registros: number;
+  total: number;
+}) {
   const [open, setOpen] = useState(false);
   const [nome, setNome] = useState("");
   const { user } = useSession();
   const qc = useQueryClient();
-  const fecharFn = useServerFn(fecharCompetenciaProvisao);
 
   const mutation = useMutation({
     mutationFn: async () => {
-      const now = new Date();
-      const mes = format(now, "yyyy-MM");
-      const ano = format(now, "yyyy");
-      const res = await fecharFn({ nome, mes, ano, usuarioId: user!.id });
-      
-      const { notificarFechamentoCompetencia } = await import("@/lib/provisao-fechamento-competencia");
-      await notificarFechamentoCompetencia(
-        `Fechamento: ${nome}`,
-        `A competência de Provisão Diária (${mes}) foi encerrada com sucesso.`,
-        user!.id
+      const { fecharCompetenciaPeriodo, notificarFechamentoCompetencia } = await import(
+        "@/lib/provisao-fechamento-competencia"
       );
-      
+      const res = await fecharCompetenciaPeriodo({ nome, de: dateFrom, ate: dateTo });
+      await notificarFechamentoCompetencia(
+        `Fechamento de Competência: ${nome}`,
+        `O período de ${fmtBR(dateFrom)} a ${fmtBR(dateTo)} da Provisão Diária foi encerrado por ${
+          user?.email ?? "usuário"
+        } em ${format(new Date(), "dd/MM/yyyy HH:mm:ss")} — ${res.registros} registro(s) arquivado(s) e removido(s) da base.`,
+        user!.id,
+      );
       return res;
     },
-    onSuccess: () => {
-      toast.success("Competência fechada com sucesso.");
+    onSuccess: (res) => {
+      toast.success(
+        `Competência fechada: ${res.registros} registro(s) arquivado(s) e arquivo gerado.`,
+      );
       setOpen(false);
+      setNome("");
       qc.invalidateQueries({ queryKey: provisaoQueryKey });
       qc.invalidateQueries({ queryKey: provisaoArchivedQueryKey });
+      qc.invalidateQueries({ queryKey: comunicadosQueryKey });
     },
-    onError: (e: any) => toast.error(e.message),
+    onError: (e: any) => toast.error(e?.message ?? "Falha no fechamento"),
   });
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" size="lg" className="gap-2 border-emerald-600 text-emerald-700 hover:bg-emerald-50">
-          <FileCheck2 className="h-4 w-4" /> Fechamento de Competência
+          <FileCheck2 className="h-4 w-4" /> Fechar Competência
         </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="backdrop-blur-md">
         <DialogHeader>
           <DialogTitle>Fechamento de Competência</DialogTitle>
           <DialogDescription className="bg-red-50 p-3 text-red-800 border border-red-200 rounded-md flex items-start gap-2">
             <Info className="h-4 w-4 mt-0.5 shrink-0" />
             <span>
-              Ao realizar o fechamento, os dados do mês atual serão arquivados e a base de 
-              <b> Provisão Diária </b> será limpa para o próximo ciclo.
+              O arquivo do período <b>{fmtBR(dateFrom)}</b> a <b>{fmtBR(dateTo)}</b> será gerado
+              automaticamente e enviado ao módulo de <b>Fechamento de Competências</b>. Após a
+              confirmação de sucesso, os registros processados serão removidos da base da Provisão
+              Diária e o dashboard será atualizado.
             </span>
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4 py-4">
+          <div className="rounded-md border border-border bg-muted/40 p-3 text-sm">
+            <p>
+              Registros no período: <b>{registros.toLocaleString("pt-BR")}</b>
+            </p>
+            <p>
+              Valor total: <b>{brl(total)}</b>
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Responsável: {user?.email ?? "—"} · {format(new Date(), "dd/MM/yyyy HH:mm:ss")}
+            </p>
+          </div>
           <div className="space-y-2">
             <Label htmlFor="nome-fechamento">Nome do Fechamento (Ex: Julho/2026)</Label>
             <Input
@@ -424,12 +449,12 @@ function FechamentoCompetenciaButton() {
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => setOpen(false)}>Cancelar</Button>
-          <Button 
+          <Button
             className="bg-red-600 hover:bg-red-700 text-white"
             onClick={() => mutation.mutate()}
-            disabled={!nome || mutation.isPending}
+            disabled={!nome.trim() || registros === 0 || mutation.isPending}
           >
-            {mutation.isPending ? "Processando..." : "Realizar Fechamento"}
+            {mutation.isPending ? "Processando..." : "Gerar arquivo e fechar"}
           </Button>
         </DialogFooter>
       </DialogContent>
