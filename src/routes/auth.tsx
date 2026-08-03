@@ -49,7 +49,7 @@ function AuthPage() {
 
   return (
     <div className="grid min-h-dvh place-items-center bg-gradient-auth p-4">
-      <Card className="w-full max-w-md border-border/60 bg-card/80 shadow-elegant backdrop-blur-md">
+      <Card className="w-full max-w-md border-border/60 bg-card/80 shadow-[var(--shadow-elegant)] backdrop-blur-md">
         <CardHeader className="items-center text-center">
           <AppLogo area="login" className="mb-2 h-10 object-contain" />
           <CardTitle className="text-xl text-foreground">Portal Pagadoria</CardTitle>
