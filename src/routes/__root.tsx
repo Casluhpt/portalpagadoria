@@ -15,6 +15,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { PasswordExpirationGuard } from "@/components/password-expiration-guard";
 import { PresenceHeartbeat } from "@/components/presence-heartbeat";
 import { BackButton } from "@/components/back-button";
+import { PlanilhaOnboarding } from "@/components/planilha-onboarding";
 import { AuthGate } from "@/components/auth-gate";
 import { ThemeProvider } from "@/components/theme-provider";
 import { GlobalShortcutManager } from "@/hooks/use-global-shortcuts";
@@ -138,6 +139,7 @@ function RootComponent() {
         <PasswordExpirationGuard />
         <PresenceHeartbeat />
         <GlobalShortcutManager />
+        <PlanilhaOnboarding />
         <BackButton />
         {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
         <Outlet />
