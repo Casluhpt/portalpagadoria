@@ -336,14 +336,15 @@ export function GlobalSearch({ variant = "compact" }: { variant?: "compact" | "h
 
         {!isAiMode && (
           <CommandList className="max-h-[460px]">
-            <CommandEmpty>
+            <div className="py-6 text-center text-sm">
               <div className="flex flex-col items-center justify-center gap-1 py-6 text-center">
                 <Bot className="mb-2 h-10 w-10 text-violet-300" />
                 <p className="text-sm font-medium">Nenhum resultado direto no portal.</p>
                 <button
                   type="button"
-                  onMouseDown={(e) => {
+                  onClick={(e) => {
                     e.preventDefault();
+                    e.stopPropagation();
                     void askAi();
                   }}
                   className="pointer-events-auto cursor-pointer rounded-md px-2 py-1 text-xs font-medium text-violet-600 underline-offset-2 transition-colors hover:bg-violet-100 hover:underline dark:text-violet-300 dark:hover:bg-violet-900/40"
@@ -351,7 +352,7 @@ export function GlobalSearch({ variant = "compact" }: { variant?: "compact" | "h
                   Perguntar à IA Assistente da Pagadoria
                 </button>
               </div>
-            </CommandEmpty>
+            </div>
             <>
               {history.length > 0 && !search && (
                 <CommandGroup
