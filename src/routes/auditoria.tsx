@@ -148,10 +148,11 @@ function AuditoriaContent() {
       </div>
     );
   }
-  return <AuditoriaTable />;
+  return <AuditoriaTable isAdmin={isAdmin} />;
 }
 
-function AuditoriaTable() {
+function AuditoriaTable({ isAdmin }: { isAdmin: boolean }) {
+
   const { user } = useSession();
   const { data = [], isLoading, error } = useQuery({
     queryKey: ["pagamentos_audit"],
