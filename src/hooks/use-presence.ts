@@ -1,54 +1,77 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/hooks/use-session";
+import { useServerFn } from "@tanstack/react-start";
+import { registrarSessaoUnica, verificarSessaoAtiva, heartbeatSessao } from "@/lib/session.functions";
+import { toast } from "sonner";
 
 export type PresenceStatus = "online" | "ausente" | "offline";
-const KEY = "presence_status_pref";
-const HEARTBEAT_MS = 45_000;
 
-async function push(status: PresenceStatus) {
-  try {
-    await supabase.rpc("set_presence" as never, { _status: status } as never);
-  } catch {
-    /* ignore transient errors */
-  }
-}
+// Gerador simples de ID de sessão para esta aba/instância
+const getSessionId = () => {
+  if (typeof window === 'undefined') return '';
+  const existing = window.sessionStorage.getItem('portal_session_id');
+  if (existing) return existing;
+  const newId = Math.random().toString(36).substring(2) + Date.now().toString(36);
+  window.sessionStorage.setItem('portal_session_id', newId);
+  return newId;
+};
 
 export function usePresence() {
   const { user } = useSession();
+  const sessionId = useRef<string | null>(null);
+  const registrarFn = useServerFn(registrarSessaoUnica);
+  const verificarFn = useServerFn(verificarSessaoAtiva);
+  const heartbeatFn = useServerFn(heartbeatSessao);
+  const [sessionValida, setSessionValida] = useState(true);
+  
+  // Status de presença (mantido para compatibilidade de UI)
   const [status, setStatusState] = useState<PresenceStatus>("online");
-  const statusRef = useRef<PresenceStatus>("online");
+  const setStatus = (next: PresenceStatus) => setStatusState(next);
 
-  // Load stored preference once
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    const stored = window.localStorage.getItem(KEY) as PresenceStatus | null;
-    if (stored === "online" || stored === "ausente" || stored === "offline") {
-      setStatusState(stored);
-      statusRef.current = stored;
-    }
-  }, []);
+    if (!user) return;
 
-  const setStatus = useCallback((next: PresenceStatus) => {
-    setStatusState(next);
-    statusRef.current = next;
-    if (typeof window !== "undefined") window.localStorage.setItem(KEY, next);
-    void push(next);
-  }, []);
+    sessionId.current = getSessionId();
 
-  // On login → announce, heartbeat while tab visible, offline on unload
-  useEffect(() => {
-    // Real-time presence heartbeat disabled per user request
-    return;
-  }, [user?.id]);
+    const initSession = async () => {
+      try {
+        await registrarFn({ data: { sessionId: sessionId.current! } });
+      } catch (e) {
+        console.error("Erro ao registrar sessão:", e);
+      }
+    };
 
-  // Sign out → offline
-  useEffect(() => {
-    const { data: sub } = supabase.auth.onAuthStateChange((event) => {
-      if (event === "SIGNED_OUT") void push("offline");
-    });
-    return () => sub.subscription.unsubscribe();
-  }, []);
+    initSession();
 
-  return { status, setStatus };
+    // Heartbeat e verificação a cada 30 segundos
+    const interval = setInterval(async () => {
+      if (!sessionId.current) return;
+      try {
+        const { valida } = await verificarFn({ data: { sessionId: sessionId.current } });
+        if (!valida) {
+          setSessionValida(false);
+          toast.error("Sua sessão foi encerrada porque você entrou em outro dispositivo ou aba.", {
+            duration: Infinity,
+            description: "Você será deslogado em instantes para garantir a segurança."
+          });
+          
+          setTimeout(() => {
+            void supabase.auth.signOut().then(() => {
+              window.location.href = "/auth";
+            });
+          }, 5000);
+          return;
+        }
+        
+        await heartbeatFn({ data: { sessionId: sessionId.current } });
+      } catch (e) {
+        console.error("Erro no heartbeat de sessão:", e);
+      }
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, [user?.id, registrarFn, verificarFn, heartbeatFn]);
+
+  return { sessionValida, sessionId: sessionId.current, status, setStatus };
 }
