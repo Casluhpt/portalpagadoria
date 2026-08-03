@@ -1087,30 +1087,45 @@ export type Database = {
           arquivo_url: string | null
           data_fechamento: string | null
           fechado_por: string | null
+          fechado_por_nome: string | null
           id: string
           mes: string
           nome: string
+          periodo_fim: string | null
+          periodo_inicio: string | null
           snapshot: Json
+          total_registros: number | null
+          total_valor: number | null
         }
         Insert: {
           ano: string
           arquivo_url?: string | null
           data_fechamento?: string | null
           fechado_por?: string | null
+          fechado_por_nome?: string | null
           id?: string
           mes: string
           nome: string
+          periodo_fim?: string | null
+          periodo_inicio?: string | null
           snapshot: Json
+          total_registros?: number | null
+          total_valor?: number | null
         }
         Update: {
           ano?: string
           arquivo_url?: string | null
           data_fechamento?: string | null
           fechado_por?: string | null
+          fechado_por_nome?: string | null
           id?: string
           mes?: string
           nome?: string
+          periodo_fim?: string | null
+          periodo_inicio?: string | null
           snapshot?: Json
+          total_registros?: number | null
+          total_valor?: number | null
         }
         Relationships: []
       }
@@ -1303,6 +1318,15 @@ export type Database = {
           _mes: string
           _nome: string
           _usuario_id?: string
+        }
+        Returns: string
+      }
+      fechar_competencia_provisao_periodo: {
+        Args: {
+          _arquivo_url?: string
+          _ate: string
+          _de: string
+          _nome: string
         }
         Returns: string
       }
