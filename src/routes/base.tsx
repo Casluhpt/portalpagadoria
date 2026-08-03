@@ -493,7 +493,7 @@ function BasePage() {
                     {rows.length === 0 && (
                       <tr>
                         <td
-                          colSpan={COLS.length + 2}
+                          colSpan={COLS.length + 3}
                           className="px-4 py-16 text-center text-sm text-muted-foreground"
                         >
                           Nenhum registro. Clique em "Nova linha" para começar.
