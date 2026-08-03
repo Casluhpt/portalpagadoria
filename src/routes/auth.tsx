@@ -187,7 +187,7 @@ function SignInForm() {
       {errorMsg && (
         <div
           role="alert"
-          className="flex items-start gap-2 rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive"
+          className="flex animate-in items-start gap-2 rounded-xl bg-destructive/10 px-3 py-2 text-sm text-destructive ring-1 ring-destructive/30 backdrop-blur-md duration-500 fade-in-0 slide-in-from-top-1"
         >
           <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
           <span>{errorMsg}</span>
@@ -197,7 +197,7 @@ function SignInForm() {
       <div className="space-y-1.5">
         <Label className="text-foreground" htmlFor="si-email">E-mail</Label>
         <Input
-          className="bg-background/80 text-foreground placeholder:text-muted-foreground"
+          className={FIELD_CLASS}
           id="si-email"
           type="email"
           required
@@ -221,7 +221,7 @@ function SignInForm() {
           </Link>
         </div>
         <PasswordInput
-          className="bg-background/80 text-foreground"
+          className={FIELD_CLASS}
           id="si-pw"
           required
           autoComplete="current-password"
@@ -232,7 +232,7 @@ function SignInForm() {
           }}
         />
       </div>
-      <Button type="submit" disabled={loading} className="w-full bg-primary/95 text-primary-foreground transition-colors hover:bg-primary">
+      <Button type="submit" disabled={loading} className={ACTION_BUTTON_CLASS}>
 
 
         {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <LogIn className="mr-2 h-4 w-4" />}
@@ -290,7 +290,7 @@ function SignUpForm() {
       <div className="space-y-1.5">
         <Label className="text-foreground" htmlFor="su-nome">Nome completo</Label>
         <Input
-          className="bg-background/80 text-foreground placeholder:text-muted-foreground"
+          className={FIELD_CLASS}
           id="su-nome"
           type="text"
           required
@@ -309,7 +309,7 @@ function SignUpForm() {
       <div className="space-y-1.5">
         <Label className="text-foreground" htmlFor="su-email">E-mail</Label>
         <Input
-          className="bg-background/80 text-foreground placeholder:text-muted-foreground"
+          className={FIELD_CLASS}
           id="su-email"
           type="email"
           required
@@ -322,7 +322,7 @@ function SignUpForm() {
       <div className="space-y-1.5">
         <Label className="text-foreground" htmlFor="su-setor">Setor</Label>
         <Select value={setor} onValueChange={(v) => setSetor(v as Setor)}>
-          <SelectTrigger id="su-setor" className="bg-background/80 text-foreground">
+          <SelectTrigger id="su-setor" className={FIELD_CLASS}>
             <SelectValue placeholder="Selecione o setor" />
           </SelectTrigger>
           <SelectContent>
@@ -335,7 +335,7 @@ function SignUpForm() {
       <div className="space-y-1.5">
         <Label className="text-foreground" htmlFor="su-pw">Senha (mín. 8)</Label>
         <PasswordInput
-          className="bg-background/80 text-foreground"
+          className={FIELD_CLASS}
           id="su-pw"
           required
           minLength={8}
@@ -344,11 +344,11 @@ function SignUpForm() {
           onChange={(e) => setPassword(e.target.value)}
         />
       </div>
-      <Button type="submit" disabled={loading} className="w-full bg-primary/95 text-primary-foreground transition-colors hover:bg-primary">
+      <Button type="submit" disabled={loading} className={ACTION_BUTTON_CLASS}>
         {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <UserPlus className="mr-2 h-4 w-4" />}
         Criar conta
       </Button>
-      <p className="text-center text-xs text-foreground/70">
+      <p className="text-center text-xs text-muted-foreground">
         <KeyRound className="mr-1 inline h-3 w-3" />
         Ao criar conta você recebe acesso de consulta; um administrador libera edição.
       </p>
