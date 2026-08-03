@@ -149,7 +149,7 @@ function PortalPage() {
       subtitle: "Apresentação dos indicadores consolidados da Pagadoria.",
       objetivo: "Acompanhamento dos resultados finais da operação através de uma única base oficial.",
       base: "Base de Resultados",
-      baseTo: "/base",
+      baseTo: "/principal/base",
       to: "/principal",
       cta: "Visualizar Resultados",
       icon: BarChart3,
