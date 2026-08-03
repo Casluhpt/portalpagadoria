@@ -19,17 +19,24 @@ import {
   Filter, 
   ArrowRight,
   Download,
-  Bell
+  Bell,
+  Upload,
+  AlertTriangle,
+  Loader2
 } from "lucide-react";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import * as XLSX from "xlsx";
+import { toast } from "sonner";
+import { format } from "date-fns";
+
 
 export const Route = createFileRoute('/esocial')({
   component: ESocialPage
@@ -38,6 +45,9 @@ export const Route = createFileRoute('/esocial')({
 function ESocialPage() {
   const [mesFiltro, setMesFiltro] = useState("01/2026");
   const [busca, setBusca] = useState("");
+  const qc = useQueryClient();
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [importMode, setImportMode] = useState<"incremental" | "replace">("incremental");
 
   const { data: base = [], isLoading } = useQuery({
     queryKey: ['esocial_base', mesFiltro],
@@ -45,11 +55,88 @@ function ESocialPage() {
       const { data, error } = await supabase
         .from('esocial_base')
         .select('*')
-        .eq('mes_ano', mesFiltro);
+        .eq('mes_ano', mesFiltro)
+        .order('empresa', { ascending: true });
       if (error) throw error;
       return data || [];
     }
   });
+
+  const importMut = useMutation({
+    mutationFn: async (rows: any[]) => {
+      if (importMode === 'replace') {
+        const { error: delError } = await supabase
+          .from('esocial_base')
+          .delete()
+          .eq('mes_ano', mesFiltro);
+        if (delError) throw delError;
+      }
+      
+      const { data, error } = await supabase
+        .from('esocial_base')
+        .insert(rows);
+      if (error) throw error;
+      return rows.length;
+    },
+    onSuccess: (n) => {
+      qc.invalidateQueries({ queryKey: ['esocial_base'] });
+      toast.success(`${n} registro(s) importado(s) com sucesso.`);
+    },
+    onError: (e: any) => {
+      toast.error(`Falha na importação: ${e.message}`);
+    }
+  });
+
+  const handleImport = async (file: File) => {
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      try {
+        const data = new Uint8Array(e.target?.result as ArrayBuffer);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+        const json = XLSX.utils.sheet_to_json(worksheet);
+
+        if (json.length === 0) {
+          toast.error("O arquivo está vazio.");
+          return;
+        }
+
+        // Mapping and Validation
+        const expectedFields = [
+          "Empresa", "Coligadas", "CNPJ", "INSS", "IRRF", "FGTS", "PIS", 
+          "Lancamento", "FUPAG", "Compensado"
+        ];
+        
+        const firstRow = json[0] as any;
+        const missingFields = expectedFields.filter(f => !(f in firstRow));
+        
+        if (missingFields.length > 0) {
+          toast.error(`Layout inválido. Campos ausentes: ${missingFields.join(", ")}. Por favor, utilize o modelo padrão.`);
+          return;
+        }
+
+        const mappedRows = json.map((row: any) => ({
+          empresa: row["Empresa"],
+          nome_coligada: row["Coligadas"],
+          cnpj: row["CNPJ"]?.toString(),
+          valor_inss: parseFloat(row["INSS"]) || 0,
+          valor_irrf: parseFloat(row["IRRF"]) || 0,
+          valor_fgts: parseFloat(row["FGTS"]) || 0,
+          valor_pis: parseFloat(row["PIS"]) || 0,
+          status_lancamento: row["Lancamento"] || "Pendente",
+          num_fopag: row["FUPAG"]?.toString(),
+          dcomp_compensado: row["Compensado"] === "Sim" || row["Compensado"] === true,
+          mes_ano: mesFiltro
+        }));
+
+        importMut.mutate(mappedRows);
+      } catch (err: any) {
+        toast.error(`Erro ao processar arquivo: ${err.message}`);
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  };
 
   const filteredData = useMemo(() => {
     return base.filter(item => 
@@ -70,6 +157,7 @@ function ESocialPage() {
     const totalMes = inss + irrf + fgts + pis;
     return { pendentes, totalMes, inss, irrf, fgts, pis };
   }, [base]);
+
 
   return (
     <SidebarProvider>
@@ -180,12 +268,62 @@ function ESocialPage() {
                   onChange={(e) => setBusca(e.target.value)}
                 />
               </div>
-              <div className="flex gap-2">
-                <Button variant="outline" size="sm">
-                  <Download className="mr-2 h-4 w-4" /> Exportar Base
+              <div className="flex items-center gap-3">
+                <div className="flex items-center rounded-lg border border-border bg-card p-1">
+                  <Button 
+                    variant={importMode === 'incremental' ? "secondary" : "ghost"} 
+                    size="sm" 
+                    className="h-7 text-[10px] uppercase font-bold"
+                    onClick={() => setImportMode('incremental')}
+                  >
+                    Incremental
+                  </Button>
+                  <Button 
+                    variant={importMode === 'replace' ? "secondary" : "ghost"} 
+                    size="sm" 
+                    className="h-7 text-[10px] uppercase font-bold"
+                    onClick={() => setImportMode('replace')}
+                  >
+                    Substituir
+                  </Button>
+                </div>
+
+                <input 
+                  type="file" 
+                  ref={fileRef} 
+                  className="hidden" 
+                  accept=".xlsx,.xls" 
+                  onChange={(e) => e.target.files?.[0] && handleImport(e.target.files[0])} 
+                />
+
+                <Button variant="outline" size="sm" onClick={() => {
+                  const ws = XLSX.utils.json_to_sheet([{
+                    "Empresa": "Exemplo LTDA",
+                    "Coligadas": "Coligada A",
+                    "CNPJ": "00.000.000/0000-00",
+                    "INSS": 1500.50,
+                    "IRRF": 300.20,
+                    "FGTS": 800.00,
+                    "PIS": 150.00,
+                    "Lancamento": "Pendente",
+                    "FUPAG": "12345",
+                    "Compensado": "Não"
+                  }]);
+                  const wb = XLSX.utils.book_new();
+                  XLSX.utils.book_append_sheet(wb, ws, "Modelo");
+                  XLSX.writeFile(wb, "modelo_esocial.xlsx");
+                }}>
+                  <Download className="mr-2 h-4 w-4" /> Modelo
                 </Button>
-                <Button className="bg-indigo-600 hover:bg-indigo-700" size="sm">
-                  <FileSpreadsheet className="mr-2 h-4 w-4" /> Importar Excel
+                
+                <Button 
+                  className="bg-indigo-600 hover:bg-indigo-700" 
+                  size="sm" 
+                  onClick={() => fileRef.current?.click()}
+                  disabled={importMut.isPending}
+                >
+                  {importMut.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <FileSpreadsheet className="mr-2 h-4 w-4" />}
+                  Importar Excel
                 </Button>
               </div>
             </div>
@@ -201,25 +339,30 @@ function ESocialPage() {
                 <table className="w-full text-sm text-left">
                   <thead className="text-xs text-muted-foreground uppercase bg-muted dark:bg-card dark:text-muted-foreground border-b dark:border-border">
                     <tr>
-                      <th className="px-4 py-3 font-semibold">Empresa / Coligada</th>
+                      <th className="px-4 py-3 font-semibold">Empresa</th>
+                      <th className="px-4 py-3 font-semibold">Coligadas</th>
                       <th className="px-4 py-3 font-semibold">CNPJ</th>
-                      <th className="px-4 py-3 font-semibold text-right">INSS / IRRF</th>
-                      <th className="px-4 py-3 font-semibold text-right">FGTS / PIS</th>
-                      <th className="px-4 py-3 font-semibold">Lançamento / FOPAG</th>
+                      <th className="px-4 py-3 font-semibold text-right">INSS</th>
+                      <th className="px-4 py-3 font-semibold text-right">IRRF</th>
+                      <th className="px-4 py-3 font-semibold text-right">FGTS</th>
+                      <th className="px-4 py-3 font-semibold text-right">PIS</th>
+                      <th className="px-4 py-3 font-semibold">Lançamento</th>
+                      <th className="px-4 py-3 font-semibold">FUPAG</th>
                       <th className="px-4 py-3 font-semibold">Compensado</th>
                       <th className="px-4 py-3 font-semibold text-center">Ações</th>
                     </tr>
                   </thead>
+
                   <tbody className="divide-y dark:divide-border">
                     {isLoading ? (
                       <tr>
-                        <td colSpan={7} className="px-4 py-8 text-center text-muted-foreground">
+                        <td colSpan={11} className="px-4 py-8 text-center text-muted-foreground">
                           Carregando base...
                         </td>
                       </tr>
                     ) : filteredData.length === 0 ? (
                       <tr>
-                        <td colSpan={7} className="px-4 py-8 text-center text-muted-foreground">
+                        <td colSpan={11} className="px-4 py-8 text-center text-muted-foreground">
                           Nenhum registro encontrado para {mesFiltro}.
                         </td>
                       </tr>
@@ -228,35 +371,26 @@ function ESocialPage() {
                         const isOk = item.num_fopag || item.dcomp_compensado;
                         return (
                           <tr key={item.id} className={`hover:bg-muted/50 dark:hover:bg-muted/50 transition-colors ${!isOk ? 'bg-red-50/30 dark:bg-red-900/10' : ''}`}>
+                            <td className="px-4 py-3 font-medium text-foreground dark:text-foreground">{item.empresa}</td>
+                            <td className="px-4 py-3 text-muted-foreground text-xs uppercase">{item.nome_coligada}</td>
+                            <td className="px-4 py-3 text-muted-foreground font-mono text-xs">{item.cnpj}</td>
+                            <td className="px-4 py-3 text-right text-xs">{Number(item.valor_inss).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
+                            <td className="px-4 py-3 text-right text-xs">{Number(item.valor_irrf).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
+                            <td className="px-4 py-3 text-right text-xs">{Number(item.valor_fgts).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
+                            <td className="px-4 py-3 text-right text-xs">{Number(item.valor_pis).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
                             <td className="px-4 py-3">
-                              <div className="font-medium text-foreground dark:text-foreground">{item.empresa}</div>
-                              <div className="text-[10px] text-muted-foreground uppercase">{item.nome_coligada} · {item.bandeira}</div>
+                              <Badge variant="outline" className={item.status_lancamento === 'Concluído' ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-muted text-muted-foreground"}>
+                                {item.status_lancamento}
+                              </Badge>
                             </td>
-                            <td className="px-4 py-3 text-muted-foreground dark:text-muted-foreground font-mono text-xs">{item.cnpj}</td>
-                            <td className="px-4 py-3 text-right">
-                              <div className="text-xs"><span className="text-muted-foreground">INSS:</span> {Number(item.valor_inss).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
-                              <div className="text-xs"><span className="text-muted-foreground">IRRF:</span> {Number(item.valor_irrf).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
-                            </td>
-                            <td className="px-4 py-3 text-right">
-                              <div className="text-xs"><span className="text-muted-foreground">FGTS:</span> {Number(item.valor_fgts).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
-                              <div className="text-xs"><span className="text-muted-foreground">PIS:</span> {Number(item.valor_pis).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
-                            </td>
-                            <td className="px-4 py-3">
-                              {item.num_fopag ? (
-                                <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200 gap-1 font-mono">
-                                  <CheckCircle2 className="h-3 w-3" /> {item.num_fopag}
-                                </Badge>
-                              ) : (
-                                <Badge variant="outline" className="bg-muted text-muted-foreground border-border gap-1">
-                                  Pendente
-                                </Badge>
-                              )}
+                            <td className="px-4 py-3 font-mono text-xs">
+                              {item.num_fopag || <span className="text-muted-foreground opacity-50">—</span>}
                             </td>
                             <td className="px-4 py-3">
                               {item.dcomp_compensado ? (
-                                <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-100 border-none">DCOMP = Compensado</Badge>
+                                <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-100 border-none text-[10px]">SIM (DCOMP)</Badge>
                               ) : (
-                                <span className="text-xs text-muted-foreground">—</span>
+                                <span className="text-xs text-muted-foreground opacity-50">NÃO</span>
                               )}
                             </td>
                             <td className="px-4 py-3 text-center">
@@ -268,6 +402,7 @@ function ESocialPage() {
                         );
                       })
                     )}
+
                   </tbody>
                 </table>
               </CardContent>
