@@ -121,11 +121,6 @@ const advancedItems: MenuItem[] = [
   { title: "Auditoria", url: "/auditoria", icon: ScrollText, match: (p: string) => p === "/auditoria" || p === "/registros-excluidos", allowedRoles: ["administrador", "auditor"] },
 ];
 
-const settingItems: MenuItem[] = [
-  { title: "Administração de usuários", url: "/usuarios", icon: Users, match: (p: string) => p === "/usuarios", adminOnly: true },
-  { title: "Histórico de versões", url: "/historico", icon: History, match: (p: string) => p === "/historico", adminOnly: true },
-  { title: "Configurações Técnicas", url: "/configuracoes", icon: Cog, match: (p: string) => p === "/configuracoes", adminOnly: true },
-];
 
 const roleLabel: Record<AppRole, string> = {
   administrador: "Administração",
@@ -309,16 +304,6 @@ export function AppSidebar() {
               <SidebarMenu>
                 {advancedItems.filter(canSee).map(renderItem)}
                 
-                {isAdmin && (
-                  <SidebarMenuItem>
-                    <SidebarMenuButton asChild isActive={currentPath.startsWith("/configuracoes")} tooltip="Configurações">
-                      <Link to="/configuracoes">
-                        <Settings className="h-4 w-4 shrink-0" />
-                        <span>Configurações</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                )}
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
