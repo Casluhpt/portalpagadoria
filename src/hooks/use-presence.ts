@@ -34,36 +34,11 @@ export function usePresence() {
 
     sessionId.current = getSessionId();
 
-    const initSession = async () => {
-      try {
-        await registrarFn({ data: { sessionId: sessionId.current! } });
-      } catch (e) {
-        console.error("Erro ao registrar sessão:", e);
-      }
-    };
-
-    initSession();
-
-    // Heartbeat e verificação a cada 30 segundos
+    // Múltiplas sessões/abas são permitidas: apenas mantemos o heartbeat,
+    // sem invalidar sessões anteriores nem forçar logout.
     const interval = setInterval(async () => {
       if (!sessionId.current) return;
       try {
-        const { valida } = await verificarFn({ data: { sessionId: sessionId.current } });
-        if (!valida) {
-          setSessionValida(false);
-          toast.error("Sua sessão foi encerrada porque você entrou em outro dispositivo ou aba.", {
-            duration: Infinity,
-            description: "Você será deslogado em instantes para garantir a segurança."
-          });
-          
-          setTimeout(() => {
-            void supabase.auth.signOut().then(() => {
-              window.location.href = "/auth";
-            });
-          }, 5000);
-          return;
-        }
-        
         await heartbeatFn({ data: { sessionId: sessionId.current } });
       } catch (e) {
         console.error("Erro no heartbeat de sessão:", e);
@@ -71,7 +46,8 @@ export function usePresence() {
     }, 30000);
 
     return () => clearInterval(interval);
-  }, [user?.id, registrarFn, verificarFn, heartbeatFn]);
+  }, [user?.id, heartbeatFn]);
 
   return { sessionValida, sessionId: sessionId.current, status, setStatus };
 }
+
