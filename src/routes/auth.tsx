@@ -311,7 +311,7 @@ function SignUpForm() {
           onChange={(e) => setPassword(e.target.value)}
         />
       </div>
-      <Button type="submit" disabled={loading} className="w-full bg-primary/85 hover:bg-primary/95 transition-colors">
+      <Button type="submit" disabled={loading} className="w-full bg-primary/80 hover:bg-primary/90 transition-colors">
         {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <UserPlus className="mr-2 h-4 w-4" />}
         Criar conta
       </Button>
