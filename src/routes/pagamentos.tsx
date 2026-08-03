@@ -1163,13 +1163,15 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
 }
 
 const EditableCell = React.memo(function EditableCell({
-  rowId, row, col, onSave, disabled,
+  rowId, row, col, onSave, disabled, suggest,
 }: {
   rowId: string;
   row: Pagamento;
   col: typeof PAGAMENTO_CAMPOS[number];
   onSave: (id: string, patch: PagamentoInput) => void;
   disabled?: boolean;
+  /** Assistência inteligente: valores frequentes para o campo neste contexto. */
+  suggest?: (campo: string, row: Pagamento) => string[];
 }) {
   const raw = row[col.key];
   const editable = col.editable !== false && !col.computed;
