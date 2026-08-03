@@ -64,10 +64,13 @@ function ProvisaoDashboard() {
   const qc = useQueryClient();
 
   const { data, isLoading } = useQuery({
-    queryKey: provisaoQueryKey,
-    queryFn: fetchAllProvisao,
+    queryKey: [...provisaoQueryKey, dateFrom, dateTo],
+    queryFn: async () => {
+      const { fetchProvisaoRange } = await import("@/lib/provisao");
+      return fetchProvisaoRange(dateFrom, dateTo);
+    },
     enabled: !!user,
-    staleTime: 30_000,
+    staleTime: 60_000,
   });
 
   const hoje = todayISO();
@@ -121,13 +124,8 @@ function ProvisaoDashboard() {
   });
 
 
-  const filtered = useMemo(
-    () =>
-      (data ?? []).filter(
-        (r) => r.data != null && r.data >= dateFrom && r.data <= dateTo,
-      ),
-    [data, dateFrom, dateTo],
-  );
+  // Otimização: A filtragem já ocorre no banco de dados via fetchProvisaoRange
+  const filtered = data ?? [];
 
   // Group by empresa + banco, sorted desc by valor
   const grouped = useMemo(() => {
