@@ -91,6 +91,9 @@
 
   --gradient-primary: linear-gradient(135deg, oklch(0.52 0.22 295), oklch(0.72 0.18 320));
   --gradient-soft: linear-gradient(135deg, oklch(0.96 0.04 300), oklch(0.94 0.05 320));
+  --gradient-auth: radial-gradient(circle at 15% 15%, color-mix(in oklab, oklch(0.52 0.22 295) 18%, transparent), transparent 55%),
+    radial-gradient(circle at 85% 80%, color-mix(in oklab, oklch(0.72 0.18 320) 20%, transparent), transparent 55%),
+    linear-gradient(160deg, oklch(0.99 0.01 300), oklch(0.95 0.04 305) 45%, oklch(0.92 0.06 320));
   --shadow-elegant: 0 10px 40px -10px color-mix(in oklab, oklch(0.52 0.22 295) 15%, transparent), 0 4px 20px -12px color-mix(in oklab, oklch(0.52 0.22 295) 10%, transparent);
   --shadow-glow: 0 0 30px color-mix(in oklab, oklch(0.72 0.18 300) 20%, transparent);
 
@@ -133,6 +136,9 @@
 
   --gradient-primary: linear-gradient(135deg, oklch(0.6 0.25 295), oklch(0.82 0.2 320));
   --gradient-soft: linear-gradient(135deg, oklch(0.2 0.06 295), oklch(0.24 0.07 320));
+  --gradient-auth: radial-gradient(circle at 15% 15%, color-mix(in oklab, oklch(0.78 0.22 300) 22%, transparent), transparent 55%),
+    radial-gradient(circle at 85% 80%, color-mix(in oklab, oklch(0.6 0.2 330) 20%, transparent), transparent 55%),
+    linear-gradient(160deg, oklch(0.14 0.03 288), oklch(0.11 0.02 285) 50%, oklch(0.16 0.04 300));
   --shadow-elegant: 0 20px 50px -12px color-mix(in oklab, oklch(0 0 0) 60%, transparent), 0 8px 24px -16px color-mix(in oklab, oklch(0 0 0) 50%, transparent);
   --shadow-glow: 0 0 40px color-mix(in oklab, oklch(0.78 0.22 300) 25%, transparent);
 
@@ -174,4 +180,9 @@
 
 .animate-slide-in-right-slow {
   animation: slide-in-right-slow 1.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@utility bg-gradient-auth {
+  background-image: var(--gradient-auth);
+  background-attachment: fixed;
 }
