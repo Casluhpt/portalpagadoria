@@ -1331,6 +1331,10 @@ export type Database = {
       integrar_pagamentos_na_provisao: { Args: never; Returns: undefined }
       is_provisao_fechada: { Args: { _data: string }; Returns: boolean }
       mark_password_changed: { Args: never; Returns: undefined }
+      purgar_acoes_criticas: {
+        Args: { _ids: string[]; _justificativa: string }
+        Returns: number
+      }
       reabrir_provisao_diaria: { Args: { _data: string }; Returns: undefined }
       registrar_acao_critica: {
         Args: {

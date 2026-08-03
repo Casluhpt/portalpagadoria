@@ -1,5 +1,4 @@
-import { createFileRoute, redirect, Link } from "@tanstack/react-router";
-import { AppLogo } from "@/components/app-logo";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useMemo, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -11,9 +10,7 @@ import {
   Folder, FolderOpen, ChevronRight, X, CheckSquare, Square, GripVertical,
 } from "lucide-react";
 
-import { AppSidebar } from "@/components/app-sidebar";
-import { HeaderActions } from "@/components/header-actions";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -70,31 +67,12 @@ function Content() {
     );
   }
   return (
-    <SidebarProvider>
-      <div className="flex min-h-screen w-full bg-background">
-        <AppSidebar />
-        <div className="flex flex-1 flex-col">
-          <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-border bg-background/80 px-4 backdrop-blur">
-            <SidebarTrigger />
-            <Link to="/" className="flex flex-1 items-center gap-2 hover:opacity-80 transition-opacity">
-              <AppLogo className="h-6 w-auto shrink-0 sm:h-7" />
-              <div className="min-w-0">
-                <h1 className="truncate text-sm font-semibold text-foreground">Registros Excluídos</h1>
-                <p className="hidden truncate text-[10px] text-muted-foreground sm:block">Auditoria e recuperação lógica</p>
-              </div>
-            </Link>
-            <div className="ml-auto">
-              <HeaderActions />
-            </div>
-          </header>
-          <main className="flex-1 p-4 lg:p-6">
-            <Board />
-          </main>
-        </div>
-      </div>
-    </SidebarProvider>
+    <main className="flex-1 p-4 lg:p-6">
+      <Board />
+    </main>
   );
 }
+
 
 function empresaOf(r: RegistroExcluido): string {
   const s = r.snapshot ?? {};

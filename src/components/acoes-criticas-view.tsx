@@ -1,17 +1,26 @@
 import { useMemo, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
-import { Loader2, Search, ShieldAlert, Lock } from "lucide-react";
+import { Loader2, Search, ShieldAlert, Trash2 } from "lucide-react";
+import { toast } from "sonner";
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription,
+  AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
+import { supabase } from "@/integrations/supabase/client";
 import { useRoles } from "@/hooks/use-roles";
 import { ACOES_CRITICAS, fetchAuditCritico, type AuditLogRow } from "@/lib/audit-critico";
+
 
 const severidadeTone: Record<string, string> = {
   info: "bg-muted text-foreground border-border",
@@ -42,10 +51,11 @@ export function AcoesCriticasView() {
     );
   }
 
-  return <AcoesCriticasTable />;
+  return <AcoesCriticasTable isAdmin={isAdmin} />;
 }
 
-function AcoesCriticasTable() {
+function AcoesCriticasTable({ isAdmin }: { isAdmin: boolean }) {
+
   const { data = [], isLoading, error } = useQuery({
     queryKey: ["audit_log_criticas"],
     queryFn: fetchAuditCritico,
@@ -77,12 +87,63 @@ function AcoesCriticasTable() {
     });
   }, [data, busca, acao, severidade, de, ate]);
 
+  const qc = useQueryClient();
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [justificativa, setJustificativa] = useState("");
+
+  const visibleIds = rows.map((r) => r.id);
+  const allSelected = visibleIds.length > 0 && visibleIds.every((id) => selected.has(id));
+
+  const toggle = (id: string) =>
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+
+  const toggleAll = () =>
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (allSelected) visibleIds.forEach((id) => next.delete(id));
+      else visibleIds.forEach((id) => next.add(id));
+      return next;
+    });
+
+  const purge = useMutation({
+    mutationFn: async () => {
+      const ids = visibleIds.filter((id) => selected.has(id));
+      const { data: n, error: err } = await supabase.rpc("purgar_acoes_criticas", {
+        _ids: ids,
+        _justificativa: justificativa.trim(),
+      });
+      if (err) throw err;
+      return (n as number) ?? 0;
+    },
+    onSuccess: (n) => {
+      toast.success(`${n} registro(s) excluído(s) permanentemente.`);
+      setSelected(new Set());
+      setJustificativa("");
+      setConfirmOpen(false);
+      qc.invalidateQueries({ queryKey: ["audit_log_criticas"] });
+    },
+    onError: (e: unknown) => {
+      toast.error(e instanceof Error ? e.message : "Não foi possível excluir os registros.");
+    },
+  });
+
+  const selectedCount = visibleIds.filter((id) => selected.has(id)).length;
+
   return (
     <div className="flex flex-1 flex-col p-4">
       <div className="mb-3 flex items-center gap-2 rounded-lg border border-indigo-200 bg-indigo-50/60 px-3 py-2 text-xs text-indigo-900">
         <ShieldAlert className="h-3.5 w-3.5" />
-        Trilha imutável — nenhum usuário, inclusive Administração, pode editar ou apagar estes registros.
+        {isAdmin
+          ? "Trilha protegida — a exclusão permanente é exclusiva da Administração e exige justificativa registrada."
+          : "Trilha imutável — nenhum usuário, exceto a Administração autorizada, pode editar ou apagar estes registros."}
       </div>
+
 
       <div className="mb-3 grid grid-cols-1 gap-2 rounded-lg border border-border bg-card p-3 md:grid-cols-3 lg:grid-cols-5">
         <div className="lg:col-span-2">
@@ -133,14 +194,36 @@ function AcoesCriticasTable() {
         </div>
       </div>
 
-      <div className="mb-2 text-xs text-muted-foreground">
-        {isLoading ? "Carregando…" : error ? "Erro ao carregar a trilha." : `${rows.length.toLocaleString("pt-BR")} ação(ões) registrada(s)`}
+      <div className="mb-2 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
+        <span>
+          {isLoading ? "Carregando…" : error ? "Erro ao carregar a trilha." : `${rows.length.toLocaleString("pt-BR")} ação(ões) registrada(s)`}
+        </span>
+        {isAdmin && selectedCount > 0 && (
+          <div className="ml-auto flex items-center gap-2">
+            <span className="font-medium text-foreground">{selectedCount} selecionado(s)</span>
+            <Button variant="ghost" size="sm" onClick={() => setSelected(new Set())}>
+              Limpar seleção
+            </Button>
+            <Button variant="destructive" size="sm" className="gap-1.5" onClick={() => setConfirmOpen(true)}>
+              <Trash2 className="h-3.5 w-3.5" /> Excluir permanentemente
+            </Button>
+          </div>
+        )}
       </div>
 
       <div className="overflow-x-auto rounded-lg border border-border bg-card">
         <table className="w-full min-w-[980px] border-collapse text-sm">
           <thead className="bg-muted/50">
             <tr>
+              {isAdmin && (
+                <th className="w-10 border-b border-border px-3 py-2 text-left">
+                  <Checkbox
+                    checked={allSelected}
+                    onCheckedChange={toggleAll}
+                    aria-label="Selecionar todos os registros visíveis"
+                  />
+                </th>
+              )}
               <th className="border-b border-border px-3 py-2 text-left font-semibold">Data e hora</th>
               <th className="border-b border-border px-3 py-2 text-left font-semibold">Usuário</th>
               <th className="border-b border-border px-3 py-2 text-left font-semibold">Ação</th>
@@ -152,6 +235,15 @@ function AcoesCriticasTable() {
           <tbody>
             {rows.map((r) => (
               <tr key={r.id} className="hover:bg-muted/40">
+                {isAdmin && (
+                  <td className="border-b border-border px-3 py-2">
+                    <Checkbox
+                      checked={selected.has(r.id)}
+                      onCheckedChange={() => toggle(r.id)}
+                      aria-label="Selecionar registro"
+                    />
+                  </td>
+                )}
                 <td className="whitespace-nowrap border-b border-border px-3 py-2 tabular-nums">
                   {format(new Date(r.created_at), "dd/MM/yyyy HH:mm:ss")}
                 </td>
@@ -172,7 +264,7 @@ function AcoesCriticasTable() {
             ))}
             {!isLoading && rows.length === 0 && (
               <tr>
-                <td colSpan={6} className="px-3 py-10 text-center text-sm text-muted-foreground">
+                <td colSpan={isAdmin ? 7 : 6} className="px-3 py-10 text-center text-sm text-muted-foreground">
                   Nenhuma ação crítica registrada para os filtros aplicados.
                 </td>
               </tr>
@@ -180,6 +272,37 @@ function AcoesCriticasTable() {
           </tbody>
         </table>
       </div>
+
+      <AlertDialog open={confirmOpen} onOpenChange={(o) => !purge.isPending && setConfirmOpen(o)}>
+        <AlertDialogContent className="bg-background/85 backdrop-blur-md">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir {selectedCount} registro(s) permanentemente?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta ação é irreversível e remove definitivamente os registros da trilha de auditoria.
+              Informe a justificativa da exclusão.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <Textarea
+            value={justificativa}
+            onChange={(e) => setJustificativa(e.target.value)}
+            placeholder="Justificativa obrigatória…"
+            className="min-h-[90px]"
+          />
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={purge.isPending}>Cancelar</AlertDialogCancel>
+            <Button
+              variant="destructive"
+              disabled={purge.isPending || justificativa.trim().length < 5}
+              onClick={() => purge.mutate()}
+              className="gap-1.5"
+            >
+              {purge.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
+              Excluir definitivamente
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
+
 }
