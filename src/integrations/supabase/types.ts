@@ -1015,6 +1015,8 @@ export type Database = {
           id: string
           last_seen_at: string | null
           nome: string | null
+          planilha_inteligente: boolean | null
+          planilha_onboarding_em: string | null
           presence_status: string
           setor: string | null
         }
@@ -1025,6 +1027,8 @@ export type Database = {
           id: string
           last_seen_at?: string | null
           nome?: string | null
+          planilha_inteligente?: boolean | null
+          planilha_onboarding_em?: string | null
           presence_status?: string
           setor?: string | null
         }
@@ -1035,6 +1039,8 @@ export type Database = {
           id?: string
           last_seen_at?: string | null
           nome?: string | null
+          planilha_inteligente?: boolean | null
+          planilha_onboarding_em?: string | null
           presence_status?: string
           setor?: string | null
         }
