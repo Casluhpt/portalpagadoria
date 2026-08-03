@@ -120,16 +120,55 @@ export const setUserRole = createServerFn({ method: "POST" })
       throw new Error("Você não pode remover seu próprio acesso de administrador.");
     }
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    
+    // Obter dados do usuário para auditoria
+    const { data: profile } = await supabaseAdmin
+      .from("profiles")
+      .select("nome, email, setor")
+      .eq("id", data.userId)
+      .single();
+
+    const { data: oldRoles } = await supabaseAdmin
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", data.userId);
+    const roleAnterior = oldRoles?.[0]?.role ?? "Nenhuma";
+
     const { error: delErr } = await supabaseAdmin
       .from("user_roles")
       .delete()
       .eq("user_id", data.userId)
       .in("role", [...ALLOWED_ROLES]);
     if (delErr) throw delErr;
+    
     const { error: insErr } = await supabaseAdmin
       .from("user_roles")
       .insert({ user_id: data.userId, role: data.role });
     if (insErr) throw insErr;
+
+    // Auditoria obrigatória para alteração de perfil
+    try {
+      const { logAcaoCritica } = await import("@/lib/audit-critico");
+      await logAcaoCritica({
+        acao: "alteracao_permissao",
+        modulo: "Administração de Usuários",
+        tabela: "user_roles",
+        registro_id: data.userId,
+        descricao: `Alteração de perfil: ${roleAnterior} -> ${data.role}`,
+        metadata: {
+          alvo_id: data.userId,
+          alvo_nome: profile?.nome,
+          alvo_email: profile?.email,
+          perfil_anterior: roleAnterior,
+          perfil_novo: data.role,
+          setor_atual: profile?.setor
+        },
+        severidade: data.role === "administrador" ? "critico" : "alerta"
+      });
+    } catch (auditErr) {
+      console.warn("[audit] falha ao registrar alteração de perfil", auditErr);
+    }
+
     return { ok: true };
   });
 
