@@ -120,14 +120,14 @@ export function HeaderActions() {
               />
             </div>
             <span className="hidden max-w-[140px] truncate text-xs font-medium text-foreground sm:inline">
-              {user.email}
+              {user.user_metadata?.nome || user.user_metadata?.full_name || user.email}
             </span>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-64">
           <DropdownMenuLabel>
             <div className="flex flex-col">
-              <span className="truncate text-sm font-semibold">{user.email}</span>
+              <span className="truncate text-sm font-semibold">{user.user_metadata?.nome || user.user_metadata?.full_name || user.email}</span>
               <span className="text-[10px] uppercase tracking-wide text-muted-foreground">
                 {primary ? roleLabel[primary] : "Sem perfil atribuído"}
                 {setor ? <span className="ml-1 normal-case text-muted-foreground">· {setor}</span> : null}

@@ -317,7 +317,9 @@ export function AppSidebar() {
                 <div className="rounded-md bg-sidebar-accent/40 px-2 py-1.5 text-xs text-sidebar-foreground">
                   <div className="flex items-center gap-2">
                     <User className="h-3.5 w-3.5" />
-                    <span className="truncate" title={user.email ?? ""}>{user.email}</span>
+                    <span className="truncate" title={user.email ?? ""}>
+                      {user.user_metadata?.nome || user.user_metadata?.full_name || user.email}
+                    </span>
                   </div>
                   <div className="mt-1 pl-5 text-[10px] uppercase tracking-wide text-muted-foreground">
                     {rolesLoading
