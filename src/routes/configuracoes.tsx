@@ -11,7 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { HelpCircle, Bug, AlertCircle, MessageSquare, Send, CheckCircle2, Paperclip, X, Loader2, Settings, Users, History, ChevronRight, Activity, Cloud, ShieldCheck, Mail, Save, Code, Zap, Database, ShieldAlert, Cpu, Sparkles, RefreshCw, Trash2, Lock, Table as TableIcon } from "lucide-react";
+import { HelpCircle, Bug, AlertCircle, MessageSquare, Send, CheckCircle2, Paperclip, X, Loader2, Settings, Users, History, ChevronRight, Activity, Cloud, ShieldCheck, Mail, Save, Code, Zap, Database, ShieldAlert, Cpu, Sparkles, RefreshCw, Trash2, Lock, Table as TableIcon, Image as ImageIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { usePlanilhaModo } from "@/hooks/use-planilha-modo";
 import { useState, useRef, useEffect } from "react";
@@ -23,6 +23,8 @@ import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { UsuariosTableWrapper as UsuariosTable } from "@/components/admin/usuarios-table";
 import { PermissoesManagement } from "@/components/admin/permissoes-management";
+import { IdentidadeVisualPanel } from "@/components/admin/identidade-visual";
+
 import { DocumentacaoTecnicaSection } from "@/components/documentacao-tecnica-section";
 
 
@@ -40,7 +42,7 @@ function ConfiguracoesPage() {
           <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-border bg-background/80 px-4 backdrop-blur">
             <SidebarTrigger />
             <Link to="/" className="flex flex-1 items-center gap-2 hover:opacity-80 transition-opacity">
-              <AppLogo className="h-6 w-auto shrink-0 sm:h-7" />
+              <AppLogo area="header" className="h-6 w-auto shrink-0 sm:h-7" />
               <div className="min-w-0">
                 <h1 className="truncate text-sm font-semibold text-foreground">Configurações</h1>
                 <p className="hidden truncate text-[10px] text-muted-foreground sm:block">Personalização e suporte técnico</p>
@@ -58,7 +60,7 @@ function ConfiguracoesPage() {
                   <h2 className="text-2xl font-bold text-foreground">Acesso Rápido</h2>
                   <p className="text-sm text-muted-foreground">Gerencie o portal e solicite suporte técnico.</p>
                 </div>
-                <TabsList className="bg-muted/50 border border-border p-1 h-auto grid grid-cols-3 md:grid-cols-6 w-full md:w-auto">
+                <TabsList className="bg-muted/50 border border-border p-1 h-auto grid grid-cols-3 md:grid-cols-7 w-full md:w-auto">
                   <TabsTrigger value="suporte" className="py-2.5 px-4 text-xs font-semibold data-[state=active]:bg-background data-[state=active]:shadow-sm">
                     <HelpCircle className="h-3.5 w-3.5 mr-2" /> Suporte
                   </TabsTrigger>
@@ -67,6 +69,9 @@ function ConfiguracoesPage() {
                   </TabsTrigger>
                   <TabsTrigger value="permissoes" className="py-2.5 px-4 text-xs font-semibold data-[state=active]:bg-background data-[state=active]:shadow-sm">
                     <ShieldCheck className="h-3.5 w-3.5 mr-2" /> Permissões
+                  </TabsTrigger>
+                  <TabsTrigger value="identidade" className="py-2.5 px-4 text-xs font-semibold data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                    <ImageIcon className="h-3.5 w-3.5 mr-2" /> Identidade
                   </TabsTrigger>
                   <TabsTrigger value="documentacao" className="py-2.5 px-4 text-xs font-semibold data-[state=active]:bg-background data-[state=active]:shadow-sm">
                     <Code className="h-3.5 w-3.5 mr-2" /> Documentação
@@ -78,6 +83,7 @@ function ConfiguracoesPage() {
                     <ShieldCheck className="h-3.5 w-3.5 mr-2" /> Segurança
                   </TabsTrigger>
                 </TabsList>
+
               </div>
 
               <TabsContent value="suporte" className="m-0 focus-visible:outline-none">
@@ -90,6 +96,10 @@ function ConfiguracoesPage() {
               <TabsContent value="permissoes" className="m-0 focus-visible:outline-none">
                 <PermissoesManagement />
               </TabsContent>
+              <TabsContent value="identidade" className="m-0 focus-visible:outline-none">
+                <IdentidadeVisualPanel />
+              </TabsContent>
+
               <TabsContent value="documentacao" className="m-0 focus-visible:outline-none">
                 <DocumentacaoTecnicaSection />
               </TabsContent>
