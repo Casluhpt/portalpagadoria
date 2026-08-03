@@ -55,22 +55,26 @@ const toRow = (m: Partial<Provisao>): InsertRow => {
 
 const PAGE = 1000;
 
+export async function fetchProvisaoRange(dateFrom: string, dateTo: string): Promise<Provisao[]> {
+  const { data, error } = await supabase
+    .from("provisao_diaria")
+    .select("*")
+    .gte("data", dateFrom)
+    .lte("data", dateTo)
+    .order("data", { ascending: false, nullsFirst: false });
+  
+  if (error) throw error;
+  return (data as Row[] || []).map(toModel);
+}
+
 export async function fetchAllProvisao(): Promise<Provisao[]> {
-  const all: Row[] = [];
-  let from = 0;
-  while (true) {
-    const { data, error } = await supabase
-      .from("provisao_diaria")
-      .select("*")
-      .order("data", { ascending: false, nullsFirst: false })
-      .range(from, from + PAGE - 1);
-    if (error) throw error;
-    if (!data || data.length === 0) break;
-    all.push(...(data as Row[]));
-    if (data.length < PAGE) break;
-    from += PAGE;
-  }
-  return all.map(toModel);
+  // Otimização: Buscamos apenas os últimos 30 dias por padrão para evitar travamentos
+  const d = new Date();
+  const dateTo = d.toISOString().slice(0, 10);
+  d.setDate(d.getDate() - 30);
+  const dateFrom = d.toISOString().slice(0, 10);
+  
+  return fetchProvisaoRange(dateFrom, dateTo);
 }
 
 export async function createProvisao(patch: Partial<Provisao>): Promise<Provisao> {
