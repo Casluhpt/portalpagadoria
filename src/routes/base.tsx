@@ -124,10 +124,21 @@ function BasePage() {
   });
 
   const deleteMut = useMutation({
-    mutationFn: (id: string) => deleteLancamento(id),
+    mutationFn: async (ids: string[]) => {
+      // Registrar na auditoria antes de excluir (mesmo que a trigger faça log, o manual pede registro conforme regras existentes)
+      const count = ids.length;
+      await logAcaoCritica({
+        acao: "Exclusão na Base de Resultados",
+        detalhes: `Usuário excluiu ${count} registro(s) da base de provisão diária. IDs: ${ids.join(", ")}`,
+        nivel: "medio",
+      });
+      return deleteLancamentosBulk(ids);
+    },
     onSuccess: () => {
       invalidate();
-      toast.success("Registro excluído");
+      setSelectedIds(new Set());
+      toast.success("Registros excluídos com sucesso");
+      setPurgeOpen(false);
     },
     onError: (e: Error) => toast.error("Falha ao excluir: " + e.message),
   });
