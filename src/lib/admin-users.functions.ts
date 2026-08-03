@@ -197,11 +197,40 @@ export const setUserSetor = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: oldProfile } = await supabaseAdmin
+      .from("profiles")
+      .select("setor, nome, email")
+      .eq("id", data.userId)
+      .single();
+
     const { error } = await supabaseAdmin
       .from("profiles")
       .update({ setor: data.setor })
       .eq("id", data.userId);
     if (error) throw error;
+
+    // Auditoria obrigatória para alteração de setor (especialmente Pagadoria)
+    try {
+      const { logAcaoCritica } = await import("@/lib/audit-critico");
+      await logAcaoCritica({
+        acao: "alteracao_permissao",
+        modulo: "Administração de Usuários",
+        tabela: "profiles",
+        registro_id: data.userId,
+        descricao: `Alteração de setor: ${oldProfile?.setor ?? "Nenhum"} -> ${data.setor ?? "Nenhum"}`,
+        metadata: {
+          alvo_id: data.userId,
+          alvo_nome: oldProfile?.nome,
+          alvo_email: oldProfile?.email,
+          setor_anterior: oldProfile?.setor,
+          setor_novo: data.setor
+        },
+        severidade: data.setor === "PAGADORIA" || oldProfile?.setor === "PAGADORIA" ? "alerta" : "info"
+      });
+    } catch (auditErr) {
+      console.warn("[audit] falha ao registrar alteração de setor", auditErr);
+    }
+
     return { ok: true };
   });
 
