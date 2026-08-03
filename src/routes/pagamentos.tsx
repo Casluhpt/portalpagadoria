@@ -786,9 +786,13 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
             variant={smartOn ? "default" : "outline"}
             className={cn("h-7 gap-1.5 text-xs", smartOn && "bg-violet-600 text-white hover:bg-violet-700")}
             onClick={() => toggleSmart(!smartOn)}
-            title="Assistência inteligente: aprende padrões, sugere preenchimentos e valida os dados. Você mantém o controle total."
+            disabled={salvandoModo}
+            title={smartOn
+              ? "Modo Inteligente ativo — clique para voltar ao Modo Tradicional"
+              : "Modo Tradicional ativo — clique para ativar a Planilha Inteligente"}
           >
-            <Sparkles className="h-3.5 w-3.5" /> Planilha Inteligente
+            {salvandoModo ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
+            {smartOn ? "Modo Inteligente" : "Modo Tradicional"}
           </Button>
           {smartOn && diagnostico && (
             <Popover>
