@@ -58,25 +58,43 @@ function AuthPage() {
         type="button"
         onClick={toggleTheme}
         aria-label={isDark ? "Ativar modo claro" : "Ativar modo noturno"}
-        className="fixed right-3 top-3 z-50 flex h-10 w-10 items-center justify-center rounded-full border border-border/50 bg-card/70 text-foreground shadow-[var(--shadow-elegant)] backdrop-blur-md transition-all hover:scale-105 hover:bg-card/95 focus:outline-none focus:ring-2 focus:ring-ring sm:right-5 sm:top-5"
+        className="group fixed right-3 top-3 z-50 flex h-10 w-10 items-center justify-center rounded-full bg-background/60 text-foreground shadow-[var(--shadow-elegant)] ring-1 ring-border/40 backdrop-blur-2xl transition-all duration-500 hover:bg-background/80 hover:text-primary hover:shadow-[var(--shadow-glow)] active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:right-5 sm:top-5"
       >
-        {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+        {isDark ? (
+          <Sun className="h-5 w-5 transition-transform duration-500 group-hover:rotate-45" />
+        ) : (
+          <Moon className="h-5 w-5 transition-transform duration-500 group-hover:-rotate-12" />
+        )}
       </button>
 
-      <Card className="w-full max-w-md border-border/70 bg-card/90 shadow-[var(--shadow-elegant)] backdrop-blur-xl">
+      <Card className="w-full max-w-md animate-in rounded-2xl border-none bg-background/70 shadow-[var(--shadow-elegant)] backdrop-blur-2xl duration-500 fade-in-0 zoom-in-95">
         <CardHeader className="items-center px-5 text-center sm:px-6">
           <AppLogo area="login" className="mb-2 h-9 object-contain sm:h-10" />
           <CardTitle className="text-lg text-foreground sm:text-xl">Portal Pagadoria</CardTitle>
-          <p className="text-sm text-foreground/70">Acesse para editar as bases de dados.</p>
+          <p className="text-sm text-muted-foreground">Acesse para editar as bases de dados.</p>
         </CardHeader>
         <CardContent className="px-5 sm:px-6">
           <Tabs defaultValue="signin">
-            <TabsList className="grid w-full grid-cols-2 bg-muted/70">
-              <TabsTrigger value="signin" className="text-foreground/80 data-[state=active]:text-foreground">Entrar</TabsTrigger>
-              <TabsTrigger value="signup" className="text-foreground/80 data-[state=active]:text-foreground">Criar conta</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2 rounded-xl border-none bg-background/40 backdrop-blur-md">
+              <TabsTrigger
+                value="signin"
+                className="rounded-lg text-muted-foreground transition-all duration-500 data-[state=active]:bg-background/80 data-[state=active]:text-foreground data-[state=active]:shadow-[var(--shadow-elegant)] data-[state=active]:backdrop-blur-2xl"
+              >
+                Entrar
+              </TabsTrigger>
+              <TabsTrigger
+                value="signup"
+                className="rounded-lg text-muted-foreground transition-all duration-500 data-[state=active]:bg-background/80 data-[state=active]:text-foreground data-[state=active]:shadow-[var(--shadow-elegant)] data-[state=active]:backdrop-blur-2xl"
+              >
+                Criar conta
+              </TabsTrigger>
             </TabsList>
-            <TabsContent value="signin"><SignInForm /></TabsContent>
-            <TabsContent value="signup"><SignUpForm /></TabsContent>
+            <TabsContent value="signin" className="animate-in duration-500 fade-in-0 slide-in-from-bottom-1">
+              <SignInForm />
+            </TabsContent>
+            <TabsContent value="signup" className="animate-in duration-500 fade-in-0 slide-in-from-bottom-1">
+              <SignUpForm />
+            </TabsContent>
           </Tabs>
         </CardContent>
       </Card>
@@ -84,6 +102,14 @@ function AuthPage() {
 
   );
 }
+
+/** Padrão translúcido mestre aplicado aos campos do formulário. */
+const FIELD_CLASS =
+  "rounded-xl border-none bg-background/50 text-foreground ring-1 ring-border/40 backdrop-blur-md transition-all duration-500 placeholder:text-muted-foreground focus-visible:bg-background/70 focus-visible:ring-2 focus-visible:ring-ring";
+
+/** Padrão translúcido mestre aplicado aos botões de ação. */
+const ACTION_BUTTON_CLASS =
+  "w-full rounded-xl border-none bg-primary/80 text-primary-foreground shadow-[var(--shadow-elegant)] backdrop-blur-md transition-all duration-500 hover:bg-primary/90 hover:shadow-[var(--shadow-glow)] active:scale-[0.98]";
 
 
 function translateAuthError(msg: string): string {
