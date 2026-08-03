@@ -172,6 +172,10 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
   const isVisitante = roles.includes("visitante");
   
   const isEditingEnabled = !!userId && activeUser?.user_id === userId && !isViewer && !isVisitante;
+  // Inclusão/exclusão liberadas a qualquer usuário autorizado (independe da fila),
+  // com confirmação prévia e registro automático em Auditoria.
+  const canMutate = !!userId && !isViewer && !isVisitante;
+
   const nextUser = queue.filter(q => q.status === 'aguardando').sort((a, b) => {
     const da = a.entrou_em ? new Date(a.entrou_em).getTime() : 0;
     const db = b.entrou_em ? new Date(b.entrou_em).getTime() : 0;
@@ -299,16 +303,43 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
 
   const bulkDeleteMut = useMutation({
     mutationFn: async (ids: string[]) => {
+      const snapshots = data.filter((r) => ids.includes(r.id));
       await Promise.all(ids.map((id) => deletePagamento(id)));
+      // Envio automático para Auditoria com data, hora, usuário e dados relevantes
+      await Promise.all(
+        snapshots.map((r) =>
+          logAcaoCritica({
+            acao: "exclusao_logica",
+            modulo: "Pagamentos Diversos",
+            tabela: "pagamentos_diversos",
+            registro_id: r.id,
+            descricao: `Exclusão de lançamento — ${r.empresa ?? "sem empresa"} · ${r.descricao_pagamento ?? "sem descrição"} · ${brl(r.valor_lg)}`,
+
+            metadata: {
+              excluido_em: new Date().toISOString(),
+              usuario: colaboradorNome,
+              usuario_id: userId,
+              empresa: r.empresa,
+              banco: r.banco,
+              data_credito: r.data_credito,
+              competencia: r.competencia,
+              valor_lg: r.valor_lg,
+              descricao_pagamento: r.descricao_pagamento,
+            },
+            severidade: "critico",
+          }),
+        ),
+      );
       return ids.length;
     },
     onSuccess: (n) => {
       invalidate();
       setSelected(new Set());
-      toast.success(`${n} registro(s) excluído(s)`);
+      toast.success(`${n} registro(s) excluído(s) e registrado(s) na Auditoria`);
     },
     onError: (e: Error) => toast.error("Falha ao excluir: " + e.message),
   });
+
 
   const importMut = useMutation({
     mutationFn: (rows: PagamentoInput[]) => createPagamentosBulk(rows, colaboradorNome, userId, importMode === "replace"),
@@ -608,7 +639,7 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
                 <Button
                   size="sm"
                   className="gap-1"
-                  disabled={createMut.isPending || !isEditingEnabled}
+                  disabled={createMut.isPending || !canMutate}
                 >
                   {createMut.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
                   Novo
@@ -647,7 +678,7 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
           <span className="text-xs font-medium text-foreground">
             {selected.size} selecionada(s)
           </span>
-          <Button size="sm" variant="outline" className="gap-1" onClick={cutSelected} disabled={bulkDeleteMut.isPending || !isEditingEnabled}>
+          <Button size="sm" variant="outline" className="gap-1" onClick={cutSelected} disabled={bulkDeleteMut.isPending || !canMutate}>
             <Scissors className="h-4 w-4" /> Recortar
           </Button>
           <DropdownMenu>
@@ -673,7 +704,7 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
             variant="destructive"
             className="gap-1"
             onClick={() => setBulkPendingDelete(true)}
-            disabled={bulkDeleteMut.isPending || !isEditingEnabled}
+            disabled={bulkDeleteMut.isPending || !canMutate}
           >
             {bulkDeleteMut.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
             Excluir
