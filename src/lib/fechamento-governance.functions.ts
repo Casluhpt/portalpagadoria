@@ -40,7 +40,6 @@ export const updateFechamento = createServerFn({ method: "POST" })
       _tabela: "fechamento_pagamentos",
       _registro_id: data.id,
       _descricao: `Renomeação do fechamento para "${data.nome}"`,
-      _justificativa: null,
       _snapshot: anterior ?? null,
       _metadata: { novo_nome: data.nome },
       _severidade: "alerta",
@@ -80,7 +79,6 @@ export const reabrirCompetencia = createServerFn({ method: "POST" })
       _descricao: "Reabertura (exclusão) de fechamento de competência",
       _justificativa: data.justificativa,
       _snapshot: anterior ?? null,
-      _metadata: null,
       _severidade: "critico",
     });
 
