@@ -195,7 +195,8 @@ function SignInForm() {
   );
 }
 
-const SETORES = ["FOLHA/FÉRIAS", "RESCISÃO", "BENEFICIOS", "PAGADORIA", "GERÊNCIA/VISITANTE"] as const;
+const PUBLIC_SETORES = ["FOLHA/FÉRIAS", "RESCISÃO", "BENEFICIOS", "GERÊNCIA/VISITANTE"] as const;
+const SETORES = [...PUBLIC_SETORES, "PAGADORIA"] as const;
 type Setor = (typeof SETORES)[number];
 
 function SignUpForm() {
@@ -276,7 +277,7 @@ function SignUpForm() {
             <SelectValue placeholder="Selecione o setor" />
           </SelectTrigger>
           <SelectContent>
-            {SETORES.map((s) => (
+            {PUBLIC_SETORES.map((s) => (
               <SelectItem key={s} value={s}>{s}</SelectItem>
             ))}
           </SelectContent>
