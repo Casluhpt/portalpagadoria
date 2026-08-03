@@ -1,13 +1,29 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { HeaderActions } from "@/components/header-actions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Info, Calendar, Database, Users, TrendingUp } from "lucide-react";
-import { fetchFechamentosPagamentos, fechamentoPagamentosKey } from "@/lib/fechamento-pagamentos";
+import { Info, Calendar, Database, Users, TrendingUp, Edit2, RotateCcw, Save, Trash2 } from "lucide-react";
+import { fetchFechamentosPagamentos, fechamentoPagamentosKey, type FechamentoPagamento } from "@/lib/fechamento-pagamentos";
 import { useSession } from "@/hooks/use-session";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
+import { useServerFn } from "@tanstack/react-start";
+import { updateFechamento, reabrirCompetencia } from "@/lib/fechamento-governance.functions";
+import { logAcaoCritica } from "@/lib/audit-critico";
 
 export const Route = createFileRoute("/fechamento")({
   component: FechamentoPage,
