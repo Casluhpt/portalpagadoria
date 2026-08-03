@@ -65,21 +65,12 @@ function ProvisaoDashboard() {
 
   const { data, isLoading } = useQuery({
     queryKey: [...provisaoQueryKey, dateFrom, dateTo],
-    queryFn: () => {
-      const { fetchProvisaoRange } = import.meta.hot ? 
-        // @ts-ignore
-        require("@/lib/provisao") : 
-        // This is a bit hacky for TanStack Start, but we need the actual function
-        // In a real scenario, we'd import it at the top
-        null;
-      
-      // Since I can't easily change the top-level import without risks, 
-      // I'll use a dynamic import approach or just assume fetchAllProvisao is enough if it takes params
-      // Better: let's update fetchAllProvisao signature in lib/provisao.ts or just call it.
-      return import("@/lib/provisao").then(m => m.fetchProvisaoRange(dateFrom, dateTo));
+    queryFn: async () => {
+      const { fetchProvisaoRange } = await import("@/lib/provisao");
+      return fetchProvisaoRange(dateFrom, dateTo);
     },
     enabled: !!user,
-    staleTime: 60_000, // Aumentado para reduzir pressão no banco
+    staleTime: 60_000,
   });
 
   const hoje = todayISO();
