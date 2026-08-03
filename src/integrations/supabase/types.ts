@@ -1335,6 +1335,10 @@ export type Database = {
         Args: { _ids: string[]; _justificativa: string }
         Returns: number
       }
+      purgar_logs_auditoria: {
+        Args: { _ids: string[]; _justificativa: string }
+        Returns: number
+      }
       reabrir_provisao_diaria: { Args: { _data: string }; Returns: undefined }
       registrar_acao_critica: {
         Args: {
