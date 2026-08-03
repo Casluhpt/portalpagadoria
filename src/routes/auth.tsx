@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate, useRouterState, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Loader2, LogIn, UserPlus, KeyRound, AlertCircle } from "lucide-react";
+import { Loader2, LogIn, UserPlus, KeyRound, AlertCircle, Moon, Sun } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -19,6 +19,8 @@ import {
 } from "@/components/ui/select";
 import { AppLogo } from "@/components/app-logo";
 import { useSession } from "@/hooks/use-session";
+import { useTheme } from "@/components/theme-provider";
+
 
 export const Route = createFileRoute("/auth")({
   component: AuthPage,
