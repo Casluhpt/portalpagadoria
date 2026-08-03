@@ -207,12 +207,39 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
     }
   });
 
+  const [confirmSaidaFila, setConfirmSaidaFila] = useState(false);
+
   const sairMut = useMutation({
-    mutationFn: () => sairFilaFn({ data: { userId: userId as string, modulo: 'pagamentos_diversos' } }),
+    mutationFn: async () => {
+      const posicaoAnterior = queue.findIndex((q) => q.user_id === userId) + 1;
+      const statusAnterior = currentUserQueue?.status ?? null;
+      await sairFilaFn({ data: { userId: userId as string, modulo: 'pagamentos_diversos' } });
+      const { logAcaoCritica } = await import("@/lib/audit-critico");
+      await logAcaoCritica({
+        acao: "saida_fila",
+        modulo: "Pagamentos Diversos",
+        tabela: "concorrencia_fila",
+        registro_id: userId ?? undefined,
+        descricao: `Saída voluntária da fila virtual (posição ${posicaoAnterior || "-"}, status ${statusAnterior ?? "-"})`,
+        metadata: {
+          modulo_fila: "pagamentos_diversos",
+          posicao_anterior: posicaoAnterior || null,
+          status_anterior: statusAnterior,
+          total_na_fila: queue.length,
+          saiu_em: new Date().toISOString(),
+        },
+        severidade: "info",
+      });
+    },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['concorrencia-fila'] });
-      toast.info("Você saiu da fila/sessão de edição.");
-    }
+      setConfirmSaidaFila(false);
+      setFilaOpen(false);
+      setPosicaoFila(null);
+      setPrevStatus(null);
+      toast.info("Você saiu da fila. Sua posição foi liberada — entre novamente quando desejar.");
+    },
+    onError: (e: Error) => toast.error("Não foi possível sair da fila: " + e.message),
   });
 
   const [posicaoFila, setPosicaoFila] = useState<number | null>(null);
