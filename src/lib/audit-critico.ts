@@ -17,6 +17,8 @@ export const ACOES_CRITICAS = {
   alteracao_parametros: "Alteração em parâmetros",
   integracao_provisao: "Integração automática com a Base da Provisão Diária",
   ajuste_manual_provisao: "Ajuste manual em dado integrado da provisão",
+  entrada_fila: "Entrada na fila virtual",
+  saida_fila: "Saída voluntária da fila virtual",
 } as const;
 
 export type AcaoCritica = keyof typeof ACOES_CRITICAS;
