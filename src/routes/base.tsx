@@ -509,23 +509,31 @@ function BasePage() {
       </div>
 
       <AlertDialog
-        open={!!pendingDelete}
-        onOpenChange={(o) => !o && setPendingDelete(null)}
+        open={!!pendingDelete || purgeOpen}
+        onOpenChange={(o) => {
+          if (!o) {
+            setPendingDelete(null);
+            setPurgeOpen(false);
+          }
+        }}
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Excluir registro?</AlertDialogTitle>
+            <AlertDialogTitle>
+              {purgeOpen ? `Excluir ${selectedIds.size} registros?` : "Excluir registro?"}
+            </AlertDialogTitle>
             <AlertDialogDescription>
-              Essa ação é permanente e removerá a linha da Base. O dashboard
-              Principal será atualizado automaticamente.
+              Essa ação é permanente e removerá as linhas da Base. O dashboard
+              Principal será atualizado automaticamente. A ação será registrada na auditoria.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               onClick={() => {
-                if (pendingDelete) deleteMut.mutate(pendingDelete.id);
-                setPendingDelete(null);
+                const ids = purgeOpen ? Array.from(selectedIds) : (pendingDelete ? [pendingDelete.id] : []);
+                if (ids.length > 0) deleteMut.mutate(ids);
               }}
             >
               Excluir
