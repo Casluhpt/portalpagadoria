@@ -4,11 +4,11 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { HeaderActions } from "@/components/header-actions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Info, Calendar, Database, Users, TrendingUp, Edit2, RotateCcw, Save, Trash2 } from "lucide-react";
+import { Info, Calendar, Database, Edit2, RotateCcw, Save } from "lucide-react";
 import { fetchFechamentosPagamentos, fechamentoPagamentosKey, type FechamentoPagamento } from "@/lib/fechamento-pagamentos";
 import { useSession } from "@/hooks/use-session";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -29,12 +29,20 @@ export const Route = createFileRoute("/fechamento")({
   component: FechamentoPage,
 });
 
-const brl = (n: number) =>
-  n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-
 function FechamentoPage() {
-  const { user, profile } = useSession();
+  const { user } = useSession();
+  const [profile, setProfile] = useState<any>(null);
   const queryClient = useQueryClient();
+  
+  useEffect(() => {
+    if (user) {
+      import("@/integrations/supabase/client").then(({ supabase }) => {
+        supabase.from("user_roles").select("role").eq("user_id", user.id).single()
+          .then(({ data }) => setProfile(data));
+      });
+    }
+  }, [user]);
+
   const isAdmin = profile?.role === "admin";
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editNome, setEditNome] = useState("");
@@ -51,33 +59,33 @@ function FechamentoPage() {
   });
 
   const updateMut = useMutation({
-    mutationFn: (data: { id: string; nome: string }) => updateFn(data),
+    mutationFn: (data: { id: string; nome: string }) => updateFn({ data }),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: fechamentoPagamentosKey });
       toast.success("Fechamento atualizado com sucesso");
       setEditingId(null);
       logAcaoCritica({
-        acao: "Edição de Fechamento",
+        acao: "edicao_pos_fechamento",
         modulo: "Fechamento de Competência",
-        detalhes: `Nome alterado para: ${variables.nome}`,
-        impacto: "Médio",
+        descricao: `Nome alterado para: ${variables.nome}`,
+        severidade: "alerta",
       });
     },
     onError: () => toast.error("Erro ao atualizar fechamento"),
   });
 
   const reabrirMut = useMutation({
-    mutationFn: (data: { id: string; justificativa: string }) => reabrirFn(data),
+    mutationFn: (data: { id: string; justificativa: string }) => reabrirFn({ data }),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: fechamentoPagamentosKey });
       toast.success("Competência reaberta com sucesso");
       setReopenId(null);
       setJustificativa("");
       logAcaoCritica({
-        acao: "Reabertura de Competência",
+        acao: "reabertura_competencia",
         modulo: "Fechamento de Competência",
-        detalhes: `Justificativa: ${variables.justificativa}`,
-        impacto: "Alto",
+        justificativa: variables.justificativa,
+        severidade: "critico",
       });
     },
     onError: () => toast.error("Erro ao reabrir competência"),
@@ -110,7 +118,7 @@ function FechamentoPage() {
                 <h2 className="text-2xl font-bold text-foreground">Histórico de Fechamentos</h2>
                 <p className="text-sm text-muted-foreground">
                   {isAdmin 
-                    ? "Painel de controle administrativo do histórico de fechamentos." 
+                    ? "Manter os dados de fechamentos concluídos como imutáveis para usuários comuns, incluindo Viewer e Visitante conforme suas permissões. Administradores devem poder editar dados do histórico de fechamentos quando necessário e, se aplicável, reabrir uma competência para correções. Toda alteração administrativa deve respeitar permissões e manter rastreabilidade adequada." 
                     : "Área restrita para consulta de competências encerradas."}
                 </p>
               </div>
