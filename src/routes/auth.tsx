@@ -169,8 +169,9 @@ function SignInForm() {
       )}
 
       <div className="space-y-1.5">
-        <Label htmlFor="si-email">E-mail</Label>
+        <Label className="text-foreground" htmlFor="si-email">E-mail</Label>
         <Input
+          className="bg-background/80 text-foreground placeholder:text-muted-foreground"
           id="si-email"
           type="email"
           required
@@ -185,15 +186,16 @@ function SignInForm() {
       </div>
       <div className="space-y-1.5">
         <div className="flex items-center justify-between">
-          <Label htmlFor="si-pw">Senha</Label>
+          <Label className="text-foreground" htmlFor="si-pw">Senha</Label>
           <Link
             to="/forgot-password"
-            className="text-xs font-medium text-violet-700 hover:underline"
+            className="text-xs font-medium text-primary hover:underline"
           >
             Esqueci minha senha
           </Link>
         </div>
         <PasswordInput
+          className="bg-background/80 text-foreground"
           id="si-pw"
           required
           autoComplete="current-password"
@@ -204,7 +206,7 @@ function SignInForm() {
           }}
         />
       </div>
-      <Button type="submit" disabled={loading} className="w-full bg-primary/80 hover:bg-primary/90 transition-colors">
+      <Button type="submit" disabled={loading} className="w-full bg-primary/95 text-primary-foreground transition-colors hover:bg-primary">
 
 
         {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <LogIn className="mr-2 h-4 w-4" />}
@@ -260,8 +262,9 @@ function SignUpForm() {
   return (
     <form onSubmit={submit} className="mt-4 space-y-3">
       <div className="space-y-1.5">
-        <Label htmlFor="su-nome">Nome completo</Label>
+        <Label className="text-foreground" htmlFor="su-nome">Nome completo</Label>
         <Input
+          className="bg-background/80 text-foreground placeholder:text-muted-foreground"
           id="su-nome"
           type="text"
           required
@@ -275,11 +278,12 @@ function SignUpForm() {
           onBlur={() => setNomeError(validateNome(nome))}
           aria-invalid={!!nomeError}
         />
-        {nomeError && <p className="text-xs text-red-600">{nomeError}</p>}
+        {nomeError && <p className="text-xs text-destructive">{nomeError}</p>}
       </div>
       <div className="space-y-1.5">
-        <Label htmlFor="su-email">E-mail</Label>
+        <Label className="text-foreground" htmlFor="su-email">E-mail</Label>
         <Input
+          className="bg-background/80 text-foreground placeholder:text-muted-foreground"
           id="su-email"
           type="email"
           required
@@ -290,9 +294,9 @@ function SignUpForm() {
         />
       </div>
       <div className="space-y-1.5">
-        <Label htmlFor="su-setor">Setor</Label>
+        <Label className="text-foreground" htmlFor="su-setor">Setor</Label>
         <Select value={setor} onValueChange={(v) => setSetor(v as Setor)}>
-          <SelectTrigger id="su-setor">
+          <SelectTrigger id="su-setor" className="bg-background/80 text-foreground">
             <SelectValue placeholder="Selecione o setor" />
           </SelectTrigger>
           <SelectContent>
@@ -303,8 +307,9 @@ function SignUpForm() {
         </Select>
       </div>
       <div className="space-y-1.5">
-        <Label htmlFor="su-pw">Senha (mín. 8)</Label>
+        <Label className="text-foreground" htmlFor="su-pw">Senha (mín. 8)</Label>
         <PasswordInput
+          className="bg-background/80 text-foreground"
           id="su-pw"
           required
           minLength={8}
@@ -313,11 +318,11 @@ function SignUpForm() {
           onChange={(e) => setPassword(e.target.value)}
         />
       </div>
-      <Button type="submit" disabled={loading} className="w-full bg-primary/80 hover:bg-primary/90 transition-colors">
+      <Button type="submit" disabled={loading} className="w-full bg-primary/95 text-primary-foreground transition-colors hover:bg-primary">
         {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <UserPlus className="mr-2 h-4 w-4" />}
         Criar conta
       </Button>
-      <p className="text-center text-xs text-muted-foreground">
+      <p className="text-center text-xs text-foreground/70">
         <KeyRound className="mr-1 inline h-3 w-3" />
         Ao criar conta você recebe acesso de consulta; um administrador libera edição.
       </p>
