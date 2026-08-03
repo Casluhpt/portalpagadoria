@@ -1,5 +1,4 @@
-import { createFileRoute, redirect, Link } from "@tanstack/react-router";
-import { AppLogo } from "@/components/app-logo";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useMemo, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -11,9 +10,7 @@ import {
   Folder, FolderOpen, ChevronRight, X, CheckSquare, Square, GripVertical,
 } from "lucide-react";
 
-import { AppSidebar } from "@/components/app-sidebar";
-import { HeaderActions } from "@/components/header-actions";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
