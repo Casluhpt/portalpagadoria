@@ -7,6 +7,7 @@ export const entrarFila = createServerFn({ method: "POST" })
     userId: z.string(),
     userNome: z.string(),
     modulo: z.string(),
+    sessionId: z.string().optional(),
   }).parse(data))
   .handler(async ({ data }) => {
     // Check if user already in queue
@@ -36,6 +37,7 @@ export const entrarFila = createServerFn({ method: "POST" })
         modulo: data.modulo,
         status,
         ativo_desde,
+        session_id: data.sessionId
       })
       .select()
       .single();
@@ -147,11 +149,22 @@ export const heartbeatFila = createServerFn({ method: "POST" })
   .validator((data) => z.object({
     userId: z.string(),
     modulo: z.string(),
+    sessionId: z.string().optional(),
   }).parse(data))
   .handler(async ({ data }) => {
-    // Update 'entrou_em' as a heartbeat for simplicity, 
-    // or we could add a last_seen column if we wanted to be cleaner.
-    // The current table 'concorrencia_fila' has 'entrou_em', 'status', 'user_id', 'modulo', 'user_nome', 'ativo_desde'.
+    // Heartbeat: update 'entrou_em' and ensure session integrity
+    const { data: current } = await supabase
+      .from('concorrencia_fila')
+      .select('session_id')
+      .eq('user_id', data.userId)
+      .eq('modulo', data.modulo)
+      .maybeSingle();
+
+    // If session ID doesn't match, this is a duplicated session or browser
+    if (current && data.sessionId && current.session_id !== data.sessionId) {
+      throw new Error("Sessão inválida ou duplicada detectada.");
+    }
+
     const { error } = await supabase
       .from('concorrencia_fila')
       .update({ entrou_em: new Date().toISOString() })

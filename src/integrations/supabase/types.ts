@@ -259,6 +259,7 @@ export type Database = {
           entrou_em: string | null
           id: string
           modulo: string
+          session_id: string | null
           status: string | null
           user_id: string | null
           user_nome: string | null
@@ -268,6 +269,7 @@ export type Database = {
           entrou_em?: string | null
           id?: string
           modulo: string
+          session_id?: string | null
           status?: string | null
           user_id?: string | null
           user_nome?: string | null
@@ -277,6 +279,7 @@ export type Database = {
           entrou_em?: string | null
           id?: string
           modulo?: string
+          session_id?: string | null
           status?: string | null
           user_id?: string | null
           user_nome?: string | null
@@ -1302,6 +1305,30 @@ export type Database = {
         }
         Relationships: []
       }
+      user_sessions: {
+        Row: {
+          id: string
+          last_seen_at: string | null
+          metadata: Json | null
+          session_id: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          last_seen_at?: string | null
+          metadata?: Json | null
+          session_id: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          last_seen_at?: string | null
+          metadata?: Json | null
+          session_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -1377,6 +1404,10 @@ export type Database = {
           _tabela?: string
         }
         Returns: string
+      }
+      registrar_sessao_e_limpar_anteriores: {
+        Args: { _session_id: string }
+        Returns: undefined
       }
       rejeitar_solicitacao_provisao: {
         Args: { _id: string; _motivo?: string }
