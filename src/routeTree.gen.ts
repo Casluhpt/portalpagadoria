@@ -37,6 +37,7 @@ import { Route as PrincipalIndexRouteImport } from './routes/principal.index'
 import { Route as ProvisaoBaseRouteImport } from './routes/provisao.base'
 import { Route as PrincipalBaseRouteImport } from './routes/principal.base'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
+import { Route as ApiPublicConcorrenciaSairRouteImport } from './routes/api/public/concorrencia.sair'
 
 const UsuariosRoute = UsuariosRouteImport.update({
   id: '/usuarios',
@@ -178,6 +179,12 @@ const AuthCallbackRoute = AuthCallbackRouteImport.update({
   path: '/callback',
   getParentRoute: () => AuthRoute,
 } as any)
+const ApiPublicConcorrenciaSairRoute =
+  ApiPublicConcorrenciaSairRouteImport.update({
+    id: '/api/public/concorrencia/sair',
+    path: '/api/public/concorrencia/sair',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -208,6 +215,7 @@ export interface FileRoutesByFullPath {
   '/provisao/base': typeof ProvisaoBaseRoute
   '/principal/': typeof PrincipalIndexRoute
   '/provisao/': typeof ProvisaoIndexRoute
+  '/api/public/concorrencia/sair': typeof ApiPublicConcorrenciaSairRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -236,6 +244,7 @@ export interface FileRoutesByTo {
   '/provisao/base': typeof ProvisaoBaseRoute
   '/principal': typeof PrincipalIndexRoute
   '/provisao': typeof ProvisaoIndexRoute
+  '/api/public/concorrencia/sair': typeof ApiPublicConcorrenciaSairRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -267,6 +276,7 @@ export interface FileRoutesById {
   '/provisao/base': typeof ProvisaoBaseRoute
   '/principal/': typeof PrincipalIndexRoute
   '/provisao/': typeof ProvisaoIndexRoute
+  '/api/public/concorrencia/sair': typeof ApiPublicConcorrenciaSairRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -299,6 +309,7 @@ export interface FileRouteTypes {
     | '/provisao/base'
     | '/principal/'
     | '/provisao/'
+    | '/api/public/concorrencia/sair'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -327,6 +338,7 @@ export interface FileRouteTypes {
     | '/provisao/base'
     | '/principal'
     | '/provisao'
+    | '/api/public/concorrencia/sair'
   id:
     | '__root__'
     | '/'
@@ -357,6 +369,7 @@ export interface FileRouteTypes {
     | '/provisao/base'
     | '/principal/'
     | '/provisao/'
+    | '/api/public/concorrencia/sair'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -383,6 +396,7 @@ export interface RootRouteChildren {
   RegistrosExcluidosRoute: typeof RegistrosExcluidosRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   UsuariosRoute: typeof UsuariosRoute
+  ApiPublicConcorrenciaSairRoute: typeof ApiPublicConcorrenciaSairRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -583,6 +597,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthCallbackRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/api/public/concorrencia/sair': {
+      id: '/api/public/concorrencia/sair'
+      path: '/api/public/concorrencia/sair'
+      fullPath: '/api/public/concorrencia/sair'
+      preLoaderRoute: typeof ApiPublicConcorrenciaSairRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -648,7 +669,18 @@ const rootRouteChildren: RootRouteChildren = {
   RegistrosExcluidosRoute: RegistrosExcluidosRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   UsuariosRoute: UsuariosRoute,
+  ApiPublicConcorrenciaSairRoute: ApiPublicConcorrenciaSairRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

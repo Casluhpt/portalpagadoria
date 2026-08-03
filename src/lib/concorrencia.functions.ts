@@ -92,22 +92,46 @@ export const getFilaStatus = createServerFn({ method: "GET" })
     modulo: z.string(),
   }).parse(data))
   .handler(async ({ data }) => {
-    // 1. Clean up "dead" sessions (inactive for more than 30 seconds)
-    // In a real high-scale app, this would be a cron or background worker.
-    // Here we do it "just-in-time" to keep the logic simple and self-contained.
-    const threshold = new Date(Date.now() - 30000).toISOString();
+    // 1. Clean up "dead" sessions (inactive for more than 45 seconds)
+    // Threshold calculation: 45 seconds ago
+    const threshold = new Date(Date.now() - 45000).toISOString();
     
-    // Find who we're about to remove
+    // Find who we're about to remove due to timeout
     const { data: expired } = await supabase
       .from('concorrencia_fila')
       .select('user_id, status')
       .eq('modulo', data.modulo)
-      .lt('entrou_em', threshold); // Assuming 'entrou_em' is updated as a heartbeat, but the table schema uses it as entry time.
-      // Wait, the table schema in memory doesn't have a 'heartbeat' column.
-      // I should add a heartbeat or use a more robust way to detect drops.
-      // For now, I'll stick to entry time as a proxy or just rely on manual 'sairFila'.
-      // Actually, the prompt says "If user leaves... close browser... remove automatically".
-      // This implies a heartbeat system.
+      .lt('entrou_em', threshold);
+
+    if (expired && expired.length > 0) {
+      const expiredIds = expired.map(e => e.user_id);
+      const wasActiveExpired = expired.some(e => e.status === 'ativo');
+      
+      await supabase
+        .from('concorrencia_fila')
+        .delete()
+        .in('user_id', expiredIds)
+        .eq('modulo', data.modulo);
+        
+      if (wasActiveExpired) {
+        // Promote next if active person timed out
+        const { data: next } = await supabase
+          .from('concorrencia_fila')
+          .select('id')
+          .eq('modulo', data.modulo)
+          .eq('status', 'aguardando')
+          .order('entrou_em', { ascending: true })
+          .limit(1)
+          .maybeSingle();
+
+        if (next) {
+          await supabase
+            .from('concorrencia_fila')
+            .update({ status: 'ativo', ativo_desde: new Date().toISOString() })
+            .eq('id', next.id);
+        }
+      }
+    }
     
     const { data: queue, error } = await supabase
       .from('concorrencia_fila')
