@@ -160,6 +160,7 @@ function PagamentosPage() {
               <DashboardTab />
             </TabsContent>
           </Tabs>
+        </div>
       </div>
     </div>
   );
