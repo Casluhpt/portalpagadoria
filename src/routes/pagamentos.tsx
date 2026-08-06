@@ -1170,7 +1170,18 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
         </DialogContent>
       </Dialog>
 
-      <Dialog open={entrarMut.isPending || (!!currentUserQueue && currentUserQueue.status === 'aguardando' && filaOpen)} onOpenChange={setFilaOpen}>
+      <Dialog
+        open={entrarMut.isPending || (!!currentUserQueue && currentUserQueue.status === 'aguardando' && filaOpen)}
+        onOpenChange={(open) => {
+          // Só permite fechar se o estado da fila mudar ou via botões internos.
+          // O onOpenChange(false) disparado por cliques fora/ESC é ignorado aqui.
+          if (!open) {
+             // Opcional: registrar log ou apenas ignorar o fechamento forçado
+             return;
+          }
+          setFilaOpen(open);
+        }}
+      >
         <DialogContent className="max-w-sm border-amber-200 bg-amber-50/95 dark:bg-amber-950/20 backdrop-blur-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-amber-700">
