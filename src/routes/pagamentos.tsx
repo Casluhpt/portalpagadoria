@@ -417,38 +417,21 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
 
 
 
+  const purgarBulkFn = useServerFn(await import("@/lib/pagamentos-admin.functions").then(m => m.purgarPagamentosBulkFn));
+
   const bulkDeleteMut = useMutation({
     mutationFn: async (ids: string[]) => {
-      const snapshots = data.filter((r) => ids.includes(r.id));
-      await Promise.all(ids.map((id) => deletePagamento(id)));
-      // Envio automático para Auditoria com data, hora, usuário e dados relevantes
-      await Promise.all(
-        snapshots.map((r) =>
-          logAcaoCritica({
-            acao: "exclusao_logica",
-            modulo: "Pagamentos Diversos",
-            tabela: "pagamentos_diversos",
-            registro_id: r.id,
-            descricao: `Exclusão de lançamento — ${r.empresa ?? "sem empresa"} · ${r.descricao_pagamento ?? "sem descrição"} · ${brl(r.valor_lg)}`,
-
-            metadata: {
-              excluido_em: new Date().toISOString(),
-              usuario: colaboradorNome,
-              usuario_id: userId,
-              empresa: r.empresa,
-              banco: r.banco,
-              data_credito: r.data_credito,
-              competencia: r.competencia,
-              valor_lg: r.valor_lg,
-              descricao_pagamento: r.descricao_pagamento,
-            },
-            severidade: "critico",
-          }),
-        ),
-      );
-      return ids.length;
+      const res = await purgarBulkFn({
+        data: {
+          ids,
+          colaboradorNome,
+          userId: userId || undefined
+        }
+      });
+      return res.count;
     },
     onSuccess: (n) => {
+
       invalidate();
       setSelected(new Set());
       toast.success(`${n} registro(s) excluído(s) e registrado(s) na Auditoria`);
