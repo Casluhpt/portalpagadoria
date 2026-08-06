@@ -576,7 +576,7 @@ type ModuleDef = {
 function ModuleCard({ m }: { m: ModuleDef }) {
   const Icon = m.icon;
   return (
-    <Card className="group relative overflow-hidden border-border shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-xl">
+    <Card className="group relative overflow-hidden border-border shadow-sm transition-all hover:shadow-md">
       <div className={`h-1.5 w-full bg-gradient-to-r ${m.accent}`} />
       <CardContent className="space-y-5 p-6">
         <div className="flex items-start justify-between gap-4">
