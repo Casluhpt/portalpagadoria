@@ -46,7 +46,13 @@ const toRow = (m: Partial<Provisao>): InsertRow => {
     mes: mes || new Date().toISOString().substring(0, 7)
   };
   
-  if ("data" in m) out.data = m.data ?? null;
+  if ("data" in m) {
+    out.data = m.data ?? null;
+    // Update 'mes' if 'data' was changed but 'mes' was not explicitly provided
+    if (!m.mes && m.data) {
+      out.mes = m.data.substring(0, 7);
+    }
+  }
   if ("empresa" in m) out.empresa = m.empresa ?? null;
   if ("banco" in m) out.banco = m.banco ?? null;
   if ("valor" in m) out.valor = m.valor ?? null;
