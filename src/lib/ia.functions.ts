@@ -62,11 +62,14 @@ export const perguntarIa = createServerFn({ method: "POST" })
 
       // 2. Construir mensagens para o GPT
       const messages = [
-        { role: "system", content: SYSTEM + (patterns ? `\nPadrões de Aprendizado do Usuário: ${JSON.stringify(patterns.patterns)}` : "") },
+        { 
+          role: "system", 
+          content: `${SYSTEM}${patterns ? `\nPadrões de Aprendizado do Usuário: ${JSON.stringify(patterns.patterns)}` : ""}${data.appState ? `\nCONTEXTO DO APP:\n${JSON.stringify(data.appState)}` : ""}` 
+        },
         ...(historico?.reverse().map((h: any) => ({ role: h.role, content: h.content })) || []),
         {
           role: "user",
-          content: `CONTEXTO ATUAL (MATERIAL DE APOIO):\n${data.contexto || "Sem material direto"}\n\nPERGUNTA ATUAL:\n${data.pergunta}`,
+          content: `CONTEXTO ATUAL (DOCUMENTAÇÃO/MATERIAL DE APOIO):\n${data.contexto || "Sem material direto"}\n\nPERGUNTA DO USUÁRIO:\n${data.pergunta}`,
         },
       ];
 
