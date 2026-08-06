@@ -2,13 +2,15 @@ import { useState, useEffect } from "react";
 import { Command, Home, Banknote, ShieldCheck, BookOpen, FileArchive, FileCheck2, Search, LineChart, Wallet, Settings, Users, History, AlertTriangle, X, Keyboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useSession } from "@/hooks/use-session";
+import { useShortcutLegend } from "@/hooks/use-shortcut-legend";
 import { cn } from "@/lib/utils";
 
 export function ShortcutLegend() {
   const { user } = useSession();
+  const { isEnabled } = useShortcutLegend();
   const [isVisible, setIsVisible] = useState(false);
 
-  if (!user) return null;
+  if (!user || !isEnabled) return null;
 
   const shortcutItems = [
     { key: "H", label: "Início", icon: Home },

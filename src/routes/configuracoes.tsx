@@ -11,7 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { HelpCircle, Bug, AlertCircle, MessageSquare, Send, CheckCircle2, Paperclip, X, Loader2, Settings, Users, History, ChevronRight, Activity, Cloud, ShieldCheck, Mail, Save, Code, Zap, Database, ShieldAlert, Cpu, Sparkles, RefreshCw, Trash2, Lock, Table as TableIcon, Image as ImageIcon } from "lucide-react";
+import { HelpCircle, Bug, AlertCircle, MessageSquare, Send, CheckCircle2, Paperclip, X, Loader2, Settings, Users, History, ChevronRight, Activity, Cloud, ShieldCheck, Mail, Save, Code, Zap, Database, ShieldAlert, Cpu, Sparkles, RefreshCw, Trash2, Lock, Table as TableIcon, Image as ImageIcon, Keyboard } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { usePlanilhaModo } from "@/hooks/use-planilha-modo";
 import { useState, useRef, useEffect } from "react";
@@ -24,6 +24,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { UsuariosTableWrapper as UsuariosTable } from "@/components/admin/usuarios-table";
 import { IdentidadeVisualPanel } from "@/components/admin/identidade-visual";
 
+import { useShortcutLegend } from "@/hooks/use-shortcut-legend";
 import { DocumentacaoTecnicaSection } from "@/components/documentacao-tecnica-section";
 
 
@@ -404,9 +405,9 @@ function DiagnosticPanel() {
         <Card className="hover:shadow-md transition-all">
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
-              <Database className="h-4 w-4 text-sky-600" /> Armazenamento em Nuvem
+              <Database className="h-4 w-4 text-sky-600" /> Armazenamento e Interface
             </CardTitle>
-            <CardDescription>Uso de disco e backups.</CardDescription>
+            <CardDescription>Uso de disco e preferências visuais.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <button 
@@ -437,8 +438,16 @@ function DiagnosticPanel() {
               <span className="text-sm font-medium">Último Backup</span>
               <span className="text-sm text-emerald-600 font-bold">Hoje, 03:00 AM</span>
             </button>
+            <div className="w-full flex items-center justify-between py-2 px-2 rounded-md hover:bg-muted/30 transition-colors">
+              <div className="flex items-center gap-2">
+                <Keyboard className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm font-medium text-foreground">Legenda de Atalhos</span>
+              </div>
+              <ShortcutLegendSwitch />
+            </div>
           </CardContent>
         </Card>
+
 
         <Card className="hover:shadow-md transition-all md:col-span-2">
           <CardHeader>
@@ -850,5 +859,21 @@ function AdvancedSecuritySettings() {
         </Button>
       </CardContent>
     </Card>
+  );
+}
+
+function ShortcutLegendSwitch() {
+  const { isEnabled, toggleEnabled } = useShortcutLegend();
+  return (
+    <div className="flex items-center space-x-2">
+      <Switch 
+        id="shortcut-legend-toggle" 
+        checked={isEnabled} 
+        onCheckedChange={toggleEnabled}
+      />
+      <Label htmlFor="shortcut-legend-toggle" className="text-[10px] text-muted-foreground">
+        {isEnabled ? "Ativado" : "Desativado"}
+      </Label>
+    </div>
   );
 }
