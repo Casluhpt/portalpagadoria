@@ -309,12 +309,17 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
     };
   }, [userId, currentUserQueue, heartbeatFn]);
 
-  const { data = [], isLoading } = useQuery({
+  const { data: rawData = [], isLoading } = useQuery({
     queryKey: pagamentosQueryKey,
     queryFn: fetchPagamentos,
     enabled: !!userId,
     staleTime: 30_000,
   });
+
+  const data = React.useMemo(() => {
+    // Filter out rows that were recently deleted to avoid them lingering due to cache
+    return rawData.filter(r => !selected.has(r.id));
+  }, [rawData]);
 
   const [search, setSearch] = useState("");
   const [importMode, setImportMode] = useState<"incremental" | "replace">("incremental");
