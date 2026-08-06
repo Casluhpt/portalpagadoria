@@ -137,7 +137,7 @@ export function AppSidebar() {
   const currentPath = useRouterState({ select: (r) => r.location.pathname });
   const navigate = useNavigate();
   const { user } = useSession();
-  const { roles, isAdmin, isViewer, hasAny, loading: rolesLoading } = useRoles();
+  const { roles, isAdmin, isGerente, isViewer, hasAny, loading: rolesLoading } = useRoles();
   const { setor } = useProfile();
   const { data: materiais = [] } = useQuery({
     queryKey: materialApoioQueryKey,
@@ -227,9 +227,9 @@ export function AppSidebar() {
   const canSee = (item: MenuItem): boolean => {
 
 
-    if (isAdmin) return true;
+    if (isAdmin || isGerente) return true;
     if (isViewer) return isViewerAllowed(item.url);
-    if (item.adminOnly) return isAdmin;
+    if (item.adminOnly) return isAdmin || isGerente;
     if (item.allowedRoles && item.allowedRoles.length > 0) return hasAny(item.allowedRoles);
 
     return true;
