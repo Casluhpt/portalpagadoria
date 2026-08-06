@@ -4,7 +4,8 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { HeaderActions } from "@/components/header-actions";
 import { AppLogo } from "@/components/app-logo";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { LayoutDashboard, ShieldCheck, History, AlertTriangle } from "lucide-react";
+import { LayoutDashboard, ShieldCheck, History, AlertTriangle, BarChart3 } from "lucide-react";
+import { ConciliacaoLiquidosView } from "@/components/conciliacao/conciliacao-liquidos";
 
 export const Route = createFileRoute('/conciliacao')({
   beforeLoad: async () => {
@@ -45,6 +46,9 @@ function BankReconciliationPage() {
                 </TabsTrigger>
                 <TabsTrigger value="conciliacao" className="gap-2">
                   <ShieldCheck className="h-4 w-4" /> Conciliar
+                </TabsTrigger>
+                <TabsTrigger value="liquidos" className="gap-2">
+                  <BarChart3 className="h-4 w-4" /> Conciliação de Líquidos
                 </TabsTrigger>
                 <TabsTrigger value="semanal" className="gap-2">
                   <History className="h-4 w-4" /> Conciliação Semanal
@@ -110,6 +114,10 @@ function BankReconciliationPage() {
 
               <TabsContent value="semanal" className="space-y-6">
                 <ConciliacaoSemanalView />
+              </TabsContent>
+
+              <TabsContent value="liquidos" className="space-y-6">
+                <ConciliacaoLiquidosView />
               </TabsContent>
             </Tabs>
           </main>
