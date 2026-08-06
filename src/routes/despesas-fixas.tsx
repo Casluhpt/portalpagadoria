@@ -338,7 +338,7 @@ function DespesasFixasPage() {
               {tab !== "dashboard" && (
                 <Dialog open={novoOpen} onOpenChange={setNovoOpen}>
                   <DialogTrigger asChild>
-                    <Button size="sm" className="ml-auto bg-indigo-600 hover:bg-indigo-700">
+                    <Button size="sm" className="ml-auto bg-indigo-600 hover:bg-indigo-700 shadow-md">
                       <Plus className="mr-1 h-4 w-4" /> Nova linha
                     </Button>
                   </DialogTrigger>
@@ -389,10 +389,10 @@ function DespesasFixasPage() {
                 <Input autoFocus placeholder="Descrição (ex.: João da Silva)"
                   value={novaLinha.descricao}
                   onChange={(e) => setNovaLinha({ ...novaLinha, descricao: e.target.value })}
-                  className="w-80"
+                  className="w-80 border-emerald-300"
                   onKeyDown={(e) => { if (e.key === "Enter") criarNovaLinha(); if (e.key === "Escape") setNovaLinha(null); }} />
-                <Button size="sm" onClick={criarNovaLinha} disabled={upsertMut.isPending}>Adicionar</Button>
-                <Button size="sm" variant="ghost" onClick={() => setNovaLinha(null)}>Cancelar</Button>
+                <Button size="sm" onClick={criarNovaLinha} disabled={upsertMut.isPending} className="bg-emerald-600 hover:bg-emerald-700">Adicionar</Button>
+                <Button size="sm" variant="ghost" onClick={() => setNovaLinha(null)} className="text-emerald-700">Cancelar</Button>
               </div>
             )}
 
