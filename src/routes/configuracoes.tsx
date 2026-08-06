@@ -684,6 +684,7 @@ function AdvancedSecuritySettings() {
 
   useEffect(() => {
     fetchSettings();
+    fetchIaStatus();
   }, []);
 
   if (loading) {
