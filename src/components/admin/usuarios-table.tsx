@@ -309,7 +309,7 @@ function UsuariosTable() {
             </thead>
             <tbody>
               {filtered.map((u: AdminUserRow) => (
-                <UserTableRow key={u.id} u={u} user={user} roleMut={roleMut} setorMut={setorMut} nomeMut={nomeMut} deleteMut={deleteMut} resetMut={resetMut} />
+                <UserTableRow key={u.id} u={u} user={user} roleMut={roleMut} setorMut={setorMut} nomeMut={nomeMut} deleteMut={deleteMut} resetMut={resetMut} setSelectedUserForRBAC={setSelectedUserForRBAC} />
               ))}
             </tbody>
           </table>
@@ -332,7 +332,7 @@ function UsuariosTable() {
                   </thead>
                   <tbody>
                     {users.map((u: AdminUserRow) => (
-                      <UserTableRow key={u.id} u={u} user={user} roleMut={roleMut} setorMut={setorMut} nomeMut={nomeMut} deleteMut={deleteMut} resetMut={resetMut} compact />
+                      <UserTableRow key={u.id} u={u} user={user} roleMut={roleMut} setorMut={setorMut} nomeMut={nomeMut} deleteMut={deleteMut} resetMut={resetMut} compact setSelectedUserForRBAC={setSelectedUserForRBAC} />
                     ))}
                   </tbody>
                 </table>
@@ -344,7 +344,7 @@ function UsuariosTable() {
     </div>
   );
 }
-function UserTableRow({ u, user, roleMut, setorMut, nomeMut, deleteMut, resetMut, compact }: any) {
+function UserTableRow({ u, user, roleMut, setorMut, nomeMut, deleteMut, resetMut, compact, setSelectedUserForRBAC }: any) {
   const isSelf = user?.id === u.id;
   const [pendingRole, setPendingRole] = useState<AppRole | null>(null);
   const [justificativa, setJustificativa] = useState("");
@@ -616,5 +616,192 @@ function UserTableRow({ u, user, roleMut, setorMut, nomeMut, deleteMut, resetMut
         </div>
       </td>
     </tr>
+  );
+}
+
+function RBACManagerDialog({ user, open, onOpenChange }: { user: AdminUserRow, open: boolean, onOpenChange: (open: boolean) => void }) {
+  const fetchModules = useServerFn(getAppModules);
+  const fetchUserModules = useServerFn(getUserModules);
+  const fetchUserPerms = useServerFn(getUserSpecificPermissions);
+  const toggleModuleFn = useServerFn(toggleUserModule);
+  const setPermFn = useServerFn(setUserSpecificPermission);
+  const removePermFn = useServerFn(removeUserSpecificPermission);
+
+  const { data: modules, isLoading: loadingModules } = useQuery({ 
+    queryKey: ["app-modules"], 
+    queryFn: () => fetchModules() 
+  });
+
+  const { data: userModules, isLoading: loadingUserModules, refetch: refetchUserModules } = useQuery({ 
+    queryKey: ["user-modules", user.id], 
+    queryFn: () => fetchUserModules(user.id) 
+  });
+
+  const { data: userPerms, isLoading: loadingUserPerms, refetch: refetchUserPerms } = useQuery({ 
+    queryKey: ["user-permissions", user.id], 
+    queryFn: () => fetchUserPerms(user.id) 
+  });
+
+  const handleToggleModule = async (moduleId: string, enabled: boolean) => {
+    try {
+      await toggleModuleFn({ data: { userId: user.id, moduleId, enabled } });
+      refetchUserModules();
+      toast.success(enabled ? "Módulo ativado" : "Módulo desativado");
+    } catch (e: any) {
+      toast.error("Erro: " + e.message);
+    }
+  };
+
+  const handleSetPermission = async (resource: string, action: string, isAllowed: boolean | null) => {
+    try {
+      if (isAllowed === null) {
+        await removePermFn({ data: { userId: user.id, resource, action } });
+        toast.success("Permissão restaurada ao padrão");
+      } else {
+        await setPermFn({ data: { userId: user.id, resource, action, isAllowed } });
+        toast.success(isAllowed ? "Permissão concedida" : "Permissão negada");
+      }
+      refetchUserPerms();
+    } catch (e: any) {
+      toast.error("Erro: " + e.message);
+    }
+  };
+
+  const isLoading = loadingModules || loadingUserModules || loadingUserPerms;
+
+  const RESOURCES = [
+    { id: "pagamentos", label: "Pagamentos Diversos" },
+    { id: "provisao", label: "Provisão Diária" },
+    { id: "esocial", label: "eSocial" },
+    { id: "configuracoes", label: "Configurações" },
+    { id: "auditoria", label: "Auditoria" },
+    { id: "aprovacao", label: "Processo de Aprovação" }
+  ];
+
+  const ACTIONS = [
+    { id: "read", label: "Visualizar" },
+    { id: "write", label: "Criar/Editar" },
+    { id: "delete", label: "Excluir" },
+    { id: "admin", label: "Gerenciar" }
+  ];
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <ShieldCheck className="h-5 w-5 text-indigo-600" />
+            Gestão de Acessos: {user.nome || user.email}
+          </DialogTitle>
+          <DialogDescription>
+            Controle granular de módulos e permissões específicas para este usuário.
+          </DialogDescription>
+        </DialogHeader>
+
+        {isLoading ? (
+          <div className="flex h-40 items-center justify-center">
+            <Loader2 className="h-8 w-8 animate-spin text-indigo-600" />
+          </div>
+        ) : (
+          <Accordion type="single" collapsible className="w-full">
+            <AccordionItem value="modules">
+              <AccordionTrigger className="text-sm font-semibold">
+                <div className="flex items-center gap-2">
+                  <LayoutGrid className="h-4 w-4" />
+                  Módulos Visíveis (Menu Lateral)
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="pt-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {modules?.map((m: any) => {
+                    const isEnabled = userModules?.includes(m.id);
+                    return (
+                      <div key={m.id} className="flex items-center justify-between p-3 rounded-lg border bg-muted/30">
+                        <div className="space-y-0.5">
+                          <span className="text-sm font-medium">{m.name}</span>
+                          <p className="text-[10px] text-muted-foreground">{m.description}</p>
+                        </div>
+                        <Switch 
+                          checked={isEnabled} 
+                          onCheckedChange={(val) => handleToggleModule(m.id, val)}
+                          className="data-[state=checked]:bg-indigo-600"
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="permissions">
+              <AccordionTrigger className="text-sm font-semibold">
+                <div className="flex items-center gap-2">
+                  <KeyRound className="h-4 w-4" />
+                  Permissões Granulares (Ações)
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="pt-4">
+                <div className="space-y-6">
+                  {RESOURCES.map((res) => (
+                    <div key={res.id} className="space-y-3">
+                      <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground border-l-2 border-indigo-500 pl-2">
+                        {res.label}
+                      </h4>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        {ACTIONS.map((act) => {
+                          const override = userPerms?.find((p: any) => p.resource === res.id && p.action === act.id);
+                          const status = override === undefined ? "default" : override.is_allowed ? "allowed" : "denied";
+
+                          return (
+                            <div key={act.id} className="flex items-center justify-between p-2 rounded border bg-background text-xs">
+                              <span className="font-medium">{act.label}</span>
+                              <div className="flex items-center gap-1">
+                                <Button 
+                                  variant={status === "default" ? "secondary" : "ghost"}
+                                  size="sm"
+                                  className="h-6 px-2 text-[10px]"
+                                  onClick={() => handleSetPermission(res.id, act.id, null)}
+                                >
+                                  Padrão
+                                </Button>
+                                <Button 
+                                  variant={status === "allowed" ? "default" : "outline"}
+                                  size="sm"
+                                  className={cn("h-6 px-2 text-[10px]", status === "allowed" && "bg-green-600 hover:bg-green-700")}
+                                  onClick={() => handleSetPermission(res.id, act.id, true)}
+                                >
+                                  Sim
+                                </Button>
+                                <Button 
+                                  variant={status === "denied" ? "destructive" : "outline"}
+                                  size="sm"
+                                  className="h-6 px-2 text-[10px]"
+                                  onClick={() => handleSetPermission(res.id, act.id, false)}
+                                >
+                                  Não
+                                </Button>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-6 p-4 rounded-lg bg-indigo-50 border border-indigo-100 dark:bg-indigo-950/20 dark:border-indigo-900/30">
+                  <p className="text-[11px] text-indigo-700 dark:text-indigo-300 leading-relaxed">
+                    <strong>Nota:</strong> Estas configurações sobrescrevem as permissões padrão do cargo. Se um cargo não tem permissão para excluir, mas você marcar "Sim" aqui, este usuário terá a permissão concedida individualmente.
+                  </p>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        )}
+
+        <DialogFooter className="mt-4">
+          <Button variant="outline" onClick={() => onOpenChange(false)}>Fechar</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
