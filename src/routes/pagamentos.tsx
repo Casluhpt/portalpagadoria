@@ -419,7 +419,7 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
 
 
 
-  const purgarBulkFn = useServerFn(await import("@/lib/pagamentos-admin.functions").then(m => m.purgarPagamentosBulkFn));
+  const purgarBulkFn = useServerFn(purgarPagamentosBulkFn);
 
   const bulkDeleteMut = useMutation({
     mutationFn: async (ids: string[]) => {
