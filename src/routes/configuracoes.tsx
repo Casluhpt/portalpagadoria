@@ -22,7 +22,6 @@ import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { UsuariosTableWrapper as UsuariosTable } from "@/components/admin/usuarios-table";
-import { PermissoesManagement } from "@/components/admin/permissoes-management";
 import { IdentidadeVisualPanel } from "@/components/admin/identidade-visual";
 
 import { DocumentacaoTecnicaSection } from "@/components/documentacao-tecnica-section";
@@ -60,15 +59,12 @@ function ConfiguracoesPage() {
                   <h2 className="text-2xl font-bold text-foreground">Acesso Rápido</h2>
                   <p className="text-sm text-muted-foreground">Gerencie o portal e solicite suporte técnico.</p>
                 </div>
-                <TabsList className="bg-muted/50 border border-border p-1 h-auto grid grid-cols-3 md:grid-cols-7 w-full md:w-auto">
+                <TabsList className="bg-muted/50 border border-border p-1 h-auto grid grid-cols-3 md:grid-cols-6 w-full md:w-auto">
                   <TabsTrigger value="suporte" className="py-2.5 px-4 text-xs font-semibold data-[state=active]:bg-background data-[state=active]:shadow-sm">
                     <HelpCircle className="h-3.5 w-3.5 mr-2" /> Suporte
                   </TabsTrigger>
                   <TabsTrigger value="administracao" className="py-2.5 px-4 text-xs font-semibold data-[state=active]:bg-background data-[state=active]:shadow-sm">
                     <Users className="h-3.5 w-3.5 mr-2" /> Usuários
-                  </TabsTrigger>
-                  <TabsTrigger value="permissoes" className="py-2.5 px-4 text-xs font-semibold data-[state=active]:bg-background data-[state=active]:shadow-sm">
-                    <ShieldCheck className="h-3.5 w-3.5 mr-2" /> Permissões
                   </TabsTrigger>
                   <TabsTrigger value="identidade" className="py-2.5 px-4 text-xs font-semibold data-[state=active]:bg-background data-[state=active]:shadow-sm">
                     <ImageIcon className="h-3.5 w-3.5 mr-2" /> Identidade
@@ -92,9 +88,6 @@ function ConfiguracoesPage() {
 
               <TabsContent value="administracao" className="m-0 focus-visible:outline-none">
                 <UsuariosTable />
-              </TabsContent>
-              <TabsContent value="permissoes" className="m-0 focus-visible:outline-none">
-                <PermissoesManagement />
               </TabsContent>
               <TabsContent value="identidade" className="m-0 focus-visible:outline-none">
                 <IdentidadeVisualPanel />
