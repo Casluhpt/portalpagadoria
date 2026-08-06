@@ -286,10 +286,10 @@ function PortalPage() {
   ];
 
   return (
-    <>
-      <div className="flex min-h-screen w-full bg-[#F8FAFC] dark:bg-background transition-colors duration-300">
-        <AppSidebar />
-        <div className="flex flex-1 flex-col">
+  return (
+    <div className="flex min-h-screen w-full bg-[#F8FAFC] dark:bg-background transition-colors duration-300">
+      <AppSidebar />
+      <div className="flex flex-1 flex-col">
           <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-border bg-card/90 px-4 backdrop-blur">
             <SidebarTrigger />
             <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
@@ -514,7 +514,8 @@ function PortalPage() {
           </main>
         </div>
       </div>
-    </>
+      </div>
+    </div>
   );
 }
 
