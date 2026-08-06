@@ -91,7 +91,7 @@ function AprovacaoPage() {
   const invalidate = () => qc.invalidateQueries({ queryKey });
 
   return (
-    <SidebarProvider>
+    <div className="flex min-h-screen w-full bg-background">
       <AppSidebar />
       <main className="flex-1 min-w-0">
         <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b bg-background/95 px-4 backdrop-blur">
@@ -137,7 +137,7 @@ function AprovacaoPage() {
           </Tabs>
         </div>
       </main>
-    </SidebarProvider>
+    </div>
   );
 }
 
