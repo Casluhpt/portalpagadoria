@@ -29,6 +29,16 @@ export const Route = createFileRoute("/administracao")({
       throw redirect({ to: "/auth", search: { returnTo: "/administracao" } });
     }
   },
+  head: () => ({
+    meta: [
+      { title: "Administração | Portal Pagadoria" },
+      { name: "description", content: "Gerenciamento central de comunicados e avisos globais do portal." },
+      { property: "og:title", content: "Administração | Portal Pagadoria" },
+      { property: "og:description", content: "Gerenciamento central de comunicados e avisos globais do portal." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: AdministracaoPage,
 });
 
