@@ -450,7 +450,7 @@ function DiagnosticPanel() {
             <div className="pt-4 border-t border-border mt-2 space-y-4">
               <div className="flex items-center justify-between px-2">
                 <div className="flex items-center gap-2">
-                  <Sparkles className="h-4 w-4 text-muted-foreground" />
+                  <Zap className="h-4 w-4 text-muted-foreground" />
                   <span className="text-sm font-medium text-foreground">Efeito Spotlight (Noturno)</span>
                 </div>
                 <SpotlightToggle />
@@ -534,7 +534,7 @@ function SmartConfigPanel() {
     {
       id: "inteligente" as const,
       titulo: "Modo Inteligente",
-      icone: Sparkles,
+      icone: Zap,
       desc: "Aprende padrões, sugere preenchimentos e aponta inconsistências — sempre como assistência.",
     },
   ];
@@ -543,7 +543,7 @@ function SmartConfigPanel() {
     <Card className="border-border shadow-sm">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-base">
-          <Sparkles className="h-5 w-5 text-violet-600" />
+          <Zap className="h-5 w-5 text-violet-600" />
           Planilha Inteligente
         </CardTitle>
         <CardDescription>
