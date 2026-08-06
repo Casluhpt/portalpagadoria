@@ -33,3 +33,10 @@
 - Uniformização dos ícones do menu lateral e abas de configurações para o padrão h-4.
 - Refinamento visual dos ícones de status e categorias no Histórico de Versões.
 - Ajuste geral de pesos visuais conforme o padrão "Minimalismo Translúcido".
+
+## [2.7.6] - 2026-08-06
+### Alterado
+- Padronização dos ícones de KPIs e Módulos no Dashboard para tamanhos consistentes.
+- Uniformização dos ícones do menu lateral e abas de configurações para o padrão h-4.
+- Refinamento visual dos ícones de status e categorias no Histórico de Versões.
+- Ajuste geral de pesos visuais conforme o padrão "Minimalismo Translúcido".
