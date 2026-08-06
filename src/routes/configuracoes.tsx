@@ -758,15 +758,6 @@ function AdvancedSecuritySettings() {
             O serviço de IA Assistente da Pagadoria foi permanentemente removido conforme a auditoria v2.6.8 para garantir a integridade e estabilidade dos dados.
           </p>
         </div>
-              <Switch 
-                checked={iaOnline} 
-                onCheckedChange={toggleIaStatus}
-                disabled={iaLoading}
-                className="data-[state=checked]:bg-indigo-600" 
-              />
-            </div>
-          </div>
-        </div>
 
         <div className="rounded-lg border border-border p-4 bg-muted/30 space-y-3">
           <div className="flex items-center gap-2">
