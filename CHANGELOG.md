@@ -1,5 +1,10 @@
 # Changelog - Portal da Pagadoria
 
+## [v2.7.6] - 2026-08-06
+### Adicionado
+- **Interação Minimalista:** Efeitos sutis de hover em botões, links e cards (elevação suave e brilho), reforçando a estética "Minimalismo Translúcido".
+- **Feedback Visual:** Interações específicas para elementos coloridos e componentes com transparência (glassmorphism).
+
 ## [v2.7.5] - 2026-08-06
 ### Adicionado
 - **Status do Sistema:** Indicador visual em tempo real no rodapé do menu lateral ("Sistema Online").
