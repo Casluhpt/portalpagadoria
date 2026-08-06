@@ -90,10 +90,11 @@ export const perguntarIa = createServerFn({ method: "POST" })
         // Atualiza padrões se a pergunta indicar preferências (ex: "prefiro tabelas", "me chame de Sr.")
         (async () => {
           if (data.pergunta.length > 10) {
-             const currentPatterns = patterns?.patterns || {};
-             // Lógica simples de aprendizado: se mencionar certos termos, guardamos
+             const currentPatterns = (patterns?.patterns as Record<string, any>) || {};
+             const temas = (currentPatterns.temas_frequentes as string[]) || [];
+             
              if (data.pergunta.toLowerCase().includes("ajuda com") || data.pergunta.toLowerCase().includes("como fazer")) {
-                currentPatterns.temas_frequentes = [...(currentPatterns.temas_frequentes || []), data.pergunta.substring(0, 30)].slice(-5);
+                currentPatterns.temas_frequentes = [...temas, data.pergunta.substring(0, 30)].slice(-5);
                 await supabase.from("ia_user_patterns").upsert({ user_id: userId, patterns: currentPatterns });
              }
           }
