@@ -44,23 +44,21 @@ export const Route = createFileRoute("/administracao")({
 
 function AdministracaoPage() {
   return (
-    <SidebarProvider>
-      <div className="flex min-h-screen w-full bg-muted">
-        <AppSidebar />
-        <div className="flex flex-1 flex-col">
-          <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-border bg-background/80 px-4 backdrop-blur">
-            <SidebarTrigger />
-            <h1 className="truncate text-sm font-semibold text-foreground">Administração de Comunicados</h1>
-            <div className="ml-auto">
-              <HeaderActions />
-            </div>
-          </header>
-          <main className="flex-1 space-y-6 p-6">
-            <ComunicadosPanel />
-          </main>
-        </div>
+    <div className="flex min-h-screen w-full bg-muted">
+      <AppSidebar />
+      <div className="flex flex-1 flex-col">
+        <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-border bg-background/80 px-4 backdrop-blur">
+          <SidebarTrigger />
+          <h1 className="truncate text-sm font-semibold text-foreground">Administração de Comunicados</h1>
+          <div className="ml-auto">
+            <HeaderActions />
+          </div>
+        </header>
+        <main className="flex-1 space-y-6 p-6">
+          <ComunicadosPanel />
+        </main>
       </div>
-    </SidebarProvider>
+    </div>
   );
 }
 
