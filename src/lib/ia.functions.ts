@@ -77,15 +77,15 @@ export const perguntarIa = createServerFn({ method: "POST" })
       ];
 
       // 3. Chamada à IA
-      const res = await fetch("https://ai.gateway.lovable.dev/v1/responses", {
+      const res = await fetch("https://api.lovable.ai/v1/chat/completions", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Lovable-API-Key": key,
+          "Authorization": `Bearer ${key}`,
         },
         body: JSON.stringify({
           model: "google/gemini-2.0-flash",
-          input: messages,
+          messages: messages,
         }),
       });
 
