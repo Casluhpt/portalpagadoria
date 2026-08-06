@@ -32,8 +32,8 @@ export const purgarPagamentosBulkFn = createServerFn({ method: "POST" })
       const brl = (n: number | null | undefined) =>
         n == null ? "" : Number(n).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
-      await Promise.all(
-        snapshots.map((r) =>
+      await Promise.all([
+        ...snapshots.map((r) =>
           logAcaoCritica({
             acao: "exclusao_logica",
             modulo: "Pagamentos Diversos",
@@ -53,8 +53,20 @@ export const purgarPagamentosBulkFn = createServerFn({ method: "POST" })
             },
             severidade: "critico",
           })
+        ),
+        // Record in pagamentos_audit with acao = DELETE for Registros Excluidos module
+        ...snapshots.map((r) =>
+          supabaseAdmin.from("pagamentos_audit").insert({
+            pagamento_id: r.id,
+            usuario_id: data.userId || null,
+            usuario_nome: data.colaboradorNome,
+            acao: 'DELETE',
+            snapshot: r,
+            alterado_em: new Date().toISOString(),
+            created_at: new Date().toISOString()
+          })
         )
-      );
+      ]);
     }
 
     return { success: true, count: data.ids.length };
