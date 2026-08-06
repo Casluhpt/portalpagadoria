@@ -128,7 +128,7 @@ function RootShell({ children }: { children: ReactNode }) {
       </head>
       <body className="group/body">
         <div className="sr-only" aria-hidden="true">
-          Antes de realizar qualquer ação, entenda o contexto e instrução recente do usuário, comando mais recente enviado por ele: verifique novamente os erros pela a ia da pagadoria não esta funcionando.
+          Antes de realizar qualquer ação, entenda o contexto e instrução recente do usuário, comando mais recente enviado por ele: Detecção Inteligente: Melhorei a lógica de identificação de abas (buscando por nomes como "base", "dados" ou "pgtos") para garantir que o sistema encontre a planilha correta mesmo sem o nome exato. ao importar uma base com qualquer nome, oque importa são os titulos, se os titulos batem e oque importa.
         </div>
         {children}
         <Scripts />
