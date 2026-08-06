@@ -40,6 +40,22 @@ export const perguntarIa = createServerFn({ method: "POST" })
 
     console.log("[IA] Request handler started for user:", userId);
 
+    // Verificar se a IA está online
+    const { data: config } = await supabase
+      .from("app_config")
+      .select("value")
+      .eq("key", "ia_online")
+      .single();
+    
+    const isOnline = config?.value !== false;
+    
+    if (!isOnline) {
+      return { 
+        resposta: null, 
+        erro: "IA de Suporte da Pagadoria: O serviço está temporariamente OFFLINE por manutenção administrativa." 
+      };
+    }
+
     if (!key) {
       console.error("[IA] LOVABLE_API_KEY is missing");
       return { 
