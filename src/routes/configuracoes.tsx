@@ -25,6 +25,8 @@ import { UsuariosTableWrapper as UsuariosTable } from "@/components/admin/usuari
 import { IdentidadeVisualPanel } from "@/components/admin/identidade-visual";
 
 import { useShortcutLegend } from "@/hooks/use-shortcut-legend";
+import { useSpotlightConfig } from "@/hooks/use-spotlight-config";
+import { Slider } from "@/components/ui/slider";
 import { DocumentacaoTecnicaSection } from "@/components/documentacao-tecnica-section";
 
 
@@ -444,6 +446,16 @@ function DiagnosticPanel() {
                 <span className="text-sm font-medium text-foreground">Legenda de Atalhos</span>
               </div>
               <ShortcutLegendSwitch />
+            </div>
+            <div className="pt-4 border-t border-border mt-2 space-y-4">
+              <div className="flex items-center justify-between px-2">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm font-medium text-foreground">Efeito Spotlight (Noturno)</span>
+                </div>
+                <SpotlightToggle />
+              </div>
+              <SpotlightControls />
             </div>
           </CardContent>
         </Card>
@@ -874,6 +886,58 @@ function ShortcutLegendSwitch() {
       <Label htmlFor="shortcut-legend-toggle" className="text-[10px] text-muted-foreground">
         {isEnabled ? "Ativado" : "Desativado"}
       </Label>
+    </div>
+  );
+}
+
+function SpotlightToggle() {
+  const { config, updateConfig } = useSpotlightConfig();
+  return (
+    <div className="flex items-center space-x-2">
+      <Switch 
+        id="spotlight-toggle" 
+        checked={config.enabled} 
+        onCheckedChange={(enabled) => updateConfig({ enabled })}
+      />
+      <Label htmlFor="spotlight-toggle" className="text-[10px] text-muted-foreground">
+        {config.enabled ? "Ativado" : "Desativado"}
+      </Label>
+    </div>
+  );
+}
+
+function SpotlightControls() {
+  const { config, updateConfig } = useSpotlightConfig();
+  
+  if (!config.enabled) return null;
+
+  return (
+    <div className="px-2 space-y-6 pb-2 animate-in fade-in slide-in-from-top-2 duration-300">
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <Label className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Intensidade: {config.intensity}%</Label>
+        </div>
+        <Slider 
+          value={[config.intensity]} 
+          min={0} 
+          max={30} 
+          step={1}
+          onValueChange={([val]) => updateConfig({ intensity: val })}
+        />
+      </div>
+      
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <Label className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Raio: {config.radius}px</Label>
+        </div>
+        <Slider 
+          value={[config.radius]} 
+          min={200} 
+          max={1200} 
+          step={50}
+          onValueChange={([val]) => updateConfig({ radius: val })}
+        />
+      </div>
     </div>
   );
 }
