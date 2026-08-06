@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppLogo } from "@/components/app-logo";
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { History } from "lucide-react";
+import { getPagamentosAudit } from "@/lib/pagamentos-audit.functions";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import * as XLSX from "xlsx";
@@ -362,7 +364,7 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
   const [blockedMotivo, setBlockedMotivo] = useState("");
 
   const updateMut = useMutation({
-    mutationFn: ({ id, patch }: { id: string; patch: PagamentoInput }) => updatePagamento(id, patch),
+    mutationFn: ({ id, patch, oldData }: { id: string; patch: PagamentoInput; oldData?: Pagamento }) => updatePagamento(id, patch, oldData),
     onSuccess: () => invalidate(),
     onError: (e: Error, variables) => {
       const dia = extractProvisaoFechadaDate(e.message);
@@ -383,7 +385,7 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
   const updateMutRef = useRef(updateMut);
   useEffect(() => { updateMutRef.current = updateMut; }, [updateMut]);
   const stableCellSave = React.useCallback(
-    (id: string, patch: PagamentoInput) => updateMutRef.current.mutate({ id, patch }),
+    (id: string, patch: PagamentoInput, oldData?: Pagamento) => updateMutRef.current.mutate({ id, patch, oldData }),
     [],
   );
 
@@ -518,7 +520,7 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
       if (!row) continue;
       const sug = sugerirPreenchimento(modeloRef.current, row, rotulos);
       if (!sug.length) continue;
-      stableCellSave(id, sugestoesParaPatch(sug));
+      stableCellSave(id, sugestoesParaPatch(sug), row);
       aplicadas += sug.length;
     }
     if (aplicadas) toast.success(`${aplicadas} campo(s) preenchido(s) por sugestão — revise e ajuste se necessário.`);
@@ -1040,7 +1042,8 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
                       </div>
                     </th>
                   ))}
-                </tr>
+                    <th className="w-10 border-b border-border px-2 py-2 text-left font-semibold text-muted-foreground">Audit</th>
+                  </tr>
               </thead>
               <tbody>
                 {rows.map((r, i) => {
@@ -1068,7 +1071,7 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
                           modelo={modelo}
                           rotulos={rotulos}
                           disabled={!isEditingEnabled}
-                          onApply={(patch) => stableCellSave(r.id, patch)}
+                          onApply={(patch) => stableCellSave(r.id, patch, r)}
                         />
                       )}
                       {VISIBLE_CAMPOS.map((c) => (
@@ -1082,13 +1085,16 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
                           suggest={smartOn ? suggestFn : undefined}
                         />
                       ))}
+                      <td className="border-b border-border px-2 py-1">
+                        <AuditCell pagamentoId={r.id} />
+                      </td>
                     </tr>
                   );
                 })}
 
                 {rows.length === 0 && (
                   <tr>
-                    <td colSpan={VISIBLE_CAMPOS.length + (smartOn ? 3 : 2)} className="px-4 py-16 text-center text-sm text-muted-foreground">
+                    <td colSpan={VISIBLE_CAMPOS.length + (smartOn ? 4 : 3)} className="px-4 py-16 text-center text-sm text-muted-foreground">
                       Nenhum lançamento. Clique em "Novo" ou importe uma planilha Excel.
                     </td>
                   </tr>
@@ -1259,7 +1265,7 @@ const EditableCell = React.memo(function EditableCell({
   rowId: string;
   row: Pagamento;
   col: typeof PAGAMENTO_CAMPOS[number];
-  onSave: (id: string, patch: PagamentoInput) => void;
+  onSave: (id: string, patch: PagamentoInput, oldData: Pagamento) => void;
   disabled?: boolean;
   /** Assistência inteligente: valores frequentes para o campo neste contexto. */
   suggest?: (campo: string, row: Pagamento) => string[];
@@ -1296,7 +1302,7 @@ const EditableCell = React.memo(function EditableCell({
     } else {
       parsed = value;
     }
-    onSave(rowId, { [col.key]: parsed } as PagamentoInput);
+    onSave(rowId, { [col.key]: parsed } as PagamentoInput, row);
   };
 
   const width =
@@ -1511,6 +1517,57 @@ function SmartRowCell({
         </PopoverContent>
       </Popover>
     </td>
+  );
+}
+
+function AuditCell({ pagamentoId }: { pagamentoId: string }) {
+  const getAudit = useServerFn(getPagamentosAudit);
+  const { data: logs, isLoading } = useQuery({
+    queryKey: ["pagamentos-audit", pagamentoId],
+    queryFn: () => getAudit({ data: { pagamentoId } }),
+    staleTime: 60000,
+  });
+
+  if (isLoading) return <Loader2 className="h-3 w-3 animate-spin opacity-50" />;
+  if (!logs || logs.length === 0) return null;
+
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button size="icon" variant="ghost" className="h-6 w-6 text-indigo-500 hover:text-indigo-600 hover:bg-indigo-50">
+          <History className="h-3.5 w-3.5" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-80 p-0 shadow-xl border-border bg-card/95 backdrop-blur-md">
+        <div className="p-3 border-b border-border bg-muted/30">
+          <h4 className="text-xs font-bold flex items-center gap-2">
+            <History className="h-3 w-3" /> Histórico de Alterações
+          </h4>
+        </div>
+        <div className="max-h-60 overflow-y-auto p-2 space-y-3 custom-scrollbar">
+          {logs.map((log: any) => (
+            <div key={log.id} className="text-[10px] space-y-1.5 border-l-2 border-indigo-200 pl-2 ml-1">
+              <div className="flex items-center justify-between text-muted-foreground font-medium">
+                <span>{log.usuario_nome}</span>
+                <span>{new Date(log.alterado_em).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })}</span>
+              </div>
+              <div className="space-y-1 bg-muted/20 rounded p-1.5 border border-border/50">
+                {Object.entries(log.dados_novos || {}).map(([key, value]: [string, any]) => (
+                  <div key={key} className="grid grid-cols-1 gap-0.5">
+                    <span className="font-bold text-foreground opacity-70 uppercase text-[8px]">{key.replace(/_/g, " ")}</span>
+                    <div className="flex items-center gap-1 flex-wrap">
+                      <span className="text-red-500/80 line-through truncate max-w-[100px]">{String(log.dados_anteriores?.[key] ?? "—")}</span>
+                      <ChevronRight className="h-2 w-2 text-muted-foreground shrink-0" />
+                      <span className="text-emerald-600 font-semibold truncate max-w-[100px]">{String(value ?? "—")}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </PopoverContent>
+    </Popover>
   );
 }
 
