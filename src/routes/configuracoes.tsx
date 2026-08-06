@@ -11,19 +11,17 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { HelpCircle, Bug, AlertCircle, MessageSquare, Send, CheckCircle2, Paperclip, X, Loader2, Settings, Users, History, ChevronRight, Activity, Cloud, ShieldCheck, Mail, Save, Code, Zap, Database, ShieldAlert, Cpu, Sparkles, RefreshCw, Trash2, Lock, Table as TableIcon, Image as ImageIcon, Info, User } from "lucide-react";
+import { HelpCircle, Bug, AlertCircle, MessageSquare, Send, CheckCircle2, Paperclip, X, Loader2, Settings, Users, History, ChevronRight, Activity, Cloud, ShieldCheck, Mail, Save, Code, Zap, Database, ShieldAlert, Cpu, Sparkles, RefreshCw, Trash2, Lock, Table as TableIcon, Image as ImageIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { usePlanilhaModo } from "@/hooks/use-planilha-modo";
 import { useState, useRef, useEffect } from "react";
 import { useSession } from "@/hooks/use-session";
-import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { sendSupportRequest } from "@/lib/suporte.functions";
 import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { UsuariosTableWrapper as UsuariosTable } from "@/components/admin/usuarios-table";
-import { listAdminUsers, setUserSpecificPermission, removeUserSpecificPermission, getUserSpecificPermissions, type AdminUserRow } from "@/lib/admin-users.functions";
-
 import { IdentidadeVisualPanel } from "@/components/admin/identidade-visual";
 
 import { DocumentacaoTecnicaSection } from "@/components/documentacao-tecnica-section";
@@ -71,10 +69,6 @@ function ConfiguracoesPage() {
                   <TabsTrigger value="identidade" className="py-2.5 px-4 text-xs font-semibold data-[state=active]:bg-background data-[state=active]:shadow-sm">
                     <ImageIcon className="h-3.5 w-3.5 mr-2" /> Identidade
                   </TabsTrigger>
-                  <TabsTrigger value="ia-governance" className="py-2.5 px-4 text-xs font-semibold data-[state=active]:bg-background data-[state=active]:shadow-sm">
-                    <Cpu className="h-3.5 w-3.5 mr-2" /> IA Governance
-                  </TabsTrigger>
-
                   <TabsTrigger value="documentacao" className="py-2.5 px-4 text-xs font-semibold data-[state=active]:bg-background data-[state=active]:shadow-sm">
                     <Code className="h-3.5 w-3.5 mr-2" /> Documentação
                   </TabsTrigger>
@@ -98,10 +92,6 @@ function ConfiguracoesPage() {
               <TabsContent value="identidade" className="m-0 focus-visible:outline-none">
                 <IdentidadeVisualPanel />
               </TabsContent>
-              <TabsContent value="ia-governance" className="m-0 focus-visible:outline-none">
-                <IAGovernancePanel />
-              </TabsContent>
-
 
               <TabsContent value="documentacao" className="m-0 focus-visible:outline-none">
                 <DocumentacaoTecnicaSection />
@@ -738,82 +728,68 @@ function AdvancedSecuritySettings() {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div className="space-y-4">
-          <div className="flex items-center gap-2 border-b border-border pb-2 mb-2">
-            <Cpu className="h-4 w-4 text-indigo-600" />
-            <h4 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Configurações da IA Assistente</h4>
+        <div className="rounded-lg border border-indigo-200 bg-indigo-50/50 p-4 dark:border-indigo-900/30 dark:bg-indigo-950/20 space-y-4">
+          <div className="flex items-center gap-2">
+            <Sparkles className="h-4 w-4 text-indigo-600" />
+            <h4 className="text-sm font-bold">Controle da IA Assistente</h4>
           </div>
-          
-          <div className="rounded-lg border border-indigo-200 bg-indigo-50/50 p-4 dark:border-indigo-900/30 dark:bg-indigo-950/20 space-y-4">
-            <div className="flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-indigo-600" />
-              <h4 className="text-sm font-bold">Controle Global de Disponibilidade</h4>
+          <p className="text-[11px] text-muted-foreground leading-relaxed">
+            Permite habilitar ou desabilitar globalmente a IA Assistente da Pagadoria para manutenção ou atualizações.
+          </p>
+          <div className="flex items-center justify-between py-1 border-t border-indigo-100 dark:border-indigo-900/50 pt-4">
+            <div className="space-y-0.5">
+              <Label className="text-[12px] font-semibold">Status da IA (Online/Offline)</Label>
+              <p className="text-[10px] text-muted-foreground">Define se a IA responderá aos usuários.</p>
             </div>
-            <p className="text-[11px] text-muted-foreground leading-relaxed">
-              Permite habilitar ou desabilitar globalmente a IA Assistente da Pagadoria para manutenção ou atualizações.
-            </p>
-            <div className="flex items-center justify-between py-1 border-t border-indigo-100 dark:border-indigo-900/50 pt-4">
-              <div className="space-y-0.5">
-                <Label className="text-[12px] font-semibold">Status da IA (Online/Offline)</Label>
-                <p className="text-[10px] text-muted-foreground">Define se a IA responderá aos usuários.</p>
-              </div>
-              <div className="flex items-center gap-3">
-                <span className={cn(
-                  "text-[10px] font-bold uppercase px-2 py-0.5 rounded-full",
-                  iaOnline ? "bg-emerald-100 text-emerald-700" : "bg-rose-100 text-rose-700"
-                )}>
-                  {iaOnline ? 'Online' : 'Offline'}
-                </span>
-                <Switch 
-                  checked={iaOnline} 
-                  onCheckedChange={toggleIaStatus}
-                  disabled={iaLoading}
-                  className="data-[state=checked]:bg-indigo-600" 
-                />
-              </div>
+            <div className="flex items-center gap-3">
+              <span className={cn(
+                "text-[10px] font-bold uppercase px-2 py-0.5 rounded-full",
+                iaOnline ? "bg-emerald-100 text-emerald-700" : "bg-rose-100 text-rose-700"
+              )}>
+                {iaOnline ? 'Online' : 'Offline'}
+              </span>
+              <Switch 
+                checked={iaOnline} 
+                onCheckedChange={toggleIaStatus}
+                disabled={iaLoading}
+                className="data-[state=checked]:bg-indigo-600" 
+              />
             </div>
           </div>
         </div>
 
-        <div className="space-y-4 pt-4 border-t border-border/50">
-          <div className="flex items-center gap-2 border-b border-border pb-2 mb-2">
-            <ShieldCheck className="h-4 w-4 text-indigo-600" />
-            <h4 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Políticas e Auditoria</h4>
+        <div className="rounded-lg border border-border p-4 bg-muted/30 space-y-3">
+          <div className="flex items-center gap-2">
+            <ShieldAlert className="h-4 w-4 text-amber-600" />
+            <h4 className="text-sm font-bold">Auditoria de Acesso Sensível (Pagadoria)</h4>
           </div>
+          <p className="text-[11px] text-muted-foreground leading-relaxed">
+            Todas as alterações de acesso ao setor <strong>Pagadoria</strong> são registradas com rastreabilidade total, incluindo o administrador responsável, o usuário alvo, data/hora e o estado anterior das permissões.
+          </p>
+          <Button 
+            variant="link" 
+            size="sm" 
+            className="h-auto p-0 text-indigo-600 text-[11px]"
+            onClick={() => navigate({ search: { tab: 'criticas' }, to: '/auditoria' })}
+          >
+            Ver logs de auditoria <ChevronRight className="h-3 w-3 ml-1" />
+          </Button>
+        </div>
 
-          <div className="rounded-lg border border-border p-4 bg-muted/30 space-y-3">
-            <div className="flex items-center gap-2">
-              <ShieldAlert className="h-4 w-4 text-amber-600" />
-              <h4 className="text-sm font-bold">Auditoria de Acesso Sensível (Pagadoria)</h4>
-            </div>
-            <p className="text-[11px] text-muted-foreground leading-relaxed">
-              Todas as alterações de acesso ao setor <strong>Pagadoria</strong> são registradas com rastreabilidade total, incluindo o administrador responsável, o usuário alvo, data/hora e o estado anterior das permissões.
-            </p>
-            <Button 
-              variant="link" 
-              size="sm" 
-              className="h-auto p-0 text-indigo-600 text-[11px]"
-              onClick={() => navigate({ search: { tab: 'criticas' }, to: '/auditoria' })}
-            >
-              Ver logs de auditoria <ChevronRight className="h-3 w-3 ml-1" />
-            </Button>
+        <div className="rounded-lg border border-border p-4 bg-muted/30 space-y-4">
+          <div className="flex items-center gap-2">
+            <Lock className="h-4 w-4 text-indigo-600" />
+            <h4 className="text-sm font-bold">Política de Sessão Única</h4>
           </div>
-
-          <div className="rounded-lg border border-border p-4 bg-muted/30 space-y-4">
-            <div className="flex items-center gap-2">
-              <Lock className="h-4 w-4 text-indigo-600" />
-              <h4 className="text-sm font-bold">Política de Sessão Única</h4>
+          <p className="text-[11px] text-muted-foreground leading-relaxed">
+            Garante que cada usuário possua apenas uma sessão ativa simultaneamente, preservando a integridade da fila virtual e segurança do login.
+          </p>
+          <div className="flex items-center justify-between py-1 border-t border-border pt-4">
+            <div className="space-y-0.5">
+              <Label className="text-[12px] font-semibold">Encerrar sessão anterior automaticamente</Label>
+              <p className="text-[10px] text-muted-foreground">Novos logins derrubam acessos antigos no mesmo usuário.</p>
             </div>
-            <p className="text-[11px] text-muted-foreground leading-relaxed">
-              Garante que cada usuário possua apenas uma sessão ativa simultaneamente, preservando a integridade da fila virtual e segurança do login.
-            </p>
-            <div className="flex items-center justify-between py-1 border-t border-border pt-4">
-              <div className="space-y-0.5">
-                <Label className="text-[12px] font-semibold">Encerrar sessão anterior automaticamente</Label>
-                <p className="text-[10px] text-muted-foreground">Novos logins derrubam acessos antigos no mesmo usuário.</p>
-              </div>
-              <Switch checked={true} disabled className="data-[state=checked]:bg-indigo-600" />
-            </div>
+            <Switch checked={true} disabled className="data-[state=checked]:bg-indigo-600" />
           </div>
         </div>
 
@@ -876,141 +852,3 @@ function AdvancedSecuritySettings() {
     </Card>
   );
 }
-
-function IAGovernancePanel() {
-  const { user } = useSession();
-  const isAdmin = user?.email === 'lucas.chaves.lc2001@gmail.com';
-  const listFn = useServerFn(listAdminUsers);
-  const setPermFn = useServerFn(setUserSpecificPermission);
-  const removePermFn = useServerFn(removeUserSpecificPermission);
-  const qc = useQueryClient();
-
-  const { data: users = [], isLoading } = useQuery({
-    queryKey: ["admin-users-ia"],
-    queryFn: () => listFn({}),
-  });
-
-  const handleToggleIA = async (userId: string, isAllowed: boolean | null) => {
-    try {
-      if (isAllowed === null) {
-        await removePermFn({ data: { userId, resource: "ia_assistente", action: "use" } });
-        toast.success("Permissão da IA restaurada ao padrão");
-      } else {
-        await setPermFn({ data: { userId, resource: "ia_assistente", action: "use", isAllowed } });
-        toast.success(isAllowed ? "Acesso à IA concedido" : "Acesso à IA revogado");
-      }
-      qc.invalidateQueries({ queryKey: ["user-permissions", userId] });
-    } catch (e: any) {
-      toast.error("Erro ao alterar permissão: " + e.message);
-    }
-  };
-
-  if (!isAdmin) {
-    return (
-      <Card className="border-rose-200 bg-rose-50 dark:bg-rose-950/20 dark:border-rose-900/30">
-        <CardContent className="flex flex-col items-center justify-center p-12 text-center">
-          <ShieldAlert className="mb-4 h-16 w-16 text-rose-600" />
-          <h2 className="mb-2 text-2xl font-bold text-rose-900">Acesso Restrito</h2>
-          <p className="text-rose-700">Esta área de governança de IA é exclusiva para o administrador mestre.</p>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Cpu className="h-5 w-5 text-indigo-600" />
-          Governança e Permissões de IA
-        </CardTitle>
-        <CardDescription>
-          Controle quais usuários e perfis podem interagir com a IA Assistente da Pagadoria.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="rounded-lg border border-amber-200 bg-amber-50/50 p-4 dark:border-amber-900/30 dark:bg-amber-950/20">
-          <div className="flex items-center gap-2 mb-2">
-            <Info className="h-4 w-4 text-amber-600" />
-            <span className="text-sm font-bold">Diretriz de Segurança</span>
-          </div>
-          <p className="text-xs text-muted-foreground leading-relaxed">
-            As permissões definidas aqui sobrescrevem as regras globais de perfil. 
-            Usuários com acesso negado não visualizarão o botão da IA e não poderão realizar perguntas, 
-            mesmo que pertençam a perfis administrativos.
-          </p>
-        </div>
-
-        {isLoading ? (
-          <div className="flex h-20 items-center justify-center">
-            <Loader2 className="h-6 w-6 animate-spin text-indigo-600" />
-          </div>
-        ) : (
-          <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {users.map((u) => (
-                <UserIAPermissionCard key={u.id} user={u} onToggle={handleToggleIA} />
-              ))}
-            </div>
-          </div>
-        )}
-      </CardContent>
-    </Card>
-  );
-}
-
-function UserIAPermissionCard({ user, onToggle }: { user: AdminUserRow, onToggle: (uid: string, allowed: boolean | null) => void }) {
-  const fetchUserPerms = useServerFn(getUserSpecificPermissions);
-  const { data: perms } = useQuery({
-    queryKey: ["user-permissions", user.id],
-    queryFn: () => fetchUserPerms({ data: user.id })
-  });
-
-  const iaPerm = perms?.find((p: any) => p.resource === "ia_assistente" && p.action === "use");
-  const status = iaPerm === undefined ? "default" : iaPerm.is_allowed ? "allowed" : "denied";
-
-  return (
-    <div className="flex flex-col gap-3 p-4 rounded-lg border bg-muted/30">
-      <div className="flex items-center gap-3">
-        <div className="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center shrink-0">
-          <User className="h-4 w-4 text-indigo-600" />
-        </div>
-        <div className="min-w-0">
-          <p className="text-sm font-bold truncate">{user.nome || user.email}</p>
-          <p className="text-[10px] text-muted-foreground truncate">{user.roles.join(', ')}</p>
-        </div>
-      </div>
-      
-      <div className="flex items-center justify-between gap-2 pt-2 border-t border-border/50">
-        <span className="text-[10px] font-bold uppercase text-muted-foreground">Acesso IA</span>
-        <div className="flex items-center gap-1">
-          <Button 
-            variant={status === "default" ? "secondary" : "ghost"} 
-            size="sm" 
-            className="h-7 px-2 text-[10px]"
-            onClick={() => onToggle(user.id, null)}
-          >
-            Padrão
-          </Button>
-          <Button 
-            variant={status === "allowed" ? "default" : "outline"} 
-            size="sm" 
-            className={cn("h-7 px-2 text-[10px]", status === "allowed" && "bg-emerald-600 hover:bg-emerald-700 text-white")}
-            onClick={() => onToggle(user.id, true)}
-          >
-            Sim
-          </Button>
-          <Button 
-            variant={status === "denied" ? "destructive" : "outline"} 
-            size="sm" 
-            className="h-7 px-2 text-[10px]"
-            onClick={() => onToggle(user.id, false)}
-          >
-            Não
-          </Button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
