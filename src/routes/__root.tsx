@@ -19,6 +19,7 @@ import { PlanilhaOnboarding } from "@/components/planilha-onboarding";
 import { FaviconManager } from "@/components/favicon-manager";
 import { PortalFooter } from "@/components/portal-footer";
 import { FloatingAI } from "@/components/FloatingAI";
+import { IABannerOffline } from "@/components/ia-banner-offline";
 
 
 import { AuthGate } from "@/components/auth-gate";
@@ -125,7 +126,7 @@ function RootShell({ children }: { children: ReactNode }) {
       </head>
       <body className="group/body">
         <div className="sr-only" aria-hidden="true">
-          Antes de realizar qualquer ação, entenda o contexto e instrução recente do usuário, comando mais recente enviado por ele: Correção e Evolução da IA Assistente – Portal da Pagadoria V2.7.5. IA integrada ao contexto (path, setor, permissões RBAC), com memória de conversa e respeito integral às regras de negócio.
+          Antes de realizar qualquer ação, entenda o contexto e instrução recente do usuário, comando mais recente enviado por ele: Adicione um banner no portal avisando quando a IA estiver Offline para o meu usuário, com instruções do que fazer em seguida.
         </div>
         {children}
         <Scripts />
@@ -150,6 +151,7 @@ function RootComponent() {
         <BackButton />
         {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
         <Outlet />
+        <IABannerOffline />
         <FloatingAI />
         <PortalFooter />
 
