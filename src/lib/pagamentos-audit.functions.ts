@@ -9,6 +9,7 @@ export const getPagamentosAudit = createServerFn({ method: "GET" })
       .from("pagamentos_audit" as any)
       .select("*")
       .eq("pagamento_id", data.pagamentoId)
+      .eq("acao", "UPDATE")
       .order("alterado_em", { ascending: false });
     
     if (error) throw error;

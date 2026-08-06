@@ -124,6 +124,7 @@ export async function updatePagamento(id: string, patch: PagamentoInput, oldData
         pagamento_id: id,
         usuario_id: userId,
         usuario_nome: userNome,
+        acao: 'UPDATE',
         dados_anteriores: previous,
         dados_novos: changes
       });
