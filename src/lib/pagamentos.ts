@@ -87,15 +87,49 @@ export async function createPagamentosBulk(
   return data?.length ?? 0;
 }
 
-export async function updatePagamento(id: string, patch: PagamentoInput): Promise<Pagamento> {
+export async function updatePagamento(id: string, patch: PagamentoInput, oldData?: Pagamento): Promise<Pagamento> {
+  const sanitizedPatch = sanitize(patch);
+  
   const { data, error } = await supabase
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     .from(TABLE as any)
-    .update(sanitize(patch))
+    .update(sanitizedPatch)
     .eq("id", id)
     .select("*")
     .single();
+    
   if (error) throw error;
+
+  // Registrar auditoria se houver dados antigos para comparação
+  if (oldData) {
+    const { data: session } = await supabase.auth.getSession();
+    const userId = session?.session?.user?.id;
+    const userNome = session?.session?.user?.user_metadata?.nome || session?.session?.user?.email;
+
+    // Filtra apenas o que mudou
+    const changes: Record<string, any> = {};
+    const previous: Record<string, any> = {};
+    
+    Object.keys(sanitizedPatch).forEach(key => {
+      const newVal = (sanitizedPatch as any)[key];
+      const oldVal = (oldData as any)[key];
+      if (newVal !== oldVal) {
+        changes[key] = newVal;
+        previous[key] = oldVal;
+      }
+    });
+
+    if (Object.keys(changes).length > 0) {
+      await supabase.from("pagamentos_audit" as any).insert({
+        pagamento_id: id,
+        usuario_id: userId,
+        usuario_nome: userNome,
+        dados_anteriores: previous,
+        dados_novos: changes
+      });
+    }
+  }
+
   return data as unknown as Pagamento;
 }
 
