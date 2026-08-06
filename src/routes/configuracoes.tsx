@@ -11,7 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { HelpCircle, Bug, AlertCircle, MessageSquare, Send, CheckCircle2, Paperclip, X, Loader2, Settings, Users, History, ChevronRight, Activity, Cloud, ShieldCheck, Mail, Save, Code, Zap, Database, ShieldAlert, Cpu, RefreshCw, Trash2, Lock, Table as TableIcon, Image as ImageIcon, Keyboard } from "lucide-react";
+import { HelpCircle, Bug, AlertCircle, MessageSquare, Send, CheckCircle2, Paperclip, X, Loader2, Settings, Users, History, ChevronRight, Activity, Cloud, ShieldCheck, Mail, Save, Code, Zap, Database, ShieldAlert, Cpu, RefreshCw, Trash2, Lock, Table as TableIcon, Image as ImageIcon, Keyboard, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { usePlanilhaModo } from "@/hooks/use-planilha-modo";
 import { useState, useRef, useEffect } from "react";
@@ -749,26 +749,15 @@ function AdvancedSecuritySettings() {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div className="rounded-lg border border-indigo-200 bg-indigo-50/50 p-4 dark:border-indigo-900/30 dark:bg-indigo-950/20 space-y-4">
+        <div className="rounded-lg border border-indigo-200 bg-indigo-50/50 p-4 dark:border-indigo-900/30 dark:bg-indigo-950/20 space-y-2">
           <div className="flex items-center gap-2">
-            <Sparkles className="h-4 w-4 text-indigo-600" />
-            <h4 className="text-sm font-bold">Controle da IA Assistente</h4>
+            <ShieldAlert className="h-4 w-4 text-indigo-600" />
+            <h4 className="text-sm font-bold">IA Assistente Desativada</h4>
           </div>
           <p className="text-[11px] text-muted-foreground leading-relaxed">
-            Permite habilitar ou desabilitar globalmente a IA Assistente da Pagadoria para manutenção ou atualizações.
+            O serviço de IA Assistente da Pagadoria foi permanentemente removido conforme a auditoria v2.6.8 para garantir a integridade e estabilidade dos dados.
           </p>
-          <div className="flex items-center justify-between py-1 border-t border-indigo-100 dark:border-indigo-900/50 pt-4">
-            <div className="space-y-0.5">
-              <Label className="text-[12px] font-semibold">Status da IA (Online/Offline)</Label>
-              <p className="text-[10px] text-muted-foreground">Define se a IA responderá aos usuários.</p>
-            </div>
-            <div className="flex items-center gap-3">
-              <span className={cn(
-                "text-[10px] font-bold uppercase px-2 py-0.5 rounded-full",
-                iaOnline ? "bg-emerald-100 text-emerald-700" : "bg-rose-100 text-rose-700"
-              )}>
-                {iaOnline ? 'Online' : 'Offline'}
-              </span>
+        </div>
               <Switch 
                 checked={iaOnline} 
                 onCheckedChange={toggleIaStatus}
