@@ -122,8 +122,8 @@ export async function updatePagamento(id: string, patch: PagamentoInput, oldData
     if (Object.keys(changes).length > 0) {
       await supabase.from("pagamentos_audit" as any).insert({
         pagamento_id: id,
-        usuario_id: userId,
-        usuario_nome: userNome,
+        user_id: userId,
+        user_nome: userNome,
         acao: 'UPDATE',
         dados_anteriores: previous,
         dados_novos: changes

@@ -59,10 +59,10 @@ export const purgarPagamentosBulkFn = createServerFn({ method: "POST" })
         ),
         // Record in pagamentos_audit with acao = DELETE for Registros Excluidos module
         ...snapshots.map((r) =>
-          supabaseAdmin.from("pagamentos_audit").insert({
+          supabaseAdmin.from("pagamentos_audit" as any).insert({
             pagamento_id: r.id,
-            usuario_id: data.userId || null,
-            usuario_nome: data.colaboradorNome,
+            user_id: data.userId || null,
+            user_nome: data.colaboradorNome,
             acao: 'DELETE',
             snapshot: r,
             alterado_em: new Date().toISOString(),
