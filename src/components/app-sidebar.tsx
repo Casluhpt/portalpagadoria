@@ -51,7 +51,6 @@ import type { ComponentType } from "react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/hooks/use-session";
-import { useAppPermissions } from "@/hooks/use-app-permissions";
 import { useRoles, type AppRole } from "@/hooks/use-roles";
 import { useProfile } from "@/hooks/use-profile";
 import { useQuery } from "@tanstack/react-query";
@@ -138,7 +137,6 @@ export function AppSidebar() {
   const navigate = useNavigate();
   const { user } = useSession();
   const { roles, isAdmin, isViewer, hasAny, loading: rolesLoading } = useRoles();
-  const { hasPermission } = useAppPermissions();
   const { setor } = useProfile();
   const { data: materiais = [] } = useQuery({
     queryKey: materialApoioQueryKey,
@@ -226,29 +224,12 @@ export function AppSidebar() {
   }, [isViewer, rolesLoading, currentPath, navigate]);
 
   const canSee = (item: MenuItem): boolean => {
-    const resourceMap: Record<string, string> = {
-      "/principal": "principal",
-      "/provisao": "provisao",
-      "/conciliacao": "conciliacao",
-      "/pagamentos": "pagamentos",
-      "/despesas-fixas": "despesas",
-      "/esocial": "esocial",
-      "/anexos": "anexos",
-      "/exportacao": "exportacao",
-      "/administracao": "administracao",
-      "/fechamento": "fechamento",
-      "/divergencias": "divergencias",
-      "/material-apoio": "material-apoio",
-      "/auditoria": "auditoria",
-    };
+
 
     if (isAdmin) return true;
     if (isViewer) return isViewerAllowed(item.url);
     if (item.adminOnly) return isAdmin;
     if (item.allowedRoles && item.allowedRoles.length > 0) return hasAny(item.allowedRoles);
-
-    const resource = resourceMap[item.url];
-    if (resource) return hasPermission(resource, 'view');
 
     return true;
   };
