@@ -344,6 +344,14 @@ function UsuariosTable() {
           </div>
         )}
       </div>
+      
+      {selectedUserForRBAC && (
+        <RBACManagerDialog 
+          user={selectedUserForRBAC} 
+          open={!!selectedUserForRBAC} 
+          onOpenChange={(open) => !open && setSelectedUserForRBAC(null)} 
+        />
+      )}
     </div>
   );
 }
