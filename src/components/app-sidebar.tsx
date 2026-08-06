@@ -49,17 +49,6 @@ import {
 import { toast } from "sonner";
 import type { ComponentType } from "react";
 
-const roleLabel: Record<string, string> = {
-  administrador: "Administrador",
-  auditor: "Auditor",
-  operacional: "Operacional",
-  criador_competencia: "Criador",
-  consulta: "Consulta",
-  viewer: "Viewer",
-  visitante: "Visitante",
-  gerente: "Gerente",
-};
-
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/hooks/use-session";
 import { useRoles, type AppRole } from "@/hooks/use-roles";
@@ -341,7 +330,7 @@ export function AppSidebar() {
                     {rolesLoading
                       ? "Carregando perfil…"
                       : primaryRole
-                      ? (roleLabel as Record<string, string>)[primaryRole] || primaryRole
+                      ? (roleLabel as any)[primaryRole] || primaryRole
                       : "Sem perfil atribuído"}
                     {setor ? (
                       <span className="ml-1 normal-case text-sidebar-foreground/70">· {setor}</span>
