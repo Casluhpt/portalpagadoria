@@ -371,36 +371,27 @@ function DiagnosticPanel() {
             <CardDescription>Status em tempo real do processamento.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <button 
-              onClick={() => toast.info("Latência normal. Nenhuma ação necessária.")}
-              className="w-full flex items-center justify-between py-2 border-b border-border hover:bg-muted/30 px-2 rounded-md transition-colors text-left"
-            >
+            <div className="w-full flex items-center justify-between py-2 border-b border-border px-2 rounded-md text-left">
               <div className="flex items-center gap-2">
                 <Activity className="h-4 w-4 text-muted-foreground" />
                 <span className="text-sm font-medium">Latência de API</span>
               </div>
               <span className="text-sm text-emerald-600 font-bold">32ms (Excelente)</span>
-            </button>
-            <button 
-              onClick={() => toast.info("Carga otimizada pelo sistema.")}
-              className="w-full flex items-center justify-between py-2 border-b border-border hover:bg-muted/30 px-2 rounded-md transition-colors text-left"
-            >
+            </div>
+            <div className="w-full flex items-center justify-between py-2 border-b border-border px-2 rounded-md text-left">
               <div className="flex items-center gap-2">
                 <Activity className="h-4 w-4 text-muted-foreground" />
                 <span className="text-sm font-medium">Carga da CPU</span>
               </div>
               <span className="text-sm text-muted-foreground font-bold">12%</span>
-            </button>
-            <button 
-              onClick={() => navigate({ to: "/auditoria", search: { tab: "log" } })}
-              className="w-full flex items-center justify-between py-2 hover:bg-muted/30 px-2 rounded-md transition-colors text-left"
-            >
+            </div>
+            <div className="w-full flex items-center justify-between py-2 px-2 rounded-md text-left">
               <div className="flex items-center gap-2">
                 <AlertCircle className="h-4 w-4 text-muted-foreground" />
                 <span className="text-sm font-medium">Erros detectados (24h)</span>
               </div>
               <span className="text-sm text-muted-foreground font-bold">0</span>
-            </button>
+            </div>
           </CardContent>
         </Card>
 
