@@ -29,28 +29,36 @@ export function reportLovableError(error: unknown, context: Record<string, unkno
 
   // Track in local store for diagnostic panel
   try {
-    useErrorLogStore.getState().addError({
-      message,
-      stack,
-      route,
-      severity: 'error'
-    });
+    const store = useErrorLogStore.getState();
+    if (store && typeof store.addError === 'function') {
+      store.addError({
+        message,
+        stack,
+        route,
+        severity: 'error'
+      });
+    }
   } catch (e) {
-    console.error("Failed to log error to store:", e);
+    // Fail silently to avoid infinite error loops
+    console.warn("Silent failure in error logging store:", e);
   }
 
-  window.__lovableEvents?.captureException?.(
-    error,
-    {
-      source: "react_error_boundary",
-      route,
-      ...context,
-    },
-    {
-      mechanism: "react_error_boundary",
-      handled: false,
-      severity: "error",
-    },
-  );
+  // Ensure window.__lovableEvents exists before calling to prevent crash
+  try {
+    window.__lovableEvents?.captureException?.(
+      error,
+      {
+        source: "react_error_boundary",
+        route,
+        ...context,
+      },
+      {
+        mechanism: "react_error_boundary",
+        handled: false,
+        severity: "error",
+      },
+    );
+  } catch (e) {
+    console.error("Critical failure in window.__lovableEvents:", e);
+  }
 }
-
