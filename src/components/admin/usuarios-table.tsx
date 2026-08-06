@@ -69,7 +69,7 @@ function UsuariosTable() {
   const [inviteOpen, setInviteOpen] = useState(false);
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteNome, setInviteNome] = useState("");
-  const [inviteRole, setInviteRole] = useState<"administrador" | "viewer" | "visitante">("viewer");
+  const [inviteRole, setInviteRole] = useState<AppRole>("viewer");
 
   const { data = [], isLoading, error, refetch, isFetching } = useQuery({
     queryKey: ["admin-users"],
@@ -106,7 +106,7 @@ function UsuariosTable() {
   });
 
   const roleMut = useMutation({
-    mutationFn: (vars: { userId: string; role: "administrador" | "viewer" | "visitante" }) =>
+    mutationFn: (vars: { userId: string; role: AppRole }) =>
       setRoleFn({ data: vars }),
     onSuccess: () => {
       toast.success("Perfil atualizado.");
@@ -136,7 +136,7 @@ function UsuariosTable() {
   });
 
   const inviteMut = useMutation({
-    mutationFn: (vars: { email: string; role: "administrador" | "viewer" | "visitante"; nome?: string }) =>
+    mutationFn: (vars: { email: string; role: AppRole; nome?: string }) =>
       inviteFn({ data: { ...vars, redirectTo: `${window.location.origin}/reset-password` } }),
     onSuccess: () => {
       toast.success("Convite enviado com sucesso.");
@@ -251,7 +251,7 @@ function UsuariosTable() {
             </div>
             <div className="space-y-1">
               <Label>Perfil</Label>
-              <Select value={inviteRole} onValueChange={(v) => setInviteRole(v as "administrador" | "viewer" | "visitante")}>
+              <Select value={inviteRole} onValueChange={(v) => setInviteRole(v as AppRole)}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="viewer">
@@ -259,6 +259,12 @@ function UsuariosTable() {
                   </SelectItem>
                   <SelectItem value="administrador">
                     <span className="inline-flex items-center gap-1"><ShieldCheck className="h-3 w-3" /> Administração</span>
+                  </SelectItem>
+                  <SelectItem value="gerente">
+                    <span className="inline-flex items-center gap-1"><User className="h-3 w-3" /> Gerente</span>
+                  </SelectItem>
+                  <SelectItem value="auditor">
+                    <span className="inline-flex items-center gap-1"><ScrollText className="h-3 w-3" /> Auditor</span>
                   </SelectItem>
                   <SelectItem value="visitante">
                     <span className="inline-flex items-center gap-1"><UserPlus className="h-3 w-3" /> Visitante</span>

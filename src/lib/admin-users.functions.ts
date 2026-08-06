@@ -3,7 +3,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 export type PresenceStatus = "online" | "ausente" | "offline";
 
-export const ALLOWED_SETORES = ["FOLHA/FÉRIAS", "RESCISÃO", "BENEFICIOS", "PAGADORIA", "GERÊNCIA/VISITANTE"] as const;
+export const ALLOWED_SETORES = ["FOLHA/FÉRIAS", "RESCISÃO", "BENEFICIOS", "PAGADORIA", "GERENTE", "VISITANTE"] as const;
 export type Setor = (typeof ALLOWED_SETORES)[number];
 
 export type AdminUserRow = {
@@ -105,7 +105,7 @@ export const resetUserPassword = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-const ALLOWED_ROLES = ["administrador", "viewer", "visitante"] as const;
+const ALLOWED_ROLES = ["administrador", "auditor", "operacional", "criador_competencia", "consulta", "viewer", "visitante", "gerente"] as const;
 
 export const setUserRole = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
