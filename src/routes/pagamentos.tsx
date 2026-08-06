@@ -83,6 +83,16 @@ import { purgarPagamentosBulkFn } from "@/lib/pagamentos-admin.functions";
 
 
 export const Route = createFileRoute("/pagamentos")({
+  head: () => ({
+    meta: [
+      { title: "Pagamentos Diversos | Portal Pagadoria" },
+      { name: "description", content: "Controle financeiro, conciliação e gestão de pagamentos diversos." },
+      { property: "og:title", content: "Pagamentos Diversos | Portal Pagadoria" },
+      { property: "og:description", content: "Controle financeiro, conciliação e gestão de pagamentos diversos." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
   component: PagamentosPage,
 });
 
