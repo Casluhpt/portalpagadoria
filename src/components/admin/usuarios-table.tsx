@@ -32,7 +32,7 @@ import { Label } from "@/components/ui/label";
 
 export function UsuariosTableWrapper() {
   return (
-    <RestrictedArea area="Administração de Usuários" role="administrador">
+    <RestrictedArea area="Administração de Usuários" anyOf={["administrador", "gerente"]}>
       <UsuariosTable />
     </RestrictedArea>
   );
