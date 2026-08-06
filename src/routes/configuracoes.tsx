@@ -389,7 +389,7 @@ function DiagnosticPanel() {
               <span className="text-sm text-muted-foreground font-bold">12%</span>
             </button>
             <button 
-              onClick={() => navigate({ to: "/auditoria" })}
+              onClick={() => navigate({ to: "/auditoria", search: { tab: "log" } })}
               className="w-full flex items-center justify-between py-2 hover:bg-muted/30 px-2 rounded-md transition-colors text-left"
             >
               <div className="flex items-center gap-2">
