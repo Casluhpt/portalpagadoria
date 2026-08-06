@@ -1,3 +1,5 @@
+import { useErrorLogStore } from "@/hooks/use-error-log-store";
+
 type LovableErrorOptions = {
   mechanism?: "manual" | "onerror" | "unhandledrejection" | "react_error_boundary";
   handled?: boolean;
@@ -20,11 +22,28 @@ declare global {
 
 export function reportLovableError(error: unknown, context: Record<string, unknown> = {}) {
   if (typeof window === "undefined") return;
+
+  const message = error instanceof Error ? error.message : String(error);
+  const stack = error instanceof Error ? error.stack : undefined;
+  const route = window.location.pathname;
+
+  // Track in local store for diagnostic panel
+  try {
+    useErrorLogStore.getState().addError({
+      message,
+      stack,
+      route,
+      severity: 'error'
+    });
+  } catch (e) {
+    console.error("Failed to log error to store:", e);
+  }
+
   window.__lovableEvents?.captureException?.(
     error,
     {
       source: "react_error_boundary",
-      route: window.location.pathname,
+      route,
       ...context,
     },
     {
@@ -34,3 +53,4 @@ export function reportLovableError(error: unknown, context: Record<string, unkno
     },
   );
 }
+
