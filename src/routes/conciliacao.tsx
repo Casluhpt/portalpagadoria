@@ -327,8 +327,19 @@ function ConciliacaoSemanalView() {
 
   const exportMut = useMutation({
     mutationFn: () => {
-      if (new Date(dataFim) < new Date(dataIni)) {
+      if (!dataIni || !dataFim) {
+        throw new Error("Por favor, selecione as datas de início e fim.");
+      }
+      const dIni = new Date(dataIni);
+      const dFim = new Date(dataFim);
+      if (dFim < dIni) {
         throw new Error("A data fim não pode ser anterior à data de início.");
+      }
+      // Opcional: Impedir períodos muito longos se necessário (ex: > 3 anos)
+      const diffTime = Math.abs(dFim.getTime() - dIni.getTime());
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      if (diffDays > 365) {
+        toast.warning("Períodos superiores a 1 ano podem demorar para processar.");
       }
       return exportarConciliacaoSemanal(dataIni, dataFim, user!.id, formato);
     },
