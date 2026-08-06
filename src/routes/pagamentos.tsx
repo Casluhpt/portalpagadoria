@@ -272,6 +272,9 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
 
       if (currentStatus === 'ativo') {
         setFilaOpen(false);
+      } else if (currentStatus === 'aguardando') {
+        // Se estiver aguardando, garante que o modal esteja aberto
+        setFilaOpen(true);
       }
     } else {
       setPosicaoFila(null);
@@ -1170,8 +1173,24 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
         </DialogContent>
       </Dialog>
 
-      <Dialog open={entrarMut.isPending || (!!currentUserQueue && currentUserQueue.status === 'aguardando' && filaOpen)} onOpenChange={setFilaOpen}>
-        <DialogContent className="max-w-sm border-amber-200 bg-amber-50/95 dark:bg-amber-950/20 backdrop-blur-md">
+      <Dialog
+        open={entrarMut.isPending || (!!currentUserQueue && currentUserQueue.status === 'aguardando' && filaOpen)}
+        onOpenChange={(open) => {
+          // Só permite fechar se o estado da fila mudar ou via botões internos.
+          // O onOpenChange(false) disparado por cliques fora/ESC é ignorado aqui.
+          if (!open) {
+             // Opcional: registrar log ou apenas ignorar o fechamento forçado
+             return;
+          }
+          setFilaOpen(open);
+        }}
+      >
+        <DialogContent 
+          className="max-w-sm border-amber-200 bg-amber-50/95 dark:bg-amber-950/20 backdrop-blur-md"
+          onPointerDownOutside={(e) => e.preventDefault()}
+          onInteractOutside={(e) => e.preventDefault()}
+          onEscapeKeyDown={(e) => e.preventDefault()}
+        >
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-amber-700">
               <Timer className="h-5 w-5 animate-pulse" /> Fila de Edição
@@ -1197,12 +1216,22 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
             </div>
           </div>
           <DialogFooter className="flex-col sm:flex-col gap-2">
-            <Button variant="outline" className="w-full border-amber-300 text-amber-800 hover:bg-amber-100" onClick={() => setFilaOpen(false)}>
+            <Button 
+              variant="outline" 
+              className="w-full border-amber-300 text-amber-800 hover:bg-amber-100" 
+              onClick={() => {
+                setFilaOpen(false);
+                toast.info("Você minimizou o modal da fila. Ele reabrirá se houver atualizações importantes.");
+              }}
+            >
               Aguardar em Segundo Plano
             </Button>
             <Button
               className="w-full gap-2 bg-red-600 font-bold text-white hover:bg-red-700"
-              onClick={() => { setFilaOpen(false); setConfirmSaidaFila(true); }}
+              onClick={() => { 
+                // setFilaOpen(false); // Mantemos a fila aberta para evitar fechar antes da confirmação
+                setConfirmSaidaFila(true); 
+              }}
             >
               <LogOut className="h-4 w-4" /> Sair da Fila
             </Button>
