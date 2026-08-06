@@ -9,7 +9,7 @@ export type ConciliacaoItem = {
   tipo: string;
   origem: "importado" | "base";
   id?: string;
-  matchId?: string;
+  matchId?: string | null;
   nivel?: number;
   diferenca?: number;
   sugestao?: ConciliacaoItem[];
@@ -21,6 +21,8 @@ export type ConciliacaoItem = {
   competencia?: string;
   motivoDivergencia?: string;
   status?: "Conciliado" | "Divergente" | "Recusado" | "Pendente";
+  score?: number;
+  valorPortal?: number;
 };
 
 export async function fetchCompetenciasDisponiveis() {
@@ -52,11 +54,7 @@ export async function executarConciliacao(
   importados: any[], 
   basePortal: any[],
   userId: string
-) {
-  // A inteligência do sistema deve identificar automaticamente o tipo de arquivo
-  // Mas para o processamento, tratamos 'importados' como a extração bancária
-  // e 'basePortal' como o arquivo gerado pelo Portal (ou dados da DB)
-
+): Promise<ConciliacaoItem[]> {
   const normalizadosBanco = importados.map(imp => {
     const valor = Number(String(imp.Valor || imp.valor || imp.VALOR || imp["Valor Total"] || 0)
       .replace(/[^\d.,]/g, "").replace(",", "."));
@@ -94,18 +92,15 @@ export async function executarConciliacao(
     };
   });
 
-  const resultados = normalizadosBanco.map(imp => {
-    // 3. Conciliação inteligente
-    // Comparação considerando Empresa, Banco, Data, Valor, Descrição, Documento, Favorecido
-
+  const resultados: ConciliacaoItem[] = normalizadosBanco.map(imp => {
     const matches = normalizadosPortal.map(p => {
       let score = 0;
       if (p.empresa.toLowerCase() === imp.empresa.toLowerCase()) score += 20;
-      if (p.valor === imp.valor) score += 40;
+      if (Math.abs(p.valor - imp.valor) < 0.01) score += 40;
       
       const dataImp = new Date(imp.data);
       const dataP = new Date(p.data);
-      const diffDays = Math.abs(differenceInDays(dataImp, dataP));
+      const diffDays = isNaN(dataImp.getTime()) || isNaN(dataP.getTime()) ? 10 : Math.abs(differenceInDays(dataImp, dataP));
       
       if (diffDays === 0) score += 15;
       else if (diffDays <= 2) score += 10;
@@ -126,16 +121,16 @@ export async function executarConciliacao(
         matchId: bestMatch.item.id, 
         nivel: 1, 
         diferenca: 0,
-        status: "Conciliado" as const,
-        score: bestMatch.score
+        status: "Conciliado",
+        score: bestMatch.score,
+        valorPortal: bestMatch.item.valor
       };
     }
 
     if (bestMatch && bestMatch.score >= 40) {
-      // 8. Inteligência para identificação das diferenças
       let motivo = "Divergência de valores ou data";
       const diff = imp.valor - bestMatch.item.valor;
-      if (Math.abs(diff) < 20) motivo = "Possível tarifa bancária";
+      if (Math.abs(diff) < 20 && Math.abs(diff) > 0) motivo = "Possível tarifa bancária";
       else if (diff > 0 && diff < 100) motivo = "Possíveis juros/IOF";
 
       return { 
@@ -143,7 +138,7 @@ export async function executarConciliacao(
         matchId: bestMatch.item.id, 
         nivel: 3, 
         diferenca: diff,
-        status: "Divergente" as const,
+        status: "Divergente",
         motivoDivergencia: motivo,
         score: bestMatch.score,
         valorPortal: bestMatch.item.valor
@@ -155,12 +150,12 @@ export async function executarConciliacao(
       matchId: null, 
       nivel: 5, 
       diferenca: imp.valor,
-      status: "Pendente" as const,
-      score: 0
+      status: "Pendente",
+      score: 0,
+      valorPortal: 0
     };
   });
 
-  // 2. Gerar Excel com os resultados
   const wb = XLSX.utils.book_new();
   
   const ws1Data = resultados.map(r => ({
@@ -169,7 +164,7 @@ export async function executarConciliacao(
     "Banco": r.banco,
     "Descrição": r.descricao,
     "Valor Banco": r.valor,
-    "Valor Portal": (r as any).valorPortal || 0,
+    "Valor Portal": r.valorPortal || 0,
     "Diferença": r.diferenca,
     "Status": r.status,
     "Motivo": r.motivoDivergencia || "",
