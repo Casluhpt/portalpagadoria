@@ -38,7 +38,10 @@ export const perguntarIa = createServerFn({ method: "POST" })
     const key = process.env["LOVABLE_API_KEY"];
     const { userId, supabase } = context;
 
+    console.log("[IA] Request handler started for user:", userId);
+
     if (!key) {
+      console.error("[IA] LOVABLE_API_KEY is missing");
       return { 
         resposta: null, 
         erro: "IA de Suporte da Pagadoria: Falha na configuração de segurança (Chave ausente)." 
@@ -87,6 +90,8 @@ export const perguntarIa = createServerFn({ method: "POST" })
       });
 
       if (!res.ok) {
+        const errorText = await res.text();
+        console.error(`[IA] Gateway error: ${res.status}`, errorText);
         throw new Error(`Gateway error: ${res.status}`);
       }
 
