@@ -96,7 +96,8 @@ export const perguntarIa = createServerFn({ method: "POST" })
       }
 
       const result = await res.json();
-      const resposta = result.choices?.[0]?.message?.content || result.output_text || "";
+      console.log("[IA] Gateway response raw:", JSON.stringify(result));
+      const resposta = result.output || result.choices?.[0]?.message?.content || result.output_text || "";
 
       if (!resposta) {
         return { resposta: "Desculpe, tive uma instabilidade momentânea. Pode repetir?", erro: null };
