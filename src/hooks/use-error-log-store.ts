@@ -1,4 +1,3 @@
-
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
@@ -21,7 +20,7 @@ export const useErrorLogStore = create<ErrorLogState>()(
   persist(
     (set) => ({
       errors: [],
-      addError: (error) => set((state) => ({
+      addError: (error) => set((state: ErrorLogState) => ({
         errors: [
           {
             ...error,
