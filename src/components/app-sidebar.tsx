@@ -102,6 +102,7 @@ const mainItems: MenuItem[] = [
   { title: "Provisão Diária", url: "/provisao", icon: Wallet, match: (p: string) => p.startsWith("/provisao"), restricted: true, adminOnly: true, group: "operacao" },
   
   { title: "Conciliação Bancária", url: "/conciliacao", icon: ShieldCheck, match: (p: string) => p.startsWith("/conciliacao"), restricted: true, adminOnly: true, group: "financeiro" },
+  { title: "Conciliação de Líquidos", url: "/conciliacao", icon: BarChart3, match: (p: string) => p === "/conciliacao" && window.location.hash === "#liquidos", group: "financeiro", adminOnly: true },
   { title: "Pagamentos Diversos", url: "/pagamentos", icon: Banknote, match: (p: string) => p.startsWith("/pagamentos"), group: "financeiro" },
   { title: "Despesas Fixas", url: "/despesas-fixas", icon: Wallet, match: (p: string) => p.startsWith("/despesas-fixas"), group: "financeiro" },
   { title: "Controle E-Social", url: "/esocial", icon: FileSpreadsheet, match: (p: string) => p.startsWith("/esocial"), group: "financeiro" },
@@ -318,6 +319,13 @@ export function AppSidebar() {
           <SidebarGroupContent>
             {user ? (
               <div className="space-y-2 px-2 pb-2 group-data-[collapsible=icon]:hidden">
+                <div className="flex items-center justify-between px-2 py-1 mb-1 rounded-md bg-emerald-500/10 border border-emerald-500/20 shadow-[0_0_10px_rgba(16,185,129,0.1)]">
+                  <div className="flex items-center gap-1.5">
+                    <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-tight">Sistema Online</span>
+                  </div>
+                  <span className="text-[9px] text-emerald-600/70 font-mono">v2.7.5</span>
+                </div>
                 <LiveClock />
                 <div className="rounded-md bg-sidebar-accent/40 px-2 py-1.5 text-xs text-sidebar-foreground">
                   <div className="flex items-center gap-2">
@@ -337,8 +345,8 @@ export function AppSidebar() {
                     ) : null}
                   </div>
                 </div>
-                <Button variant="outline" size="sm" className="w-full" onClick={() => setConfirmSignOut(true)}>
-                  <LogOut className="mr-2 h-4 w-4" /> Sair
+                <Button variant="outline" size="sm" className="w-full h-8 text-xs font-semibold" onClick={() => setConfirmSignOut(true)}>
+                  <LogOut className="mr-2 h-3 w-3" /> Sair
                 </Button>
               </div>
             ) : (
