@@ -738,68 +738,82 @@ function AdvancedSecuritySettings() {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div className="rounded-lg border border-indigo-200 bg-indigo-50/50 p-4 dark:border-indigo-900/30 dark:bg-indigo-950/20 space-y-4">
-          <div className="flex items-center gap-2">
-            <Sparkles className="h-4 w-4 text-indigo-600" />
-            <h4 className="text-sm font-bold">Controle da IA Assistente</h4>
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 border-b border-border pb-2 mb-2">
+            <Cpu className="h-4 w-4 text-indigo-600" />
+            <h4 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Configurações da IA Assistente</h4>
           </div>
-          <p className="text-[11px] text-muted-foreground leading-relaxed">
-            Permite habilitar ou desabilitar globalmente a IA Assistente da Pagadoria para manutenção ou atualizações.
-          </p>
-          <div className="flex items-center justify-between py-1 border-t border-indigo-100 dark:border-indigo-900/50 pt-4">
-            <div className="space-y-0.5">
-              <Label className="text-[12px] font-semibold">Status da IA (Online/Offline)</Label>
-              <p className="text-[10px] text-muted-foreground">Define se a IA responderá aos usuários.</p>
+          
+          <div className="rounded-lg border border-indigo-200 bg-indigo-50/50 p-4 dark:border-indigo-900/30 dark:bg-indigo-950/20 space-y-4">
+            <div className="flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-indigo-600" />
+              <h4 className="text-sm font-bold">Controle Global de Disponibilidade</h4>
             </div>
-            <div className="flex items-center gap-3">
-              <span className={cn(
-                "text-[10px] font-bold uppercase px-2 py-0.5 rounded-full",
-                iaOnline ? "bg-emerald-100 text-emerald-700" : "bg-rose-100 text-rose-700"
-              )}>
-                {iaOnline ? 'Online' : 'Offline'}
-              </span>
-              <Switch 
-                checked={iaOnline} 
-                onCheckedChange={toggleIaStatus}
-                disabled={iaLoading}
-                className="data-[state=checked]:bg-indigo-600" 
-              />
+            <p className="text-[11px] text-muted-foreground leading-relaxed">
+              Permite habilitar ou desabilitar globalmente a IA Assistente da Pagadoria para manutenção ou atualizações.
+            </p>
+            <div className="flex items-center justify-between py-1 border-t border-indigo-100 dark:border-indigo-900/50 pt-4">
+              <div className="space-y-0.5">
+                <Label className="text-[12px] font-semibold">Status da IA (Online/Offline)</Label>
+                <p className="text-[10px] text-muted-foreground">Define se a IA responderá aos usuários.</p>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className={cn(
+                  "text-[10px] font-bold uppercase px-2 py-0.5 rounded-full",
+                  iaOnline ? "bg-emerald-100 text-emerald-700" : "bg-rose-100 text-rose-700"
+                )}>
+                  {iaOnline ? 'Online' : 'Offline'}
+                </span>
+                <Switch 
+                  checked={iaOnline} 
+                  onCheckedChange={toggleIaStatus}
+                  disabled={iaLoading}
+                  className="data-[state=checked]:bg-indigo-600" 
+                />
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="rounded-lg border border-border p-4 bg-muted/30 space-y-3">
-          <div className="flex items-center gap-2">
-            <ShieldAlert className="h-4 w-4 text-amber-600" />
-            <h4 className="text-sm font-bold">Auditoria de Acesso Sensível (Pagadoria)</h4>
+        <div className="space-y-4 pt-4 border-t border-border/50">
+          <div className="flex items-center gap-2 border-b border-border pb-2 mb-2">
+            <ShieldCheck className="h-4 w-4 text-indigo-600" />
+            <h4 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Políticas e Auditoria</h4>
           </div>
-          <p className="text-[11px] text-muted-foreground leading-relaxed">
-            Todas as alterações de acesso ao setor <strong>Pagadoria</strong> são registradas com rastreabilidade total, incluindo o administrador responsável, o usuário alvo, data/hora e o estado anterior das permissões.
-          </p>
-          <Button 
-            variant="link" 
-            size="sm" 
-            className="h-auto p-0 text-indigo-600 text-[11px]"
-            onClick={() => navigate({ search: { tab: 'criticas' }, to: '/auditoria' })}
-          >
-            Ver logs de auditoria <ChevronRight className="h-3 w-3 ml-1" />
-          </Button>
-        </div>
 
-        <div className="rounded-lg border border-border p-4 bg-muted/30 space-y-4">
-          <div className="flex items-center gap-2">
-            <Lock className="h-4 w-4 text-indigo-600" />
-            <h4 className="text-sm font-bold">Política de Sessão Única</h4>
-          </div>
-          <p className="text-[11px] text-muted-foreground leading-relaxed">
-            Garante que cada usuário possua apenas uma sessão ativa simultaneamente, preservando a integridade da fila virtual e segurança do login.
-          </p>
-          <div className="flex items-center justify-between py-1 border-t border-border pt-4">
-            <div className="space-y-0.5">
-              <Label className="text-[12px] font-semibold">Encerrar sessão anterior automaticamente</Label>
-              <p className="text-[10px] text-muted-foreground">Novos logins derrubam acessos antigos no mesmo usuário.</p>
+          <div className="rounded-lg border border-border p-4 bg-muted/30 space-y-3">
+            <div className="flex items-center gap-2">
+              <ShieldAlert className="h-4 w-4 text-amber-600" />
+              <h4 className="text-sm font-bold">Auditoria de Acesso Sensível (Pagadoria)</h4>
             </div>
-            <Switch checked={true} disabled className="data-[state=checked]:bg-indigo-600" />
+            <p className="text-[11px] text-muted-foreground leading-relaxed">
+              Todas as alterações de acesso ao setor <strong>Pagadoria</strong> são registradas com rastreabilidade total, incluindo o administrador responsável, o usuário alvo, data/hora e o estado anterior das permissões.
+            </p>
+            <Button 
+              variant="link" 
+              size="sm" 
+              className="h-auto p-0 text-indigo-600 text-[11px]"
+              onClick={() => navigate({ search: { tab: 'criticas' }, to: '/auditoria' })}
+            >
+              Ver logs de auditoria <ChevronRight className="h-3 w-3 ml-1" />
+            </Button>
+          </div>
+
+          <div className="rounded-lg border border-border p-4 bg-muted/30 space-y-4">
+            <div className="flex items-center gap-2">
+              <Lock className="h-4 w-4 text-indigo-600" />
+              <h4 className="text-sm font-bold">Política de Sessão Única</h4>
+            </div>
+            <p className="text-[11px] text-muted-foreground leading-relaxed">
+              Garante que cada usuário possua apenas uma sessão ativa simultaneamente, preservando a integridade da fila virtual e segurança do login.
+            </p>
+            <div className="flex items-center justify-between py-1 border-t border-border pt-4">
+              <div className="space-y-0.5">
+                <Label className="text-[12px] font-semibold">Encerrar sessão anterior automaticamente</Label>
+                <p className="text-[10px] text-muted-foreground">Novos logins derrubam acessos antigos no mesmo usuário.</p>
+              </div>
+              <Switch checked={true} disabled className="data-[state=checked]:bg-indigo-600" />
+            </div>
           </div>
         </div>
 
