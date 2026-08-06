@@ -56,7 +56,7 @@ export function ShortcutLegend() {
             </button>
 
             <div className="mb-8 flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/20 text-primary shadow-glow ring-1 ring-primary/30">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/20 text-primary ring-1 ring-primary/30">
                 <Command className="h-6 w-6" />
               </div>
               <div>

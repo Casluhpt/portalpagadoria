@@ -154,7 +154,7 @@ export function FloatingAI() {
           {/* Header */}
           <div className="flex items-center justify-between bg-primary/20 p-4 border-b border-white/10 backdrop-blur-md">
             <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/20 shadow-glow ring-1 ring-primary/30">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/20 ring-1 ring-primary/30">
                 <Bot className="h-5 w-5 text-primary" />
               </div>
               <div>
@@ -192,7 +192,7 @@ export function FloatingAI() {
               {chatMessages.length === 0 && (
                 <div className="flex flex-col items-center justify-center pt-20 text-center space-y-4 opacity-60">
                   <div className="relative">
-                    <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full" />
+                    <div className="absolute inset-0 bg-primary/5 blur-xl rounded-full" />
                     <Sparkles className="relative h-12 w-12 text-primary/60" />
                   </div>
                   <div className="space-y-1">
@@ -284,7 +284,7 @@ export function FloatingAI() {
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
-          "group relative flex h-14 w-14 items-center justify-center rounded-full bg-primary shadow-[0_8px_32px_rgba(var(--primary-rgb),0.4)] transition-all duration-500 hover:scale-110 active:scale-95 ring-1 ring-white/20 overflow-hidden",
+          "group relative flex h-14 w-14 items-center justify-center rounded-full bg-primary shadow-lg transition-all duration-500 hover:scale-105 active:scale-95 ring-1 ring-white/20 overflow-hidden",
           isOpen && "rotate-90 scale-90"
         )}
       >

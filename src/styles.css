@@ -107,7 +107,7 @@
     radial-gradient(circle at 85% 80%, color-mix(in oklab, oklch(0.72 0.18 320) 20%, transparent), transparent 55%),
     linear-gradient(160deg, oklch(0.99 0.01 300), oklch(0.95 0.04 305) 45%, oklch(0.92 0.06 320));
   --shadow-elegant: 0 10px 40px -10px color-mix(in oklab, oklch(0.52 0.22 295) 15%, transparent), 0 4px 20px -12px color-mix(in oklab, oklch(0.52 0.22 295) 10%, transparent);
-  --shadow-glow: 0 0 30px color-mix(in oklab, oklch(0.72 0.18 300) 20%, transparent);
+  --shadow-glow: 0 0 15px color-mix(in oklab, oklch(0.72 0.18 300) 10%, transparent);
 
   --sidebar: oklch(0.98 0.02 300);
   --sidebar-foreground: oklch(0.3 0.08 295);
@@ -152,7 +152,7 @@
     radial-gradient(circle at 85% 80%, color-mix(in oklab, oklch(0.6 0.2 330) 20%, transparent), transparent 55%),
     linear-gradient(160deg, oklch(0.14 0.03 288), oklch(0.11 0.02 285) 50%, oklch(0.16 0.04 300));
   --shadow-elegant: 0 20px 50px -12px color-mix(in oklab, oklch(0 0 0) 60%, transparent), 0 8px 24px -16px color-mix(in oklab, oklch(0 0 0) 50%, transparent);
-  --shadow-glow: 0 0 40px color-mix(in oklab, oklch(0.78 0.22 300) 25%, transparent);
+  --shadow-glow: 0 0 20px color-mix(in oklab, oklch(0.78 0.22 300) 15%, transparent);
 
   --sidebar: oklch(0.14 0.025 285);
   --sidebar-foreground: oklch(0.97 0.01 285);
@@ -184,7 +184,7 @@
   }
 
   a:hover, button:hover, [role="button"]:hover, .interactive-card:hover, .glass-card:hover {
-    transform: translateY(-2px) scale(1.01);
+    transform: translateY(-1px);
     filter: brightness(1.05);
   }
 
@@ -193,9 +193,8 @@
   }
 
   /* Translucent elements (glassmorphism) minimalist interaction */
-  .bg-white\/10:hover, .bg-white\/20:hover, .bg-black\/10:hover, .bg-black\/20:hover, .backdrop-blur-md:hover {
-    background-color: color-mix(in oklab, currentColor 5%, transparent);
-    backdrop-filter: blur(12px) brightness(1.1);
+  .bg-white\/10:hover, .bg-white\/20:hover, .bg-black\/10:hover, .bg-black\/20:hover {
+    background-color: color-mix(in oklab, currentColor 2%, transparent);
   }
 }
 
