@@ -349,8 +349,8 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
   const createMut = useMutation({
     mutationFn: (qty: number) =>
       qty <= 1
-        ? createPagamento({ arquivo_remessa: `REMESSA_${new Date().toISOString().split('T')[0]}` }, colaboradorNome, userId).then(() => 1)
-        : createPagamentosBulk(Array.from({ length: qty }, () => ({ arquivo_remessa: `REMESSA_${new Date().toISOString().split('T')[0]}` })), colaboradorNome, userId),
+        ? createPagamento({ arquivo_remessa: data.length > 0 ? (data[0].arquivo_remessa || "") : "" }, colaboradorNome, userId).then(() => 1)
+        : createPagamentosBulk(Array.from({ length: qty }, () => ({ arquivo_remessa: data.length > 0 ? (data[0].arquivo_remessa || "") : "" })), colaboradorNome, userId),
     onSuccess: (n) => { invalidate(); toast.success(`${n} lançamento(s) adicionado(s)`); },
     onError: (e: Error) => toast.error("Falha ao inserir: " + e.message),
   });
@@ -605,7 +605,9 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
       }
 
       raw.forEach((row, i) => {
-        const rec: Record<string, unknown> = {};
+        const rec: Record<string, unknown> = {
+          arquivo_remessa: data.length > 0 ? (data[0].arquivo_remessa || "") : ""
+        };
         for (const [rawKey, rawVal] of Object.entries(row)) {
           const key = String(rawKey);
           if (key.startsWith("__EMPTY")) continue;
