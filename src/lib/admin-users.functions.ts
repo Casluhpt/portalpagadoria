@@ -23,12 +23,18 @@ export type AdminUserRow = {
 };
 
 async function assertAdmin(context: { supabase: any; userId: string }) {
-  const { data, error } = await context.supabase.rpc("has_role", {
+  const { data: isAdmin, error: roleError } = await context.supabase.rpc("has_role", {
     _user_id: context.userId,
     _role: "administrador",
   });
-  if (error) throw new Error("Falha ao validar permissão");
-  if (!data) throw new Error("Acesso restrito a administradores");
+  
+  const { data: isGerente, error: gerenteError } = await context.supabase.rpc("has_role", {
+    _user_id: context.userId,
+    _role: "gerente",
+  });
+
+  if (roleError || gerenteError) throw new Error("Falha ao validar permissão");
+  if (!isAdmin && !isGerente) throw new Error("Acesso restrito a administradores e gerentes");
 }
 
 export const listAdminUsers = createServerFn({ method: "GET" })
