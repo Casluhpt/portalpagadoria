@@ -79,6 +79,8 @@ const HIDDEN_COLUMN_KEYS = new Set<string>([
   "valor_itau","status_itau","diferenca_bank_itau","natureza_pagamento",
 ]);
 const VISIBLE_CAMPOS = PAGAMENTO_CAMPOS.filter((c) => !HIDDEN_COLUMN_KEYS.has(c.key));
+import { purgarPagamentosBulkFn } from "@/lib/pagamentos-admin.functions";
+
 
 export const Route = createFileRoute("/pagamentos")({
   component: PagamentosPage,
@@ -417,38 +419,21 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
 
 
 
+  const purgarBulkFn = useServerFn(purgarPagamentosBulkFn);
+
   const bulkDeleteMut = useMutation({
     mutationFn: async (ids: string[]) => {
-      const snapshots = data.filter((r) => ids.includes(r.id));
-      await Promise.all(ids.map((id) => deletePagamento(id)));
-      // Envio automático para Auditoria com data, hora, usuário e dados relevantes
-      await Promise.all(
-        snapshots.map((r) =>
-          logAcaoCritica({
-            acao: "exclusao_logica",
-            modulo: "Pagamentos Diversos",
-            tabela: "pagamentos_diversos",
-            registro_id: r.id,
-            descricao: `Exclusão de lançamento — ${r.empresa ?? "sem empresa"} · ${r.descricao_pagamento ?? "sem descrição"} · ${brl(r.valor_lg)}`,
-
-            metadata: {
-              excluido_em: new Date().toISOString(),
-              usuario: colaboradorNome,
-              usuario_id: userId,
-              empresa: r.empresa,
-              banco: r.banco,
-              data_credito: r.data_credito,
-              competencia: r.competencia,
-              valor_lg: r.valor_lg,
-              descricao_pagamento: r.descricao_pagamento,
-            },
-            severidade: "critico",
-          }),
-        ),
-      );
-      return ids.length;
+      const res = await purgarBulkFn({
+        data: {
+          ids,
+          colaboradorNome,
+          userId: userId || undefined
+        }
+      });
+      return res.count;
     },
     onSuccess: (n) => {
+
       invalidate();
       setSelected(new Set());
       toast.success(`${n} registro(s) excluído(s) e registrado(s) na Auditoria`);
@@ -1883,9 +1868,15 @@ function FechamentoCompetenciaButton({ onComplete, disabled, data }: { onComplet
       XLSX.utils.book_append_sheet(wb, ws, "Fechamento");
       XLSX.writeFile(wb, `fechamento-${nome}-${format(new Date(), "dd-MM-yyyy")}.xlsx`);
 
-      // Database closure and cleanup
-      const { fecharCompetenciaPagamentos } = await import("@/lib/fechamento-pagamentos");
-      await fecharCompetenciaPagamentos(nome, user.id, data);
+      // Database closure and cleanup via Server Function
+      const { fecharCompetenciaPagamentosFn } = await import("@/lib/fechamento-pagamentos.functions");
+      await fecharCompetenciaPagamentosFn({
+        data: {
+          nome,
+          usuarioId: user.id,
+          registros: data
+        }
+      });
       await logAcaoCritica({
         acao: "fechamento_competencia",
         modulo: "Pagamentos Diversos",
