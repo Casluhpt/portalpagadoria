@@ -651,6 +651,48 @@ export type Database = {
         }
         Relationships: []
       }
+      ia_conversas: {
+        Row: {
+          content: string
+          created_at: string | null
+          id: string
+          role: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          id?: string
+          role: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          id?: string
+          role?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      ia_user_patterns: {
+        Row: {
+          patterns: Json
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          patterns?: Json
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          patterns?: Json
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       lancamentos: {
         Row: {
           account_group: string | null
