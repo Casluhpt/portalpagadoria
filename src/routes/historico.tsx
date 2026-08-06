@@ -100,7 +100,7 @@ function Content() {
   const [search, setSearch] = useState("");
   const [tipo, setTipo] = useState<"todos" | Version["tipo"]>("todos");
 
-  const { data = [], isLoading, error } = useQuery({
+  const { data: rawData = [], isLoading, error } = useQuery({
     queryKey: ["app-versions"],
     queryFn: async (): Promise<Version[]> => {
       const { data, error } = await (supabase as any)
@@ -111,9 +111,11 @@ function Content() {
       return (data ?? []).map((v: any) => ({
         ...v,
         itens: Array.isArray(v.itens) ? v.itens : [],
-      })).sort((a: Version, b: Version) => compareVersions(a.versao, b.versao));
+      }));
     },
   });
+
+  const data = useMemo(() => [...rawData].sort((a: Version, b: Version) => compareVersions(a.versao, b.versao)), [rawData]);
 
   const versaoAtual = data[0]?.versao;
 
