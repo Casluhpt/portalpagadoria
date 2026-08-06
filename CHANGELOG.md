@@ -26,3 +26,17 @@
 ## [v2.7.2] - 2026-08-03
 ### Adicionado
 - **Automação:** Sincronização automática entre as instruções do sistema e o histórico de versões.
+
+## [2.7.6] - 2026-08-06
+### Alterado
+- Padronização dos ícones de KPIs e Módulos no Dashboard para tamanhos consistentes.
+- Uniformização dos ícones do menu lateral e abas de configurações para o padrão h-4.
+- Refinamento visual dos ícones de status e categorias no Histórico de Versões.
+- Ajuste geral de pesos visuais conforme o padrão "Minimalismo Translúcido".
+
+## [2.7.6] - 2026-08-06
+### Alterado
+- Padronização dos ícones de KPIs e Módulos no Dashboard para tamanhos consistentes.
+- Uniformização dos ícones do menu lateral e abas de configurações para o padrão h-4.
+- Refinamento visual dos ícones de status e categorias no Histórico de Versões.
+- Ajuste geral de pesos visuais conforme o padrão "Minimalismo Translúcido".
