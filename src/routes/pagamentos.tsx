@@ -349,8 +349,8 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
   const createMut = useMutation({
     mutationFn: (qty: number) =>
       qty <= 1
-        ? createPagamento({}, colaboradorNome, userId).then(() => 1)
-        : createPagamentosBulk(Array.from({ length: qty }, () => ({})), colaboradorNome, userId),
+        ? createPagamento({ arquivo_remessa: `REMESSA_${new Date().toISOString().split('T')[0]}` }, colaboradorNome, userId).then(() => 1)
+        : createPagamentosBulk(Array.from({ length: qty }, () => ({ arquivo_remessa: `REMESSA_${new Date().toISOString().split('T')[0]}` })), colaboradorNome, userId),
     onSuccess: (n) => { invalidate(); toast.success(`${n} lançamento(s) adicionado(s)`); },
     onError: (e: Error) => toast.error("Falha ao inserir: " + e.message),
   });
