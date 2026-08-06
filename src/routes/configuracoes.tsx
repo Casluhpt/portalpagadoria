@@ -122,7 +122,6 @@ function ConfiguracoesPage() {
           </main>
         </div>
       </div>
-    </div>
   );
 }
 
