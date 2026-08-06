@@ -925,33 +925,41 @@ export type Database = {
       }
       pagamentos_audit: {
         Row: {
-          acao: string
-          created_at: string
+          alterado_em: string | null
+          dados_anteriores: Json | null
+          dados_novos: Json | null
           id: string
-          pagamento_id: string | null
-          snapshot: Json | null
-          user_id: string | null
-          user_nome: string | null
+          pagamento_id: string
+          usuario_id: string | null
+          usuario_nome: string | null
         }
         Insert: {
-          acao: string
-          created_at?: string
+          alterado_em?: string | null
+          dados_anteriores?: Json | null
+          dados_novos?: Json | null
           id?: string
-          pagamento_id?: string | null
-          snapshot?: Json | null
-          user_id?: string | null
-          user_nome?: string | null
+          pagamento_id: string
+          usuario_id?: string | null
+          usuario_nome?: string | null
         }
         Update: {
-          acao?: string
-          created_at?: string
+          alterado_em?: string | null
+          dados_anteriores?: Json | null
+          dados_novos?: Json | null
           id?: string
-          pagamento_id?: string | null
-          snapshot?: Json | null
-          user_id?: string | null
-          user_nome?: string | null
+          pagamento_id?: string
+          usuario_id?: string | null
+          usuario_nome?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "pagamentos_audit_pagamento_id_fkey"
+            columns: ["pagamento_id"]
+            isOneToOne: false
+            referencedRelation: "pagamentos_diversos"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       pagamentos_diversos: {
         Row: {
