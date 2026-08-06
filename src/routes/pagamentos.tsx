@@ -349,8 +349,8 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
   const createMut = useMutation({
     mutationFn: (qty: number) =>
       qty <= 1
-        ? createPagamento({ arquivo_remessa: data.length > 0 ? (data[0].arquivo_remessa || "") : "" }, colaboradorNome, userId).then(() => 1)
-        : createPagamentosBulk(Array.from({ length: qty }, () => ({ arquivo_remessa: data.length > 0 ? (data[0].arquivo_remessa || "") : "" })), colaboradorNome, userId),
+        ? createPagamento({}, colaboradorNome, userId).then(() => 1)
+        : createPagamentosBulk(Array.from({ length: qty }, () => ({})), colaboradorNome, userId),
     onSuccess: (n) => { invalidate(); toast.success(`${n} lançamento(s) adicionado(s)`); },
     onError: (e: Error) => toast.error("Falha ao inserir: " + e.message),
   });
@@ -605,9 +605,7 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
       }
 
       raw.forEach((row, i) => {
-        const rec: Record<string, unknown> = {
-          arquivo_remessa: data.length > 0 ? (data[0].arquivo_remessa || "") : ""
-        };
+        const rec: Record<string, unknown> = {};
         for (const [rawKey, rawVal] of Object.entries(row)) {
           const key = String(rawKey);
           if (key.startsWith("__EMPTY")) continue;
@@ -615,37 +613,16 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
           const targetLabel = aliases[n] ?? n;
           const col = labelMap.get(targetLabel);
           if (!col) continue;
-
+          
           if (rawVal === null || rawVal === "") continue;
-
+          
           if (col.kind === "number" || col.kind === "currency") {
-            // Regra: valor da LG seguir o padrão R$00,00 (limpeza para número)
             const valStr = String(rawVal).replace(/[R$\s.]/g, "").replace(",", ".");
             const num = Number(valStr);
             if (!Number.isNaN(num)) rec[col.key] = num;
           } else if (col.kind === "date") {
-            // Regra: data adaptada no formato brasileiro ou ISO, mas forçando limpeza
-            let d: Date;
-            if (rawVal instanceof Date) {
-              d = rawVal;
-            } else {
-              const strVal = String(rawVal).trim();
-              // Tenta converter DD/MM/YYYY para YYYY-MM-DD
-              const dmyMatch = strVal.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
-              if (dmyMatch) {
-                d = new Date(`${dmyMatch[3]}-${dmyMatch[2].padStart(2, '0')}-${dmyMatch[1].padStart(2, '0')}`);
-              } else {
-                d = new Date(strVal);
-              }
-            }
-            if (!isNaN(d.getTime())) rec[col.key] = d.toISOString().slice(0, 10);
-          } else if (col.kind === "select" && col.options) {
-            // "Forçar preenchimento a força de acordo com os dados mais próximos informados"
-            const strVal = String(rawVal).trim().toUpperCase();
-            const match = col.options.find(opt => norm(opt) === norm(strVal)) ||
-                        col.options.find(opt => norm(opt).includes(norm(strVal))) ||
-                        col.options.find(opt => norm(strVal).includes(norm(opt)));
-            rec[col.key] = match || strVal;
+            const d = rawVal instanceof Date ? rawVal : new Date(String(rawVal));
+            if (!isNaN(d.getTime())) rec[col.key] = d.toISOString().slice(0,10);
           } else {
             rec[col.key] = String(rawVal).trim();
           }
@@ -1311,23 +1288,9 @@ const EditableCell = React.memo(function EditableCell({
     let parsed: string | number | null;
     if (value === "") parsed = null;
     else if (col.kind === "number" || col.kind === "currency") {
-      // Regra: valor da LG seguir o padrão R$00,00 (limpeza para número)
-      const valStr = String(value).replace(/[R$\s.]/g, "").replace(",", ".");
-      const n = Number(valStr);
+      const n = Number(value.replace(/[R$\s.]/g, "").replace(",", "."));
       if (Number.isNaN(n)) return;
       parsed = n;
-    } else if (col.kind === "date") {
-      // Garantir que todas as datas sejam normalizadas para YYYY-MM-DD para o banco
-      let d: Date;
-      const strVal = String(value).trim();
-      const dmyMatch = strVal.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
-      if (dmyMatch) {
-        d = new Date(`${dmyMatch[3]}-${dmyMatch[2].padStart(2, '0')}-${dmyMatch[1].padStart(2, '0')}`);
-      } else {
-        d = new Date(strVal);
-      }
-      if (isNaN(d.getTime())) return;
-      parsed = d.toISOString().slice(0, 10);
     } else {
       parsed = value;
     }
