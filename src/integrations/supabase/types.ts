@@ -925,29 +925,38 @@ export type Database = {
       }
       pagamentos_audit: {
         Row: {
+          acao: string
           alterado_em: string | null
+          created_at: string | null
           dados_anteriores: Json | null
           dados_novos: Json | null
           id: string
-          pagamento_id: string
+          pagamento_id: string | null
+          snapshot: Json | null
           usuario_id: string | null
           usuario_nome: string | null
         }
         Insert: {
+          acao?: string
           alterado_em?: string | null
+          created_at?: string | null
           dados_anteriores?: Json | null
           dados_novos?: Json | null
           id?: string
-          pagamento_id: string
+          pagamento_id?: string | null
+          snapshot?: Json | null
           usuario_id?: string | null
           usuario_nome?: string | null
         }
         Update: {
+          acao?: string
           alterado_em?: string | null
+          created_at?: string | null
           dados_anteriores?: Json | null
           dados_novos?: Json | null
           id?: string
-          pagamento_id?: string
+          pagamento_id?: string | null
+          snapshot?: Json | null
           usuario_id?: string | null
           usuario_nome?: string | null
         }
