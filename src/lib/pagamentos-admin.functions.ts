@@ -19,10 +19,13 @@ export const purgarPagamentosBulkFn = createServerFn({ method: "POST" })
     
     if (fetchError) throw new Error("Erro ao buscar registros para auditoria: " + fetchError.message);
 
-    // Delete using admin client to bypass possible RLS or complex trigger issues
+    // Perform logical deletion by setting excluido_em
     const { error: deleteError } = await supabaseAdmin
       .from("pagamentos_diversos")
-      .delete()
+      .update({ 
+        excluido_em: new Date().toISOString(),
+        excluido_por: data.userId || null 
+      } as any)
       .in("id", data.ids);
 
     if (deleteError) throw new Error("Erro ao excluir registros: " + deleteError.message);

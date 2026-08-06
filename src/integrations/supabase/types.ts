@@ -987,6 +987,8 @@ export type Database = {
           diferenca_lg_finnet: number | null
           empresa: string | null
           ev_saida_folha_mensal: number | null
+          excluido_em: string | null
+          excluido_por: string | null
           folha: string | null
           id: string
           motivo_exclusao: string | null
@@ -1019,6 +1021,8 @@ export type Database = {
           diferenca_lg_finnet?: number | null
           empresa?: string | null
           ev_saida_folha_mensal?: number | null
+          excluido_em?: string | null
+          excluido_por?: string | null
           folha?: string | null
           id?: string
           motivo_exclusao?: string | null
@@ -1051,6 +1055,8 @@ export type Database = {
           diferenca_lg_finnet?: number | null
           empresa?: string | null
           ev_saida_folha_mensal?: number | null
+          excluido_em?: string | null
+          excluido_por?: string | null
           folha?: string | null
           id?: string
           motivo_exclusao?: string | null
