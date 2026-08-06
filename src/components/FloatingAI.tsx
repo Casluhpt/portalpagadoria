@@ -8,9 +8,11 @@ import { perguntarIa } from "@/lib/ia.functions";
 import { useQuery } from "@tanstack/react-query";
 import { fetchMateriais, materialApoioQueryKey } from "@/lib/material-apoio";
 import { useSession } from "@/hooks/use-session";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate, useRouterState } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
+import { useProfile } from "@/hooks/use-profile";
+import { useRoles } from "@/hooks/use-roles";
 
 export function FloatingAI() {
   const [isOpen, setIsOpen] = useState(false);
@@ -18,7 +20,10 @@ export function FloatingAI() {
   const [chatInput, setChatInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const { user } = useSession();
+  const { profile, setor } = useProfile();
+  const { roles } = useRoles();
   const navigate = useNavigate();
+  const currentPath = useRouterState({ select: (s) => s.location.pathname });
 
   const { data: materiais = [] } = useQuery({
     queryKey: materialApoioQueryKey,
@@ -66,7 +71,21 @@ export function FloatingAI() {
       .slice(0, 50_000);
 
     try {
-      const r = await perguntarIa({ data: { pergunta: userMsg, contexto } });
+      const { data: modulosDisponiveis } = await supabase.from("app_modules").select("key");
+      const allowedModules = modulosDisponiveis?.map(m => m.key) || [];
+
+      const r = await perguntarIa({ 
+        data: { 
+          pergunta: userMsg, 
+          contexto,
+          appState: {
+            currentPath,
+            setor: setor || undefined,
+            roles: roles || [],
+            allowedModules
+          }
+        } 
+      });
       if (r.erro) {
         setChatMessages((prev) => [...prev, { role: "assistant", content: r.erro }]);
         toast.error(r.erro);
