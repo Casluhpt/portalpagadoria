@@ -58,14 +58,15 @@ export const sairFila = createServerFn({ method: "POST" })
     modulo: z.string(),
   }).parse(data))
   .handler(async ({ data }) => {
-    const { data: leavingUser } = await supabase
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: leavingUser } = await supabaseAdmin
       .from('concorrencia_fila')
       .select('status')
       .eq('user_id', data.userId)
       .eq('modulo', data.modulo)
       .maybeSingle();
 
-    const { error } = await supabase
+    const { error } = await supabaseAdmin
       .from('concorrencia_fila')
       .delete()
       .eq('user_id', data.userId)
@@ -75,7 +76,7 @@ export const sairFila = createServerFn({ method: "POST" })
 
     // If the person leaving was the active one, promote the next person
     if (leavingUser?.status === 'ativo') {
-      const { data: next } = await supabase
+      const { data: next } = await supabaseAdmin
         .from('concorrencia_fila')
         .select('id')
         .eq('modulo', data.modulo)
@@ -85,7 +86,7 @@ export const sairFila = createServerFn({ method: "POST" })
         .maybeSingle();
 
       if (next) {
-        await supabase
+        await supabaseAdmin
           .from('concorrencia_fila')
           .update({ status: 'ativo', ativo_desde: new Date().toISOString() })
           .eq('id', next.id);
@@ -100,12 +101,13 @@ export const getFilaStatus = createServerFn({ method: "GET" })
     modulo: z.string(),
   }).parse(data))
   .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     // 1. Clean up "dead" sessions (inactive for more than 45 seconds)
     // Threshold calculation: 45 seconds ago
     const threshold = new Date(Date.now() - 45000).toISOString();
     
     // Find who we're about to remove due to timeout
-    const { data: expired } = await supabase
+    const { data: expired } = await supabaseAdmin
       .from('concorrencia_fila')
       .select('user_id, status')
       .eq('modulo', data.modulo)
@@ -115,7 +117,7 @@ export const getFilaStatus = createServerFn({ method: "GET" })
       const expiredIds = expired.map(e => e.user_id);
       const wasActiveExpired = expired.some(e => e.status === 'ativo');
       
-      await supabase
+      await supabaseAdmin
         .from('concorrencia_fila')
         .delete()
         .in('user_id', expiredIds)
@@ -123,7 +125,7 @@ export const getFilaStatus = createServerFn({ method: "GET" })
         
       if (wasActiveExpired) {
         // Promote next if active person timed out
-        const { data: next } = await supabase
+        const { data: next } = await supabaseAdmin
           .from('concorrencia_fila')
           .select('id')
           .eq('modulo', data.modulo)
@@ -133,7 +135,7 @@ export const getFilaStatus = createServerFn({ method: "GET" })
           .maybeSingle();
 
         if (next) {
-          await supabase
+          await supabaseAdmin
             .from('concorrencia_fila')
             .update({ status: 'ativo', ativo_desde: new Date().toISOString() })
             .eq('id', next.id);
@@ -141,7 +143,7 @@ export const getFilaStatus = createServerFn({ method: "GET" })
       }
     }
     
-    const { data: queue, error } = await supabase
+    const { data: queue, error } = await supabaseAdmin
       .from('concorrencia_fila')
       .select('*')
       .eq('modulo', data.modulo)
@@ -158,8 +160,9 @@ export const heartbeatFila = createServerFn({ method: "POST" })
     sessionId: z.string().optional(),
   }).parse(data))
   .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     // Heartbeat: update 'entrou_em' and ensure session integrity
-    const { data: current } = await supabase
+    const { data: current } = await supabaseAdmin
       .from('concorrencia_fila')
       .select('session_id')
       .eq('user_id', data.userId)
@@ -171,7 +174,7 @@ export const heartbeatFila = createServerFn({ method: "POST" })
       throw new Error("Sessão inválida ou duplicada detectada.");
     }
 
-    const { error } = await supabase
+    const { error } = await supabaseAdmin
       .from('concorrencia_fila')
       .update({ entrou_em: new Date().toISOString() })
       .eq('user_id', data.userId)
