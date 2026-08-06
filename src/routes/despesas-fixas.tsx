@@ -888,16 +888,46 @@ function RegistroDialog({
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <Label className="text-[11px]">Emissão NF</Label>
-                  <Input type="date" value={dataEmissao} onChange={(e) => setDataEmissao(e.target.value)} className="h-8 text-xs" />
+                  <div className="relative">
+                    <Input 
+                      type="date" 
+                      value={dataEmissao} 
+                      onChange={(e) => setDataEmissao(e.target.value)} 
+                      className="h-8 text-xs pr-8" 
+                    />
+                    <div className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground font-mono pointer-events-none">
+                      {dataEmissao ? dataEmissao.split('-').reverse().join('/') : ''}
+                    </div>
+                  </div>
                 </div>
                 <div>
                   <Label className="text-[11px]">Vencimento</Label>
-                  <Input type="date" value={dataVenc} onChange={(e) => setDataVenc(e.target.value)} className="h-8 text-xs" />
+                  <div className="relative">
+                    <Input 
+                      type="date" 
+                      value={dataVenc} 
+                      onChange={(e) => setDataVenc(e.target.value)} 
+                      className="h-8 text-xs pr-8" 
+                    />
+                    <div className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground font-mono pointer-events-none">
+                      {dataVenc ? dataVenc.split('-').reverse().join('/') : ''}
+                    </div>
+                  </div>
                 </div>
               </div>
               <div>
                 <Label className="text-[11px]">Data de Lançamento (Pagamento)</Label>
-                <Input type="date" value={dataLanc} onChange={(e) => setDataLanc(e.target.value)} className="h-8 text-xs" />
+                <div className="relative">
+                  <Input 
+                    type="date" 
+                    value={dataLanc} 
+                    onChange={(e) => setDataLanc(e.target.value)} 
+                    className="h-8 text-xs pr-8" 
+                  />
+                  <div className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground font-mono pointer-events-none">
+                    {dataLanc ? dataLanc.split('-').reverse().join('/') : ''}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
