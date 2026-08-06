@@ -84,7 +84,7 @@ export const perguntarIa = createServerFn({ method: "POST" })
           "Lovable-API-Key": key,
         },
         body: JSON.stringify({
-          model: "openai/gpt-5",
+          model: "google/gemini-2.5-flash",
           input: messages,
         }),
       });
