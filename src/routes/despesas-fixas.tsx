@@ -291,9 +291,10 @@ function DespesasFixasPage() {
   };
 
   return (
-    <div className="flex min-h-screen w-full bg-gradient-to-br from-muted via-background to-emerald-50/40">
-      <AppSidebar />
-      <div className="flex flex-1 flex-col">
+    <>
+      <div className="flex min-h-screen w-full bg-gradient-to-br from-muted via-background to-emerald-50/40">
+        <AppSidebar />
+        <div className="flex flex-1 flex-col">
           <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-border bg-card/90 px-4 backdrop-blur">
             <SidebarTrigger />
             <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
