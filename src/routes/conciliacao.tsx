@@ -361,6 +361,12 @@ function ConciliacaoSemanalView() {
     window.print();
   };
 
+  const { data: previewData, isLoading: isPreviewLoading } = useQuery({
+    queryKey: ['conciliacao-preview', dataIni, dataFim],
+    queryFn: () => getPagamentosParaConciliacao({ data: { dataInicio: dataIni, dataFim } }),
+    enabled: !!dataIni && !!dataFim && new Date(dataFim) >= new Date(dataIni)
+  });
+
   return (
     <Card className="border-border/40 bg-card/50 backdrop-blur-md">
       <CardHeader>
