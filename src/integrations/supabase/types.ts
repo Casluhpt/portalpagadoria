@@ -933,8 +933,8 @@ export type Database = {
           id: string
           pagamento_id: string | null
           snapshot: Json | null
-          usuario_id: string | null
-          usuario_nome: string | null
+          user_id: string | null
+          user_nome: string | null
         }
         Insert: {
           acao?: string
@@ -945,8 +945,8 @@ export type Database = {
           id?: string
           pagamento_id?: string | null
           snapshot?: Json | null
-          usuario_id?: string | null
-          usuario_nome?: string | null
+          user_id?: string | null
+          user_nome?: string | null
         }
         Update: {
           acao?: string
@@ -957,8 +957,8 @@ export type Database = {
           id?: string
           pagamento_id?: string | null
           snapshot?: Json | null
-          usuario_id?: string | null
-          usuario_nome?: string | null
+          user_id?: string | null
+          user_nome?: string | null
         }
         Relationships: [
           {
