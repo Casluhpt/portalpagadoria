@@ -79,9 +79,19 @@ function uniqSorted<T>(arr: (T | null | undefined)[]): T[] {
 function Dashboard() {
   const { isAdmin, loading: rolesLoading } = useRoles();
 
-  if (rolesLoading || !isAdmin) {
-    return (
-      <SidebarProvider>
+    if (rolesLoading) {
+      return (
+        <div className="flex min-h-screen w-full bg-background">
+          <AppSidebar />
+          <div className="flex flex-1 flex-col">
+            <div className="flex flex-1 items-center justify-center text-sm text-muted-foreground">Carregando…</div>
+          </div>
+        </div>
+      );
+    }
+
+    if (!isAdmin) {
+      return (
         <div className="flex min-h-screen w-full bg-background">
           <AppSidebar />
           <div className="flex flex-1 flex-col">
@@ -89,25 +99,20 @@ function Dashboard() {
               <SidebarTrigger />
               <AppLogo area="header" className="h-6 w-auto shrink-0 sm:h-7" />
             </header>
-            {rolesLoading ? (
-              <div className="flex flex-1 items-center justify-center text-sm text-muted-foreground">Carregando…</div>
-            ) : (
-              <div className="flex flex-1 items-center justify-center p-6">
-                <div className="max-w-md rounded-lg border border-border bg-card p-8 text-center shadow-sm">
-                  <ShieldAlert className="mx-auto h-10 w-10 text-amber-600" />
-                  <h2 className="mt-3 text-lg font-semibold text-foreground">Acesso restrito</h2>
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    Resultados Principais é visível apenas para colaboradores com perfil{" "}
-                    <strong>Administrador</strong>.
-                  </p>
-                </div>
+            <div className="flex flex-1 items-center justify-center p-6">
+              <div className="max-w-md rounded-lg border border-border bg-card p-8 text-center shadow-sm">
+                <ShieldAlert className="mx-auto h-10 w-10 text-amber-600" />
+                <h2 className="mt-3 text-lg font-semibold text-foreground">Acesso restrito</h2>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Resultados Principais é visível apenas para colaboradores com perfil{" "}
+                  <strong>Administrador</strong>.
+                </p>
               </div>
-            )}
+            </div>
           </div>
         </div>
-      </SidebarProvider>
-    );
-  }
+      );
+    }
 
   return <DashboardConteudo />;
 }
