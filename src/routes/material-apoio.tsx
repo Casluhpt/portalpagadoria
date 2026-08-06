@@ -298,7 +298,7 @@ function MaterialApoioPage() {
   }, [materiais, busca]);
 
 
-  const perguntar = async (pergunta?: string) => {};
+  
 
   const abrirCriacao = () => {
     setForm({ ...vazio, ordem: materiais.length + 1 });
