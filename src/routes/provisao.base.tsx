@@ -50,6 +50,16 @@ import {
 import { useSession } from "@/hooks/use-session";
 
 export const Route = createFileRoute("/provisao/base")({
+  head: () => ({
+    meta: [
+      { title: "Base da Provisão | Portal Pagadoria" },
+      { name: "description", content: "Gerenciamento de registros brutos da provisão diária." },
+      { property: "og:title", content: "Base da Provisão | Portal Pagadoria" },
+      { property: "og:description", content: "Gerenciamento de registros brutos da provisão diária." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: ProvisaoBasePage,
 });
 

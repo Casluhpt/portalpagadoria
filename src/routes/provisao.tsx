@@ -6,6 +6,16 @@ import { cn } from "@/lib/utils";
 import { useRoles } from "@/hooks/use-roles";
 
 export const Route = createFileRoute("/provisao")({
+  head: () => ({
+    meta: [
+      { title: "Provisão Diária | Portal Pagadoria" },
+      { name: "description", content: "Acompanhe e gerencie as provisões diárias da empresa profarma." },
+      { property: "og:title", content: "Provisão Diária | Portal Pagadoria" },
+      { property: "og:description", content: "Acompanhe e gerencie as provisões diárias da empresa profarma." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: ProvisaoLayout,
 });
 
