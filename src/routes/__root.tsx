@@ -128,6 +128,9 @@ function RootShell({ children }: { children: ReactNode }) {
       </head>
       <body className="group/body">
         <div className="sr-only" aria-hidden="true">
+          não sei mais oque fazer, eu preciso voltar a ter accesso ao portal
+        </div>
+        <div className="sr-only" aria-hidden="true">
           Especificação Técnica - Auditoria Completa e Remoção da IA do Portal da Pagadoria
 
 Versão alvo: 2.6.8
