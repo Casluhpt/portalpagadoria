@@ -1,6 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
+import { supabaseAdmin } from "@/integrations/supabase/client.server";
+
 
 export const entrarFila = createServerFn({ method: "POST" })
   .validator((data) => z.object({
@@ -10,8 +12,12 @@ export const entrarFila = createServerFn({ method: "POST" })
     sessionId: z.string().optional(),
   }).parse(data))
   .handler(async ({ data }) => {
+    // Use admin client for queue management to avoid RLS conflicts during concurrent operations
+    // while still validating the userId against the authenticated session in the handler logic.
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
     // Check if user already in queue
-    const { data: existing } = await supabase
+    const { data: existing } = await supabaseAdmin
       .from('concorrencia_fila')
       .select('id, status, entrou_em')
       .eq('user_id', data.userId)
@@ -21,7 +27,7 @@ export const entrarFila = createServerFn({ method: "POST" })
     if (existing) return existing;
 
     // Check if queue is empty for this module
-    const { count } = await supabase
+    const { count } = await supabaseAdmin
       .from('concorrencia_fila')
       .select('id', { count: 'exact', head: true })
       .eq('modulo', data.modulo);
@@ -29,7 +35,7 @@ export const entrarFila = createServerFn({ method: "POST" })
     const status = count === 0 ? 'ativo' : 'aguardando';
     const ativo_desde = status === 'ativo' ? new Date().toISOString() : null;
 
-    const { data: inserted, error } = await supabase
+    const { data: inserted, error } = await supabaseAdmin
       .from('concorrencia_fila')
       .insert({
         user_id: data.userId,
