@@ -11,7 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { HelpCircle, Bug, AlertCircle, MessageSquare, Send, CheckCircle2, Paperclip, X, Loader2, Settings, Users, History, ChevronRight, Activity, Cloud, ShieldCheck, Mail, Save, Code, Zap, Database, ShieldAlert, Cpu, Sparkles, RefreshCw, Trash2, Lock, Table as TableIcon, Image as ImageIcon } from "lucide-react";
+import { HelpCircle, Bug, AlertCircle, MessageSquare, Send, CheckCircle2, Paperclip, X, Loader2, Settings, Users, History, ChevronRight, Activity, Cloud, ShieldCheck, Mail, Save, Code, Zap, Database, ShieldAlert, Cpu, Sparkles, RefreshCw, Trash2, Lock, Table as TableIcon, Image as ImageIcon, Keyboard } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { usePlanilhaModo } from "@/hooks/use-planilha-modo";
 import { useState, useRef, useEffect } from "react";
@@ -24,6 +24,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { UsuariosTableWrapper as UsuariosTable } from "@/components/admin/usuarios-table";
 import { IdentidadeVisualPanel } from "@/components/admin/identidade-visual";
 
+import { useShortcutLegend } from "@/hooks/use-shortcut-legend";
 import { DocumentacaoTecnicaSection } from "@/components/documentacao-tecnica-section";
 
 
@@ -404,9 +405,9 @@ function DiagnosticPanel() {
         <Card className="hover:shadow-md transition-all">
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
-              <Database className="h-4 w-4 text-sky-600" /> Armazenamento em Nuvem
+              <Database className="h-4 w-4 text-sky-600" /> Armazenamento e Interface
             </CardTitle>
-            <CardDescription>Uso de disco e backups.</CardDescription>
+            <CardDescription>Uso de disco e preferências visuais.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <button 
