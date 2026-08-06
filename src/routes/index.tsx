@@ -111,7 +111,7 @@ function PortalPage() {
     if (visibleVersoes.length <= 1) return;
     const t = setInterval(() => {
       setCarouselIdx((i) => {
-        const next = (i + 1) % visibleVersoes.length;
+        const next = visibleVersoes.length > 0 ? (i + 1) % visibleVersoes.length : 0;
         return next;
       });
       setSlideKey((k) => k + 1);
