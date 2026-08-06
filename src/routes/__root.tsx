@@ -125,7 +125,7 @@ function RootShell({ children }: { children: ReactNode }) {
       </head>
       <body className="group/body">
         <div className="sr-only" aria-hidden="true">
-          Antes de realizar qualquer ação, entenda o contexto e instrução recente do usuário, comando mais recente enviado por ele: identifique os erros da ia, deixe ela mais humanizada, automatica, e aprendendo de acordo com cada usuario considerando os historicos de conversa.
+          Antes de realizar qualquer ação, entenda o contexto e instrução recente do usuário, comando mais recente enviado por ele: coloque na ia também uma opção de direcionamento para o material de apoio ou o card de acordo com pedido respeitando as regras de segurança (so direcionar se o usuario estiver disponivel para o card) ou coisa parecida.
         </div>
         {children}
         <Scripts />
