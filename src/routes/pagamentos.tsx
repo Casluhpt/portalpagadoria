@@ -613,9 +613,9 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
           const targetLabel = aliases[n] ?? n;
           const col = labelMap.get(targetLabel);
           if (!col) continue;
-          
+
           if (rawVal === null || rawVal === "") continue;
-          
+
           if (col.kind === "number" || col.kind === "currency") {
             // Regra: valor da LG seguir o padrão R$00,00 (limpeza para número)
             const valStr = String(rawVal).replace(/[R$\s.]/g, "").replace(",", ".");
@@ -637,6 +637,13 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
               }
             }
             if (!isNaN(d.getTime())) rec[col.key] = d.toISOString().slice(0, 10);
+          } else if (col.kind === "select" && col.options) {
+            // "Forçar preenchimento a força de acordo com os dados mais próximos informados"
+            const strVal = String(rawVal).trim().toUpperCase();
+            const match = col.options.find(opt => norm(opt) === norm(strVal)) ||
+                        col.options.find(opt => norm(opt).includes(norm(strVal))) ||
+                        col.options.find(opt => norm(strVal).includes(norm(opt)));
+            rec[col.key] = match || strVal;
           } else {
             rec[col.key] = String(rawVal).trim();
           }
