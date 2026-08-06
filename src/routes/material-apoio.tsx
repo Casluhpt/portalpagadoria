@@ -399,9 +399,6 @@ function MaterialApoioPage() {
                     <Input
                       value={busca}
                       onChange={(e) => setBusca(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") perguntar(busca);
-                      }}
                       placeholder="Ex.: como fechar a competência? como importar pagamentos?"
                       className="h-11 border-0 bg-card pl-9 text-sm text-foreground placeholder:text-muted-foreground"
                       aria-label="Pesquisar no material de apoio"
