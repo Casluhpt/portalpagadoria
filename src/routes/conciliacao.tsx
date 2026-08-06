@@ -171,7 +171,7 @@ function ConciliacaoAtivaView({ onResults }: { onResults: (res: ConciliacaoItem[
 
   const { data: pagamentosPortal } = useQuery({
     queryKey: ['pagamentos-conciliacao', competencia],
-    queryFn: () => getPagamentosParaConciliacao({ data: { competencias: [competencia] } }),
+    queryFn: () => getPagamentosParaConciliacao({ competencias: [competencia] }),
     enabled: !!competencia
   });
 

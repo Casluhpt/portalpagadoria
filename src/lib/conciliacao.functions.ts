@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { z } from "zod";
 
 export const getPagamentosParaConciliacao = createServerFn({ method: "GET" })
-  .validator((data) => z.object({
+  .validator((data: { competencias: string[] }) => z.object({
     competencias: z.array(z.string()),
   }).parse(data))
   .handler(async ({ data }) => {
@@ -17,7 +17,7 @@ export const getPagamentosParaConciliacao = createServerFn({ method: "GET" })
   });
 
 export const saveConciliacaoHistorico = createServerFn({ method: "POST" })
-  .validator((data) => z.object({
+  .validator((data: any) => z.object({
     tipo: z.string(),
     nomenclatura: z.string().optional(),
     competencias_utilizadas: z.array(z.string()).optional(),
