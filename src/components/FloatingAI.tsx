@@ -145,7 +145,38 @@ export function FloatingAI() {
                       ? "bg-primary text-primary-foreground rounded-tr-none" 
                       : "bg-muted/50 border border-white/10 text-foreground rounded-tl-none backdrop-blur-sm"
                   )}>
-                    {msg.content}
+                    {msg.content.split(/(\[.*?\])/g).map((part, idx) => {
+                      if (part.startsWith('[') && part.endsWith(']')) {
+                        const moduleName = part.slice(1, -1);
+                        const paths: Record<string, string> = {
+                          'Pagamentos Diversos': '/pagamentos',
+                          'Provisão Diária': '/provisao',
+                          'Conciliação Bancária': '/conciliacao',
+                          'Material de Apoio': '/apoio',
+                          'Configurações': '/configuracoes',
+                          'Dashboard': '/',
+                          'Aprovação': '/aprovacao',
+                          'eSocial': '/esocial'
+                        };
+                        const path = paths[moduleName];
+                        if (path) {
+                          return (
+                            <button
+                              key={idx}
+                              onClick={() => {
+                                navigate({ to: path });
+                                setIsOpen(false);
+                              }}
+                              className="mx-1 inline-flex items-center gap-1 rounded-md bg-primary/20 px-2 py-0.5 text-[10px] font-bold text-primary transition-colors hover:bg-primary/30"
+                            >
+                              <MessageSquare className="h-3 w-3" />
+                              {moduleName}
+                            </button>
+                          );
+                        }
+                      }
+                      return part;
+                    })}
                   </div>
                 </div>
               ))}
