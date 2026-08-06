@@ -130,6 +130,7 @@ const roleLabel: Record<AppRole, string> = {
   auditor: "Auditor",
   viewer: "Visualizador",
   visitante: "Gerência/Visitante",
+  gerente: "Gerente",
 };
 
 export function AppSidebar() {
@@ -329,7 +330,7 @@ export function AppSidebar() {
                     {rolesLoading
                       ? "Carregando perfil…"
                       : primaryRole
-                      ? roleLabel[primaryRole]
+                      ? (roleLabel as any)[primaryRole] || primaryRole
                       : "Sem perfil atribuído"}
                     {setor ? (
                       <span className="ml-1 normal-case text-sidebar-foreground/70">· {setor}</span>

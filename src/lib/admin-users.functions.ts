@@ -1,9 +1,12 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import type { Database } from "@/integrations/supabase/types";
+
+export type AppRole = Database["public"]["Enums"]["app_role"];
 
 export type PresenceStatus = "online" | "ausente" | "offline";
 
-export const ALLOWED_SETORES = ["FOLHA/FÉRIAS", "RESCISÃO", "BENEFICIOS", "PAGADORIA", "GERÊNCIA/VISITANTE"] as const;
+export const ALLOWED_SETORES = ["FOLHA/FÉRIAS", "RESCISÃO", "BENEFICIOS", "PAGADORIA", "GERENTE", "VISITANTE"] as const;
 export type Setor = (typeof ALLOWED_SETORES)[number];
 
 export type AdminUserRow = {
@@ -105,11 +108,11 @@ export const resetUserPassword = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-const ALLOWED_ROLES = ["administrador", "viewer", "visitante"] as const;
+const ALLOWED_ROLES = ["administrador", "auditor", "operacional", "criador_competencia", "consulta", "viewer", "visitante", "gerente"] as const;
 
 export const setUserRole = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((input: { userId: string; role: "administrador" | "viewer" | "visitante" }) => {
+  .validator((input: { userId: string; role: AppRole }) => {
     if (!input?.userId) throw new Error("userId é obrigatório");
     if (!ALLOWED_ROLES.includes(input.role)) throw new Error("Perfil inválido");
     return input;
@@ -174,7 +177,7 @@ export const setUserRole = createServerFn({ method: "POST" })
 
 export const inviteUser = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((input: { email: string; role: "administrador" | "viewer" | "visitante"; nome?: string; redirectTo?: string }) => {
+  .validator((input: { email: string; role: AppRole; nome?: string; redirectTo?: string }) => {
     const email = (input?.email ?? "").trim().toLowerCase();
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error("Email inválido");
     if (!ALLOWED_ROLES.includes(input.role)) throw new Error("Perfil inválido");
@@ -298,3 +301,103 @@ export const setUserNome = createServerFn({ method: "POST" })
 
     return { ok: true };
   });
+
+export const getAppModules = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async () => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data, error } = await supabaseAdmin
+      .from("app_modules")
+      .select("*")
+      .order("name");
+    
+    if (error) throw error;
+    return data;
+  });
+
+export const getUserModules = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .validator((userId: string) => userId)
+  .handler(async ({ data: userId }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data, error } = await supabaseAdmin
+      .from("user_modules")
+      .select("module_id")
+      .eq("user_id", userId);
+    
+    if (error) throw error;
+    return data.map((m: any) => m.module_id);
+  });
+
+export const toggleUserModule = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((input: { userId: string; moduleId: string; enabled: boolean }) => input)
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    
+    if (data.enabled) {
+      const { error } = await supabaseAdmin
+        .from("user_modules")
+        .insert({ user_id: data.userId, module_id: data.moduleId });
+      if (error && error.code !== "23505") throw error; // Ignore duplicates
+    } else {
+      const { error } = await supabaseAdmin
+        .from("user_modules")
+        .delete()
+        .eq("user_id", data.userId)
+        .eq("module_id", data.moduleId);
+      if (error) throw error;
+    }
+    
+    return { success: true };
+  });
+
+export const getUserSpecificPermissions = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .validator((userId: string) => userId)
+  .handler(async ({ data: userId }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data, error } = await supabaseAdmin
+      .from("user_specific_permissions")
+      .select("*")
+      .eq("user_id", userId);
+    
+    if (error) throw error;
+    return data;
+  });
+
+export const setUserSpecificPermission = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((input: { userId: string; resource: string; action: string; isAllowed: boolean }) => input)
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin
+      .from("user_specific_permissions")
+      .upsert({
+        user_id: data.userId,
+        resource: data.resource,
+        action: data.action,
+        is_allowed: data.isAllowed,
+        updated_at: new Date().toISOString()
+      }, { onConflict: "user_id,resource,action" });
+    
+    if (error) throw error;
+    return { success: true };
+  });
+
+export const removeUserSpecificPermission = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((input: { userId: string; resource: string; action: string }) => input)
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin
+      .from("user_specific_permissions")
+      .delete()
+      .eq("user_id", data.userId)
+      .eq("resource", data.resource)
+      .eq("action", data.action);
+    
+    if (error) throw error;
+    return { success: true };
+  });
+

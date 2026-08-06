@@ -42,6 +42,7 @@ export function useRoles() {
     isOperacional: has("operacional"),
     isCriador: has("criador_competencia"),
     isConsulta: has("consulta"),
+    isGerente: has("gerente"),
     isViewer,
     has,
     hasAny,
