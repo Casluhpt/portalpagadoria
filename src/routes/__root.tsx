@@ -19,6 +19,7 @@ import { PlanilhaOnboarding } from "@/components/planilha-onboarding";
 import { FaviconManager } from "@/components/favicon-manager";
 import { PortalFooter } from "@/components/portal-footer";
 import { FloatingAI } from "@/components/FloatingAI";
+import { IABannerOffline } from "@/components/ia-banner-offline";
 
 
 import { AuthGate } from "@/components/auth-gate";
@@ -150,6 +151,7 @@ function RootComponent() {
         <BackButton />
         {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
         <Outlet />
+        <IABannerOffline />
         <FloatingAI />
         <PortalFooter />
 
