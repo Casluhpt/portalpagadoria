@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { format, formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Loader2, KeyRound, Search, ShieldCheck, Eye, UserPlus, Trash2, List, LayoutGrid, Edit2, CheckCircle2, X } from "lucide-react";
+import { Loader2, KeyRound, Search, ShieldCheck, Eye, UserPlus, Trash2, List, LayoutGrid, Edit2, CheckCircle2, X, User, ScrollText } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -22,6 +22,7 @@ import { RestrictedArea } from "@/components/role-gate";
 import { logAcaoCritica } from "@/lib/audit-critico";
 import { useSession } from "@/hooks/use-session";
 import { listAdminUsers, resetUserPassword, setUserRole, setUserSetor, setUserNome, inviteUser, deleteUser, ALLOWED_SETORES, type AdminUserRow, type Setor } from "@/lib/admin-users.functions";
+import { type AppRole } from "@/hooks/use-roles";
 import {
   Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";

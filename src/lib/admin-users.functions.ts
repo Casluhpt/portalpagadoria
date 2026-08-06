@@ -109,7 +109,7 @@ const ALLOWED_ROLES = ["administrador", "auditor", "operacional", "criador_compe
 
 export const setUserRole = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((input: { userId: string; role: "administrador" | "viewer" | "visitante" }) => {
+  .validator((input: { userId: string; role: string }) => {
     if (!input?.userId) throw new Error("userId é obrigatório");
     if (!ALLOWED_ROLES.includes(input.role)) throw new Error("Perfil inválido");
     return input;
@@ -174,7 +174,7 @@ export const setUserRole = createServerFn({ method: "POST" })
 
 export const inviteUser = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((input: { email: string; role: "administrador" | "viewer" | "visitante"; nome?: string; redirectTo?: string }) => {
+  .validator((input: { email: string; role: string; nome?: string; redirectTo?: string }) => {
     const email = (input?.email ?? "").trim().toLowerCase();
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error("Email inválido");
     if (!ALLOWED_ROLES.includes(input.role)) throw new Error("Perfil inválido");
