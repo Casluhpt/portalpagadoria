@@ -1330,7 +1330,7 @@ const EditableCell = React.memo(function EditableCell({
       <td style={{ minWidth: width }} className="border-b border-r border-border p-0">
         <Select
           value={(raw as string) ?? ""}
-          onValueChange={(v) => onSave(rowId, { [col.key]: v || null } as PagamentoInput)}
+          onValueChange={(v) => onSave(rowId, { [col.key]: v || null } as PagamentoInput, row)}
         >
           <SelectTrigger className="h-8 border-0 bg-transparent text-xs shadow-none focus:ring-1">
             <SelectValue placeholder="—" />
