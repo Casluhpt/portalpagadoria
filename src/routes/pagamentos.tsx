@@ -1486,7 +1486,7 @@ function SmartRowCell({
                       className="h-6 shrink-0 px-2 text-[10px] text-violet-700 hover:bg-violet-500/10 dark:text-violet-300"
                       disabled={disabled}
                       onClick={() => {
-                        onApply(sugestoesParaPatch([s]));
+                        onApply(sugestoesParaPatch([s]), row);
                         toast.success(`${s.label} preenchido — você pode alterar a qualquer momento.`);
                       }}
                     >
@@ -1501,7 +1501,7 @@ function SmartRowCell({
                 className="h-7 w-full gap-1.5 text-[11px]"
                 disabled={disabled}
                 onClick={() => {
-                  onApply(sugestoesParaPatch(sugestoes));
+                  onApply(sugestoesParaPatch(sugestoes), row);
                   setOpen(false);
                   toast.success(`${sugestoes.length} campo(s) preenchido(s) por sugestão — revise se necessário.`);
                 }}
