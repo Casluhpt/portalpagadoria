@@ -861,3 +861,19 @@ function AdvancedSecuritySettings() {
     </Card>
   );
 }
+
+function ShortcutLegendSwitch() {
+  const { isEnabled, toggleEnabled } = useShortcutLegend();
+  return (
+    <div className="flex items-center space-x-2">
+      <Switch 
+        id="shortcut-legend-toggle" 
+        checked={isEnabled} 
+        onCheckedChange={toggleEnabled}
+      />
+      <Label htmlFor="shortcut-legend-toggle" className="text-[10px] text-muted-foreground">
+        {isEnabled ? "Ativado" : "Desativado"}
+      </Label>
+    </div>
+  );
+}
