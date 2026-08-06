@@ -125,7 +125,7 @@ function PagamentosPage() {
     "Anônimo";
 
   return (
-    <SidebarProvider>
+    <>
       <div className="flex min-h-screen w-full bg-background">
         <AppSidebar />
         <div className="flex flex-1 flex-col">
