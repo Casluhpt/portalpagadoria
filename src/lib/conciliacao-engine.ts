@@ -70,8 +70,8 @@ export async function fetchPagamentosParaConciliacao(competencias: string[]) {
 }
 
 export async function executarConciliacao(
-  tipo: "Varejo" | "Distribuição" | "Diferenças", 
   importados: any[], 
+  basePortal: any[],
   userId: string
 ) {
   // Validação de colunas obrigatórias
