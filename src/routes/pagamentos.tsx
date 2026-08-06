@@ -1407,7 +1407,7 @@ function SmartRowCell({
   modelo: ModeloInteligente;
   rotulos: Record<string, string>;
   disabled?: boolean;
-  onApply: (patch: PagamentoInput) => void;
+  onApply: (patch: PagamentoInput, oldData: Pagamento) => void;
 }) {
   const [open, setOpen] = useState(false);
   const sugestoes = useMemo(
