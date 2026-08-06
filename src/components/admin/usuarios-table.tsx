@@ -21,7 +21,7 @@ import { toast } from "sonner";
 import { RestrictedArea } from "@/components/role-gate";
 import { logAcaoCritica } from "@/lib/audit-critico";
 import { useSession } from "@/hooks/use-session";
-import { listAdminUsers, resetUserPassword, setUserRole, setUserSetor, setUserNome, inviteUser, deleteUser, ALLOWED_SETORES, type AdminUserRow, type Setor, type AppRole } from "@/lib/admin-users.functions";
+import { listAdminUsers, resetUserPassword, setUserRole, setUserSetor, setUserNome, inviteUser, deleteUser, ALLOWED_SETORES, type AdminUserRow, type Setor, type AppRole, getAppModules, getUserModules, toggleUserModule, getUserSpecificPermissions, setUserSpecificPermission, removeUserSpecificPermission } from "@/lib/admin-users.functions";
 import {
   Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
@@ -277,7 +277,16 @@ function UsuariosTable() {
             <Button variant="outline" onClick={() => setInviteOpen(false)} disabled={inviteMut.isPending}>
               Cancelar
             </Button>
-            <Button
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 text-indigo-600 hover:bg-indigo-50 hover:text-indigo-700"
+            title="Gerenciar Módulos e Permissões"
+            onClick={() => setSelectedUserForRBAC(u)}
+          >
+            <ShieldCheck className="h-4 w-4" />
+          </Button>
+          <Button
               onClick={() => inviteMut.mutate({ email: inviteEmail, role: inviteRole, nome: inviteNome })}
               disabled={inviteMut.isPending || !inviteEmail}
             >
