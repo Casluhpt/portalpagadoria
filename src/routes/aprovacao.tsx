@@ -518,20 +518,20 @@ function BaseView({ rows, ano, isLoading, onUpsert, onBulkInsert, onDelete }: Ba
         </div>
         <Badge variant="secondary">{selected.size} selecionada(s)</Badge>
         <div className="flex-1" />
-        <Button variant="outline" size="sm" onClick={() => {
+        <Button variant="outline" size="sm" className="hover:bg-accent/50 transition-all active:scale-95" onClick={() => {
           const nome = prompt("Nome da competência para fechamento:", `Competência ${new Date().toLocaleDateString()}`);
           if (nome) handleFechamento(nome);
         }}>
           Fechamento
         </Button>
-        <Button variant="outline" size="sm" onClick={handleCopy}><Copy className="h-4 w-4 mr-1" />Copiar</Button>
-        <Button variant="outline" size="sm" onClick={handleCut}><Scissors className="h-4 w-4 mr-1" />Recortar</Button>
-        <Button variant="outline" size="sm" onClick={handlePaste} disabled={!clipboard.length}>Colar ({clipboard.length})</Button>
-        <Button variant="outline" size="sm" onClick={() => setConfirmDel(true)} disabled={!selected.size}><Trash2 className="h-4 w-4 mr-1" />Excluir</Button>
-        <Button variant="outline" size="sm" onClick={() => fileRef.current?.click()}><Upload className="h-4 w-4 mr-1" />Importar</Button>
+        <Button variant="outline" size="sm" className="hover:bg-accent/50 transition-all active:scale-95" onClick={handleCopy}><Copy className="h-4 w-4 mr-1 text-blue-600" />Copiar</Button>
+        <Button variant="outline" size="sm" className="hover:bg-accent/50 transition-all active:scale-95" onClick={handleCut}><Scissors className="h-4 w-4 mr-1 text-amber-600" />Recortar</Button>
+        <Button variant="outline" size="sm" className="hover:bg-accent/50 transition-all active:scale-95" onClick={handlePaste} disabled={!clipboard.length}>Colar ({clipboard.length})</Button>
+        <Button variant="outline" size="sm" className="hover:bg-accent/50 transition-all active:scale-95" onClick={() => setConfirmDel(true)} disabled={!selected.size}><Trash2 className="h-4 w-4 mr-1 text-red-600" />Excluir</Button>
+        <Button variant="outline" size="sm" className="hover:bg-accent/50 transition-all active:scale-95" onClick={() => fileRef.current?.click()}><Upload className="h-4 w-4 mr-1 text-emerald-600" />Importar</Button>
         <input ref={fileRef} type="file" accept=".xlsx,.xls,.csv" hidden onChange={(e) => { const f = e.target.files?.[0]; if (f) handleImport(f); }} />
-        <Button variant="outline" size="sm" onClick={handleExport}><Download className="h-4 w-4 mr-1" />Exportar</Button>
-        <Button size="sm" onClick={() => setNovoOpen(true)}><Plus className="h-4 w-4 mr-1" />Novo</Button>
+        <Button variant="outline" size="sm" className="hover:bg-accent/50 transition-all active:scale-95" onClick={handleExport}><Download className="h-4 w-4 mr-1 text-indigo-600" />Exportar</Button>
+        <Button size="sm" className="bg-indigo-600 hover:bg-indigo-700 shadow-sm active:scale-95 transition-all" onClick={() => setNovoOpen(true)}><Plus className="h-4 w-4 mr-1" />Novo</Button>
       </div>
 
       <div className="overflow-x-auto rounded-lg border">
