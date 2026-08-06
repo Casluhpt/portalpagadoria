@@ -6,8 +6,12 @@ import { format, formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Loader2, KeyRound, Search, ShieldCheck, Eye, UserPlus, Trash2, List, LayoutGrid, Edit2, CheckCircle2, X, User, ScrollText } from "lucide-react";
 
+import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
@@ -634,12 +638,12 @@ function RBACManagerDialog({ user, open, onOpenChange }: { user: AdminUserRow, o
 
   const { data: userModules, isLoading: loadingUserModules, refetch: refetchUserModules } = useQuery({ 
     queryKey: ["user-modules", user.id], 
-    queryFn: () => fetchUserModules(user.id) 
+    queryFn: () => fetchUserModules({ data: user.id }) 
   });
 
   const { data: userPerms, isLoading: loadingUserPerms, refetch: refetchUserPerms } = useQuery({ 
     queryKey: ["user-permissions", user.id], 
-    queryFn: () => fetchUserPerms(user.id) 
+    queryFn: () => fetchUserPerms({ data: user.id }) 
   });
 
   const handleToggleModule = async (moduleId: string, enabled: boolean) => {
