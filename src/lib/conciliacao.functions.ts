@@ -4,13 +4,20 @@ import { z } from "zod";
 
 export const getPagamentosParaConciliacao = createServerFn({ method: "GET" })
   .validator((data: unknown) => z.object({
-    competencias: z.array(z.string()),
+    competencias: z.array(z.string()).optional(),
+    dataInicio: z.string().optional(),
+    dataFim: z.string().optional(),
   }).parse(data))
   .handler(async ({ data }) => {
-    const { data: pagamentos, error } = await supabase
-      .from("pagamentos_diversos")
-      .select("*")
-      .in("competencia", data.competencias);
+    let query = supabase.from("pagamentos_diversos").select("*");
+    
+    if (data.dataInicio && data.dataFim) {
+      query = query.gte("data_credito", data.dataInicio).lte("data_credito", data.dataFim);
+    } else if (data.competencias && data.competencias.length > 0) {
+      query = query.in("competencia", data.competencias);
+    }
+    
+    const { data: pagamentos, error } = await query;
     
     if (error) throw new Error(error.message);
     return pagamentos;

@@ -166,19 +166,20 @@ function BankReconciliationPage() {
 function ConciliacaoAtivaView({ onResults }: { onResults: (res: ConciliacaoItem[]) => void }) {
   const { user } = useSession();
   const [loading, setLoading] = useState(false);
-  const [competencia, setCompetencia] = useState("");
+  const [dataInicio, setDataInicio] = useState("");
+  const [dataFim, setDataFim] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
 
   const { data: pagamentosPortal } = useQuery({
-    queryKey: ['pagamentos-conciliacao', competencia],
-    queryFn: () => getPagamentosParaConciliacao({ data: { competencias: [competencia] } }),
-    enabled: !!competencia
+    queryKey: ['pagamentos-conciliacao', dataInicio, dataFim],
+    queryFn: () => getPagamentosParaConciliacao({ data: { dataInicio, dataFim } }),
+    enabled: !!dataInicio && !!dataFim
   });
 
   const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !user || !pagamentosPortal) {
-      if (!competencia) toast.error("Selecione a competência antes de importar.");
+      if (!dataInicio || !dataFim) toast.error("Selecione o período (início e fim) antes de importar.");
       return;
     }
 
@@ -228,18 +229,29 @@ function ConciliacaoAtivaView({ onResults }: { onResults: (res: ConciliacaoItem[
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label>Competência no Portal</Label>
-              <Input 
-                placeholder="Ex: 07/2026" 
-                value={competencia} 
-                onChange={(e) => setCompetencia(e.target.value)}
-                className="bg-white/5 border-white/10"
-              />
-              <p className="text-[10px] text-muted-foreground italic">
-                O sistema buscará os registros de "Pagamentos Diversos" desta competência para comparar.
-              </p>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Data Início</Label>
+                <Input 
+                  type="date"
+                  value={dataInicio} 
+                  onChange={(e) => setDataInicio(e.target.value)}
+                  className="bg-white/5 border-white/10"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Data Fim</Label>
+                <Input 
+                  type="date"
+                  value={dataFim} 
+                  onChange={(e) => setDataFim(e.target.value)}
+                  className="bg-white/5 border-white/10"
+                />
+              </div>
             </div>
+            <p className="text-[10px] text-muted-foreground italic">
+              O sistema buscará os registros de "Pagamentos Diversos" deste período para comparar.
+            </p>
           </CardContent>
         </Card>
 
@@ -256,7 +268,7 @@ function ConciliacaoAtivaView({ onResults }: { onResults: (res: ConciliacaoItem[
               variant="outline" 
               className="w-full h-24 border-dashed border-2 hover:border-emerald-500/40 hover:bg-emerald-500/5 flex-col gap-2 group transition-all"
               onClick={() => fileRef.current?.click()}
-              disabled={loading || !competencia}
+              disabled={loading || !dataInicio || !dataFim}
             >
               {loading ? (
                 <Loader2 className="h-5 w-5 animate-spin" />
