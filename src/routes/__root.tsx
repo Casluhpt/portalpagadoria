@@ -142,18 +142,19 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
       <AuthGate>
-        <PasswordExpirationGuard />
-        <PresenceHeartbeat />
-        <GlobalShortcutManager />
-        <PlanilhaOnboarding />
-        <FaviconManager />
+        <SidebarProvider>
+          <PasswordExpirationGuard />
+          <PresenceHeartbeat />
+          <GlobalShortcutManager />
+          <PlanilhaOnboarding />
+          <FaviconManager />
 
-        <BackButton />
-        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-        <Outlet />
-        <FloatingAI />
-        <PortalFooter />
-
+          <BackButton />
+          {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+          <Outlet />
+          <FloatingAI />
+          <PortalFooter />
+        </SidebarProvider>
       </AuthGate>
       <Toaster position="top-right" richColors closeButton />
       </ThemeProvider>
