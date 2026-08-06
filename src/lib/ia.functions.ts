@@ -84,8 +84,8 @@ export const perguntarIa = createServerFn({ method: "POST" })
           "Authorization": `Bearer ${key}`,
         },
         body: JSON.stringify({
-          model: "openai/gpt-4o-mini",
-          messages: messages,
+          model: "openai/gpt-4o",
+          input: messages,
         }),
       });
 
