@@ -4,7 +4,13 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const AskInput = z.object({
   pergunta: z.string().min(2).max(1000),
-  contexto: z.string().max(60_000).default(""),
+  contexto: z.string().max(100_000).default(""),
+  appState: z.object({
+    currentPath: z.string(),
+    setor: z.string().optional(),
+    roles: z.array(z.string()).default([]),
+    allowedModules: z.array(z.string()).default([]),
+  }).optional(),
 });
 
 // Prompt humanizado e focado em aprendizado
