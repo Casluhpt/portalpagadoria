@@ -318,7 +318,7 @@ function DespesasFixasPage() {
                 <Checkbox id="closedMonths" checked={showClosedMonths} onCheckedChange={(v) => setShowClosedMonths(!!v)} />
                 <Label htmlFor="closedMonths" className="cursor-pointer">Ver meses fechados</Label>
               </div>
-              <Button variant="outline" size="sm" className="gap-2">
+              <Button variant="outline" size="sm" className="gap-2" onClick={() => toast.info("Busca centralizada disponível em breve.")}>
                 <Search className="h-4 w-4" /> Busca Centralizada
               </Button>
               {selectedKeys.size > 0 && (
@@ -821,7 +821,7 @@ function RegistroDialog({
       const first = entries[0];
       const v = parseFloat(String(first.valor).replace(/\./g, "").replace(",", "."));
       
-      await onSave({
+      const res = await upsertMut.mutateAsync({
         id: existente?.id,
         categoria: linha.categoria, descricao: linha.descricao, ano, mes,
         valor: v, tipo,
@@ -834,6 +834,13 @@ function RegistroDialog({
         lancado,
         meta: entries.length > 1 ? { entries } : null
       });
+
+      if (res) {
+        onClose();
+        toast.success(existente ? "Lançamento atualizado" : "Lançamento confirmado");
+      }
+    } catch (err: any) {
+      toast.error(err?.message ?? "Falha ao salvar lançamento");
     } finally { setSaving(false); }
   };
 
@@ -1007,7 +1014,7 @@ function DescricaoDialog({
     const empresa = EMPRESAS.find((e) => e.codigo === empresaCodigo);
     setSaving(true);
     try {
-      await onSave({
+      await updateMetaMut.mutateAsync({
         categoria: linha.categoria, descricao: linha.descricao, ano,
         nova_descricao: descricao.trim() || linha.descricao,
         empresa_codigo: empresa?.codigo ?? null,
@@ -1025,6 +1032,9 @@ function DescricaoDialog({
         motivo_suspensao: suspensa ? motivoSuspensao || null : null,
         notas: notas || null,
       });
+      onClose();
+    } catch (err: any) {
+      toast.error(err?.message ?? "Falha ao atualizar informações");
     } finally { setSaving(false); }
   };
 
