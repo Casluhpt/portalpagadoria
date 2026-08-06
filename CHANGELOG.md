@@ -4,6 +4,7 @@
 ### Adicionado
 - **Interação Minimalista:** Efeitos sutis de hover em botões, links e cards (elevação suave e brilho), reforçando a estética "Minimalismo Translúcido".
 - **Feedback Visual:** Interações específicas para elementos coloridos e componentes com transparência (glassmorphism).
+- **Design de Status:** Removida a barra de fundo colorida no indicador de status do menu lateral para um visual mais limpo e integrado, seguindo o novo padrão visual.
 
 ## [v2.7.5] - 2026-08-06
 ### Adicionado
