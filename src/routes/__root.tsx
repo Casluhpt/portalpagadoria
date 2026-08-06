@@ -56,7 +56,12 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   console.error(error);
   const router = useRouter();
   useEffect(() => {
-    reportLovableError(error, { boundary: "tanstack_root_error_component" });
+    // Try to report the error if possible
+    try {
+      reportLovableError(error, { boundary: "tanstack_root_error_component" });
+    } catch (e) {
+      console.error("Failed to report error:", e);
+    }
   }, [error]);
 
   return (
