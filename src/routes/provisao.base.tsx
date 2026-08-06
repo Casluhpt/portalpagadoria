@@ -535,7 +535,9 @@ function EditableCell({
   const display =
     col.kind === "number" && col.key === "valor"
       ? brl(raw as number | null)
-      : syncedStr;
+      : col.kind === "date" && syncedStr
+        ? syncedStr.split("-").reverse().join("/")
+        : syncedStr;
 
   return (
     <td
