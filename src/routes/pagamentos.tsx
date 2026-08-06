@@ -1309,9 +1309,23 @@ const EditableCell = React.memo(function EditableCell({
     let parsed: string | number | null;
     if (value === "") parsed = null;
     else if (col.kind === "number" || col.kind === "currency") {
-      const n = Number(value.replace(/[R$\s.]/g, "").replace(",", "."));
+      // Regra: valor da LG seguir o padrão R$00,00 (limpeza para número)
+      const valStr = String(value).replace(/[R$\s.]/g, "").replace(",", ".");
+      const n = Number(valStr);
       if (Number.isNaN(n)) return;
       parsed = n;
+    } else if (col.kind === "date") {
+      // Garantir que todas as datas sejam normalizadas para YYYY-MM-DD para o banco
+      let d: Date;
+      const strVal = String(value).trim();
+      const dmyMatch = strVal.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+      if (dmyMatch) {
+        d = new Date(`${dmyMatch[3]}-${dmyMatch[2].padStart(2, '0')}-${dmyMatch[1].padStart(2, '0')}`);
+      } else {
+        d = new Date(strVal);
+      }
+      if (isNaN(d.getTime())) return;
+      parsed = d.toISOString().slice(0, 10);
     } else {
       parsed = value;
     }
