@@ -316,25 +316,43 @@ function ConciliacaoSemanalView() {
   const { user } = useSession();
   const [dataIni, setDataIni] = useState("");
   const [dataFim, setDataFim] = useState("");
+  const [formato, setFormato] = useState<"xlsx" | "csv">("xlsx");
 
   const exportMut = useMutation({
-    mutationFn: () => exportarConciliacaoSemanal(dataIni, dataFim, user!.id),
+    mutationFn: () => {
+      if (new Date(dataFim) < new Date(dataIni)) {
+        throw new Error("A data fim não pode ser anterior à data de início.");
+      }
+      return exportarConciliacaoSemanal(dataIni, dataFim, user!.id, formato);
+    },
     onSuccess: () => {
-      toast.success("Extração gerada e enviada para o seu sino.");
+      toast.success(`Extração (${formato.toUpperCase()}) gerada e enviada para o seu sino.`);
     },
     onError: (e: any) => toast.error(e.message),
   });
+
+  const handlePrintPDF = () => {
+    if (!dataIni || !dataFim) {
+      toast.error("Selecione o período para exportar PDF.");
+      return;
+    }
+    if (new Date(dataFim) < new Date(dataIni)) {
+      toast.error("Data inválida: Fim anterior ao Início.");
+      return;
+    }
+    window.print();
+  };
 
   return (
     <Card className="border-border/40 bg-card/50 backdrop-blur-md">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-lg">
           <FileSpreadsheet className="h-5 w-5 text-emerald-500" />
-          Extração Semanal
+          Extração por Período
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-4 md:grid-cols-3">
           <div className="space-y-2">
             <Label>Início do Período</Label>
             <Input type="date" value={dataIni} onChange={(e) => setDataIni(e.target.value)} className="bg-white/5 border-white/10" />
@@ -343,16 +361,46 @@ function ConciliacaoSemanalView() {
             <Label>Fim do Período</Label>
             <Input type="date" value={dataFim} onChange={(e) => setDataFim(e.target.value)} className="bg-white/5 border-white/10" />
           </div>
+          <div className="space-y-2">
+            <Label>Formato</Label>
+            <Select value={formato} onValueChange={(v: any) => setFormato(v)}>
+              <SelectTrigger className="bg-white/5 border-white/10">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="xlsx">Excel (.xlsx)</SelectItem>
+                <SelectItem value="csv">CSV (.csv)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
-        <Button 
-          className="w-full bg-emerald-600 hover:bg-emerald-700 gap-2 font-bold shadow-lg shadow-emerald-600/20" 
-          disabled={!dataIni || !dataFim || exportMut.isPending}
-          onClick={() => exportMut.mutate()}
-        >
-          {exportMut.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
-          Gerar Relatório de Auditoria
-        </Button>
+        <div className="flex gap-3">
+          <Button 
+            className="flex-1 bg-emerald-600 hover:bg-emerald-700 gap-2 font-bold shadow-lg shadow-emerald-600/20" 
+            disabled={!dataIni || !dataFim || exportMut.isPending}
+            onClick={() => exportMut.mutate()}
+          >
+            {exportMut.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
+            Gerar Relatório {formato.toUpperCase()}
+          </Button>
+          
+          <Button 
+            variant="outline"
+            className="flex-1 gap-2 font-bold border-red-500/20 text-red-400 hover:bg-red-500/10"
+            onClick={handlePrintPDF}
+            disabled={!dataIni || !dataFim}
+          >
+            <XCircle className="h-4 w-4" />
+            Exportar para PDF
+          </Button>
+        </div>
+
+        {dataIni && dataFim && new Date(dataFim) < new Date(dataIni) && (
+          <p className="text-xs text-red-500 animate-pulse">
+            Atenção: A data final é anterior à data inicial.
+          </p>
+        )}
       </CardContent>
     </Card>
   );

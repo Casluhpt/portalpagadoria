@@ -190,7 +190,8 @@ export async function executarConciliacao(
 export async function exportarConciliacaoSemanal(
   dataIni: string,
   dataFim: string,
-  userId: string
+  userId: string,
+  formato: "xlsx" | "csv" = "xlsx"
 ) {
   const { data, error } = await supabase
     .from("pagamentos_diversos")
@@ -204,15 +205,33 @@ export async function exportarConciliacaoSemanal(
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Pagamentos Filtrados");
   
-  const fileName = `conciliacao-semanal-${dataIni}-a-${dataFim}.xlsx`;
-  XLSX.writeFile(wb, fileName);
+  const extension = formato === "xlsx" ? "xlsx" : "csv";
+  const fileName = `conciliacao-semanal-${dataIni}-a-${dataFim}.${extension}`;
+  
+  if (formato === "xlsx") {
+    XLSX.writeFile(wb, fileName);
+  } else {
+    XLSX.writeFile(wb, fileName, { bookType: "csv" });
+  }
 
   const { notificarArquivoPronto } = await import("./notificacoes-arquivos");
   await notificarArquivoPronto(
     "Relatório de Conciliação Pronto",
-    `O arquivo filtrado de ${dataIni} a ${dataFim} foi gerado.`,
+    `O arquivo filtrado (${extension.toUpperCase()}) de ${dataIni} a ${dataFim} foi gerado.`,
     userId
   );
   
   return data;
+}
+
+export async function exportarResultadosParaPDF(
+  resultados: ConciliacaoItem[],
+  dataIni: string,
+  dataFim: string
+) {
+  // Como estamos em um ambiente de Worker/Edge, não temos bibliotecas de PDF nativas pesadas.
+  // Vamos simular a geração ou usar uma abordagem de impressão.
+  // No frontend, usaremos window.print() ou uma lib leve se disponível.
+  console.log("Exportando PDF para o período:", dataIni, "a", dataFim);
+  return true;
 }
