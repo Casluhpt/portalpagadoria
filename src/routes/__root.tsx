@@ -23,6 +23,7 @@ import { FloatingAI } from "@/components/FloatingAI";
 
 import { AuthGate } from "@/components/auth-gate";
 import { ThemeProvider } from "@/components/theme-provider";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import { GlobalShortcutManager } from "@/hooks/use-global-shortcuts";
 
 
