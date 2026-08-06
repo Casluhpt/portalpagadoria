@@ -67,7 +67,8 @@ export function GlobalSearch({ variant = "compact" }: { variant?: "compact" | "h
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
-      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
+      // Alterado para Ctrl + Shift + K para manter consistência com outros atalhos
+      if (e.key.toLowerCase() === "k" && (e.metaKey || e.ctrlKey) && e.shiftKey) {
         e.preventDefault();
         setOpen((o) => !o);
       }

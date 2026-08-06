@@ -14,6 +14,7 @@ export function useGlobalShortcuts(shortcuts: Record<string, () => void>) {
       if (!(e.ctrlKey || e.metaKey) || !e.shiftKey) return;
       
       const key = e.key.toLowerCase();
+      // 'k' já é tratado no global-search.tsx, mas se quisermos unificar, podemos adicionar aqui
       if (shortcuts[key]) {
         e.preventDefault();
         shortcuts[key]();
@@ -44,6 +45,10 @@ export function GlobalShortcutManager() {
     r: () => navigate({ to: "/principal" }),
     s: () => navigate({ to: "/configuracoes" }),
     u: () => navigate({ to: "/usuarios" }),
+    b: () => navigate({ to: "/auditoria" }), // B de Base/Auditoria
+    t: () => navigate({ to: "/principal/base" }), // T de Tabela de Resultados
+    g: () => navigate({ to: "/divergencias" }), // G de Gap/Divergência
+    l: () => navigate({ to: "/provisao/base" }), // L de Lançamentos de Provisão
   });
 
   return null;
