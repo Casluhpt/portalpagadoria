@@ -403,34 +403,22 @@ function DiagnosticPanel() {
             <CardDescription>Uso de disco e preferências visuais.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <button 
-              onClick={() => navigate({ to: "/base" as any })}
-              className="w-full flex items-center justify-between py-2 border-b border-border hover:bg-muted/30 px-2 rounded-md transition-colors text-left"
-            >
+            <div className="w-full flex items-center justify-between py-2 border-b border-border px-2 rounded-md text-left">
               <span className="text-sm font-medium">Banco de Dados</span>
               <span className="text-sm text-muted-foreground font-bold">452 MB / 5 GB</span>
-            </button>
-            <button 
-              onClick={() => navigate({ to: "/anexos" })}
-              className="w-full flex items-center justify-between py-2 border-b border-border hover:bg-muted/30 px-2 rounded-md transition-colors text-left"
-            >
+            </div>
+            <div className="w-full flex items-center justify-between py-2 border-b border-border px-2 rounded-md text-left">
               <span className="text-sm font-medium">Anexos e Documentos</span>
               <span className="text-sm text-muted-foreground font-bold">1.2 GB / 10 GB</span>
-            </button>
-            <button 
-              onClick={() => navigate({ to: "/anexos" })}
-              className="w-full flex items-center justify-between py-2 border-b border-border hover:bg-muted/30 px-2 rounded-md transition-colors text-left"
-            >
+            </div>
+            <div className="w-full flex items-center justify-between py-2 border-b border-border px-2 rounded-md text-left">
               <span className="text-sm font-medium">Pasta [anexo]</span>
               <span className="text-sm text-emerald-600 font-bold">Ativa</span>
-            </button>
-            <button 
-              onClick={() => toast.success("Backup íntegro no Lovable Cloud.")}
-              className="w-full flex items-center justify-between py-2 hover:bg-muted/30 px-2 rounded-md transition-colors text-left"
-            >
+            </div>
+            <div className="w-full flex items-center justify-between py-2 px-2 rounded-md text-left">
               <span className="text-sm font-medium">Último Backup</span>
               <span className="text-sm text-emerald-600 font-bold">Hoje, 03:00 AM</span>
-            </button>
+            </div>
             <div className="w-full flex items-center justify-between py-2 px-2 rounded-md hover:bg-muted/30 transition-colors">
               <div className="flex items-center gap-2">
                 <Keyboard className="h-4 w-4 text-muted-foreground" />
@@ -460,30 +448,21 @@ function DiagnosticPanel() {
             <CardDescription>Proteção e integridade do portal.</CardDescription>
           </CardHeader>
           <CardContent className="grid gap-4 md:grid-cols-3">
-            <button 
-              onClick={() => navigate({ search: { tab: 'criticas' }, to: '/auditoria' })}
-              className="flex flex-col gap-1 rounded-lg border border-border p-4 bg-muted/30 hover:bg-muted/50 transition-all text-left"
-            >
+            <div className="flex flex-col gap-1 rounded-lg border border-border p-4 bg-muted/30 text-left">
               <span className="text-xs text-muted-foreground uppercase font-bold tracking-wider">Ameaças Bloqueadas</span>
               <span className="text-lg font-bold">4</span>
-              <span className="text-[10px] text-amber-600 font-medium">Ver detalhes na Auditoria</span>
-            </button>
-            <button 
-              onClick={() => toast.success("Lovable Antivirus: 100% dos arquivos seguros.")}
-              className="flex flex-col gap-1 rounded-lg border border-border p-4 bg-muted/30 hover:bg-muted/50 transition-all text-left"
-            >
+              <span className="text-[10px] text-amber-600 font-medium">Proteção em tempo real</span>
+            </div>
+            <div className="flex flex-col gap-1 rounded-lg border border-border p-4 bg-muted/30 text-left">
               <span className="text-xs text-muted-foreground uppercase font-bold tracking-wider">Scan de Vírus</span>
               <span className="text-lg font-bold text-emerald-600">Protegido</span>
               <span className="text-[10px] text-muted-foreground">Último scan: agora mesmo</span>
-            </button>
-            <button 
-              onClick={() => toast.info("Certificado gerado por Lovable Cloud.")}
-              className="flex flex-col gap-1 rounded-lg border border-border p-4 bg-muted/30 hover:bg-muted/50 transition-all text-left"
-            >
+            </div>
+            <div className="flex flex-col gap-1 rounded-lg border border-border p-4 bg-muted/30 text-left">
               <span className="text-xs text-muted-foreground uppercase font-bold tracking-wider">Certificado SSL</span>
               <span className="text-lg font-bold text-emerald-600">Ativo</span>
               <span className="text-[10px] text-muted-foreground">Expira em 365 dias</span>
-            </button>
+            </div>
           </CardContent>
         </Card>
       </div>
