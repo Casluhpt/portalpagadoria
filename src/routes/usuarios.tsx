@@ -8,6 +8,16 @@ import { HeaderActions } from "@/components/header-actions";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 
 export const Route = createFileRoute("/usuarios")({
+  head: () => ({
+    meta: [
+      { title: "Gestão de Usuários | Portal Pagadoria" },
+      { name: "description", content: "Administre perfis, permissões e acessos de usuários ao sistema." },
+      { property: "og:title", content: "Gestão de Usuários | Portal Pagadoria" },
+      { property: "og:description", content: "Administre perfis, permissões e acessos de usuários ao sistema." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: UsuariosPage,
 });
 
