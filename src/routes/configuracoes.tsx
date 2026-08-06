@@ -438,8 +438,16 @@ function DiagnosticPanel() {
               <span className="text-sm font-medium">Último Backup</span>
               <span className="text-sm text-emerald-600 font-bold">Hoje, 03:00 AM</span>
             </button>
+            <div className="w-full flex items-center justify-between py-2 px-2 rounded-md hover:bg-muted/30 transition-colors">
+              <div className="flex items-center gap-2">
+                <Keyboard className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm font-medium text-foreground">Legenda de Atalhos</span>
+              </div>
+              <ShortcutLegendSwitch />
+            </div>
           </CardContent>
         </Card>
+
 
         <Card className="hover:shadow-md transition-all md:col-span-2">
           <CardHeader>
