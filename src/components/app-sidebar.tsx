@@ -40,8 +40,6 @@ import {
   BookOpen,
   ChevronRight,
   FileSpreadsheet,
-  MessageSquare,
-  Bot,
   X,
   Send,
   Loader2,
@@ -55,7 +53,7 @@ import { useRoles, type AppRole } from "@/hooks/use-roles";
 import { useProfile } from "@/hooks/use-profile";
 import { useQuery } from "@tanstack/react-query";
 import { fetchMateriais, materialApoioQueryKey } from "@/lib/material-apoio";
-import { perguntarIa } from "@/lib/ia.functions";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -92,7 +90,7 @@ const navigationGroups = [
   { id: "operacao", label: "Operação e Resultados" },
   { id: "financeiro", label: "Financeiro e Controle" },
   { id: "base_anexos", label: "[anexo] e Relatórios" },
-  { id: "apoio", label: "Suporte e IA" }
+  { id: "apoio", label: "Suporte e Ajuda" }
 ];
 
 const mainItems: MenuItem[] = [
@@ -114,7 +112,6 @@ const mainItems: MenuItem[] = [
   { title: "Central de Divergências", url: "/divergencias", icon: AlertTriangle, match: (p: string) => p.startsWith("/divergencias"), group: "geral" },
 
   { title: "Material de Apoio", url: "/material-apoio", icon: BookOpen, match: (p: string) => p.startsWith("/material-apoio"), group: "apoio" },
-  { title: "IA da Pagadoria", url: "#", icon: Sparkles, match: (p: string) => false, action: "search", group: "apoio" },
 ];
 
 const advancedItems: MenuItem[] = [
@@ -146,10 +143,6 @@ export function AppSidebar() {
     staleTime: 5 * 60_000,
   });
 
-  const [chatOpen, setChatOpen] = useState(false);
-  const [chatMessages, setChatMessages] = useState<{ role: "user" | "assistant"; content: string }[]>([]);
-  const [chatInput, setChatInput] = useState("");
-  const [isTyping, setIsTyping] = useState(false);
 
   const pages = useMemo(() => {
     const all = [
@@ -169,61 +162,6 @@ export function AppSidebar() {
     return all;
   }, []);
 
-  const handleSendMessage = async () => {
-    if (!chatInput.trim() || isTyping) return;
-
-    const userMsg = chatInput.trim();
-    setChatInput("");
-    setChatMessages((prev) => [...prev, { role: "user", content: userMsg }]);
-    setIsTyping(true);
-
-    const contexto = [
-      "MÓDULOS DO PORTAL: " + pages.map((p) => p.title).join("; "),
-      ...materiais
-        .filter((m) => m.publicado)
-        .map((m) => `### ${m.titulo} (${m.categoria})\n${m.conteudo}`),
-    ]
-      .join("\n\n")
-      .slice(0, 50_000);
-
-    try {
-      const { data: modulosDisponiveis } = await supabase.from("app_modules").select("key");
-      const allowedModules = modulosDisponiveis?.map(m => m.key) || [];
-
-      const r = await perguntarIa({ 
-        data: { 
-          pergunta: userMsg, 
-          contexto,
-          appState: {
-            currentPath,
-            setor: setor || undefined,
-            roles: roles || [],
-            allowedModules
-          }
-        } 
-      });
-      if (r.erro) {
-         setChatMessages((prev) => [
-          ...prev,
-          { role: "assistant", content: r.erro },
-        ]);
-        toast.error(r.erro);
-      } else {
-        setChatMessages((prev) => [
-          ...prev,
-          { role: "assistant", content: r.resposta ?? "IA de Suporte da Pagadoria: Não encontrei material autorizado suficiente." },
-        ]);
-      }
-    } catch (err) {
-      console.error("Erro na IA Sidebar:", err);
-      setChatMessages((prev) => [
-        ...prev,
-        { role: "assistant", content: "IA de Suporte da Pagadoria: Erro na conexão com o servidor. Tente novamente." },
-      ]);
-    } finally {
-      setIsTyping(false);
-    }
-  };
 
   // Viewer users have access to a limited set of routes.
   const VIEWER_ALLOWED = ["/pagamentos", "/divergencias"];
@@ -389,94 +327,6 @@ export function AppSidebar() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Floating IA Chat */}
-      {chatOpen && (
-        <div className="fixed bottom-4 right-4 z-50 flex h-[500px] w-[350px] flex-col overflow-hidden rounded-2xl border border-violet-200 bg-card shadow-2xl animate-in slide-in-from-bottom-4">
-          <div className="flex items-center justify-between bg-gradient-to-r from-violet-600 to-indigo-700 p-4 text-white shadow-md">
-            <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white/20 shadow-inner">
-                <Bot className="h-5 w-5" />
-              </div>
-              <div>
-                <h3 className="text-sm font-bold leading-none">IA da Pagadoria</h3>
-                <div className="mt-1 flex items-center gap-1.5">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  <span className="text-[10px] text-white/80 font-medium">Interativo</span>
-                </div>
-              </div>
-            </div>
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-white hover:bg-white/20 transition-colors" onClick={() => setChatOpen(false)}>
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
-          
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
-            {chatMessages.length === 0 && (
-              <div className="flex flex-col items-center justify-center h-full text-center space-y-2 opacity-60">
-                <Sparkles className="h-8 w-8 text-violet-400" />
-                <p className="text-xs">Olá! Sou sua assistente. Como posso ajudar com o portal hoje?</p>
-              </div>
-            )}
-            {chatMessages.map((msg, i) => (
-              <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"} animate-in fade-in slide-in-from-bottom-2`}>
-                <div className="flex items-start gap-2 max-w-[90%]">
-                  {msg.role === "assistant" && (
-                    <div className="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-violet-100 text-violet-600 dark:bg-violet-900/40">
-                      <Bot className="h-3.5 w-3.5" />
-                    </div>
-                  )}
-                  <div className={`rounded-2xl px-4 py-2.5 text-xs shadow-sm ${
-                    msg.role === "user" 
-                      ? "bg-violet-600 text-white rounded-tr-none" 
-                      : "bg-card text-foreground rounded-tl-none border border-border"
-                  }`}>
-                    {msg.content}
-                    {msg.role === "assistant" && i === chatMessages.length - 1 && !isTyping && (
-                      <div className="mt-2 flex gap-1.5 border-t border-border pt-1.5 opacity-80">
-                        <button className="text-[10px] font-bold text-violet-600 hover:underline" onClick={() => setChatInput("Explique mais")}>Dúvidas?</button>
-                        <span className="text-muted-foreground">·</span>
-                        <button className="text-[10px] font-bold text-violet-600 hover:underline" onClick={() => navigate({ to: "/material-apoio" })}>Ajuda</button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))}
-            {isTyping && (
-              <div className="flex justify-start animate-pulse">
-                <div className="flex items-start gap-2 max-w-[90%]">
-                  <div className="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-violet-100 text-violet-600 dark:bg-violet-900/40">
-                    <Loader2 className="h-3 w-3 animate-spin" />
-                  </div>
-                  <div className="rounded-2xl px-4 py-2.5 text-xs bg-muted text-foreground rounded-tl-none border border-border">
-                    <span>Processando sua solicitação...</span>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-
-          <div className="border-t p-3 bg-muted/30">
-            <form 
-              className="flex gap-2" 
-              onSubmit={(e: React.FormEvent) => {
-                e.preventDefault();
-                handleSendMessage();
-              }}
-            >
-              <Input 
-                placeholder="Sua dúvida..." 
-                className="h-9 text-xs" 
-                value={chatInput} 
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setChatInput(e.target.value)}
-              />
-              <Button type="submit" size="icon" className="h-9 w-9 shrink-0 bg-violet-600 hover:bg-violet-700" disabled={isTyping}>
-                <Send className="h-4 w-4" />
-              </Button>
-            </form>
-          </div>
-        </div>
-      )}
     </Sidebar>
   );
 }
