@@ -38,7 +38,10 @@ export const perguntarIa = createServerFn({ method: "POST" })
     const key = process.env["LOVABLE_API_KEY"];
     const { userId, supabase } = context;
 
+    console.log("[IA] Request handler started for user:", userId);
+
     if (!key) {
+      console.error("[IA] LOVABLE_API_KEY is missing");
       return { 
         resposta: null, 
         erro: "IA de Suporte da Pagadoria: Falha na configuração de segurança (Chave ausente)." 
@@ -81,17 +84,20 @@ export const perguntarIa = createServerFn({ method: "POST" })
           "Lovable-API-Key": key,
         },
         body: JSON.stringify({
-          model: "openai/gpt-4o",
+          model: "google/gemini-2.5-flash",
           input: messages,
         }),
       });
 
       if (!res.ok) {
+        const errorText = await res.text();
+        console.error(`[IA] Gateway error: ${res.status}`, errorText);
         throw new Error(`Gateway error: ${res.status}`);
       }
 
       const result = await res.json();
-      const resposta = result.choices?.[0]?.message?.content || result.output_text || "";
+      console.log("[IA] Gateway response raw:", JSON.stringify(result));
+      const resposta = result.output || result.choices?.[0]?.message?.content || result.output_text || "";
 
       if (!resposta) {
         return { resposta: "Desculpe, tive uma instabilidade momentânea. Pode repetir?", erro: null };
