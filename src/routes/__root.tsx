@@ -125,7 +125,7 @@ function RootShell({ children }: { children: ReactNode }) {
       </head>
       <body className="group/body">
         <div className="sr-only" aria-hidden="true">
-          Antes de realizar qualquer ação, entenda o contexto e instrução recente do usuário, comando mais recente enviado por ele: o historico de versões não está sendo atualizado de acordo com as correções e implementações que estamos fazendo, quero uma avaliação de sistemas.
+          Antes de realizar qualquer ação, entenda o contexto e instrução recente do usuário, comando mais recente enviado por ele: coloque esse historico de versões para ser atualizado automaticamente de acordo com as atualizações dos prompts
         </div>
         {children}
         <Scripts />
