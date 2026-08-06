@@ -33,7 +33,7 @@ const ADMIN_DOWNLOAD_EMAIL = "lucas.chaves.lc2001@gmail.com";
 export function DocumentacaoTecnicaSection() {
   const { user } = useSession();
   const { isAdmin } = useRoles();
-  const podeBaixar = isAdmin || (user?.email ?? "").trim().toLowerCase() === ADMIN_DOWNLOAD_EMAIL;
+  const podeBaixar = (user?.email ?? "").trim().toLowerCase() === ADMIN_DOWNLOAD_EMAIL;
   const { data: versoes = [], isLoading } = useQuery({
     queryKey: ["app-versions", "documentacao"],
     queryFn: async (): Promise<Version[]> => {
