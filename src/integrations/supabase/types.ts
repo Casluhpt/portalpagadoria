@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      app_modules: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          key: string
+          label: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          key: string
+          label: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          key?: string
+          label?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       app_permissions: {
         Row: {
           action: string
@@ -1040,6 +1067,7 @@ export type Database = {
       profiles: {
         Row: {
           atualizado_em: string
+          created_by: string | null
           criado_em: string
           email: string | null
           id: string
@@ -1049,9 +1077,11 @@ export type Database = {
           planilha_onboarding_em: string | null
           presence_status: string
           setor: string | null
+          status: string | null
         }
         Insert: {
           atualizado_em?: string
+          created_by?: string | null
           criado_em?: string
           email?: string | null
           id: string
@@ -1061,9 +1091,11 @@ export type Database = {
           planilha_onboarding_em?: string | null
           presence_status?: string
           setor?: string | null
+          status?: string | null
         }
         Update: {
           atualizado_em?: string
+          created_by?: string | null
           criado_em?: string
           email?: string | null
           id?: string
@@ -1073,6 +1105,7 @@ export type Database = {
           planilha_onboarding_em?: string | null
           presence_status?: string
           setor?: string | null
+          status?: string | null
         }
         Relationships: []
       }
@@ -1302,6 +1335,38 @@ export type Database = {
         }
         Relationships: []
       }
+      user_modules: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_authorized: boolean | null
+          module_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_authorized?: boolean | null
+          module_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_authorized?: boolean | null
+          module_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_modules_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "app_modules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_password_metadata: {
         Row: {
           created_at: string
@@ -1365,6 +1430,36 @@ export type Database = {
         }
         Relationships: []
       }
+      user_specific_permissions: {
+        Row: {
+          action: string
+          created_at: string | null
+          id: string
+          is_allowed: boolean
+          resource: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          action: string
+          created_at?: string | null
+          id?: string
+          is_allowed?: boolean
+          resource: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          action?: string
+          created_at?: string | null
+          id?: string
+          is_allowed?: boolean
+          resource?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -1373,6 +1468,10 @@ export type Database = {
       aprovar_solicitacao_provisao: {
         Args: { _id: string; _motivo?: string }
         Returns: string
+      }
+      check_user_permission: {
+        Args: { _action: string; _resource: string; _user_id: string }
+        Returns: boolean
       }
       ensure_viewer_role: { Args: never; Returns: undefined }
       fechar_competencia_provisao: {
@@ -1464,6 +1563,7 @@ export type Database = {
         | "auditor"
         | "viewer"
         | "visitante"
+        | "gerente"
       app_version_tipo: "major" | "minor" | "patch" | "hotfix"
       solicitacao_status:
         | "aberta"
@@ -1613,6 +1713,7 @@ export const Constants = {
         "auditor",
         "viewer",
         "visitante",
+        "gerente",
       ],
       app_version_tipo: ["major", "minor", "patch", "hotfix"],
       solicitacao_status: [
