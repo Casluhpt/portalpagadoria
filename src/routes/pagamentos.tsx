@@ -452,7 +452,7 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
       invalidate();
       toast.success(`${n} lançamento(s) importado(s)`);
       void logAcaoCritica({
-        acao: "importacao_dados",
+        acao: "importacao_excel",
         modulo: "Pagamentos Diversos",
         tabela: "pagamentos_diversos",
         descricao: `Importação de ${n} lançamento(s) — modo ${importMode === "replace" ? "substituição da base" : "incremental"}`,
@@ -887,7 +887,7 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
           />
           <Button size="sm" variant="outline" className="gap-1" onClick={() => fileRef.current?.click()} disabled={importMut.isPending || !canImport || !isEditingEnabled}>
             {importMut.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
-            Importar Excel
+            Importar Excel/CSV
           </Button>
           <Button size="sm" variant="outline" className="gap-1" onClick={() => {
             handleExport();
