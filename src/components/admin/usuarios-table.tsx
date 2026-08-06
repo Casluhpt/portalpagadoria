@@ -278,16 +278,10 @@ function UsuariosTable() {
             <Button variant="outline" onClick={() => setInviteOpen(false)} disabled={inviteMut.isPending}>
               Cancelar
             </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 text-indigo-600 hover:bg-indigo-50 hover:text-indigo-700"
-            title="Gerenciar Módulos e Permissões"
-            onClick={() => setSelectedUserForRBAC(u)}
-          >
-            <ShieldCheck className="h-4 w-4" />
-          </Button>
-          <Button
+            <Button variant="outline" onClick={() => setInviteOpen(false)} disabled={inviteMut.isPending}>
+              Cancelar
+            </Button>
+            <Button
               onClick={() => inviteMut.mutate({ email: inviteEmail, role: inviteRole, nome: inviteNome })}
               disabled={inviteMut.isPending || !inviteEmail}
             >
