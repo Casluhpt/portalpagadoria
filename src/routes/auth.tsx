@@ -53,7 +53,7 @@ function AuthPage() {
   const toggleTheme = () => setMode(isDark ? "claro" : "noturno");
 
   return (
-    <div className="relative flex min-h-dvh items-center justify-center bg-gradient-auth px-4 py-10 sm:p-6">
+    <div className="relative flex min-h-screen items-center justify-center bg-gradient-auth px-4 py-10 sm:p-6">
       <Card className="relative w-full max-w-md animate-in rounded-2xl border-none bg-background/70 shadow-[var(--shadow-elegant)] backdrop-blur-2xl duration-500 fade-in-0 zoom-in-95">
         <button
           type="button"
