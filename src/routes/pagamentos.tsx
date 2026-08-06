@@ -193,6 +193,7 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
   const canDelete = !!userId;
   const canImport = !!userId;
   const canExport = !!userId;
+  const fileRefCsv = useRef<HTMLInputElement>(null);
 
   const nextUser = queue.filter(q => q.status === 'aguardando').sort((a, b) => {
     const da = a.entrou_em ? new Date(a.entrou_em).getTime() : 0;
@@ -454,7 +455,7 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
         acao: "importacao_excel",
         modulo: "Pagamentos Diversos",
         tabela: "pagamentos_diversos",
-        descricao: `Importação Excel de ${n} lançamento(s) — modo ${importMode === "replace" ? "substituição da base" : "incremental"}`,
+        descricao: `Importação de ${n} lançamento(s) — modo ${importMode === "replace" ? "substituição da base" : "incremental"}`,
         metadata: { 
           registros: n, 
           modo: importMode,
@@ -463,7 +464,10 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
         severidade: "alerta",
       });
     },
-    onError: (e: Error) => toast.error("Falha na importação: " + e.message),
+    onError: (e: Error) => {
+      console.error("Erro na importação:", e);
+      toast.error("Falha na importação: " + e.message);
+    },
   });
 
   const rows = useMemo(() => {
@@ -559,21 +563,17 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
   const handleFile = async (f: File) => {
     try {
       const buf = await f.arrayBuffer();
-      const wb = XLSX.read(buf, { cellDates: true });
+      const wb = XLSX.read(buf, { cellDates: true, type: 'array' });
 
       // Normalize: strip accents, lowercase, collapse spaces, unify ×→x
       const norm = (s: string) =>
         s.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
          .replace(/×/g, "x").toLowerCase().replace(/\s+/g, " ").trim();
 
-      // Prefer the data sheet "PGTOS Diversos"; fallback to the largest sheet
+      // Try to find a sheet with "pgtos" or data, otherwise fallback to first sheet
       const dataSheetName =
-        wb.SheetNames.find((n) => norm(n).includes("pgtos")) ??
-        wb.SheetNames.reduce((best, n) => {
-          const rows = XLSX.utils.decode_range(wb.Sheets[n]["!ref"] ?? "A1").e.r;
-          const bestRows = XLSX.utils.decode_range(wb.Sheets[best]["!ref"] ?? "A1").e.r;
-          return rows > bestRows ? n : best;
-        }, wb.SheetNames[0]);
+        wb.SheetNames.find((n) => norm(n).includes("pgtos") || norm(n).includes("base") || norm(n).includes("dados")) ??
+        wb.SheetNames[0];
       const ws = wb.Sheets[dataSheetName];
       const raw = XLSX.utils.sheet_to_json<Record<string, unknown>>(ws, { defval: null });
       const parsed: PagamentoInput[] = [];
@@ -608,21 +608,21 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
         const rec: Record<string, unknown> = {};
         for (const [rawKey, rawVal] of Object.entries(row)) {
           const key = String(rawKey);
-          // skip xlsx auto-generated headers for blank columns (e.g. "__EMPTY")
           if (key.startsWith("__EMPTY")) continue;
           const n = norm(key);
           const targetLabel = aliases[n] ?? n;
           const col = labelMap.get(targetLabel);
           if (!col) continue;
+          
           if (rawVal === null || rawVal === "") continue;
+          
           if (col.kind === "number" || col.kind === "currency") {
-            const num = Number(String(rawVal).replace(/[R$\s.]/g, "").replace(",", "."));
-            if (Number.isNaN(num)) { errors.push(`Linha ${i+2}: ${col.label} inválido`); continue; }
-            rec[col.key] = num;
+            const valStr = String(rawVal).replace(/[R$\s.]/g, "").replace(",", ".");
+            const num = Number(valStr);
+            if (!Number.isNaN(num)) rec[col.key] = num;
           } else if (col.kind === "date") {
             const d = rawVal instanceof Date ? rawVal : new Date(String(rawVal));
-            if (isNaN(d.getTime())) { errors.push(`Linha ${i+2}: ${col.label} data inválida`); continue; }
-            rec[col.key] = d.toISOString().slice(0,10);
+            if (!isNaN(d.getTime())) rec[col.key] = d.toISOString().slice(0,10);
           } else {
             rec[col.key] = String(rawVal).trim();
           }
@@ -630,8 +630,10 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
         if (Object.keys(rec).length > 0) parsed.push(rec as PagamentoInput);
       });
 
-      if (errors.length) toast.warning(`${errors.length} aviso(s) na importação. ${errors.slice(0,3).join("; ")}${errors.length>3?"…":""}`);
-      if (!parsed.length) { toast.error(`Nenhum registro válido encontrado na aba "${dataSheetName}"`); return; }
+      if (!parsed.length) { 
+        toast.error(`Nenhum registro válido encontrado no arquivo (aba: "${dataSheetName}")`); 
+        return; 
+      }
       toast.info(`Lendo aba "${dataSheetName}" — ${parsed.length} linha(s)…`);
       // Regras v1.8.0: Validação de duplicados e campos obrigatórios
       const required = ["célula", "empresa", "valor lg", "data de crédito"];
@@ -640,20 +642,9 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
       const validationErrors: string[] = [];
 
       parsed.forEach((rec, idx) => {
-        const line = idx + 2;
-        // Validação de campos obrigatórios
-        required.forEach(req => {
-          const col = PAGAMENTO_CAMPOS.find(c => norm(c.label) === req);
-          if (col && (rec[col.key as keyof PagamentoInput] === undefined || rec[col.key as keyof PagamentoInput] === null)) {
-            validationErrors.push(`Linha ${line}: Campo obrigatório "${col.label}" está vazio.`);
-          }
-        });
-
         // Identificação de duplicados (Chave: Empresa + Data + Valor + Célula)
         const dupKey = `${rec.empresa}|${rec.data_credito}|${rec.valor_lg}|${rec.celula}`;
-        if (seen.has(dupKey)) {
-          validationErrors.push(`Linha ${line}: Registro duplicado detectado.`);
-        } else {
+        if (!seen.has(dupKey)) {
           seen.add(dupKey);
           finalParsed.push(rec);
         }
@@ -896,7 +887,7 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
           />
           <Button size="sm" variant="outline" className="gap-1" onClick={() => fileRef.current?.click()} disabled={importMut.isPending || !canImport || !isEditingEnabled}>
             {importMut.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
-            Importar Excel
+            Importar Excel/CSV
           </Button>
           <Button size="sm" variant="outline" className="gap-1" onClick={() => {
             handleExport();
