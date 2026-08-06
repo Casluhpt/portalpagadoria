@@ -42,6 +42,16 @@ export const Route = createFileRoute("/despesas-fixas")({
       throw redirect({ to: "/auth", search: { returnTo: "/despesas-fixas" } });
     }
   },
+  head: () => ({
+    meta: [
+      { title: "Despesas Fixas | Portal Pagadoria" },
+      { name: "description", content: "Controle e gestão orçamentária de despesas fixas (PJ, Fornecedores e Penhora)." },
+      { property: "og:title", content: "Despesas Fixas | Portal Pagadoria" },
+      { property: "og:description", content: "Controle e gestão orçamentária de despesas fixas (PJ, Fornecedores e Penhora)." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: DespesasFixasPage,
 });
 
