@@ -10,6 +10,7 @@ import { fetchMateriais, materialApoioQueryKey } from "@/lib/material-apoio";
 import { useSession } from "@/hooks/use-session";
 import { useNavigate } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
 
 export function FloatingAI() {
   const [isOpen, setIsOpen] = useState(false);
@@ -25,6 +26,28 @@ export function FloatingAI() {
     enabled: !!user,
     staleTime: 5 * 60_000,
   });
+
+  // Carregar histórico inicial do banco
+  useEffect(() => {
+    if (user && isOpen && chatMessages.length === 0) {
+      const loadHistory = async () => {
+        const { data } = await supabase
+          .from("ia_conversas")
+          .select("role, content")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: true })
+          .limit(10);
+        
+        if (data && data.length > 0) {
+          setChatMessages(data.map(m => ({ 
+            role: m.role as "user" | "assistant", 
+            content: m.content 
+          })));
+        }
+      };
+      loadHistory();
+    }
+  }, [user, isOpen]);
 
   const handleSendMessage = async () => {
     if (!chatInput.trim() || isTyping) return;
