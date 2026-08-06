@@ -188,7 +188,7 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
   const isViewer = roles.includes("viewer");
   const isVisitante = roles.includes("visitante");
   
-  const isEditingEnabled = !!userId && activeUser?.user_id === userId;
+  const isEditingEnabled = !!userId; // Edit enabled for all logged in users, queue only for new launches
   const canMutate = !!userId;
   const canDelete = !!userId;
   const canImport = !!userId;
