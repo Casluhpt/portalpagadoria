@@ -166,13 +166,14 @@ function BankReconciliationPage() {
 function ConciliacaoAtivaView({ onResults }: { onResults: (res: ConciliacaoItem[]) => void }) {
   const { user } = useSession();
   const [loading, setLoading] = useState(false);
-  const [competencia, setCompetencia] = useState("");
+  const [dataInicio, setDataInicio] = useState("");
+  const [dataFim, setDataFim] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
 
   const { data: pagamentosPortal } = useQuery({
-    queryKey: ['pagamentos-conciliacao', competencia],
-    queryFn: () => getPagamentosParaConciliacao({ data: { competencias: [competencia] } }),
-    enabled: !!competencia
+    queryKey: ['pagamentos-conciliacao', dataInicio, dataFim],
+    queryFn: () => getPagamentosParaConciliacao({ data: { dataInicio, dataFim } }),
+    enabled: !!dataInicio && !!dataFim
   });
 
   const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
