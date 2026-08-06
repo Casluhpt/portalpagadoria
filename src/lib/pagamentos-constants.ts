@@ -83,6 +83,8 @@ export type Pagamento = {
   status_itau: string | null;
   diferenca_bank_itau: number | null;
   natureza_pagamento: string | null;
+  excluido_em: string | null;
+  excluido_por: string | null;
 };
 
 export const PAGAMENTO_CAMPOS: {

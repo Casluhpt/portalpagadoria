@@ -314,6 +314,7 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
     queryFn: fetchPagamentos,
     enabled: !!userId,
     staleTime: 30_000,
+    select: (list) => list.filter(r => !r.excluido_em),
   });
 
   const [search, setSearch] = useState("");
