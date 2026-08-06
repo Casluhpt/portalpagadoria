@@ -441,7 +441,7 @@ function PortalPage() {
                                               : Wrench;
                                       return (
                                         <li key={i} className="flex items-start gap-2">
-                                          <Icon className="mt-0.5 h-4 w-4 shrink-0 text-violet-600" />
+                                          <Icon className="mt-0.5 h-3.5 w-3.5 shrink-0 text-violet-600" />
                                           <span>{it.descricao}</span>
                                         </li>
                                       );
@@ -607,10 +607,10 @@ function ModuleCard({ m }: { m: ModuleDef }) {
 
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 rounded-lg bg-muted px-3 py-2 text-xs text-muted-foreground">
           <span className="flex items-center gap-1">
-            <ScrollText className="h-4 w-4" /> Base: <b>{m.base}</b>
+            <ScrollText className="h-3.5 w-3.5" /> Base: <b>{m.base}</b>
           </span>
           <span className="flex items-center gap-1">
-            <Clock className="h-4 w-4" /> Atualizado: {m.updated}
+            <Clock className="h-3.5 w-3.5" /> Atualizado: {m.updated}
           </span>
         </div>
 

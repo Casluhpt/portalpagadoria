@@ -409,7 +409,7 @@ export function AppSidebar() {
                 <div className="flex items-start gap-2 max-w-[90%]">
                   {msg.role === "assistant" && (
                     <div className="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-violet-100 text-violet-600 dark:bg-violet-900/40">
-                      <Bot className="h-4 w-4" />
+                      <Bot className="h-3.5 w-3.5" />
                     </div>
                   )}
                   <div className={`rounded-2xl px-4 py-2.5 text-xs shadow-sm ${

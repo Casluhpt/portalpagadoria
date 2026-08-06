@@ -61,22 +61,22 @@ function ConfiguracoesPage() {
                 </div>
                 <TabsList className="bg-muted/50 border border-border p-1 h-auto grid grid-cols-3 md:grid-cols-6 w-full md:w-auto">
                   <TabsTrigger value="suporte" className="py-2.5 px-4 text-xs font-semibold data-[state=active]:bg-background data-[state=active]:shadow-sm">
-                    <HelpCircle className="h-4 w-4 mr-2" /> Suporte
+                    <HelpCircle className="h-3.5 w-3.5 mr-2" /> Suporte
                   </TabsTrigger>
                   <TabsTrigger value="administracao" className="py-2.5 px-4 text-xs font-semibold data-[state=active]:bg-background data-[state=active]:shadow-sm">
-                    <Users className="h-4 w-4 mr-2" /> Usuários
+                    <Users className="h-3.5 w-3.5 mr-2" /> Usuários
                   </TabsTrigger>
                   <TabsTrigger value="identidade" className="py-2.5 px-4 text-xs font-semibold data-[state=active]:bg-background data-[state=active]:shadow-sm">
-                    <ImageIcon className="h-4 w-4 mr-2" /> Identidade
+                    <ImageIcon className="h-3.5 w-3.5 mr-2" /> Identidade
                   </TabsTrigger>
                   <TabsTrigger value="documentacao" className="py-2.5 px-4 text-xs font-semibold data-[state=active]:bg-background data-[state=active]:shadow-sm">
-                    <Code className="h-4 w-4 mr-2" /> Documentação
+                    <Code className="h-3.5 w-3.5 mr-2" /> Documentação
                   </TabsTrigger>
                   <TabsTrigger value="diagnostico" className="py-2.5 px-4 text-xs font-semibold data-[state=active]:bg-background data-[state=active]:shadow-sm">
-                    <Activity className="h-4 w-4 mr-2" /> Diagnóstico
+                    <Activity className="h-3.5 w-3.5 mr-2" /> Diagnóstico
                   </TabsTrigger>
                   <TabsTrigger value="seguranca" className="py-2.5 px-4 text-xs font-semibold data-[state=active]:bg-background data-[state=active]:shadow-sm">
-                    <ShieldCheck className="h-4 w-4 mr-2" /> Segurança
+                    <ShieldCheck className="h-3.5 w-3.5 mr-2" /> Segurança
                   </TabsTrigger>
                 </TabsList>
 
