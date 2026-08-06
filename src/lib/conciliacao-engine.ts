@@ -1,22 +1,31 @@
 import { supabase } from "@/integrations/supabase/client";
 import * as XLSX from "xlsx";
-import { format } from "date-fns";
+import { format, differenceInDays } from "date-fns";
 
 export type ConciliacaoItem = {
   empresa: string;
   data: string;
   valor: number;
-  tipo: "Varejo" | "Distribuição" | "Diferenças";
+  tipo: string;
   origem: "importado" | "base";
   id?: string;
-  matchId?: string;
+  matchId?: string | null;
   nivel?: number;
   diferenca?: number;
   sugestao?: ConciliacaoItem[];
+  banco?: string;
+  descricao?: string;
+  documento?: string;
+  favorecido?: string;
+  setor?: string;
+  competencia?: string;
+  motivoDivergencia?: string;
+  status?: "Conciliado" | "Divergente" | "Recusado" | "Pendente";
+  score?: number;
+  valorPortal?: number;
 };
 
 export async function fetchCompetenciasDisponiveis() {
-  // Busca competências da base ativa
   const { data: ativas, error: err1 } = await supabase
     .from("pagamentos_diversos")
     .select("competencia")
@@ -24,7 +33,6 @@ export async function fetchCompetenciasDisponiveis() {
   
   if (err1) throw err1;
 
-  // Busca competências fechadas
   const { data: fechadas, error: err2 } = await supabase
     .from("fechamento_pagamentos")
     .select("mes");
@@ -42,168 +50,148 @@ export async function fetchCompetenciasDisponiveis() {
   return Array.from(todas).sort().reverse();
 }
 
-export async function fetchPagamentosParaConciliacao(competencias: string[]) {
-  // 1. Busca na base ativa
-  const { data: ativas, error: err1 } = await supabase
-    .from("pagamentos_diversos")
-    .select("empresa, data_credito, valor_lg, competencia")
-    .in("competencia", competencias);
-  
-  if (err1) throw err1;
-
-  // Em uma implementação real completa, buscaríamos também no histórico de itens arquivados
-  
-  return (ativas || []).map(r => ({
-    empresa: r.empresa || "N/A",
-    data: r.data_credito || "",
-    valor: Number(r.valor_lg) || 0,
-    origem: "base" as const,
-    tipo: "Varejo" as any // Será definido na UI
-  }));
-}
-
 export async function executarConciliacao(
-  tipo: "Varejo" | "Distribuição" | "Diferenças", 
   importados: any[], 
+  basePortal: any[],
   userId: string
-) {
-  // Validação de colunas obrigatórias
-  const colunasObrigatorias = ["empresa", "data", "valor"];
-  if (importados.length > 0) {
-    const firstRowKeys = Object.keys(importados[0]).map(k => k.toLowerCase());
-    const faltantes = colunasObrigatorias.filter(col => 
-      !firstRowKeys.some(key => key.includes(col))
-    );
-    if (faltantes.length > 0) {
-      throw new Error(`Arquivo inválido. Colunas obrigatórias faltantes: ${faltantes.join(", ")}`);
-    }
-  }
-
-  // 1. Buscar a base de referência (Pagamentos Diversos ativos + Competências recentes)
-  const { data: baseRows, error } = await supabase
-    .from("pagamentos_diversos")
-    .select("empresa, data_credito, valor_lg, celula, id")
-    .limit(10000); // Em prod, ideal filtrar por competências próximas
-
-  if (error) throw error;
-
-  const base: ConciliacaoItem[] = (baseRows || []).map(r => ({
-    empresa: r.empresa || "",
-    data: r.data_credito || "",
-    valor: Number(r.valor_lg) || 0,
-    origem: "base",
-    tipo,
-    id: r.id
-  }));
-
-  const normalizados = importados.map(imp => {
-    // Normalização básica de campos comuns em arquivos de retorno
+): Promise<ConciliacaoItem[]> {
+  const normalizadosBanco = importados.map(imp => {
+    const valor = Number(String(imp.Valor || imp.valor || imp.VALOR || imp["Valor Total"] || 0)
+      .replace(/[^\d.,]/g, "").replace(",", "."));
+    
     return {
       empresa: imp.Empresa || imp.empresa || imp.EMPRESA || "",
       data: imp.Data || imp.data || imp.DATA || imp["Data Crédito"] || "",
-      valor: Number(String(imp.Valor || imp.valor || imp.VALOR || imp["Valor Total"] || 0).replace(/[^\d.,]/g, "").replace(",", ".")),
+      valor,
+      banco: imp.Banco || imp.banco || imp.BANCO || "",
+      descricao: imp.Descricao || imp.descrição || imp.DESCRICAO || "",
+      documento: imp.Documento || imp.documento || imp.DOCUMENTO || "",
+      favorecido: imp.Favorecido || imp.favorecido || imp.FAVORECIDO || "",
       origem: "importado" as const,
-      tipo,
+      tipo: "Banco",
       original: imp
     };
   });
 
-  const resultados = normalizados.map(imp => {
-    // Nível 1: Correspondência exata (Empresa, Data, Valor)
-    const exactMatch = base.find(b => 
-      b.empresa === imp.empresa && 
-      b.data === imp.data && 
-      Math.abs(b.valor - imp.valor) < 0.01
-    );
+  const normalizadosPortal = basePortal.map(p => {
+    const valor = Number(String(p.Valor || p.valor || p.VALOR || p.valor_lg || 0)
+      .replace(/[^\d.,]/g, "").replace(",", "."));
 
-    if (exactMatch) {
-      return { ...imp, matchId: "ok", nivel: 1, diferenca: 0 };
-    }
+    return {
+      empresa: p.Empresa || p.empresa || p.EMPRESA || "",
+      data: p.Data || p.data || p.DATA || p.data_credito || "",
+      valor,
+      banco: p.Banco || p.banco || p.BANCO || "",
+      descricao: p.Descricao || p.descrição || p.DESCRICAO || p.celula || "",
+      documento: p.Documento || p.documento || p.DOCUMENTO || "",
+      favorecido: p.Favorecido || p.favorecido || p.FAVORECIDO || "",
+      id: p.id,
+      origem: "base" as const,
+      tipo: "Portal",
+      original: p
+    };
+  });
 
-    // Nível 2: Data próxima (± 2 dias)
-    const dataImp = new Date(imp.data);
-    const dataProxima = base.find(b => {
-      if (b.empresa !== imp.empresa || Math.abs(b.valor - imp.valor) > 0.01) return false;
-      const dataB = new Date(b.data);
-      const diffDays = Math.abs(dataB.getTime() - dataImp.getTime()) / (1000 * 3600 * 24);
-      return diffDays <= 2;
-    });
+  const resultados: ConciliacaoItem[] = normalizadosBanco.map(imp => {
+    const matches = normalizadosPortal.map(p => {
+      let score = 0;
+      if (p.empresa.toLowerCase() === imp.empresa.toLowerCase()) score += 20;
+      if (Math.abs(p.valor - imp.valor) < 0.01) score += 40;
+      
+      const dataImp = new Date(imp.data);
+      const dataP = new Date(p.data);
+      const diffDays = isNaN(dataImp.getTime()) || isNaN(dataP.getTime()) ? 10 : Math.abs(differenceInDays(dataImp, dataP));
+      
+      if (diffDays === 0) score += 15;
+      else if (diffDays <= 2) score += 10;
+      
+      if (p.banco && imp.banco && p.banco.toLowerCase() === imp.banco.toLowerCase()) score += 10;
+      if (p.descricao && imp.descricao && p.descricao.toLowerCase().includes(imp.descricao.toLowerCase())) score += 5;
+      if (p.documento && imp.documento && p.documento === imp.documento) score += 5;
+      if (p.favorecido && imp.favorecido && p.favorecido.toLowerCase().includes(imp.favorecido.toLowerCase())) score += 5;
 
-    if (dataProxima) {
-      return { ...imp, matchId: "ok-data", nivel: 2, diferenca: 0 };
-    }
+      return { item: p, score };
+    }).sort((a, b) => b.score - a.score);
 
-    // Nível 3: Soma de valores (SubSet Sum simplificado)
-    const candidatos = base.filter(b => {
-      if (b.empresa !== imp.empresa) return false;
-      const dataB = new Date(b.data);
-      const diffDays = Math.abs(dataB.getTime() - dataImp.getTime()) / (1000 * 3600 * 24);
-      return diffDays <= 3;
-    });
+    const bestMatch = matches[0];
 
-    const sugestao = buscarCombinacao(candidatos, imp.valor);
-    if (sugestao.length > 1) { // 1 item seria Nível 1/2
-      const soma = sugestao.reduce((s, c) => s + c.valor, 0);
+    if (bestMatch && bestMatch.score >= 75) {
       return { 
         ...imp, 
-        matchId: "soma", 
-        nivel: 3, 
-        sugestao, 
-        diferenca: imp.valor - soma 
+        matchId: bestMatch.item.id, 
+        nivel: 1, 
+        diferenca: 0,
+        status: "Conciliado",
+        score: bestMatch.score,
+        valorPortal: bestMatch.item.valor
       };
     }
 
-    return { ...imp, matchId: "divergente", nivel: 5, diferenca: imp.valor };
+    if (bestMatch && bestMatch.score >= 40) {
+      let motivo = "Divergência de valores ou data";
+      const diff = imp.valor - bestMatch.item.valor;
+      if (Math.abs(diff) < 20 && Math.abs(diff) > 0) motivo = "Possível tarifa bancária";
+      else if (diff > 0 && diff < 100) motivo = "Possíveis juros/IOF";
+
+      return { 
+        ...imp, 
+        matchId: bestMatch.item.id, 
+        nivel: 3, 
+        diferenca: diff,
+        status: "Divergente",
+        motivoDivergencia: motivo,
+        score: bestMatch.score,
+        valorPortal: bestMatch.item.valor
+      };
+    }
+
+    return { 
+      ...imp, 
+      matchId: null, 
+      nivel: 5, 
+      diferenca: imp.valor,
+      status: "Pendente",
+      score: 0,
+      valorPortal: 0
+    };
   });
 
-  // 2. Gerar Excel com os resultados em 2 sheets
   const wb = XLSX.utils.book_new();
   
-  // Sheet 1: Todos os registros importados com seu status
   const ws1Data = resultados.map(r => ({
-    "Empresa": r.empresa,
     "Data": r.data,
-    "Valor Original": r.valor,
-    "Nível Conciliação": r.nivel,
-    "Status": r.nivel === 5 ? "Divergente" : "Conciliado",
-    "Diferença": r.diferenca
-  }));
-  const ws1 = XLSX.utils.json_to_sheet(ws1Data);
-  XLSX.utils.book_append_sheet(wb, ws1, tipo);
-
-  // Sheet 2: Somente Divergências (Nível 5) ou Diferenças
-  const ws2Data = resultados.filter(r => r.nivel >= 3).map((r: any) => ({
     "Empresa": r.empresa,
-    "Data": r.data,
-    "Valor": r.valor,
-    "Nível": r.nivel,
+    "Banco": r.banco,
+    "Descrição": r.descricao,
+    "Valor Banco": r.valor,
+    "Valor Portal": r.valorPortal || 0,
     "Diferença": r.diferenca,
-    "Sugestão": r.sugestao?.map((s: any) => `ID:${s.id} (R$ ${s.valor})`).join(", ") || "Nenhuma"
+    "Status": r.status,
+    "Motivo": r.motivoDivergencia || "",
+    "Confiança (%)": r.score
   }));
-  const ws2 = XLSX.utils.json_to_sheet(ws2Data);
-  XLSX.utils.book_append_sheet(wb, ws2, "Divergências e Sugestões");
+  
+  const ws1 = XLSX.utils.json_to_sheet(ws1Data);
+  XLSX.utils.book_append_sheet(wb, ws1, "Conciliação Geral");
 
-  const fileName = `conciliacao-${tipo.toLowerCase()}-${format(new Date(), "yyyy-MM-dd-HHmm")}.xlsx`;
+  const fileName = `conciliacao-bancaria-${format(new Date(), "yyyy-MM-dd-HHmm")}.xlsx`;
   XLSX.writeFile(wb, fileName);
 
-  // 3. Notificar e registrar
   const { notificarArquivoPronto } = await import("./notificacoes-arquivos");
   await notificarArquivoPronto(
-    `Conciliação ${tipo} Concluída`,
-    `O processamento de ${resultados.length} registros foi finalizado. O arquivo detalhado está disponível.`,
+    `Conciliação Bancária Concluída`,
+    `O processamento inteligente de ${resultados.length} registros foi finalizado.`,
     userId
   );
 
   return resultados;
 }
 
-
 export async function exportarConciliacaoSemanal(
   dataIni: string,
   dataFim: string,
   userId: string
 ) {
-  // 1. Busca dados filtrados por data
   const { data, error } = await supabase
     .from("pagamentos_diversos")
     .select("*")
@@ -212,7 +200,6 @@ export async function exportarConciliacaoSemanal(
 
   if (error) throw error;
 
-  // 2. Gera Excel com títulos da base
   const ws = XLSX.utils.json_to_sheet(data || []);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Pagamentos Filtrados");
@@ -220,29 +207,12 @@ export async function exportarConciliacaoSemanal(
   const fileName = `conciliacao-semanal-${dataIni}-a-${dataFim}.xlsx`;
   XLSX.writeFile(wb, fileName);
 
-  // 3. Notificação e Anexo (Simulado - em prod enviaria para Storage)
   const { notificarArquivoPronto } = await import("./notificacoes-arquivos");
   await notificarArquivoPronto(
     "Relatório de Conciliação Pronto",
-    `O arquivo filtrado de ${dataIni} a ${dataFim} foi gerado. Disponível em [anexo] > Conciliação Bancária.`,
+    `O arquivo filtrado de ${dataIni} a ${dataFim} foi gerado.`,
     userId
   );
   
   return data;
-}
-
-function buscarCombinacao(arr: ConciliacaoItem[], target: number): ConciliacaoItem[] {
-  const result: ConciliacaoItem[] = [];
-  let currentSum = 0;
-  const sorted = [...arr].sort((a, b) => b.valor - a.valor);
-  
-  for (const item of sorted) {
-    if (currentSum + item.valor <= target + 0.01) {
-      currentSum += item.valor;
-      result.push(item);
-    }
-    if (Math.abs(currentSum - target) < 0.01) return result;
-  }
-  
-  return [];
 }

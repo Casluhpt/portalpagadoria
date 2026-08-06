@@ -102,7 +102,6 @@ const mainItems: MenuItem[] = [
   { title: "Provisão Diária", url: "/provisao", icon: Wallet, match: (p: string) => p.startsWith("/provisao"), restricted: true, adminOnly: true, group: "operacao" },
   
   { title: "Conciliação Bancária", url: "/conciliacao", icon: ShieldCheck, match: (p: string) => p.startsWith("/conciliacao"), restricted: true, adminOnly: true, group: "financeiro" },
-  { title: "Conciliação de Líquidos", url: "/conciliacao", icon: BarChart3, match: (p: string) => p === "/conciliacao" && window.location.hash === "#liquidos", group: "financeiro", adminOnly: true },
   { title: "Pagamentos Diversos", url: "/pagamentos", icon: Banknote, match: (p: string) => p.startsWith("/pagamentos"), group: "financeiro" },
   { title: "Despesas Fixas", url: "/despesas-fixas", icon: Wallet, match: (p: string) => p.startsWith("/despesas-fixas"), group: "financeiro" },
   { title: "Controle E-Social", url: "/esocial", icon: FileSpreadsheet, match: (p: string) => p.startsWith("/esocial"), group: "financeiro" },
@@ -338,7 +337,7 @@ export function AppSidebar() {
                     <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
                     <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-tight">Sistema Online</span>
                   </div>
-                  <span className="text-[9px] text-emerald-600/70 font-mono">v2.7.5</span>
+                  <span className="text-[9px] text-emerald-600/70 font-mono">v2.8.4</span>
                 </div>
                 <LiveClock />
                 <div className="rounded-md bg-sidebar-accent/40 px-2 py-1.5 text-xs text-sidebar-foreground">
