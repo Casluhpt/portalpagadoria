@@ -62,7 +62,7 @@ export function HeaderActions() {
   const { roles, isAdmin } = useRoles();
   const { setor } = useProfile();
   const { status, setStatus } = usePresence();
-  const [iaOnline, setIaOnline] = useState<boolean | null>(null);
+  // iaOnline state removed to clean up residual AI logic
 
   const navigate = useNavigate();
   const primary = roles[0];
@@ -84,36 +84,8 @@ export function HeaderActions() {
     else toast.success("Enviamos um link de redefinição para seu email.");
   };
 
-  useEffect(() => {
-    if (!user) return;
-    
-    const fetchIaStatus = async () => {
-      const { data } = await supabase
-        .from('app_config')
-        .select('value')
-        .eq('key', 'ia_online')
-        .single();
-      setIaOnline(data?.value !== false);
-    };
+  // AI status fetching removed as part of AI cleanup to prevent errors and visual marks
 
-    fetchIaStatus();
-
-    const channel = supabase
-      .channel('public:app_config')
-      .on('postgres_changes', { 
-        event: 'UPDATE', 
-        schema: 'public', 
-        table: 'app_config',
-        filter: 'key=eq.ia_online'
-      }, (payload) => {
-        setIaOnline(payload.new.value !== false);
-      })
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [user]);
 
 
   if (!user) {
