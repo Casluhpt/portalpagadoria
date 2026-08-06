@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { AppLogo } from "@/components/app-logo";
 import { AppSidebar } from "@/components/app-sidebar";
-import { SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { HeaderActions } from "@/components/header-actions";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -28,25 +28,16 @@ import { DocumentacaoTecnicaSection } from "@/components/documentacao-tecnica-se
 
 
 export const Route = createFileRoute("/configuracoes")({
-  head: () => ({
-    meta: [
-      { title: "Configurações | Portal Pagadoria" },
-      { name: "description", content: "Personalize sua experiência, gerencie permissões e acesse o suporte técnico." },
-      { property: "og:title", content: "Configurações | Portal Pagadoria" },
-      { property: "og:description", content: "Personalize sua experiência, gerencie permissões e acesse o suporte técnico." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-    ],
-  }),
   component: ConfiguracoesPage,
 });
 
 function ConfiguracoesPage() {
   const navigate = useNavigate();
   return (
-    <div className="flex min-h-screen w-full bg-background">
-      <AppSidebar />
-      <div className="flex flex-1 flex-col">
+    <SidebarProvider>
+      <div className="flex min-h-screen w-full bg-background">
+        <AppSidebar />
+        <div className="flex flex-1 flex-col">
           <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-border bg-background/80 px-4 backdrop-blur">
             <SidebarTrigger />
             <Link to="/" className="flex flex-1 items-center gap-2 hover:opacity-80 transition-opacity">
@@ -113,20 +104,16 @@ function ConfiguracoesPage() {
               </TabsContent>
 
               <TabsContent value="seguranca" className="m-0 focus-visible:outline-none">
-                <div className="grid gap-6 lg:grid-cols-3">
-                  <div className="lg:col-span-1">
-                    <PerfilAcessoInfo />
-                  </div>
-                  <div className="lg:col-span-2 space-y-6">
-                    <AdvancedSecuritySettings />
-                    <SmartConfigPanel />
-                  </div>
+                <div className="grid gap-6 md:grid-cols-2">
+                  <AdvancedSecuritySettings />
+                  <SmartConfigPanel />
                 </div>
               </TabsContent>
             </Tabs>
           </main>
         </div>
       </div>
+    </SidebarProvider>
   );
 }
 
@@ -603,75 +590,6 @@ function SmartConfigPanel() {
             Restaurar Padrão
           </Button>
         </div>
-      </CardContent>
-    </Card>
-  );
-}
-
-function PerfilAcessoInfo() {
-  const perfis = [
-    {
-      nome: "Administrador",
-      nivel: "Master / Geral",
-      desc: "Acesso completo e irrestrito a todos os módulos, configurações de sistema, gestão de usuários e logs de auditoria críticos.",
-      cor: "text-rose-600",
-      bg: "bg-rose-500/10",
-      border: "border-rose-200"
-    },
-    {
-      nome: "Gerente",
-      nivel: "Gestão Setorial",
-      desc: "Acesso total aos módulos operacionais e visualização de relatórios. Pode gerenciar comunicados e visualizar auditoria básica.",
-      cor: "text-amber-600",
-      bg: "bg-amber-500/10",
-      border: "border-amber-200"
-    },
-    {
-      nome: "Colaborador",
-      nivel: "Operacional",
-      desc: "Acesso aos módulos de trabalho diário (Provisão, Pagamentos) conforme seu setor. Restrito a operações de lançamento e consulta.",
-      cor: "text-indigo-600",
-      bg: "bg-indigo-500/10",
-      border: "border-indigo-200"
-    },
-    {
-      nome: "Visitante",
-      nivel: "Consulta",
-      desc: "Acesso apenas para visualização de dashboards e bases públicas. Não possui permissão para inclusão, edição ou exclusão de dados.",
-      cor: "text-slate-600",
-      bg: "bg-slate-500/10",
-      border: "border-slate-200"
-    }
-  ];
-
-  return (
-    <Card className="border-border shadow-sm">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-base">
-          <ShieldAlert className="h-5 w-5 text-rose-600" />
-          Matriz de Perfis de Acesso
-        </CardTitle>
-        <CardDescription>
-          Definição detalhada das permissões e capacidades de cada nível de acesso no portal.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="grid gap-3">
-          {perfis.map((p) => (
-            <div key={p.nome} className={cn("p-3 rounded-lg border flex flex-col gap-1.5 transition-all", p.bg, p.border)}>
-              <div className="flex items-center justify-between">
-                <span className={cn("text-xs font-bold uppercase tracking-wider", p.cor)}>{p.nome}</span>
-                <span className="text-[10px] font-medium bg-background/50 px-2 py-0.5 rounded-full border border-current/20">{p.nivel}</span>
-              </div>
-              <p className="text-[11px] leading-relaxed text-foreground/80">
-                {p.desc}
-              </p>
-            </div>
-          ))}
-        </div>
-        <p className="text-[10px] italic text-muted-foreground mt-2 border-t border-border pt-3">
-          * O acesso Administrador é geral e master, possuindo controle total sobre a infraestrutura do Portal Pagadoria.
-        </p>
       </CardContent>
     </Card>
   );

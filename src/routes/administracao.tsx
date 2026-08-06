@@ -6,7 +6,7 @@ import { toast } from "sonner";
 
 import { AppSidebar } from "@/components/app-sidebar";
 import { HeaderActions } from "@/components/header-actions";
-import { SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,36 +29,28 @@ export const Route = createFileRoute("/administracao")({
       throw redirect({ to: "/auth", search: { returnTo: "/administracao" } });
     }
   },
-  head: () => ({
-    meta: [
-      { title: "Administração | Portal Pagadoria" },
-      { name: "description", content: "Gerenciamento central de comunicados e avisos globais do portal." },
-      { property: "og:title", content: "Administração | Portal Pagadoria" },
-      { property: "og:description", content: "Gerenciamento central de comunicados e avisos globais do portal." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-    ],
-  }),
   component: AdministracaoPage,
 });
 
 function AdministracaoPage() {
   return (
-    <div className="flex min-h-screen w-full bg-muted">
-      <AppSidebar />
-      <div className="flex flex-1 flex-col">
-        <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-border bg-background/80 px-4 backdrop-blur">
-          <SidebarTrigger />
-          <h1 className="truncate text-sm font-semibold text-foreground">Administração de Comunicados</h1>
-          <div className="ml-auto">
-            <HeaderActions />
-          </div>
-        </header>
-        <main className="flex-1 space-y-6 p-6">
-          <ComunicadosPanel />
-        </main>
+    <SidebarProvider>
+      <div className="flex min-h-screen w-full bg-muted">
+        <AppSidebar />
+        <div className="flex flex-1 flex-col">
+          <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-border bg-background/80 px-4 backdrop-blur">
+            <SidebarTrigger />
+            <h1 className="truncate text-sm font-semibold text-foreground">Administração de Comunicados</h1>
+            <div className="ml-auto">
+              <HeaderActions />
+            </div>
+          </header>
+          <main className="flex-1 space-y-6 p-6">
+            <ComunicadosPanel />
+          </main>
+        </div>
       </div>
-    </div>
+    </SidebarProvider>
   );
 }
 

@@ -23,16 +23,6 @@ import { useTheme } from "@/components/theme-provider";
 
 
 export const Route = createFileRoute("/auth")({
-  head: () => ({
-    meta: [
-      { title: "Autenticação | Portal Pagadoria" },
-      { name: "description", content: "Entre ou crie sua conta no Portal Pagadoria para gerenciar bases de dados financeiras." },
-      { property: "og:title", content: "Autenticação | Portal Pagadoria" },
-      { property: "og:description", content: "Entre ou crie sua conta no Portal Pagadoria para gerenciar bases de dados financeiras." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-    ],
-  }),
   component: AuthPage,
 });
 

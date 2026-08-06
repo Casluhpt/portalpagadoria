@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { HeaderActions } from "@/components/header-actions";
 import { AppLogo } from "@/components/app-logo";
@@ -39,16 +39,6 @@ import { format } from "date-fns";
 
 
 export const Route = createFileRoute('/esocial')({
-  head: () => ({
-    meta: [
-      { title: "Controle E-Social | Portal Pagadoria" },
-      { name: "description", content: "Acompanhamento mensal de lançamentos e impostos do e-Social." },
-      { property: "og:title", content: "Controle E-Social | Portal Pagadoria" },
-      { property: "og:description", content: "Acompanhamento mensal de lançamentos e impostos do e-Social." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-    ],
-  }),
   component: ESocialPage
 });
 
@@ -170,9 +160,10 @@ function ESocialPage() {
 
 
   return (
-    <div className="flex min-h-screen w-full bg-muted dark:bg-background">
-      <AppSidebar />
-      <div className="flex flex-1 flex-col">
+    <SidebarProvider>
+      <div className="flex min-h-screen w-full bg-muted dark:bg-background">
+        <AppSidebar />
+        <div className="flex flex-1 flex-col">
           <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-border bg-card/90 px-4 backdrop-blur dark:bg-card/90 dark:border-border">
             <SidebarTrigger />
             <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
@@ -431,7 +422,8 @@ function ESocialPage() {
               </div>
             </div>
           </main>
+        </div>
       </div>
-    </div>
+    </SidebarProvider>
   );
 }

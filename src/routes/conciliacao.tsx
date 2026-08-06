@@ -1,5 +1,5 @@
 import { createFileRoute, redirect, Link } from '@tanstack/react-router';
-import { SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { HeaderActions } from "@/components/header-actions";
 import { AppLogo } from "@/components/app-logo";
@@ -15,123 +15,115 @@ export const Route = createFileRoute('/conciliacao')({
       throw redirect({ to: "/auth", search: { returnTo: "/conciliacao" } });
     }
   },
-  head: () => ({
-    meta: [
-      { title: "Conciliação Bancária | Portal Pagadoria" },
-      { name: "description", content: "Validação multi-fonte e engine de conciliação multi-nível." },
-      { property: "og:title", content: "Conciliação Bancária | Portal Pagadoria" },
-      { property: "og:description", content: "Validação multi-fonte e engine de conciliação multi-nível." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-    ],
-  }),
   component: BankReconciliationPage
 });
 
 function BankReconciliationPage() {
   return (
-    <div className="flex min-h-screen w-full bg-muted">
-      <AppSidebar />
-      <div className="flex flex-1 flex-col">
-        <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-border bg-card/90 px-4 backdrop-blur">
-          <SidebarTrigger />
-          <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-            <AppLogo area="header" className="h-6 w-auto shrink-0 sm:h-7" />
-            <div className="ml-2 flex flex-col leading-tight">
-              <span className="text-sm font-semibold text-foreground">Conciliação Bancária</span>
-              <span className="text-[11px] text-muted-foreground">Validação multi-fonte</span>
+    <SidebarProvider>
+      <div className="flex min-h-screen w-full bg-muted">
+        <AppSidebar />
+        <div className="flex flex-1 flex-col">
+          <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-border bg-card/90 px-4 backdrop-blur">
+            <SidebarTrigger />
+            <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+              <AppLogo area="header" className="h-6 w-auto shrink-0 sm:h-7" />
+              <div className="ml-2 flex flex-col leading-tight">
+                <span className="text-sm font-semibold text-foreground">Conciliação Bancária</span>
+                <span className="text-[11px] text-muted-foreground">Validação multi-fonte</span>
+              </div>
+            </Link>
+            <div className="ml-auto flex items-center gap-3">
+              <HeaderActions />
             </div>
-          </Link>
-          <div className="ml-auto flex items-center gap-3">
-            <HeaderActions />
-          </div>
-        </header>
+          </header>
 
-        <main className="flex-1 space-y-6 p-6">
-          <Tabs defaultValue="dashboard" className="w-full">
-            <TabsList className="mb-4">
-              <TabsTrigger value="dashboard" className="gap-2">
-                <LayoutDashboard className="h-4 w-4" /> Dashboard
-              </TabsTrigger>
-              <TabsTrigger value="conciliacao" className="gap-2">
-                <ShieldCheck className="h-4 w-4" /> Conciliar
-              </TabsTrigger>
-              <TabsTrigger value="liquidos" className="gap-2">
-                <BarChart3 className="h-4 w-4" /> Conciliação de Líquidos
-              </TabsTrigger>
-              <TabsTrigger value="semanal" className="gap-2">
-                <History className="h-4 w-4" /> Conciliação Semanal
-              </TabsTrigger>
-              <TabsTrigger value="historico" className="gap-2">
-                <History className="h-4 w-4" /> Histórico
-              </TabsTrigger>
-              <TabsTrigger value="pendencias" className="gap-2 text-red-600">
-                <AlertTriangle className="h-4 w-4" /> Pendências
-              </TabsTrigger>
-            </TabsList>
+          <main className="flex-1 space-y-6 p-6">
+            <Tabs defaultValue="dashboard" className="w-full">
+              <TabsList className="mb-4">
+                <TabsTrigger value="dashboard" className="gap-2">
+                  <LayoutDashboard className="h-4 w-4" /> Dashboard
+                </TabsTrigger>
+                <TabsTrigger value="conciliacao" className="gap-2">
+                  <ShieldCheck className="h-4 w-4" /> Conciliar
+                </TabsTrigger>
+                <TabsTrigger value="liquidos" className="gap-2">
+                  <BarChart3 className="h-4 w-4" /> Conciliação de Líquidos
+                </TabsTrigger>
+                <TabsTrigger value="semanal" className="gap-2">
+                  <History className="h-4 w-4" /> Conciliação Semanal
+                </TabsTrigger>
+                <TabsTrigger value="historico" className="gap-2">
+                  <History className="h-4 w-4" /> Histórico
+                </TabsTrigger>
+                <TabsTrigger value="pendencias" className="gap-2 text-red-600">
+                  <AlertTriangle className="h-4 w-4" /> Pendências
+                </TabsTrigger>
+              </TabsList>
 
-            <TabsContent value="dashboard" className="space-y-4">
-              <div className="grid gap-4 md:grid-cols-3">
-                <div className="rounded-xl border bg-card p-6 shadow-sm">
-                  <h3 className="text-sm font-medium text-muted-foreground">Status Geral</h3>
-                  <p className="mt-2 text-3xl font-bold text-foreground">92.4%</p>
-                  <p className="text-xs text-emerald-600 mt-1">Conciliado (Junho/2026)</p>
+              <TabsContent value="dashboard" className="space-y-4">
+                <div className="grid gap-4 md:grid-cols-3">
+                  <div className="rounded-xl border bg-card p-6 shadow-sm">
+                    <h3 className="text-sm font-medium text-muted-foreground">Status Geral</h3>
+                    <p className="mt-2 text-3xl font-bold text-foreground">92.4%</p>
+                    <p className="text-xs text-emerald-600 mt-1">Conciliado (Junho/2026)</p>
+                  </div>
+                  <div className="rounded-xl border bg-card p-6 shadow-sm">
+                    <h3 className="text-sm font-medium text-muted-foreground">Divergências</h3>
+                    <p className="mt-2 text-3xl font-bold text-amber-600">12</p>
+                    <p className="text-xs text-muted-foreground mt-1">Aguardando ajuste</p>
+                  </div>
+                  <div className="rounded-xl border bg-card p-6 shadow-sm">
+                    <h3 className="text-sm font-medium text-muted-foreground">Pendências Críticas</h3>
+                    <p className="mt-2 text-3xl font-bold text-red-600">2</p>
+                    <p className="text-xs text-muted-foreground mt-1">Sem retorno bancário</p>
+                  </div>
                 </div>
-                <div className="rounded-xl border bg-card p-6 shadow-sm">
-                  <h3 className="text-sm font-medium text-muted-foreground">Divergências</h3>
-                  <p className="mt-2 text-3xl font-bold text-amber-600">12</p>
-                  <p className="text-xs text-muted-foreground mt-1">Aguardando ajuste</p>
+
+                <div className="rounded-xl border bg-card p-8 text-center">
+                  <p className="text-muted-foreground">Módulo de Conciliação Bancária v1.9.0 em implementação.</p>
+                  <div className="mt-4 text-left max-w-2xl mx-auto space-y-4">
+                    <p className="text-sm text-indigo-600 font-bold border-b border-indigo-100 pb-2 flex items-center gap-2">
+                      <Sparkles className="h-4 w-4" /> Próximos Passos (Engine de Conciliação):
+                    </p>
+                    <ul className="text-sm text-muted-foreground space-y-3">
+                      <li className="flex gap-3">
+                        <div className="h-5 w-5 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">✓</div>
+                        <span><b>Níveis 1 e 2:</b> Correspondência exata e por data próxima (+/- 2 dias) implementadas.</span>
+                      </li>
+                      <li className="flex gap-3">
+                        <div className="h-5 w-5 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">✓</div>
+                        <span><b>Nível 3:</b> Lógica de Soma (SubSet Sum) para agrupar múltiplos títulos bancários integrada.</span>
+                      </li>
+                      <li className="flex gap-3">
+                        <div className="h-5 w-5 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">→</div>
+                        <span><b>Nível 4 (Ajuste de Tarifa):</b> Configurar tolerância de centavos para conciliação automática de tarifas bancárias.</span>
+                      </li>
+                      <li className="flex gap-3">
+                        <div className="h-5 w-5 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">!</div>
+                        <span><b>Interface Dinâmica:</b> Adicionar tooltips detalhados para exibir quais IDs compõem a sugestão do Nível 3.</span>
+                      </li>
+                    </ul>
+                  </div>
                 </div>
-                <div className="rounded-xl border bg-card p-6 shadow-sm">
-                  <h3 className="text-sm font-medium text-muted-foreground">Pendências Críticas</h3>
-                  <p className="mt-2 text-3xl font-bold text-red-600">2</p>
-                  <p className="text-xs text-muted-foreground mt-1">Sem retorno bancário</p>
-                </div>
-              </div>
+              </TabsContent>
 
-              <div className="rounded-xl border bg-card p-8 text-center">
-                <p className="text-muted-foreground">Módulo de Conciliação Bancária v1.9.0 em implementação.</p>
-                <div className="mt-4 text-left max-w-2xl mx-auto space-y-4">
-                  <p className="text-sm text-indigo-600 font-bold border-b border-indigo-100 pb-2 flex items-center gap-2">
-                    <Sparkles className="h-4 w-4" /> Próximos Passos (Engine de Conciliação):
-                  </p>
-                  <ul className="text-sm text-muted-foreground space-y-3">
-                    <li className="flex gap-3">
-                      <div className="h-5 w-5 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">✓</div>
-                      <span><b>Níveis 1 e 2:</b> Correspondência exata e por data próxima (+/- 2 dias) implementadas.</span>
-                    </li>
-                    <li className="flex gap-3">
-                      <div className="h-5 w-5 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">✓</div>
-                      <span><b>Nível 3:</b> Lógica de Soma (SubSet Sum) para agrupar múltiplos títulos bancários integrada.</span>
-                    </li>
-                    <li className="flex gap-3">
-                      <div className="h-5 w-5 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">→</div>
-                      <span><b>Nível 4 (Ajuste de Tarifa):</b> Configurar tolerância de centavos para conciliação automática de tarifas bancárias.</span>
-                    </li>
-                    <li className="flex gap-3">
-                      <div className="h-5 w-5 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">!</div>
-                      <span><b>Interface Dinâmica:</b> Adicionar tooltips detalhados para exibir quais IDs compõem a sugestão do Nível 3.</span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </TabsContent>
+              <TabsContent value="conciliacao" className="space-y-6">
+                <ConciliacaoAtivaView />
+              </TabsContent>
 
-            <TabsContent value="conciliacao" className="space-y-6">
-              <ConciliacaoAtivaView />
-            </TabsContent>
+              <TabsContent value="semanal" className="space-y-6">
+                <ConciliacaoSemanalView />
+              </TabsContent>
 
-            <TabsContent value="semanal" className="space-y-6">
-              <ConciliacaoSemanalView />
-            </TabsContent>
-
-            <TabsContent value="liquidos" className="space-y-6">
-              <ConciliacaoLiquidosView />
-            </TabsContent>
-          </Tabs>
-        </main>
+              <TabsContent value="liquidos" className="space-y-6">
+                <ConciliacaoLiquidosView />
+              </TabsContent>
+            </Tabs>
+          </main>
+        </div>
       </div>
-    </div>
+    </SidebarProvider>
   );
 }
 

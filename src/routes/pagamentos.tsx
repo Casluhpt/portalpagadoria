@@ -83,16 +83,6 @@ import { purgarPagamentosBulkFn } from "@/lib/pagamentos-admin.functions";
 
 
 export const Route = createFileRoute("/pagamentos")({
-  head: () => ({
-    meta: [
-      { title: "Pagamentos Diversos | Portal Pagadoria" },
-      { name: "description", content: "Controle financeiro, conciliação e gestão de pagamentos diversos." },
-      { property: "og:title", content: "Pagamentos Diversos | Portal Pagadoria" },
-      { property: "og:description", content: "Controle financeiro, conciliação e gestão de pagamentos diversos." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-  }),
   component: PagamentosPage,
 });
 
@@ -125,9 +115,10 @@ function PagamentosPage() {
     "Anônimo";
 
   return (
-    <div className="flex min-h-screen w-full bg-background">
-      <AppSidebar />
-      <div className="flex flex-1 flex-col">
+    <SidebarProvider>
+      <div className="flex min-h-screen w-full bg-background">
+        <AppSidebar />
+        <div className="flex flex-1 flex-col">
           <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-border bg-background/80 px-4 backdrop-blur">
             <SidebarTrigger />
             <Link to="/" className="flex flex-1 items-center gap-2 hover:opacity-80 transition-opacity">
@@ -162,6 +153,7 @@ function PagamentosPage() {
           </Tabs>
         </div>
       </div>
+    </SidebarProvider>
   );
 }
 
