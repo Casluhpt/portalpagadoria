@@ -16,12 +16,14 @@ import { cn } from "@/lib/utils";
 import { usePlanilhaModo } from "@/hooks/use-planilha-modo";
 import { useState, useRef, useEffect } from "react";
 import { useSession } from "@/hooks/use-session";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { sendSupportRequest } from "@/lib/suporte.functions";
 import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { UsuariosTableWrapper as UsuariosTable } from "@/components/admin/usuarios-table";
+import { listAdminUsers, setUserSpecificPermission, removeUserSpecificPermission, getUserSpecificPermissions, type AdminUserRow } from "@/lib/admin-users.functions";
+
 import { IdentidadeVisualPanel } from "@/components/admin/identidade-visual";
 
 import { DocumentacaoTecnicaSection } from "@/components/documentacao-tecnica-section";
