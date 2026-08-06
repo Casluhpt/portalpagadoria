@@ -11,7 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { HelpCircle, Bug, AlertCircle, MessageSquare, Send, CheckCircle2, Paperclip, X, Loader2, Settings, Users, History, ChevronRight, Activity, Cloud, ShieldCheck, Mail, Save, Code, Zap, Database, ShieldAlert, Cpu, Sparkles, RefreshCw, Trash2, Lock, Table as TableIcon, Image as ImageIcon, Keyboard } from "lucide-react";
+import { HelpCircle, Bug, AlertCircle, MessageSquare, Send, CheckCircle2, Paperclip, X, Loader2, Settings, Users, History, ChevronRight, Activity, Cloud, ShieldCheck, Mail, Save, Code, Zap, Database, ShieldAlert, RefreshCw, Trash2, Lock, Table as TableIcon, Image as ImageIcon, Keyboard } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { usePlanilhaModo } from "@/hooks/use-planilha-modo";
 import { useState, useRef, useEffect } from "react";
@@ -376,7 +376,7 @@ function DiagnosticPanel() {
               className="w-full flex items-center justify-between py-2 border-b border-border hover:bg-muted/30 px-2 rounded-md transition-colors text-left"
             >
               <div className="flex items-center gap-2">
-                <Cpu className="h-4 w-4 text-muted-foreground" />
+                <Activity className="h-4 w-4 text-muted-foreground" />
                 <span className="text-sm font-medium">Latência de API</span>
               </div>
               <span className="text-sm text-emerald-600 font-bold">32ms (Excelente)</span>
@@ -450,7 +450,7 @@ function DiagnosticPanel() {
             <div className="pt-4 border-t border-border mt-2 space-y-4">
               <div className="flex items-center justify-between px-2">
                 <div className="flex items-center gap-2">
-                  <Sparkles className="h-4 w-4 text-muted-foreground" />
+                  <Zap className="h-4 w-4 text-muted-foreground" />
                   <span className="text-sm font-medium text-foreground">Efeito Spotlight (Noturno)</span>
                 </div>
                 <SpotlightToggle />
@@ -534,7 +534,7 @@ function SmartConfigPanel() {
     {
       id: "inteligente" as const,
       titulo: "Modo Inteligente",
-      icone: Sparkles,
+      icone: Zap,
       desc: "Aprende padrões, sugere preenchimentos e aponta inconsistências — sempre como assistência.",
     },
   ];
@@ -543,7 +543,7 @@ function SmartConfigPanel() {
     <Card className="border-border shadow-sm">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-base">
-          <Sparkles className="h-5 w-5 text-violet-600" />
+          <Zap className="h-5 w-5 text-violet-600" />
           Planilha Inteligente
         </CardTitle>
         <CardDescription>
@@ -620,69 +620,11 @@ function AdvancedSecuritySettings() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [iaLoading, setIaLoading] = useState(false);
-  const [iaOnline, setIaOnline] = useState(true);
   const [settings, setSettings] = useState({
     enabled: false,
     email: "",
   });
 
-  const fetchIaStatus = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('app_config')
-        .select('value')
-        .eq('key', 'ia_online')
-        .single();
-      
-      if (error) throw error;
-      setIaOnline(data?.value !== false);
-    } catch (e: any) {
-      console.error("Erro ao carregar status da IA:", e);
-    }
-  };
-
-  const toggleIaStatus = async (status: boolean) => {
-    setIaLoading(true);
-    try {
-      // First, check if the record exists to decide between insert and update
-      // This helps avoid RLS issues with upsert if only update is allowed
-      const { data: existing } = await supabase
-        .from('app_config')
-        .select('key')
-        .eq('key', 'ia_online')
-        .single();
-
-      let result;
-      if (existing) {
-        result = await supabase
-          .from('app_config')
-          .update({
-            value: status,
-            updated_at: new Date().toISOString()
-          })
-          .eq('key', 'ia_online');
-      } else {
-        result = await supabase
-          .from('app_config')
-          .insert({
-            key: 'ia_online',
-            value: status,
-            updated_at: new Date().toISOString()
-          });
-      }
-      
-      if (result.error) throw result.error;
-      
-      setIaOnline(status);
-      toast.success(`IA da Pagadoria agora está ${status ? 'ONLINE' : 'OFFLINE'}`);
-    } catch (e: any) {
-      console.error("Erro ao alterar status da IA:", e);
-      toast.error("Erro ao alterar status da IA: " + (e.message || "Erro desconhecido"));
-    } finally {
-      setIaLoading(false);
-    }
-  };
 
   const fetchSettings = async () => {
     setLoading(true);
@@ -726,7 +668,7 @@ function AdvancedSecuritySettings() {
 
   useEffect(() => {
     fetchSettings();
-    fetchIaStatus();
+    
   }, []);
 
   if (loading) {
@@ -749,35 +691,6 @@ function AdvancedSecuritySettings() {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div className="rounded-lg border border-indigo-200 bg-indigo-50/50 p-4 dark:border-indigo-900/30 dark:bg-indigo-950/20 space-y-4">
-          <div className="flex items-center gap-2">
-            <Sparkles className="h-4 w-4 text-indigo-600" />
-            <h4 className="text-sm font-bold">Controle da IA Assistente</h4>
-          </div>
-          <p className="text-[11px] text-muted-foreground leading-relaxed">
-            Permite habilitar ou desabilitar globalmente a IA Assistente da Pagadoria para manutenção ou atualizações.
-          </p>
-          <div className="flex items-center justify-between py-1 border-t border-indigo-100 dark:border-indigo-900/50 pt-4">
-            <div className="space-y-0.5">
-              <Label className="text-[12px] font-semibold">Status da IA (Online/Offline)</Label>
-              <p className="text-[10px] text-muted-foreground">Define se a IA responderá aos usuários.</p>
-            </div>
-            <div className="flex items-center gap-3">
-              <span className={cn(
-                "text-[10px] font-bold uppercase px-2 py-0.5 rounded-full",
-                iaOnline ? "bg-emerald-100 text-emerald-700" : "bg-rose-100 text-rose-700"
-              )}>
-                {iaOnline ? 'Online' : 'Offline'}
-              </span>
-              <Switch 
-                checked={iaOnline} 
-                onCheckedChange={toggleIaStatus}
-                disabled={iaLoading}
-                className="data-[state=checked]:bg-indigo-600" 
-              />
-            </div>
-          </div>
-        </div>
 
         <div className="rounded-lg border border-border p-4 bg-muted/30 space-y-3">
           <div className="flex items-center gap-2">

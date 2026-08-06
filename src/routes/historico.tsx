@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import {
-  Download, GitBranch, Loader2, Search, Sparkles, ShieldCheck, Wrench, Bug,
+  Download, GitBranch, Loader2, Search, Zap, ShieldCheck, Wrench, Bug,
 } from "lucide-react";
 import logoPagadoria from "@/assets/logo-pagadoria.png.asset.json";
 import { useRoles } from "@/hooks/use-roles";
@@ -40,8 +40,8 @@ type Version = {
   destaque: boolean;
 };
 
-const catMeta: Record<Categoria, { label: string; Icon: typeof Sparkles; color: string }> = {
-  novo: { label: "Novo", Icon: Sparkles, color: "text-violet-600" },
+const catMeta: Record<Categoria, { label: string; Icon: typeof Zap; color: string }> = {
+  novo: { label: "Novo", Icon: Zap, color: "text-violet-600" },
   melhoria: { label: "Melhoria", Icon: Wrench, color: "text-blue-600" },
   correcao: { label: "Correção", Icon: Bug, color: "text-amber-600" },
   seguranca: { label: "Segurança", Icon: ShieldCheck, color: "text-emerald-600" },
@@ -318,7 +318,7 @@ function Content() {
                 <ul className="mt-3 space-y-1.5">
                   {v.itens.map((it, i) => {
                     const meta = catMeta[it.categoria];
-                    const Icon = meta?.Icon ?? Sparkles;
+                    const Icon = meta?.Icon ?? Zap;
                     return (
                       <li key={i} className="flex items-start gap-2 text-sm">
                         <Icon className={`mt-0.5 h-4 w-4 shrink-0 ${meta?.color ?? "text-muted-foreground"}`} />

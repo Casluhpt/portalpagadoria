@@ -11,7 +11,7 @@ import {
   Pencil,
   Plus,
   Search,
-  Sparkles,
+  
   Trash2,
   LifeBuoy,
   ShieldCheck,
@@ -53,7 +53,7 @@ import {
 import { useRoles } from "@/hooks/use-roles";
 import { useProfile } from "@/hooks/use-profile";
 import { useSession } from "@/hooks/use-session";
-import { perguntarIa } from "@/lib/ia.functions";
+
 import {
   createMaterial,
   deleteMaterial,
@@ -75,7 +75,7 @@ export const Route = createFileRoute("/material-apoio")({
       {
         name: "description",
         content:
-          "Central de ajuda do Portal da Pagadoria: materiais de suporte, busca por dúvidas, IA assistente e download em PDF.",
+          "Central de ajuda do Portal da Pagadoria: materiais de suporte e busca por dúvidas.",
       },
       { property: "og:title", content: "Material de Apoio — Portal da Pagadoria" },
       {
@@ -270,9 +270,6 @@ function MaterialApoioPage() {
   const [categoria, setCategoria] = useState<string | null>(null);
   const [aberto, setAberto] = useState<string | null>(null);
 
-  const [iaPergunta, setIaPergunta] = useState("");
-  const [iaResposta, setIaResposta] = useState<string | null>(null);
-  const [iaCarregando, setIaCarregando] = useState(false);
 
   const [editando, setEditando] = useState<MaterialApoio | null>(null);
   const [criando, setCriando] = useState(false);
@@ -300,41 +297,8 @@ function MaterialApoioPage() {
     return ranked.map((m) => m.titulo);
   }, [materiais, busca]);
 
-  const contextoIa = useMemo(
-    () =>
-      materiais
-        .filter((m) => m.publicado)
-        .map(
-          (m) =>
-            `### ${m.titulo} (categoria: ${m.categoria})\nPalavras-chave: ${(m.palavras_chave ?? []).join(", ")}\n${m.conteudo}`,
-        )
-        .join("\n\n---\n\n")
-        .slice(0, 55_000),
-    [materiais],
-  );
 
-  const perguntar = async (pergunta?: string) => {
-    const q = (pergunta ?? iaPergunta ?? busca).trim();
-    if (q.length < 2) {
-      toast.info("Escreva sua dúvida para a IA Assistente.");
-      return;
-    }
-    setIaPergunta(q);
-    setIaCarregando(true);
-    setIaResposta(null);
-    try {
-      const r = await perguntarIa({ data: { pergunta: q, contexto: contextoIa } });
-      if (r.erro) {
-        toast.error(r.erro, { duration: 5000 });
-      }
-      setIaResposta(r.resposta ?? null);
-    } catch (e) {
-      console.error("IA Material Apoio Catch:", e);
-      toast.error("IA de Suporte da Pagadoria: Ocorreu um erro inesperado na interface.");
-    } finally {
-      setIaCarregando(false);
-    }
-  };
+  
 
   const abrirCriacao = () => {
     setForm({ ...vazio, ordem: materiais.length + 1 });
@@ -427,7 +391,7 @@ function MaterialApoioPage() {
               <div className="bg-gradient-to-br from-violet-600 to-indigo-700 px-6 py-6 text-white">
                 <h2 className="text-lg font-semibold">Qual é a sua dúvida?</h2>
                 <p className="mt-1 text-xs text-white/80">
-                  Pesquise no material de apoio do portal ou pergunte à IA Assistente da Pagadoria.
+                  Pesquise no material de apoio do portal.
                 </p>
                 <div className="mt-4 flex flex-col gap-2 sm:flex-row">
                   <div className="relative flex-1">
@@ -435,26 +399,11 @@ function MaterialApoioPage() {
                     <Input
                       value={busca}
                       onChange={(e) => setBusca(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") perguntar(busca);
-                      }}
                       placeholder="Ex.: como fechar a competência? como importar pagamentos?"
                       className="h-11 border-0 bg-card pl-9 text-sm text-foreground placeholder:text-muted-foreground"
                       aria-label="Pesquisar no material de apoio"
                     />
                   </div>
-                  <Button
-                    className="h-11 gap-2 bg-card text-violet-700 hover:bg-card/90"
-                    onClick={() => perguntar(busca)}
-                    disabled={iaCarregando}
-                  >
-                    {iaCarregando ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <Sparkles className="h-4 w-4" />
-                    )}
-                    Perguntar à IA
-                  </Button>
                 </div>
 
                 {sugestoes.length > 0 && (
@@ -473,26 +422,6 @@ function MaterialApoioPage() {
                 )}
               </div>
 
-              {(iaResposta || iaCarregando) && (
-                <CardContent className="border-t bg-violet-50/50 p-5 dark:bg-violet-950/20">
-                  <div className="flex items-center gap-2 text-xs font-semibold text-violet-700 dark:text-violet-300">
-                    <Sparkles className="h-3.5 w-3.5" /> IA Assistente da Pagadoria
-                  </div>
-                  <div className="mt-3">
-                    {iaCarregando ? (
-                      <p className="flex items-center gap-2 text-xs italic text-muted-foreground">
-                        <Loader2 className="h-3 w-3 animate-spin" /> Consultando o material autorizado…
-                      </p>
-                    ) : (
-                      <Markdown text={iaResposta ?? ""} />
-                    )}
-                  </div>
-                  <p className="mt-3 flex items-center gap-1 text-[10px] text-muted-foreground">
-                    <ShieldCheck className="h-3 w-3" /> Respostas baseadas somente no material de apoio
-                    publicado pelo administrador.
-                  </p>
-                </CardContent>
-              )}
             </Card>
 
             <section id="atalhos" className="rounded-xl border border-blue-100 bg-blue-50/30 p-5">
