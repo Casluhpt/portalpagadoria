@@ -10,7 +10,8 @@ type ShortcutHandler = (e: KeyboardEvent) => void;
 export function useGlobalShortcuts(shortcuts: Record<string, () => void>) {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (!(e.ctrlKey || e.metaKey)) return;
+      // Alterado para Ctrl + Shift + Tecla a pedido do usuário
+      if (!(e.ctrlKey || e.metaKey) || !e.shiftKey) return;
       
       const key = e.key.toLowerCase();
       if (shortcuts[key]) {
@@ -31,13 +32,18 @@ export function GlobalShortcutManager() {
   const navigate = useNavigate();
   
   useGlobalShortcuts({
-    // Atalhos sugeridos baseados na navegação comum
+    // Atalhos atualizados para Ctrl + Shift + Letra
     h: () => navigate({ to: "/" }),
     p: () => navigate({ to: "/pagamentos" }),
     c: () => navigate({ to: "/conciliacao" }),
     m: () => navigate({ to: "/material-apoio" }),
     a: () => navigate({ to: "/anexos" }),
     f: () => navigate({ to: "/fechamento" }),
+    d: () => navigate({ to: "/despesas-fixas" }),
+    e: () => navigate({ to: "/esocial" }),
+    r: () => navigate({ to: "/principal" }),
+    s: () => navigate({ to: "/configuracoes" }),
+    u: () => navigate({ to: "/usuarios" }),
   });
 
   return null;
