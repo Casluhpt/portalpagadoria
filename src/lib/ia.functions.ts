@@ -84,7 +84,7 @@ export const perguntarIa = createServerFn({ method: "POST" })
           "Authorization": `Bearer ${key}`,
         },
         body: JSON.stringify({
-          model: "google/gemini-2.5-flash",
+          model: "openai/gpt-5",
           messages: messages,
         }),
       });
