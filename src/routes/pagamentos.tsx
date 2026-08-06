@@ -1216,12 +1216,22 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
             </div>
           </div>
           <DialogFooter className="flex-col sm:flex-col gap-2">
-            <Button variant="outline" className="w-full border-amber-300 text-amber-800 hover:bg-amber-100" onClick={() => setFilaOpen(false)}>
+            <Button 
+              variant="outline" 
+              className="w-full border-amber-300 text-amber-800 hover:bg-amber-100" 
+              onClick={() => {
+                setFilaOpen(false);
+                toast.info("Você minimizou o modal da fila. Ele reabrirá se houver atualizações importantes.");
+              }}
+            >
               Aguardar em Segundo Plano
             </Button>
             <Button
               className="w-full gap-2 bg-red-600 font-bold text-white hover:bg-red-700"
-              onClick={() => { setFilaOpen(false); setConfirmSaidaFila(true); }}
+              onClick={() => { 
+                // setFilaOpen(false); // Mantemos a fila aberta para evitar fechar antes da confirmação
+                setConfirmSaidaFila(true); 
+              }}
             >
               <LogOut className="h-4 w-4" /> Sair da Fila
             </Button>
