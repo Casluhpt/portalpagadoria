@@ -5,7 +5,7 @@ import { Loader2, KeyRound, Search, ShieldCheck, Eye, UserPlus, Trash2, List, La
 
 import { AppSidebar } from "@/components/app-sidebar";
 import { HeaderActions } from "@/components/header-actions";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 
 export const Route = createFileRoute("/usuarios")({
   head: () => ({
