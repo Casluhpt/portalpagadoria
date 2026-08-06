@@ -1192,7 +1192,7 @@ export type Database = {
           data?: string | null
           empresa?: string | null
           id?: string
-          mes: string
+          mes?: string
           pagamento_id?: string | null
           updated_at?: string
           valor?: number | null
