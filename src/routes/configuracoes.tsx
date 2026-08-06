@@ -738,32 +738,39 @@ function AdvancedSecuritySettings() {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div className="rounded-lg border border-indigo-200 bg-indigo-50/50 p-4 dark:border-indigo-900/30 dark:bg-indigo-950/20 space-y-4">
-          <div className="flex items-center gap-2">
-            <Sparkles className="h-4 w-4 text-indigo-600" />
-            <h4 className="text-sm font-bold">Controle da IA Assistente</h4>
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 border-b border-border pb-2 mb-2">
+            <Cpu className="h-4 w-4 text-indigo-600" />
+            <h4 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Configurações da IA Assistente</h4>
           </div>
-          <p className="text-[11px] text-muted-foreground leading-relaxed">
-            Permite habilitar ou desabilitar globalmente a IA Assistente da Pagadoria para manutenção ou atualizações.
-          </p>
-          <div className="flex items-center justify-between py-1 border-t border-indigo-100 dark:border-indigo-900/50 pt-4">
-            <div className="space-y-0.5">
-              <Label className="text-[12px] font-semibold">Status da IA (Online/Offline)</Label>
-              <p className="text-[10px] text-muted-foreground">Define se a IA responderá aos usuários.</p>
+          
+          <div className="rounded-lg border border-indigo-200 bg-indigo-50/50 p-4 dark:border-indigo-900/30 dark:bg-indigo-950/20 space-y-4">
+            <div className="flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-indigo-600" />
+              <h4 className="text-sm font-bold">Controle Global de Disponibilidade</h4>
             </div>
-            <div className="flex items-center gap-3">
-              <span className={cn(
-                "text-[10px] font-bold uppercase px-2 py-0.5 rounded-full",
-                iaOnline ? "bg-emerald-100 text-emerald-700" : "bg-rose-100 text-rose-700"
-              )}>
-                {iaOnline ? 'Online' : 'Offline'}
-              </span>
-              <Switch 
-                checked={iaOnline} 
-                onCheckedChange={toggleIaStatus}
-                disabled={iaLoading}
-                className="data-[state=checked]:bg-indigo-600" 
-              />
+            <p className="text-[11px] text-muted-foreground leading-relaxed">
+              Permite habilitar ou desabilitar globalmente a IA Assistente da Pagadoria para manutenção ou atualizações.
+            </p>
+            <div className="flex items-center justify-between py-1 border-t border-indigo-100 dark:border-indigo-900/50 pt-4">
+              <div className="space-y-0.5">
+                <Label className="text-[12px] font-semibold">Status da IA (Online/Offline)</Label>
+                <p className="text-[10px] text-muted-foreground">Define se a IA responderá aos usuários.</p>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className={cn(
+                  "text-[10px] font-bold uppercase px-2 py-0.5 rounded-full",
+                  iaOnline ? "bg-emerald-100 text-emerald-700" : "bg-rose-100 text-rose-700"
+                )}>
+                  {iaOnline ? 'Online' : 'Offline'}
+                </span>
+                <Switch 
+                  checked={iaOnline} 
+                  onCheckedChange={toggleIaStatus}
+                  disabled={iaLoading}
+                  className="data-[state=checked]:bg-indigo-600" 
+                />
+              </div>
             </div>
           </div>
         </div>
