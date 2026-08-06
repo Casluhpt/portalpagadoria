@@ -173,6 +173,29 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+    cursor: default;
+  }
+
+  /* Minimalist interaction on hover for colored or translucent elements */
+  a, button, [role="button"], .interactive-card, .glass-card, [class*="bg-primary"], [class*="bg-accent"], [class*="bg-secondary"] {
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), 
+                filter 0.2s ease, 
+                box-shadow 0.2s ease;
+  }
+
+  a:hover, button:hover, [role="button"]:hover, .interactive-card:hover, .glass-card:hover {
+    transform: translateY(-2px) scale(1.01);
+    filter: brightness(1.05);
+  }
+
+  [class*="bg-primary"]:hover, [class*="bg-accent"]:hover, [class*="bg-secondary"]:hover {
+    filter: saturate(1.1) brightness(1.02);
+  }
+
+  /* Translucent elements (glassmorphism) minimalist interaction */
+  .bg-white\/10:hover, .bg-white\/20:hover, .bg-black\/10:hover, .bg-black\/20:hover, .backdrop-blur-md:hover {
+    background-color: color-mix(in oklab, currentColor 5%, transparent);
+    backdrop-filter: blur(12px) brightness(1.1);
   }
 }
 
