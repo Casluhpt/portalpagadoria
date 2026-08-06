@@ -16,7 +16,14 @@ export type PagamentoInput = Partial<Pick<Pagamento, (typeof WRITABLE_KEYS)[numb
 function sanitize(patch: PagamentoInput): Record<string, unknown> {
   const out: Record<string, unknown> = {};
   for (const k of WRITABLE_KEYS) {
-    if (k in patch) out[k] = (patch as Record<string, unknown>)[k] ?? null;
+    if (k in patch) {
+      let val = (patch as Record<string, unknown>)[k];
+      // Garantir que datas vazias sejam enviadas como null para evitar erros de restrição no banco
+      if (k === "data_credito" && (val === "" || val === undefined)) {
+        val = null;
+      }
+      out[k] = val ?? null;
+    }
   }
   return out;
 }
