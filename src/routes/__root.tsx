@@ -127,10 +127,10 @@ function RootShell({ children }: { children: ReactNode }) {
           Antes de realizar qualquer ação, entenda o contexto e instrução recente do usuário, comando mais recente enviado por ele: For the code present, I get the error below.
 
           Please think step-by-step in order to resolve it.
-          ```
+          {"```"}
           Error: new row violates row-level security policy for table "concorrencia_fila"
 
-          {
+          {"{"}
             "timestamp": 1785980354125,
             "error_type": "RUNTIME_ERROR",
             "filename": "https://localhost:8080/_serverFn/eyJmaWxlIjoiL3NyYy9saWIvY29uY29ycmVuY2lhLmZ1bmN0aW9ucy50cz90c3Mtc2VydmVyZm4tc3BsaXQiLCJleHBvcnQiOiJlbnRyYXJGaWxhX2NyZWF0ZVNlcnZlckZuX2hhbmRsZXIifQ",
@@ -138,8 +138,8 @@ function RootShell({ children }: { children: ReactNode }) {
             "colno": 0,
             "stack": "Error: new row violates row-level security policy for table \"concorrencia_fila\"\n    at Object.eval (/dev-server/src/lib/concorrencia.functions.ts:45:22)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async server (/dev-server/node_modules/@tanstack/start-client-core/src/createServerFn.ts:944:24)\n    at async callNextMiddleware (/dev-server/node_modules/@tanstack/start-client-core/src/createServerFn.ts:322:24)\n    at async AsyncFunction.__executeServer (/dev-server/node_modules/@tanstack/start-client-core/src/createServerFn.ts:212:20)\n    at async eval (/dev-server/node_modules/@tanstack/start-server-core/src/server-functions-handler.ts:159:16)\n    at async eval (/dev-server/node_modules/@tanstack/start-server-core/src/server-functions-handler.ts:81:17)\n    at async handleServerAction (/dev-server/node_modules/@tanstack/start-server-core/src/server-functions-handler.ts:418:10)\n    at async next (/dev-server/node_modules/@tanstack/start-server-core/src/createStartHandler.ts:301:16)\n    at async eval (/dev-server/src/start.ts:8:12)",
             "has_blank_screen": true
-          }
-          ```
+          {"}"}
+          {"```"}
         </div>
         {children}
         <Scripts />
