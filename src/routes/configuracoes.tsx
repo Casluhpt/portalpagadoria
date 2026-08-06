@@ -123,7 +123,7 @@ function ConfiguracoesPage() {
           </main>
         </div>
       </div>
-    </SidebarProvider>
+    </>
   );
 }
 
