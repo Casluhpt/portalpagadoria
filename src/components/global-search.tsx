@@ -14,9 +14,8 @@ import {
   Download,
   ScrollText,
   BarChart3,
-  Sparkles,
-  Bot,
   Loader2,
+
   Building2,
   Truck,
   CalendarRange,
@@ -58,9 +57,6 @@ export function GlobalSearch({ variant = "compact" }: { variant?: "compact" | "h
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [history, setHistory] = useState<string[]>([]);
-  const [isAiMode, setIsAiMode] = useState(false);
-  const [aiResponse, setAiResponse] = useState<string | null>(null);
-  const [isAiLoading, setIsAiLoading] = useState(false);
 
   const navigate = useNavigate();
   const { isAdmin, hasAny } = useRoles();
@@ -152,7 +148,7 @@ export function GlobalSearch({ variant = "compact" }: { variant?: "compact" | "h
     navigate({ to: url as never });
   };
 
-  const askAi = async () => {};
+  
 
   const hitsPorGrupo = useMemo(() => {
     const map = new Map<PortalHit["grupo"], PortalHit[]>();
@@ -197,10 +193,6 @@ export function GlobalSearch({ variant = "compact" }: { variant?: "compact" | "h
         open={open}
         onOpenChange={(val) => {
           setOpen(val);
-          if (!val) {
-            setIsAiMode(false);
-            setAiResponse(null);
-          }
         }}
       >
         <div className="flex items-center gap-2 border-none px-3">
@@ -210,10 +202,6 @@ export function GlobalSearch({ variant = "compact" }: { variant?: "compact" | "h
             value={search}
             onValueChange={(v) => {
               setSearch(v);
-              if (isAiMode) {
-                setIsAiMode(false);
-                setAiResponse(null);
-              }
             }}
             className="flex h-11 w-full bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground"
           />
@@ -288,7 +276,7 @@ export function GlobalSearch({ variant = "compact" }: { variant?: "compact" | "h
         )}
 
 
-        {!isAiMode && (
+        {true && (
           <CommandList className="max-h-[460px]">
             <div className="py-6 text-center text-sm">
               <div className="flex flex-col items-center justify-center gap-1 py-6 text-center">
