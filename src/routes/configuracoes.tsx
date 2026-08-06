@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { AppLogo } from "@/components/app-logo";
 import { AppSidebar } from "@/components/app-sidebar";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 import { HeaderActions } from "@/components/header-actions";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -44,10 +44,9 @@ export const Route = createFileRoute("/configuracoes")({
 function ConfiguracoesPage() {
   const navigate = useNavigate();
   return (
-    <>
-      <div className="flex min-h-screen w-full bg-background">
-        <AppSidebar />
-        <div className="flex flex-1 flex-col">
+    <div className="flex min-h-screen w-full bg-background">
+      <AppSidebar />
+      <div className="flex flex-1 flex-col">
           <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-border bg-background/80 px-4 backdrop-blur">
             <SidebarTrigger />
             <Link to="/" className="flex flex-1 items-center gap-2 hover:opacity-80 transition-opacity">
@@ -121,9 +120,8 @@ function ConfiguracoesPage() {
               </TabsContent>
             </Tabs>
           </main>
-        </div>
       </div>
-    </>
+    </div>
   );
 }
 
