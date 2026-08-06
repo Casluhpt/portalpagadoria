@@ -617,12 +617,26 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
           if (rawVal === null || rawVal === "") continue;
           
           if (col.kind === "number" || col.kind === "currency") {
+            // Regra: valor da LG seguir o padrão R$00,00 (limpeza para número)
             const valStr = String(rawVal).replace(/[R$\s.]/g, "").replace(",", ".");
             const num = Number(valStr);
             if (!Number.isNaN(num)) rec[col.key] = num;
           } else if (col.kind === "date") {
-            const d = rawVal instanceof Date ? rawVal : new Date(String(rawVal));
-            if (!isNaN(d.getTime())) rec[col.key] = d.toISOString().slice(0,10);
+            // Regra: data adaptada no formato brasileiro ou ISO, mas forçando limpeza
+            let d: Date;
+            if (rawVal instanceof Date) {
+              d = rawVal;
+            } else {
+              const strVal = String(rawVal).trim();
+              // Tenta converter DD/MM/YYYY para YYYY-MM-DD
+              const dmyMatch = strVal.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+              if (dmyMatch) {
+                d = new Date(`${dmyMatch[3]}-${dmyMatch[2].padStart(2, '0')}-${dmyMatch[1].padStart(2, '0')}`);
+              } else {
+                d = new Date(strVal);
+              }
+            }
+            if (!isNaN(d.getTime())) rec[col.key] = d.toISOString().slice(0, 10);
           } else {
             rec[col.key] = String(rawVal).trim();
           }
