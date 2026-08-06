@@ -28,6 +28,16 @@ import { DocumentacaoTecnicaSection } from "@/components/documentacao-tecnica-se
 
 
 export const Route = createFileRoute("/configuracoes")({
+  head: () => ({
+    meta: [
+      { title: "Configurações | Portal Pagadoria" },
+      { name: "description", content: "Personalize sua experiência, gerencie permissões e acesse o suporte técnico." },
+      { property: "og:title", content: "Configurações | Portal Pagadoria" },
+      { property: "og:description", content: "Personalize sua experiência, gerencie permissões e acesse o suporte técnico." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: ConfiguracoesPage,
 });
 
