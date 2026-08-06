@@ -1848,7 +1848,7 @@ function DashboardTab() {
                     <td className="px-2 py-1 text-muted-foreground">{i + 1}</td>
                     <td className="px-2 py-1">{r.empresa ?? "—"}</td>
                     <td className="px-2 py-1">{r.descricao_pagamento ?? "—"}</td>
-                    <td className="px-2 py-1">{r.data_credito ?? "—"}</td>
+                    <td className="px-2 py-1">{r.data_credito ? r.data_credito.split("-").reverse().join("/") : "—"}</td>
                     <td className="px-2 py-1 text-right font-medium">{brl(r.valor_lg)}</td>
                   </tr>
                 ))}
