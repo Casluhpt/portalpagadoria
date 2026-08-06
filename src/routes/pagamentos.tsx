@@ -10,7 +10,7 @@ import {
   Loader2, Plus, Search, Trash2, ArrowUpDown, ArrowUp, ArrowDown,
   Upload, Download, LayoutGrid, Table as TableIcon,
   Scissors, Palette, X, Lock, Unlock, Users, Timer, LogOut, Info, ChevronRight,
-  Zap, AlertTriangle, Wand2, CheckCircle2
+  Sparkles, AlertTriangle, Wand2, CheckCircle2
 } from "lucide-react";
 import {
   Dialog, DialogContent, DialogDescription, DialogFooter,
@@ -813,7 +813,7 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
               ? "Modo Inteligente ativo — clique para voltar ao Modo Tradicional"
               : "Modo Tradicional ativo — clique para ativar a Planilha Inteligente"}
           >
-            {salvandoModo ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Zap className="h-3.5 w-3.5" />}
+            {salvandoModo ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
             {smartOn ? "Modo Inteligente" : "Modo Tradicional"}
           </Button>
           {smartOn && diagnostico && (
@@ -1017,7 +1017,7 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
                   <th className="w-10 border-b border-border px-2 py-2 text-left font-semibold text-muted-foreground">#</th>
                   {smartOn && (
                     <th className="w-9 border-b border-border px-2 py-2 text-left" title="Assistência inteligente">
-                      <Zap className="h-3.5 w-3.5 text-violet-500" />
+                      <Sparkles className="h-3.5 w-3.5 text-violet-500" />
                     </th>
                   )}
                   {VISIBLE_CAMPOS.map((c) => (
@@ -1435,7 +1435,7 @@ function SmartRowCell({
         </PopoverTrigger>
         <PopoverContent align="start" className="w-80 space-y-3 border-border bg-card/95 p-3 text-left shadow-xl backdrop-blur-md">
           <div className="flex items-center gap-2 border-b border-border pb-2">
-            <Zap className="h-3.5 w-3.5 text-violet-500" />
+            <Sparkles className="h-3.5 w-3.5 text-violet-500" />
             <span className="text-xs font-bold text-foreground">Assistência da linha</span>
           </div>
 

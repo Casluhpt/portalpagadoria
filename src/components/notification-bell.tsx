@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Bell, BellOff, CheckCheck, Zap, X, Clock } from "lucide-react";
+import { Bell, BellOff, CheckCheck, Sparkles, X, Clock } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -240,7 +240,7 @@ export function NotificationBell() {
               <X className="h-3.5 w-3.5" />
             </button>
             <div className="flex items-start gap-2 pr-6">
-              <Zap className="mt-0.5 h-4 w-4 shrink-0 text-violet-600 dark:text-violet-400" />
+              <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-violet-600 dark:text-violet-400" />
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
                   <span className="rounded-full bg-violet-600 px-1.5 py-0.5 text-[10px] font-bold text-white">
