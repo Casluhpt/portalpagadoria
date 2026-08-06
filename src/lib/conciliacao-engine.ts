@@ -6,13 +6,20 @@ export type ConciliacaoItem = {
   empresa: string;
   data: string;
   valor: number;
-  tipo: "Varejo" | "Distribuição" | "Diferenças";
+  tipo: string;
   origem: "importado" | "base";
   id?: string;
   matchId?: string;
   nivel?: number;
   diferenca?: number;
   sugestao?: ConciliacaoItem[];
+  banco?: string;
+  descricao?: string;
+  documento?: string;
+  favorecido?: string;
+  setor?: string;
+  competencia?: string;
+  motivoDivergencia?: string;
 };
 
 export async function fetchCompetenciasDisponiveis() {
