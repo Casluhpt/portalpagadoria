@@ -24,6 +24,16 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/historico")({
+  head: () => ({
+    meta: [
+      { title: "Histórico de Versões | Portal Pagadoria" },
+      { name: "description", content: "Acompanhe a evolução do portal, novas funcionalidades e correções implementadas." },
+      { property: "og:title", content: "Histórico de Versões | Portal Pagadoria" },
+      { property: "og:description", content: "Acompanhe a evolução do portal, novas funcionalidades e correções implementadas." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: HistoricoPage,
 });
 
