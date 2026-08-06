@@ -188,7 +188,21 @@ export function AppSidebar() {
       .slice(0, 50_000);
 
     try {
-      const r = await perguntarIa({ data: { pergunta: userMsg, contexto } });
+      const { data: modulosDisponiveis } = await supabase.from("app_modules").select("key");
+      const allowedModules = modulosDisponiveis?.map(m => m.key) || [];
+
+      const r = await perguntarIa({ 
+        data: { 
+          pergunta: userMsg, 
+          contexto,
+          appState: {
+            currentPath,
+            setor: setor || undefined,
+            roles: roles || [],
+            allowedModules
+          }
+        } 
+      });
       if (r.erro) {
          setChatMessages((prev) => [
           ...prev,
