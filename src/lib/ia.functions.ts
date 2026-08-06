@@ -1,131 +1,112 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const AskInput = z.object({
   pergunta: z.string().min(2).max(1000),
   contexto: z.string().max(60_000).default(""),
 });
 
-const SYSTEM = `Você é a IA Assistente do Portal da Pagadoria (Profarma).
-Regras obrigatórias:
-- Responda SOMENTE com base no material de apoio autorizado e nas informações do portal fornecidas no contexto.
-- Se a resposta não estiver no material, diga claramente que não há material autorizado sobre o tema e sugira abrir um chamado em Configurações > Canal de Suporte Técnico.
-- Nunca invente valores, números de registro, matrículas, nomes de colaboradores ou dados financeiros.
-- Responda em português do Brasil, de forma objetiva, em no máximo 200 palavras, usando markdown simples (títulos curtos, listas e negrito).
-- Sempre que possível indique o módulo do portal onde a ação é feita (ex.: Pagamentos Diversos, Provisão Diária, Conciliação Bancária).`;
+// Prompt humanizado e focado em aprendizado
+const SYSTEM = `Você é a IA Assistente Humanizada do Portal da Pagadoria (Profarma).
+Personalidade: Atenciosa, profissional, empática e proativa.
+Regras de Comportamento:
+1. Responda SOMENTE com base no material de apoio e módulos do portal.
+2. Seja humanizada: Use saudações cordiais, entenda o sentimento do usuário e responda de forma natural.
+3. Se não souber, diga: "Ainda não tenho essa informação nos meus manuais autorizados. Para sua segurança, recomendo abrir um chamado em Configurações > Canal de Suporte Técnico."
+4. NUNCA invente dados sensíveis ou financeiros.
+5. Indique o módulo (ex: Provisão Diária, Pagamentos Diversos).
+6. Considere o histórico e padrões do usuário para ser mais assertiva.`;
 
 export const perguntarIa = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .validator((data: unknown) => AskInput.parse(data))
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
     const key = process.env["LOVABLE_API_KEY"];
-    
-    console.log("[IA] Iniciando consulta:", {
-      pergunta: data.pergunta.substring(0, 50) + "...",
-      hasContexto: !!data.contexto,
-      hasKey: !!key
-    });
+    const { userId, supabase } = context;
 
     if (!key) {
-      console.error("[IA] Erro: LOVABLE_API_KEY não encontrada no ambiente.");
       return { 
         resposta: null, 
-        erro: "IA de Suporte da Pagadoria: A chave de integração não está configurada corretamente no servidor." 
+        erro: "IA de Suporte da Pagadoria: Falha na configuração de segurança (Chave ausente)." 
       };
     }
 
     try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 45000); // 45s timeout
+      // 1. Buscar histórico recente e padrões de aprendizado
+      const { data: historico } = await supabase
+        .from("ia_conversas")
+        .select("role, content")
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false })
+        .limit(6);
 
+      const { data: patterns } = await supabase
+        .from("ia_user_patterns")
+        .select("patterns")
+        .eq("user_id", userId)
+        .single();
+
+      // 2. Construir mensagens para o GPT
+      const messages = [
+        { role: "system", content: SYSTEM + (patterns ? `\nPadrões de Aprendizado do Usuário: ${JSON.stringify(patterns.patterns)}` : "") },
+        ...(historico?.reverse().map((h: any) => ({ role: h.role, content: h.content })) || []),
+        {
+          role: "user",
+          content: `CONTEXTO ATUAL (MATERIAL DE APOIO):\n${data.contexto || "Sem material direto"}\n\nPERGUNTA ATUAL:\n${data.pergunta}`,
+        },
+      ];
+
+      // 3. Chamada à IA
       const res = await fetch("https://ai.gateway.lovable.dev/v1/responses", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "Lovable-API-Key": key,
-          "X-Lovable-AIG-SDK": "fetch",
         },
-        signal: controller.signal,
         body: JSON.stringify({
           model: "openai/gpt-4o",
-          stream: true,
-          input: [
-            { role: "system", content: SYSTEM },
-            {
-              role: "user",
-              content: `MATERIAL DE APOIO AUTORIZADO E MÓDULOS DO PORTAL:\n${data.contexto || "(nenhum material cadastrado)"}\n\nPERGUNTA DO USUÁRIO:\n${data.pergunta}`,
-            },
-          ],
+          input: messages,
         }),
       });
 
-      clearTimeout(timeoutId);
-
-      if (!res.ok || !res.body) {
-        const detalhe = await res.text().catch(() => "Sem detalhes do corpo");
-        console.error(`[IA] Falha no Gateway (Status: ${res.status}):`, detalhe);
-        
-        // Log incident for tracking
-        console.error(`[IA][INCIDENTE] Pergunta: "${data.pergunta}" | Status: ${res.status} | Detalhe: ${detalhe.substring(0, 200)}`);
-
-        if (res.status === 429) {
-          return { resposta: null, erro: "IA de Suporte da Pagadoria: O serviço está temporariamente sobrecarregado (429). Tente novamente em instantes." };
-        }
-        if (res.status === 402) {
-          return { resposta: null, erro: "IA de Suporte da Pagadoria: Limite de créditos atingido (402). Contate o administrador lucas.chaves.lc2001@gmail.com." };
-        }
-        
-        return { 
-          resposta: null, 
-          erro: `IA de Suporte da Pagadoria: Erro técnico na comunicação (${res.status}). O incidente foi registrado para análise automática.` 
-        };
+      if (!res.ok) {
+        throw new Error(`Gateway error: ${res.status}`);
       }
 
-      let texto = "";
-      const reader = res.body.getReader();
-      const decoder = new TextDecoder();
-      let buffer = "";
+      const result = await res.json();
+      const resposta = result.choices?.[0]?.message?.content || result.output_text || "";
 
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        buffer += decoder.decode(value, { stream: true });
-        const parts = buffer.split("\n\n");
-        buffer = parts.pop() ?? "";
-        for (const part of parts) {
-          const lines = part.split("\n");
-          for (const line of lines) {
-            if (!line.startsWith("data:")) continue;
-            const payload = line.slice(5).trim();
-            if (!payload || payload === "[DONE]") continue;
-            try {
-              const evt = JSON.parse(payload);
-              const delta = evt.choices?.[0]?.delta?.content || 
-                            evt.delta || 
-                            (evt.type === "response.output_text.delta" ? evt.delta : "") ||
-                            (evt.type === "response.completed" ? evt.response?.output_text : "") ||
-                            "";
-              texto += delta;
-            } catch {
-              /* ignora eventos parciais */
-            }
+      if (!resposta) {
+        return { resposta: "Desculpe, tive uma instabilidade momentânea. Pode repetir?", erro: null };
+      }
+
+      // 4. Salvar histórico e processar aprendizado em background
+      await Promise.all([
+        supabase.from("ia_conversas").insert([
+          { user_id: userId, role: "user", content: data.pergunta },
+          { user_id: userId, role: "assistant", content: resposta }
+        ]),
+        // Atualiza padrões se a pergunta indicar preferências (ex: "prefiro tabelas", "me chame de Sr.")
+        (async () => {
+          if (data.pergunta.length > 10) {
+             const currentPatterns = patterns?.patterns || {};
+             // Lógica simples de aprendizado: se mencionar certos termos, guardamos
+             if (data.pergunta.toLowerCase().includes("ajuda com") || data.pergunta.toLowerCase().includes("como fazer")) {
+                currentPatterns.temas_frequentes = [...(currentPatterns.temas_frequentes || []), data.pergunta.substring(0, 30)].slice(-5);
+                await supabase.from("ia_user_patterns").upsert({ user_id: userId, patterns: currentPatterns });
+             }
           }
-        }
-      }
+        })()
+      ]);
 
-      if (!texto.trim()) {
-        return {
-          resposta: "Não encontrei material autorizado suficiente para responder com segurança. Abra um chamado em **Configurações > Canal de Suporte Técnico**.",
-          erro: null,
-        };
-      }
-
-      return { resposta: texto.trim(), erro: null };
+      return { resposta, erro: null };
 
     } catch (err) {
-      console.error("[IA] Erro crítico na operação:", err);
+      console.error("[IA] Erro:", err);
       return { 
         resposta: null, 
-        erro: "IA de Suporte da Pagadoria: Falha técnica de rede ou processamento de stream. Tente novamente." 
+        erro: "IA de Suporte da Pagadoria: Não consegui processar sua solicitação agora. Tente em alguns segundos." 
       };
     }
   });
