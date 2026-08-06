@@ -36,6 +36,16 @@ export const Route = createFileRoute("/auditoria")({
   validateSearch: (s: Record<string, unknown>) => ({
     tab: (s.tab === "excluidos" || s.tab === "criticas" ? s.tab : "log") as AuditTab,
   }),
+  head: () => ({
+    meta: [
+      { title: "Auditoria | Portal Pagadoria" },
+      { name: "description", content: "Logs de auditoria, ações críticas e recuperação de registros excluídos." },
+      { property: "og:title", content: "Auditoria | Portal Pagadoria" },
+      { property: "og:description", content: "Logs de auditoria, ações críticas e recuperação de registros excluídos." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: AuditoriaPage,
 });
 
