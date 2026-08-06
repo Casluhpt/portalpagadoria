@@ -79,6 +79,8 @@ const HIDDEN_COLUMN_KEYS = new Set<string>([
   "valor_itau","status_itau","diferenca_bank_itau","natureza_pagamento",
 ]);
 const VISIBLE_CAMPOS = PAGAMENTO_CAMPOS.filter((c) => !HIDDEN_COLUMN_KEYS.has(c.key));
+import { purgarPagamentosBulkFn } from "@/lib/pagamentos-admin.functions";
+
 
 export const Route = createFileRoute("/pagamentos")({
   component: PagamentosPage,
