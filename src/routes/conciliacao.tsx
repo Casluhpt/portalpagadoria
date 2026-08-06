@@ -34,6 +34,13 @@ import {
 } from "@/lib/conciliacao-engine";
 import { getPagamentosParaConciliacao } from "@/lib/conciliacao.functions";
 import { ConciliacaoResultadosView } from "@/components/conciliacao/conciliacao-resultados";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
 
 export const Route = createFileRoute('/conciliacao')({
   beforeLoad: async () => {
