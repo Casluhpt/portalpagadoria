@@ -39,6 +39,16 @@ import { format } from "date-fns";
 
 
 export const Route = createFileRoute('/esocial')({
+  head: () => ({
+    meta: [
+      { title: "Controle E-Social | Portal Pagadoria" },
+      { name: "description", content: "Acompanhamento mensal de lançamentos e impostos do e-Social." },
+      { property: "og:title", content: "Controle E-Social | Portal Pagadoria" },
+      { property: "og:description", content: "Acompanhamento mensal de lançamentos e impostos do e-Social." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: ESocialPage
 });
 
