@@ -38,6 +38,16 @@ import {
 import { EMPRESAS } from "@/lib/despesas-fixas.functions";
 
 export const Route = createFileRoute("/aprovacao")({
+  head: () => ({
+    meta: [
+      { title: "Processo de Aprovação | Portal Pagadoria" },
+      { name: "description", content: "Controle de evidências de agendamento bancário e fluxos de aprovação." },
+      { property: "og:title", content: "Processo de Aprovação | Portal Pagadoria" },
+      { property: "og:description", content: "Controle de evidências de agendamento bancário e fluxos de aprovação." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: AprovacaoPage,
 });
 
