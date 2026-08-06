@@ -162,6 +162,7 @@ function PagamentosPage() {
           </Tabs>
         </div>
       </div>
+    </div>
   );
 }
 

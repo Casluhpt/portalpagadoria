@@ -120,6 +120,7 @@ function ConfiguracoesPage() {
               </TabsContent>
             </Tabs>
           </main>
+        </div>
       </div>
     </div>
   );

@@ -513,6 +513,7 @@ function PortalPage() {
           </main>
         </div>
       </div>
+    </div>
   );
 }
 
