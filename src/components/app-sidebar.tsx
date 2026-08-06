@@ -337,7 +337,7 @@ export function AppSidebar() {
                     <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
                     <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-tight">Sistema Online</span>
                   </div>
-                  <span className="text-[9px] text-emerald-600/70 font-mono">v2.7.5</span>
+                  <span className="text-[9px] text-emerald-600/70 font-mono">v2.8.4</span>
                 </div>
                 <LiveClock />
                 <div className="rounded-md bg-sidebar-accent/40 px-2 py-1.5 text-xs text-sidebar-foreground">
