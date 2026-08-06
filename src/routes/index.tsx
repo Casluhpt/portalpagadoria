@@ -286,7 +286,7 @@ function PortalPage() {
   ];
 
   return (
-    <SidebarProvider>
+    <>
       <div className="flex min-h-screen w-full bg-[#F8FAFC] dark:bg-background transition-colors duration-300">
         <AppSidebar />
         <div className="flex flex-1 flex-col">
@@ -514,7 +514,7 @@ function PortalPage() {
           </main>
         </div>
       </div>
-    </SidebarProvider>
+    </>
   );
 }
 
