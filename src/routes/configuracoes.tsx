@@ -11,13 +11,21 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { HelpCircle, Bug, AlertCircle, MessageSquare, Send, CheckCircle2, Paperclip, X, Loader2, Settings, Users, History, ChevronRight, Activity, Cloud, ShieldCheck, Mail, Save, Code, Zap, Database, ShieldAlert, RefreshCw, Trash2, Lock, Table as TableIcon, Image as ImageIcon, Keyboard } from "lucide-react";
+import { 
+  HelpCircle, Bug, AlertCircle, MessageSquare, Send, CheckCircle2, Paperclip, X, Loader2, 
+  Settings, Users, History, ChevronRight, Activity, Cloud, ShieldCheck, Mail, Save, 
+  Code, Zap, Database, ShieldAlert, RefreshCw, Trash2, Lock, Table as TableIcon, 
+  Image as ImageIcon, Keyboard, FileText, Shield, Clock 
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { usePlanilhaModo } from "@/hooks/use-planilha-modo";
 import { useState, useRef, useEffect } from "react";
 import { useSession } from "@/hooks/use-session";
 import { useMutation } from "@tanstack/react-query";
 import { sendSupportRequest } from "@/lib/suporte.functions";
+import { useErrorLogStore, type SystemError } from "@/hooks/use-error-log-store";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
@@ -327,6 +335,7 @@ function SupportForm() {
 function DiagnosticPanel() {
   const navigate = useNavigate();
   const [refreshing, setRefreshing] = useState(false);
+  const { errors, clearErrors } = useErrorLogStore();
   const [status, setStatus] = useState({
     performance: "excelente",
     carga: "normal",
@@ -388,12 +397,66 @@ function DiagnosticPanel() {
             <div className="w-full flex items-center justify-between py-2 px-2 rounded-md text-left">
               <div className="flex items-center gap-2">
                 <AlertCircle className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm font-medium">Erros detectados (24h)</span>
+                <span className="text-sm font-medium">Erros detectados (Total)</span>
               </div>
-              <span className="text-sm text-muted-foreground font-bold">0</span>
+              <span className={`text-sm font-bold ${errors.length > 0 ? 'text-red-500' : 'text-emerald-600'}`}>
+                {errors.length}
+              </span>
             </div>
           </CardContent>
         </Card>
+
+        <Card className="hover:shadow-md transition-all md:col-span-2">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <div>
+              <CardTitle className="text-base flex items-center gap-2">
+                <FileText className="h-4 w-4 text-red-500" /> Histórico de Falhas Recentes
+              </CardTitle>
+              <CardDescription>Auditoria de instabilidades e rotas afetadas.</CardDescription>
+            </div>
+            {errors.length > 0 && (
+              <Button variant="ghost" size="sm" onClick={clearErrors} className="text-xs h-8">
+                <Trash2 className="h-3 w-3 mr-1" /> Limpar Logs
+              </Button>
+            )}
+          </CardHeader>
+          <CardContent>
+            {errors.length === 0 ? (
+              <div className="py-8 text-center text-muted-foreground text-sm flex flex-col items-center gap-2">
+                <Shield className="h-8 w-8 opacity-20" />
+                Nenhuma falha crítica registrada recentemente.
+              </div>
+            ) : (
+              <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                {errors.map((error: SystemError) => (
+                  <div key={error.id} className="p-3 border rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
+                    <div className="flex items-start justify-between gap-2 mb-2">
+                      <div className="flex items-center gap-2">
+                        <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-red-100 text-red-700 uppercase">
+                          {error.severity}
+                        </span>
+                        <span className="text-sm font-semibold truncate max-w-[300px] md:max-w-md">
+                          {error.message}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-1 text-[10px] text-muted-foreground whitespace-nowrap">
+                        <Clock className="h-3 w-3" />
+                        {format(new Date(error.timestamp), "HH:mm:ss 'em' dd/MM", { locale: ptBR })}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <span className="font-medium">Rota:</span>
+                      <code className="px-1.5 py-0.5 rounded bg-background border text-[10px]">
+                        {error.route}
+                      </code>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
 
         <Card className="hover:shadow-md transition-all">
           <CardHeader>
