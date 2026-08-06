@@ -1185,7 +1185,12 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
           setFilaOpen(open);
         }}
       >
-        <DialogContent className="max-w-sm border-amber-200 bg-amber-50/95 dark:bg-amber-950/20 backdrop-blur-md">
+        <DialogContent 
+          className="max-w-sm border-amber-200 bg-amber-50/95 dark:bg-amber-950/20 backdrop-blur-md"
+          onPointerDownOutside={(e) => e.preventDefault()}
+          onInteractOutside={(e) => e.preventDefault()}
+          onEscapeKeyDown={(e) => e.preventDefault()}
+        >
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-amber-700">
               <Timer className="h-5 w-5 animate-pulse" /> Fila de Edição
