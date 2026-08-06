@@ -317,8 +317,8 @@ function PortalPage() {
           <main className="flex-1 space-y-12 p-6 lg:p-10 max-w-[1600px] mx-auto w-full">
 
             <section className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-indigo-900 via-violet-800 to-purple-900 p-8 text-white shadow-xl">
-              <div className="absolute -right-16 -top-16 h-64 w-64 rounded-full bg-white/10 blur-3xl" />
-              <div className="absolute -bottom-20 -left-10 h-72 w-72 rounded-full bg-fuchsia-400/10 blur-3xl" />
+              <div className="absolute -right-16 -top-16 h-64 w-64 rounded-full bg-white/5 blur-3xl" />
+              <div className="absolute -bottom-20 -left-10 h-72 w-72 rounded-full bg-fuchsia-400/5 blur-3xl" />
               <div className="relative flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
                 <div className="max-w-2xl">
                   <Badge className="mb-3 bg-white/15 text-white hover:bg-white/20">
