@@ -11,9 +11,12 @@ import {
   Search,
   Trash2,
   Upload,
+  CheckSquare,
+  Square,
 } from "lucide-react";
 import * as XLSX from "xlsx";
 import { toast } from "sonner";
+import { Checkbox } from "@/components/ui/checkbox";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -127,6 +130,8 @@ function ProvisaoBasePage() {
   const [sortKey, setSortKey] = useState<keyof Provisao>("data");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
   const [pendingDelete, setPendingDelete] = useState<Provisao | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [isBulkDeleteDialogOpen, setIsBulkDeleteDialogOpen] = useState(false);
 
   const invalidate = () => qc.invalidateQueries({ queryKey: provisaoQueryKey });
 
@@ -153,6 +158,24 @@ function ProvisaoBasePage() {
       toast.success("Registro excluído");
     },
     onError: (e: Error) => toast.error("Falha ao excluir: " + e.message),
+  });
+
+  const bulkDeleteMut = useMutation({
+    mutationFn: async (ids: string[]) => {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      // Note: We use the client for now if admin client is not strictly needed for this table's RLS,
+      // but following the pattern for bulk actions, we'll implement it as a server function if needed.
+      // For simplicity and immediate fix, we'll use the existing deleteProvisao logic in a loop or a bulk call.
+      const { bulkDeleteProvisao } = await import("@/lib/provisao");
+      return bulkDeleteProvisao(ids);
+    },
+    onSuccess: (count) => {
+      invalidate();
+      toast.success(`${count} registros excluídos com sucesso.`);
+      setSelectedIds(new Set());
+      setIsBulkDeleteDialogOpen(false);
+    },
+    onError: (e: Error) => toast.error("Falha ao excluir registros: " + e.message),
   });
 
   const importMut = useMutation({
@@ -276,6 +299,16 @@ function ProvisaoBasePage() {
           >
             <Plus className="h-4 w-4" /> Nova
           </Button>
+          {selectedIds.size > 0 && (
+            <Button
+              size="sm"
+              variant="destructive"
+              onClick={() => setIsBulkDeleteDialogOpen(true)}
+              className="gap-1 animate-in fade-in slide-in-from-left-2"
+            >
+              <Trash2 className="h-4 w-4" /> Excluir ({selectedIds.size})
+            </Button>
+          )}
           <Select value={importMode} onValueChange={(v: any) => setImportMode(v)}>
             <SelectTrigger className="h-9 w-[180px] text-xs">
               <SelectValue placeholder="Modo de importação" />
@@ -322,6 +355,19 @@ function ProvisaoBasePage() {
           <table className="min-w-full border-collapse text-sm">
             <thead className="sticky top-0 z-10 bg-muted/95 backdrop-blur">
               <tr>
+                <th className="w-10 border-b border-border px-2 py-2 text-center text-xs font-semibold text-muted-foreground">
+                  <Checkbox
+                    checked={rows.length > 0 && selectedIds.size === rows.length}
+                    onCheckedChange={(checked) => {
+                      if (checked) {
+                        setSelectedIds(new Set(rows.map(r => r.id)));
+                      } else {
+                        setSelectedIds(new Set());
+                      }
+                    }}
+                    aria-label="Selecionar todos"
+                  />
+                </th>
                 <th className="w-10 border-b border-border px-2 py-2 text-left text-xs font-semibold text-muted-foreground">
                   #
                 </th>
@@ -351,7 +397,22 @@ function ProvisaoBasePage() {
             </thead>
             <tbody>
               {rows.map((r, i) => (
-                <tr key={r.id} className="group hover:bg-muted/40">
+                <tr 
+                  key={r.id} 
+                  className={`group hover:bg-muted/40 ${selectedIds.has(r.id) ? 'bg-primary/5' : ''}`}
+                >
+                  <td className="border-b border-border px-2 py-1 text-center">
+                    <Checkbox
+                      checked={selectedIds.has(r.id)}
+                      onCheckedChange={(checked) => {
+                        const next = new Set(selectedIds);
+                        if (checked) next.add(r.id);
+                        else next.delete(r.id);
+                        setSelectedIds(next);
+                      }}
+                      aria-label={`Selecionar linha ${i + 1}`}
+                    />
+                  </td>
                   <td className="border-b border-border px-2 py-1 text-xs text-muted-foreground">
                     {i + 1}
                   </td>
@@ -378,7 +439,7 @@ function ProvisaoBasePage() {
               {rows.length === 0 && (
                 <tr>
                   <td
-                    colSpan={COLS.length + 2}
+                    colSpan={COLS.length + 3}
                     className="px-4 py-16 text-center text-sm text-muted-foreground"
                   >
                     Nenhum registro. Use "Nova" ou "Importar".
@@ -410,6 +471,31 @@ function ProvisaoBasePage() {
               }}
             >
               Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog
+        open={isBulkDeleteDialogOpen}
+        onOpenChange={setIsBulkDeleteDialogOpen}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir registros selecionados?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Você está prestes a excluir <b>{selectedIds.size}</b> registros permanentemente da Base da Provisão.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => {
+                bulkDeleteMut.mutate(Array.from(selectedIds));
+              }}
+            >
+              {bulkDeleteMut.isPending ? "Excluindo..." : "Excluir Todos"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
