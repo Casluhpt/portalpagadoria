@@ -5,6 +5,7 @@ import { ptBR } from "date-fns/locale";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { Code, Download, FileCode2, GitBranch, Loader2 } from "lucide-react";
+import { useRoles } from "@/hooks/use-roles";
 import { Link } from "@tanstack/react-router";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -31,8 +32,8 @@ const ADMIN_DOWNLOAD_EMAIL = "lucas.chaves.lc2001@gmail.com";
 
 export function DocumentacaoTecnicaSection() {
   const { user } = useSession();
-  const podeBaixar =
-    (user?.email ?? "").trim().toLowerCase() === ADMIN_DOWNLOAD_EMAIL;
+  const { isAdmin } = useRoles();
+  const podeBaixar = isAdmin || (user?.email ?? "").trim().toLowerCase() === ADMIN_DOWNLOAD_EMAIL;
   const { data: versoes = [], isLoading } = useQuery({
     queryKey: ["app-versions", "documentacao"],
     queryFn: async (): Promise<Version[]> => {
