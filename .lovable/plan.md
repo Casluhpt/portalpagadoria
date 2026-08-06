@@ -1,40 +1,32 @@
-# Plan: Finalizing System Organization (v2.7.5)
+# Plano: Finalização da Organização do Sistema (v2.7.5)
 
-To finalize the "organization of the system" as requested, I will audit the main entry points, sidebar navigation, and administrative modules to ensure everything is cohesive, functional, and consistent with the "Minimalismo Translúcido" aesthetic.
+Para concluir a organização geral do sistema, será realizada uma revisão final para garantir coesão, funcionalidade e aderência estética ao padrão **"Minimalismo Translúcido"**.
 
-## Audit & Cleaning Tasks
+## 1. Auditoria de Navegação e Módulos
+- **Conciliação de Líquidos:** Atualmente é uma aba dentro de `/conciliacao`. Vou adicionar um atalho direto no menu lateral para facilitar o acesso, conforme sugerido no plano de organização.
+- **Hierarquia do Menu:** Revisar `app-sidebar.tsx` para garantir que a ordem dos grupos seja lógica (Operacional -> Financeiro -> Apoio).
 
-### 1. Unified Navigation Audit
-- Verify if all new modules (Processo de Aprovação, Controle E-Social, Conciliação de Líquidos, Despesas Fixas) are correctly linked in `src/components/app-sidebar.tsx`.
-- Ensure the sidebar categories are intuitive and reflect the current scope.
+## 2. Indicadores de Status e Governança
+- **Status do Sistema:** Implementar um pequeno indicador visual de "Sistema Operacional" no rodapé do menu lateral ou no cabeçalho, reforçando a percepção de estabilidade.
+- **Documentação de Versões:** Criar o arquivo `CHANGELOG.md` na raiz do projeto para servir como registro técnico imutável das atualizações, espelhando o que está no banco de dados.
 
-### 2. Branding Consistency
-- Audit the `IdentidadeVisualPanel` in `src/components/admin/identidade-visual.tsx` to ensure all 6 branding areas are editable and applying styles globally.
+## 3. Padronização Visual e UX
+- **Datas (PT-BR):** Revisar os módulos de `Despesas Fixas` e `Controle E-Social` para garantir que todas as exibições de data sigam estritamente o formato `DD/MM/AAAA`.
+- **Elementos Flutuantes:** Ajustar o `BackButton` e o `FloatingAI` para garantir que em telas mobile eles não atrapalhem a leitura do conteúdo inferior (rodapé).
 
-### 3. Administrative Governance
-- Review `src/routes/configuracoes.tsx` to ensure all tabs (Usuarios, Segurança, Identidade, Documentação) are restricted to authorized roles and fully functional.
-- Verify that the interactive diagnostics are correctly pulling live data (or realistic mocks) and linking to the right audit areas.
+## 4. Segurança e Restrições
+- **Documentação Técnica:** Confirmar que o acesso aos downloads permanece exclusivo para `lucas.chaves.lc2001@gmail.com`.
+- **RBAC:** Verificar se a aba "Segurança" nas configurações está acessível apenas para Administradores.
 
-### 4. Technical Documentation
-- Ensure `src/components/documentacao-tecnica-section.tsx` is actually restricted by the email `lucas.chaves.lc2001@gmail.com` as requested previously, or now extended to all admins as per the latest context.
+## 5. Histórico de Versões
+- Sincronizar o histórico para garantir que a entrada **v2.7.5** esteja presente como a versão de "Organização e Estabilização".
 
-### 5. Final Polish (Visual & UX)
-- Review the floating elements (`FloatingAI`, `BackButton`) for layout overlapping on mobile viewports.
-- Apply the Brazilian date format (DD/MM/AAAA) to any missing legacy modules.
+---
 
-## Proposed Changes
-
-### Configuration & UI
-- Update `src/routes/__root.tsx` to change the hidden instruction context.
-- Update `src/components/app-sidebar.tsx` to ensure a clean hierarchical structure.
-- Add a "System Status" summary in the main dashboard or sidebar footer to increase perceived organization.
-
-### Documentation
-- Create a `CHANGELOG.md` or a dedicated "System Status" file to keep track of the final v2.7.x stable state.
-
-## Verification Plan
-
-- [ ] Check sidebar links for dead ends.
-- [ ] Verify RBAC (Role-Based Access Control) on the "Configurações" tabs.
-- [ ] Test the Brazilian date format in "Despesas Fixas" and "E-Social" modules.
-- [ ] Ensure the Version History carousel shows v2.7.4 as the latest stable entry.
+### Alterações propostas:
+- `src/components/app-sidebar.tsx`: Reorganização e inclusão do Status do Sistema.
+- `src/routes/configuracoes.tsx`: Ajuste de visibilidade de abas.
+- `src/routes/despesas-fixas.tsx`: Padronização de datas.
+- `src/routes/esocial.tsx`: Padronização de datas.
+- `CHANGELOG.md`: Criação do arquivo.
+- `supabase migration`: Registro da v2.7.5.
