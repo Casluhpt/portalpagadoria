@@ -4,8 +4,36 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { HeaderActions } from "@/components/header-actions";
 import { AppLogo } from "@/components/app-logo";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { LayoutDashboard, ShieldCheck, History, AlertTriangle, BarChart3 } from "lucide-react";
-import { ConciliacaoLiquidosView } from "@/components/conciliacao/conciliacao-liquidos";
+import { 
+  LayoutDashboard, 
+  ShieldCheck, 
+  History, 
+  AlertTriangle, 
+  BarChart3,
+  FileSpreadsheet,
+  Download,
+  Loader2,
+  Upload,
+  CheckCircle2,
+  XCircle,
+  Sparkles
+} from "lucide-react";
+import { useState, useRef, useMemo } from "react";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { toast } from "sonner";
+import * as XLSX from "xlsx";
+import { useSession } from "@/hooks/use-session";
+import { 
+  executarConciliacao, 
+  exportarConciliacaoSemanal,
+  ConciliacaoItem 
+} from "@/lib/conciliacao-engine";
+import { getPagamentosParaConciliacao } from "@/lib/conciliacao.functions";
+import { ConciliacaoResultadosView } from "@/components/conciliacao/conciliacao-resultados";
 
 export const Route = createFileRoute('/conciliacao')({
   beforeLoad: async () => {
@@ -19,6 +47,14 @@ export const Route = createFileRoute('/conciliacao')({
 });
 
 function BankReconciliationPage() {
+  const [activeTab, setActiveTab] = useState("dashboard");
+  const [results, setResults] = useState<ConciliacaoItem[]>([]);
+
+  const handleResults = (newResults: ConciliacaoItem[]) => {
+    setResults(newResults);
+    setActiveTab("resultados");
+  };
+
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full bg-muted">
@@ -30,7 +66,7 @@ function BankReconciliationPage() {
               <AppLogo area="header" className="h-6 w-auto shrink-0 sm:h-7" />
               <div className="ml-2 flex flex-col leading-tight">
                 <span className="text-sm font-semibold text-foreground">Conciliação Bancária</span>
-                <span className="text-[11px] text-muted-foreground">Validação multi-fonte</span>
+                <span className="text-[11px] text-muted-foreground">Inteligência Financeira</span>
               </div>
             </Link>
             <div className="ml-auto flex items-center gap-3">
@@ -39,7 +75,7 @@ function BankReconciliationPage() {
           </header>
 
           <main className="flex-1 space-y-6 p-6">
-            <Tabs defaultValue="dashboard" className="w-full">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="mb-4">
                 <TabsTrigger value="dashboard" className="gap-2">
                   <LayoutDashboard className="h-4 w-4" /> Dashboard
@@ -47,11 +83,13 @@ function BankReconciliationPage() {
                 <TabsTrigger value="conciliacao" className="gap-2">
                   <ShieldCheck className="h-4 w-4" /> Conciliar
                 </TabsTrigger>
-                <TabsTrigger value="liquidos" className="gap-2">
-                  <BarChart3 className="h-4 w-4" /> Conciliação de Líquidos
-                </TabsTrigger>
+                {results.length > 0 && (
+                  <TabsTrigger value="resultados" className="gap-2">
+                    <BarChart3 className="h-4 w-4" /> Resultados
+                  </TabsTrigger>
+                )}
                 <TabsTrigger value="semanal" className="gap-2">
-                  <History className="h-4 w-4" /> Conciliação Semanal
+                  <History className="h-4 w-4" /> Semanal
                 </TabsTrigger>
                 <TabsTrigger value="historico" className="gap-2">
                   <History className="h-4 w-4" /> Histórico
@@ -80,28 +118,24 @@ function BankReconciliationPage() {
                   </div>
                 </div>
 
-                <div className="rounded-xl border bg-card p-8 text-center">
-                  <p className="text-muted-foreground">Módulo de Conciliação Bancária v1.9.0 em implementação.</p>
+                <div className="rounded-xl border bg-card p-8 text-center bg-white/5 backdrop-blur-sm">
+                  <p className="text-muted-foreground font-medium">Conciliação Bancária v2.0</p>
                   <div className="mt-4 text-left max-w-2xl mx-auto space-y-4">
-                    <p className="text-sm text-indigo-600 font-bold border-b border-indigo-100 pb-2 flex items-center gap-2">
-                      <Sparkles className="h-4 w-4" /> Próximos Passos (Engine de Conciliação):
+                    <p className="text-sm text-primary font-bold border-b border-primary/20 pb-2 flex items-center gap-2">
+                      <Sparkles className="h-4 w-4" /> Tecnologias de Conciliação Ativas:
                     </p>
                     <ul className="text-sm text-muted-foreground space-y-3">
                       <li className="flex gap-3">
-                        <div className="h-5 w-5 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">✓</div>
-                        <span><b>Níveis 1 e 2:</b> Correspondência exata e por data próxima (+/- 2 dias) implementadas.</span>
+                        <div className="h-5 w-5 rounded-full bg-emerald-500/20 text-emerald-500 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">✓</div>
+                        <span><b>Multi-Factor Matching:</b> Validação cruzada de Empresa, Banco, Data, Valor e Favorecido.</span>
                       </li>
                       <li className="flex gap-3">
-                        <div className="h-5 w-5 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">✓</div>
-                        <span><b>Nível 3:</b> Lógica de Soma (SubSet Sum) para agrupar múltiplos títulos bancários integrada.</span>
+                        <div className="h-5 w-5 rounded-full bg-emerald-500/20 text-emerald-500 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">✓</div>
+                        <span><b>Confidence Scoring:</b> Cálculo de probabilidade de acerto com tolerância para centavos.</span>
                       </li>
                       <li className="flex gap-3">
-                        <div className="h-5 w-5 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">→</div>
-                        <span><b>Nível 4 (Ajuste de Tarifa):</b> Configurar tolerância de centavos para conciliação automática de tarifas bancárias.</span>
-                      </li>
-                      <li className="flex gap-3">
-                        <div className="h-5 w-5 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">!</div>
-                        <span><b>Interface Dinâmica:</b> Adicionar tooltips detalhados para exibir quais IDs compõem a sugestão do Nível 3.</span>
+                        <div className="h-5 w-5 rounded-full bg-primary/20 text-primary flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">→</div>
+                        <span><b>Detecção de Tarifas:</b> Identificação automática de taxas e encargos bancários.</span>
                       </li>
                     </ul>
                   </div>
@@ -109,19 +143,17 @@ function BankReconciliationPage() {
               </TabsContent>
 
               <TabsContent value="conciliacao" className="space-y-6">
-                <ConciliacaoAtivaView onResults={(res) => setConciliacaoResults(res)} />
+                <ConciliacaoAtivaView onResults={handleResults} />
               </TabsContent>
 
-              <TabsContent value="resultados" className="space-y-6">
-                <ConciliacaoResultadosView data={conciliacaoResults} onClear={() => setConciliacaoResults([])} />
-              </TabsContent>
+              {results.length > 0 && (
+                <TabsContent value="resultados" className="space-y-6">
+                  <ConciliacaoResultadosView data={results} onClear={() => setResults([])} />
+                </TabsContent>
+              )}
 
               <TabsContent value="semanal" className="space-y-6">
                 <ConciliacaoSemanalView />
-              </TabsContent>
-
-              <TabsContent value="liquidos" className="space-y-6">
-                <ConciliacaoLiquidosView />
               </TabsContent>
             </Tabs>
           </main>
@@ -131,85 +163,24 @@ function BankReconciliationPage() {
   );
 }
 
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import { useMutation } from "@tanstack/react-query";
-import { exportarConciliacaoSemanal } from "@/lib/conciliacao-engine";
-import { useSession } from "@/hooks/use-session";
-import { toast } from "sonner";
-import { Download, Calendar as CalendarIcon, FileSpreadsheet } from "lucide-react";
-
-function ConciliacaoSemanalView() {
-  const { user } = useSession();
-  const [dataIni, setDataIni] = useState("");
-  const [dataFim, setDataFim] = useState("");
-
-  const exportMut = useMutation({
-    mutationFn: () => exportarConciliacaoSemanal(dataIni, dataFim, user!.id),
-    onSuccess: () => {
-      toast.success("Arquivo de conciliação semanal gerado e registrado no sino.");
-    },
-    onError: (e: any) => toast.error(e.message),
-  });
-
-  return (
-    <Card className="border-border">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-lg">
-          <FileSpreadsheet className="h-5 w-5 text-emerald-600" />
-          Extração Semanal (Referência: Pagamentos Diversos)
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="grid gap-4 md:grid-cols-2">
-          <div className="space-y-2">
-            <Label>Data Início</Label>
-            <Input type="date" value={dataIni} onChange={(e) => setDataIni(e.target.value)} />
-          </div>
-          <div className="space-y-2">
-            <Label>Data Fim</Label>
-            <Input type="date" value={dataFim} onChange={(e) => setDataFim(e.target.value)} />
-          </div>
-        </div>
-
-        <div className="flex flex-col gap-3 rounded-lg bg-muted p-4 border border-border">
-          <h4 className="text-sm font-semibold text-foreground">Resumo da Operação</h4>
-          <ul className="text-xs text-muted-foreground space-y-2 list-disc pl-4">
-            <li>Os títulos das colunas seguirão o padrão da base de <b>Pagamentos Diversos</b>.</li>
-            <li>O arquivo será baixado localmente e uma cópia será vinculada à <b>[anexo]</b>.</li>
-            <li>Uma notificação será enviada para o sino com atalho de download direto.</li>
-          </ul>
-        </div>
-
-        <Button 
-          className="w-full bg-emerald-600 hover:bg-emerald-700 gap-2" 
-          disabled={!dataIni || !dataFim || exportMut.isPending}
-          onClick={() => exportMut.mutate()}
-        >
-          {exportMut.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
-          Gerar Conciliação Semanal
-        </Button>
-      </CardContent>
-    </Card>
-  );
-}
-
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Loader2, Upload, FileText, CheckCircle2, XCircle } from "lucide-react";
-import { useState, useRef } from "react";
-import * as XLSX from "xlsx";
-import { executarConciliacao } from "@/lib/conciliacao-engine";
-
-function ConciliacaoAtivaView() {
+function ConciliacaoAtivaView({ onResults }: { onResults: (res: ConciliacaoItem[]) => void }) {
   const { user } = useSession();
   const [loading, setLoading] = useState(false);
-  const [tipo, setTipo] = useState<"Varejo" | "Distribuição" | "Diferenças" | null>(null);
+  const [competencia, setCompetencia] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
+
+  const { data: pagamentosPortal } = useQuery({
+    queryKey: ['pagamentos-conciliacao', competencia],
+    queryFn: () => getPagamentosParaConciliacao({ competencias: [competencia] }),
+    enabled: !!competencia
+  });
 
   const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file || !tipo || !user) return;
+    if (!file || !user || !pagamentosPortal) {
+      if (!competencia) toast.error("Selecione a competência antes de importar.");
+      return;
+    }
 
     setLoading(true);
     try {
@@ -220,16 +191,16 @@ function ConciliacaoAtivaView() {
           const wb = XLSX.read(bstr, { type: "binary" });
           const wsname = wb.SheetNames[0];
           const ws = wb.Sheets[wsname];
-          const data = XLSX.utils.sheet_to_json(ws);
+          const importData = XLSX.utils.sheet_to_json(ws);
 
-          if (!data.length) throw new Error("Arquivo vazio");
+          if (!importData.length) throw new Error("Arquivo vazio");
 
-          toast.info(`Processando ${data.length} registros de ${tipo}...`);
+          toast.info(`Processando ${importData.length} registros bancários...`);
           
-          // Executar engine de conciliação multi-nível
-          await executarConciliacao(tipo, data, user.id);
+          const resultados = await executarConciliacao(importData, pagamentosPortal, user.id);
           
-          toast.success(`Conciliação de ${tipo} concluída com sucesso! Verifique seu sino.`);
+          toast.success(`Processamento concluído!`);
+          onResults(resultados);
         } catch (err: any) {
           toast.error("Erro no processamento: " + err.message);
         } finally {
@@ -248,93 +219,78 @@ function ConciliacaoAtivaView() {
     <div className="space-y-6">
       <input type="file" ref={fileRef} className="hidden" accept=".xlsx,.xls,.csv" onChange={handleFile} />
       
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="border-blue-100 hover:shadow-md transition-shadow">
-          <CardHeader className="pb-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Card className="border-primary/20 bg-card/50 backdrop-blur-md">
+          <CardHeader>
             <CardTitle className="text-sm font-bold flex items-center gap-2">
-              <div className="h-6 w-6 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-[10px] font-bold">1</div>
-              Varejo
+              <div className="h-6 w-6 rounded-full bg-primary/20 text-primary flex items-center justify-center text-[10px] font-bold">1</div>
+              Configurar Origem
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <p className="text-xs text-muted-foreground">Importe o arquivo de retorno consolidado do Varejo.</p>
-            <Button 
-              variant="outline" 
-              className="w-full h-24 border-dashed border-2 hover:border-blue-400 hover:bg-blue-50/50 flex-col gap-2"
-              onClick={() => { setTipo("Varejo"); fileRef.current?.click(); }}
-              disabled={loading}
-            >
-              {loading && tipo === "Varejo" ? <Loader2 className="h-5 w-5 animate-spin" /> : <Upload className="h-5 w-5 text-blue-500" />}
-              <span className="text-xs font-medium">Selecionar arquivo Varejo</span>
-            </Button>
+            <div className="space-y-2">
+              <Label>Competência no Portal</Label>
+              <Input 
+                placeholder="Ex: 07/2026" 
+                value={competencia} 
+                onChange={(e) => setCompetencia(e.target.value)}
+                className="bg-white/5 border-white/10"
+              />
+              <p className="text-[10px] text-muted-foreground italic">
+                O sistema buscará os registros de "Pagamentos Diversos" desta competência para comparar.
+              </p>
+            </div>
           </CardContent>
         </Card>
 
-        <Card className="border-indigo-100 hover:shadow-md transition-shadow">
-          <CardHeader className="pb-3">
+        <Card className="border-emerald-500/20 bg-card/50 backdrop-blur-md">
+          <CardHeader>
             <CardTitle className="text-sm font-bold flex items-center gap-2">
-              <div className="h-6 w-6 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-[10px] font-bold">2</div>
-              Distribuição
+              <div className="h-6 w-6 rounded-full bg-emerald-500/20 text-emerald-500 flex items-center justify-center text-[10px] font-bold">2</div>
+              Importar Extrato Bancário
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <p className="text-xs text-muted-foreground">Importe o arquivo de retorno da Distribuição.</p>
+            <p className="text-xs text-muted-foreground">O motor inteligente identificará automaticamente os campos de valor, data e banco.</p>
             <Button 
               variant="outline" 
-              className="w-full h-24 border-dashed border-2 hover:border-indigo-400 hover:bg-indigo-50/50 flex-col gap-2"
-              onClick={() => { setTipo("Distribuição"); fileRef.current?.click(); }}
-              disabled={loading}
+              className="w-full h-24 border-dashed border-2 hover:border-emerald-500/40 hover:bg-emerald-500/5 flex-col gap-2 group transition-all"
+              onClick={() => fileRef.current?.click()}
+              disabled={loading || !competencia}
             >
-              {loading && tipo === "Distribuição" ? <Loader2 className="h-5 w-5 animate-spin" /> : <Upload className="h-5 w-5 text-indigo-500" />}
-              <span className="text-xs font-medium">Selecionar arquivo Distribuição</span>
-            </Button>
-          </CardContent>
-        </Card>
-        
-        <Card className="border-amber-100 hover:shadow-md transition-shadow lg:col-span-2">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-bold flex items-center gap-2">
-              <div className="h-6 w-6 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center text-[10px] font-bold">3</div>
-              Conciliação de Diferenças
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-xs text-muted-foreground">Importe Excel ou CSV para identificar discrepâncias de valores, datas e IDs.</p>
-            <Button 
-              variant="outline" 
-              className="w-full h-24 border-dashed border-2 hover:border-amber-400 hover:bg-amber-50/50 flex-col gap-2"
-              onClick={() => { setTipo("Diferenças"); fileRef.current?.click(); }}
-              disabled={loading}
-            >
-              {loading && tipo === "Diferenças" ? <Loader2 className="h-5 w-5 animate-spin" /> : <Upload className="h-5 w-5 text-amber-500" />}
-              <span className="text-xs font-medium">Importar Base de Divergências (Excel/CSV)</span>
+              {loading ? (
+                <Loader2 className="h-5 w-5 animate-spin" />
+              ) : (
+                <Upload className="h-5 w-5 text-emerald-500 group-hover:scale-110 transition-transform" />
+              )}
+              <span className="text-xs font-medium">Selecionar Arquivo Bancário</span>
             </Button>
           </CardContent>
         </Card>
       </div>
 
-      <Card className="border-border">
-        <CardHeader className="pb-3 border-b bg-muted/50">
+      <Card className="border-border/40 bg-card/30 backdrop-blur-sm">
+        <CardHeader className="pb-3 border-b border-white/5 bg-white/5">
           <CardTitle className="text-sm font-bold flex items-center gap-2 text-foreground">
-            <ShieldCheck className="h-4 w-4 text-emerald-600" /> Funcionamento da Conciliação Multi-nível
+            <ShieldCheck className="h-4 w-4 text-emerald-500" /> Motor de Conciliação 2.0
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
-          <div className="grid md:grid-cols-2 lg:grid-cols-5 divide-x divide-border">
+          <div className="grid md:grid-cols-5 divide-x divide-white/5">
             {[
-              { level: 1, label: "Exata", desc: "Data, Empresa e Valor idênticos.", icon: CheckCircle2, color: "text-emerald-500" },
-              { level: 2, label: "Data Próxima", desc: "Empresa e Valor exatos, data +/- 2 dias.", icon: CheckCircle2, color: "text-blue-500" },
-              { level: 3, label: "Soma (SubSet)", desc: "Um valor do arquivo é a soma de vários títulos.", icon: Sparkles, color: "text-violet-500" },
-              { level: 4, label: "Ajuste de Tarifa", desc: "Valor com diferença mínima aceitável.", icon: AlertTriangle, color: "text-amber-500" },
-              { level: 5, label: "Divergência", desc: "Nenhuma correspondência encontrada.", icon: XCircle, color: "text-red-500" },
+              { level: 1, label: "Exata", desc: "Confiança 90-100%", icon: CheckCircle2, color: "text-emerald-500" },
+              { level: 2, label: "Aproximada", desc: "Data +/- 2 dias", icon: CheckCircle2, color: "text-blue-500" },
+              { level: 3, label: "Divergente", desc: "Necessita Justificativa", icon: AlertTriangle, color: "text-amber-500" },
+              { level: 4, label: "Tarifas", desc: "Ajuste < R$ 20,00", icon: Sparkles, color: "text-violet-500" },
+              { level: 5, label: "Desconhecido", desc: "Sem referência", icon: XCircle, color: "text-red-500" },
             ].map((n) => (
-              <div key={n.level} className="p-4 space-y-2">
+              <div key={n.level} className="p-4 space-y-1">
                 <div className="flex items-center gap-2">
-                  <n.icon className={`h-4 w-4 ${n.color}`} />
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Nível {n.level}</span>
+                  <n.icon className={`h-3 w-3 ${n.color}`} />
+                  <span className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">LV {n.level}</span>
                 </div>
-                <p className="text-xs font-bold text-foreground">{n.label}</p>
-                <p className="text-[10px] text-muted-foreground leading-relaxed">{n.desc}</p>
+                <p className="text-[10px] font-bold text-foreground">{n.label}</p>
+                <p className="text-[9px] text-muted-foreground leading-tight">{n.desc}</p>
               </div>
             ))}
           </div>
@@ -344,4 +300,48 @@ function ConciliacaoAtivaView() {
   );
 }
 
-import { Sparkles } from "lucide-react";
+function ConciliacaoSemanalView() {
+  const { user } = useSession();
+  const [dataIni, setDataIni] = useState("");
+  const [dataFim, setDataFim] = useState("");
+
+  const exportMut = useMutation({
+    mutationFn: () => exportarConciliacaoSemanal(dataIni, dataFim, user!.id),
+    onSuccess: () => {
+      toast.success("Extração gerada e enviada para o seu sino.");
+    },
+    onError: (e: any) => toast.error(e.message),
+  });
+
+  return (
+    <Card className="border-border/40 bg-card/50 backdrop-blur-md">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 text-lg">
+          <FileSpreadsheet className="h-5 w-5 text-emerald-500" />
+          Extração Semanal
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="space-y-2">
+            <Label>Início do Período</Label>
+            <Input type="date" value={dataIni} onChange={(e) => setDataIni(e.target.value)} className="bg-white/5 border-white/10" />
+          </div>
+          <div className="space-y-2">
+            <Label>Fim do Período</Label>
+            <Input type="date" value={dataFim} onChange={(e) => setDataFim(e.target.value)} className="bg-white/5 border-white/10" />
+          </div>
+        </div>
+
+        <Button 
+          className="w-full bg-emerald-600 hover:bg-emerald-700 gap-2 font-bold shadow-lg shadow-emerald-600/20" 
+          disabled={!dataIni || !dataFim || exportMut.isPending}
+          onClick={() => exportMut.mutate()}
+        >
+          {exportMut.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
+          Gerar Relatório de Auditoria
+        </Button>
+      </CardContent>
+    </Card>
+  );
+}
