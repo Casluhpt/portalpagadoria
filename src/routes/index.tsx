@@ -33,7 +33,7 @@ import { useRoles } from "@/hooks/use-roles";
 import { useSession } from "@/hooks/use-session";
 import logoPagadoria from "@/assets/logo-pagadoria.png.asset.json";
 import { GlobalSearch } from "@/components/global-search";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
