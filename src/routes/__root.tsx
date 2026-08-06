@@ -59,29 +59,35 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   }, [error]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="max-w-md text-center">
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">
-          verifique o erro
+    <div className="flex min-h-screen items-center justify-center bg-background/80 backdrop-blur-md px-4">
+      <div className="max-w-md w-full p-8 rounded-2xl border border-white/20 bg-white/10 shadow-2xl text-center animate-in fade-in zoom-in duration-300">
+        <div className="flex justify-center mb-6">
+          <div className="p-4 rounded-full bg-red-500/10 border border-red-500/20">
+            <AlertCircle className="h-12 w-12 text-red-500" />
+          </div>
+        </div>
+        <h1 className="text-2xl font-bold tracking-tight text-foreground mb-3">
+          Verifique o erro
         </h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Something went wrong on our end. You can try refreshing or head back home.
+        <p className="text-sm text-muted-foreground mb-8 leading-relaxed">
+          Ocorreu uma instabilidade na interface. Nossa equipe foi notificada e os detalhes foram salvos no seu Painel de Diagnóstico.
         </p>
-        <div className="mt-6 flex flex-wrap justify-center gap-2">
+        <div className="flex flex-col gap-3">
           <button
             onClick={() => {
               router.invalidate();
               reset();
             }}
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            className="w-full inline-flex items-center justify-center rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
           >
-            Try again
+            <RefreshCw className="mr-2 h-4 w-4" />
+            Tentar novamente
           </button>
           <a
             href="/"
-            className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
+            className="w-full inline-flex items-center justify-center rounded-xl border border-border bg-background/50 backdrop-blur-sm px-6 py-3 text-sm font-semibold text-foreground transition-all hover:bg-accent"
           >
-            Go home
+            Voltar ao Início
           </a>
         </div>
       </div>
