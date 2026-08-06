@@ -10,6 +10,7 @@ import { fetchMateriais, materialApoioQueryKey } from "@/lib/material-apoio";
 import { useSession } from "@/hooks/use-session";
 import { useNavigate } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
 
 export function FloatingAI() {
   const [isOpen, setIsOpen] = useState(false);
