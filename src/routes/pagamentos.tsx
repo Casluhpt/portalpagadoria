@@ -163,7 +163,7 @@ function PagamentosPage() {
           </Tabs>
         </div>
       </div>
-    </SidebarProvider>
+    </>
   );
 }
 
