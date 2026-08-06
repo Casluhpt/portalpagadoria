@@ -21,8 +21,7 @@ import { toast } from "sonner";
 import { RestrictedArea } from "@/components/role-gate";
 import { logAcaoCritica } from "@/lib/audit-critico";
 import { useSession } from "@/hooks/use-session";
-import { listAdminUsers, resetUserPassword, setUserRole, setUserSetor, setUserNome, inviteUser, deleteUser, ALLOWED_SETORES, type AdminUserRow, type Setor } from "@/lib/admin-users.functions";
-import { type AppRole } from "@/hooks/use-roles";
+import { listAdminUsers, resetUserPassword, setUserRole, setUserSetor, setUserNome, inviteUser, deleteUser, ALLOWED_SETORES, type AdminUserRow, type Setor, type AppRole } from "@/lib/admin-users.functions";
 import {
   Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
@@ -343,7 +342,7 @@ function UsuariosTable() {
 }
 function UserTableRow({ u, user, roleMut, setorMut, nomeMut, deleteMut, resetMut, compact }: any) {
   const isSelf = user?.id === u.id;
-  const [pendingRole, setPendingRole] = useState<"administrador" | "viewer" | "visitante" | null>(null);
+  const [pendingRole, setPendingRole] = useState<AppRole | null>(null);
   const [justificativa, setJustificativa] = useState("");
   const [editingNome, setEditingNome] = useState(false);
   const [tempNome, setTempNome] = useState(u.nome || "");
@@ -426,9 +425,14 @@ function UserTableRow({ u, user, roleMut, setorMut, nomeMut, deleteMut, resetMut
       <td className="border-b border-border px-3 py-2">
         <div className="flex flex-wrap items-center gap-2">
           {(() => {
-            const current: "administrador" | "viewer" | "visitante" =
-              u.roles.includes("administrador") ? "administrador" : u.roles.includes("visitante") ? "visitante" : "viewer";
-            const otherRoles = u.roles.filter((r: any) => r !== "administrador" && r !== "viewer");
+            const current = (u.roles.includes("administrador") 
+              ? "administrador" 
+              : u.roles.includes("gerente")
+                ? "gerente"
+                : u.roles.includes("visitante")
+                  ? "visitante"
+                  : "viewer") as AppRole;
+            const otherRoles = u.roles.filter((r: any) => r !== "administrador" && r !== "viewer" && r !== "visitante" && r !== "gerente");
             return (
               <>
                 <Select
@@ -437,7 +441,7 @@ function UserTableRow({ u, user, roleMut, setorMut, nomeMut, deleteMut, resetMut
                   onValueChange={(v) => {
                     if (v === current) return;
                     setJustificativa("");
-                    setPendingRole(v as "administrador" | "viewer" | "visitante");
+                    setPendingRole(v as AppRole);
                   }}
                 >
                   <SelectTrigger className="h-8 w-[160px] text-xs">
@@ -452,6 +456,11 @@ function UserTableRow({ u, user, roleMut, setorMut, nomeMut, deleteMut, resetMut
                     <SelectItem value="viewer">
                       <span className="inline-flex items-center gap-1">
                         <Eye className="h-3 w-3" /> Viewer
+                      </span>
+                    </SelectItem>
+                    <SelectItem value="gerente">
+                      <span className="inline-flex items-center gap-1">
+                        <User className="h-3 w-3" /> Gerente
                       </span>
                     </SelectItem>
                     <SelectItem value="visitante">
