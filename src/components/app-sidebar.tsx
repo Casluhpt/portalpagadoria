@@ -203,9 +203,7 @@ export function AppSidebar() {
         asChild={item.action !== "search"} 
         isActive={item.match(currentPath)} 
         tooltip={item.title}
-        onClick={item.action === "search" ? () => {
-          setChatOpen(true);
-        } : undefined}
+        onClick={undefined}
       >
         {item.action === "search" ? (
           <div className="flex items-center gap-2 cursor-pointer w-full">

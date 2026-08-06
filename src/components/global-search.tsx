@@ -40,7 +40,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { buscarNoPortal, type PortalHit } from "@/lib/portal-search";
 import { fetchMateriais, materialApoioQueryKey } from "@/lib/material-apoio";
-import { perguntarIa } from "@/lib/ia.functions";
+
 
 const RECENT_SEARCHES_KEY = "global_search_history";
 
@@ -152,36 +152,7 @@ export function GlobalSearch({ variant = "compact" }: { variant?: "compact" | "h
     navigate({ to: url as never });
   };
 
-  const askAi = async () => {
-    const q = search.trim();
-    if (q.length < 2) return;
-    setIsAiLoading(true);
-    setIsAiMode(true);
-    setAiResponse(null);
-    saveToHistory(q);
-    const contexto = [
-      "MÓDULOS DO PORTAL: " + pages.map((p) => `${p.title} (${p.url})`).join("; "),
-      ...materiais
-        .filter((m) => m.publicado)
-        .map((m) => `### ${m.titulo} (${m.categoria})\n${m.conteudo}`),
-    ]
-      .join("\n\n")
-      .slice(0, 55_000);
-    try {
-      const r = await perguntarIa({ data: { pergunta: q, contexto } });
-      if (r.erro) {
-        setAiResponse(r.erro);
-        toast.error(r.erro);
-      } else {
-        setAiResponse(r.resposta ?? "IA de Suporte da Pagadoria: Não encontrei material autorizado suficiente.");
-      }
-    } catch (err) {
-      console.error("Erro na IA Global Search:", err);
-      setAiResponse("IA de Suporte da Pagadoria: Falha de comunicação com o servidor. Tente novamente.");
-    } finally {
-      setIsAiLoading(false);
-    }
-  };
+  const askAi = async () => {};
 
   const hitsPorGrupo = useMemo(() => {
     const map = new Map<PortalHit["grupo"], PortalHit[]>();
@@ -203,9 +174,6 @@ export function GlobalSearch({ variant = "compact" }: { variant?: "compact" | "h
         <span className="flex-1 truncate text-sm text-muted-foreground">
           Matrícula, usuário, empresa, colaborador, fornecedor, competência, cards…
         </span>
-        <span className="hidden items-center gap-1 rounded-full bg-violet-100 px-2.5 py-1 text-[10px] font-semibold text-violet-700 sm:flex dark:bg-violet-900/40 dark:text-violet-300">
-          <Sparkles className="h-3 w-3" /> IA Assistente
-        </span>
       </button>
     ) : (
       <Button
@@ -216,7 +184,7 @@ export function GlobalSearch({ variant = "compact" }: { variant?: "compact" | "h
       >
         <Search className="h-4 w-4 text-violet-600 xl:mr-2" />
         <span className="hidden text-xs font-medium text-muted-foreground xl:inline-flex">
-          Busca + IA…
+          Busca…
         </span>
       </Button>
     );
@@ -250,22 +218,6 @@ export function GlobalSearch({ variant = "compact" }: { variant?: "compact" | "h
             className="flex h-11 w-full bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground"
           />
           {isFetching && <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" />}
-          {search.trim().length >= 2 && (
-            <Button
-              size="sm"
-              variant="ghost"
-              className="h-7 shrink-0 gap-1 bg-violet-100 px-2 text-[10px] text-violet-700 hover:bg-violet-200 dark:bg-violet-900/40 dark:text-violet-300"
-              onClick={askAi}
-              disabled={isAiLoading}
-            >
-              {isAiLoading ? (
-                <Loader2 className="h-3 w-3 animate-spin" />
-              ) : (
-                <Sparkles className="h-3 w-3" />
-              )}
-              Perguntar IA
-            </Button>
-          )}
         </div>
 
         {isAiMode && (
@@ -340,19 +292,7 @@ export function GlobalSearch({ variant = "compact" }: { variant?: "compact" | "h
           <CommandList className="max-h-[460px]">
             <div className="py-6 text-center text-sm">
               <div className="flex flex-col items-center justify-center gap-1 py-6 text-center">
-                <Bot className="mb-2 h-10 w-10 text-violet-300" />
                 <p className="text-sm font-medium">Nenhum resultado direto no portal.</p>
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    void askAi();
-                  }}
-                  className="pointer-events-auto cursor-pointer rounded-md px-2 py-1 text-xs font-medium text-violet-600 underline-offset-2 transition-colors hover:bg-violet-100 hover:underline dark:text-violet-300 dark:hover:bg-violet-900/40"
-                >
-                  Perguntar à IA Assistente da Pagadoria
-                </button>
               </div>
             </div>
             <>
