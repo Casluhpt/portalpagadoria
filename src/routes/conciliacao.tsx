@@ -109,7 +109,11 @@ function BankReconciliationPage() {
               </TabsContent>
 
               <TabsContent value="conciliacao" className="space-y-6">
-                <ConciliacaoAtivaView />
+                <ConciliacaoAtivaView onResults={(res) => setConciliacaoResults(res)} />
+              </TabsContent>
+
+              <TabsContent value="resultados" className="space-y-6">
+                <ConciliacaoResultadosView data={conciliacaoResults} onClear={() => setConciliacaoResults([])} />
               </TabsContent>
 
               <TabsContent value="semanal" className="space-y-6">
