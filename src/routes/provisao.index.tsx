@@ -33,6 +33,16 @@ import profarmaLogo from "@/assets/profarma-logo.png.asset.json";
 
 
 export const Route = createFileRoute("/provisao/")({
+  head: () => ({
+    meta: [
+      { title: "Provisão Diária | Portal Pagadoria" },
+      { name: "description", content: "Acompanhe e gerencie as provisões diárias da empresa profarma." },
+      { property: "og:title", content: "Provisão Diária | Portal Pagadoria" },
+      { property: "og:description", content: "Acompanhe e gerencie as provisões diárias da empresa profarma." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: ProvisaoDashboard,
 });
 
