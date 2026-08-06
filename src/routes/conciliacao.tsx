@@ -327,8 +327,19 @@ function ConciliacaoSemanalView() {
 
   const exportMut = useMutation({
     mutationFn: () => {
-      if (new Date(dataFim) < new Date(dataIni)) {
+      if (!dataIni || !dataFim) {
+        throw new Error("Por favor, selecione as datas de início e fim.");
+      }
+      const dIni = new Date(dataIni);
+      const dFim = new Date(dataFim);
+      if (dFim < dIni) {
         throw new Error("A data fim não pode ser anterior à data de início.");
+      }
+      // Opcional: Impedir períodos muito longos se necessário (ex: > 3 anos)
+      const diffTime = Math.abs(dFim.getTime() - dIni.getTime());
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      if (diffDays > 365) {
+        toast.warning("Períodos superiores a 1 ano podem demorar para processar.");
       }
       return exportarConciliacaoSemanal(dataIni, dataFim, user!.id, formato);
     },
@@ -349,6 +360,12 @@ function ConciliacaoSemanalView() {
     }
     window.print();
   };
+
+  const { data: previewData, isLoading: isPreviewLoading } = useQuery({
+    queryKey: ['conciliacao-preview', dataIni, dataFim],
+    queryFn: () => getPagamentosParaConciliacao({ data: { dataInicio: dataIni, dataFim } }),
+    enabled: !!dataIni && !!dataFim && new Date(dataFim) >= new Date(dataIni)
+  });
 
   return (
     <Card className="border-border/40 bg-card/50 backdrop-blur-md">
@@ -404,9 +421,71 @@ function ConciliacaoSemanalView() {
         </div>
 
         {dataIni && dataFim && new Date(dataFim) < new Date(dataIni) && (
-          <p className="text-xs text-red-500 animate-pulse">
-            Atenção: A data final é anterior à data inicial.
+          <p className="text-xs text-red-500 animate-pulse mt-4">
+            Atenção: A data final é anterior à data inicial. Verifique o intervalo.
           </p>
+        )}
+
+        {previewData && previewData.length > 0 && (
+          <div className="mt-8 space-y-4">
+            <h4 className="text-sm font-bold flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-primary" />
+              Prévia dos Resultados ({previewData.length} registros encontrados)
+            </h4>
+            <div className="rounded-lg border border-white/10 bg-white/5 overflow-hidden">
+              <div className="max-h-[300px] overflow-auto">
+                <table className="w-full text-[11px] text-left">
+                  <thead className="sticky top-0 bg-muted/90 backdrop-blur-sm border-b border-white/10">
+                    <tr>
+                      <th className="p-2 font-bold uppercase tracking-wider text-muted-foreground">Data</th>
+                      <th className="p-2 font-bold uppercase tracking-wider text-muted-foreground">Empresa</th>
+                      <th className="p-2 font-bold uppercase tracking-wider text-muted-foreground">Favorecido</th>
+                      <th className="p-2 font-bold uppercase tracking-wider text-muted-foreground text-right">Valor</th>
+                      <th className="p-2 font-bold uppercase tracking-wider text-muted-foreground">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/5">
+                    {previewData.slice(0, 50).map((item: any) => (
+                      <tr key={item.id} className="hover:bg-white/5 transition-colors">
+                        <td className="p-2">{new Date(item.data_credito).toLocaleDateString('pt-BR')}</td>
+                        <td className="p-2 font-medium">{item.empresa}</td>
+                        <td className="p-2 truncate max-w-[150px]">{item.favorecido}</td>
+                        <td className="p-2 text-right font-mono">
+                          {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(item.valor_lg || 0)}
+                        </td>
+                        <td className="p-2">
+                          <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-bold uppercase ${
+                            item.status === 'Pago' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-amber-500/10 text-amber-500'
+                          }`}>
+                            {item.status || 'Pendente'}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                    {previewData.length > 50 && (
+                      <tr>
+                        <td colSpan={5} className="p-2 text-center text-muted-foreground italic border-t border-white/5">
+                          Exibindo primeiros 50 de {previewData.length} registros.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {!isPreviewLoading && previewData && previewData.length === 0 && dataIni && dataFim && new Date(dataFim) >= new Date(dataIni) && (
+          <div className="mt-8 p-6 rounded-lg border border-dashed border-white/10 text-center bg-white/5">
+            <p className="text-sm text-muted-foreground italic">Nenhum registro encontrado para este período.</p>
+          </div>
+        )}
+
+        {isPreviewLoading && (
+          <div className="mt-8 flex justify-center py-8">
+            <Loader2 className="h-6 w-6 animate-spin text-primary/40" />
+          </div>
         )}
       </CardContent>
     </Card>
