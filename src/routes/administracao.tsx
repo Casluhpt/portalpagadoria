@@ -1,7 +1,7 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Megaphone, Trash2, ShieldAlert } from "lucide-react";
+import { Megaphone, Trash2, ShieldAlert, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { AppSidebar } from "@/components/app-sidebar";
@@ -164,11 +164,15 @@ function ComunicadosPanel() {
             </div>
           </div>
           <Button
-            className="w-full"
+            className="w-full bg-indigo-600 hover:bg-indigo-700 shadow-sm"
             disabled={!canSubmit}
             onClick={() => publish.mutate()}
           >
-            {publish.isPending ? "Publicando..." : "Publicar para todos"}
+            {publish.isPending ? (
+              <span className="flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" /> Publicando...
+              </span>
+            ) : "Publicar para todos"}
           </Button>
         </CardContent>
       </Card>

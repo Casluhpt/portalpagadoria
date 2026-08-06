@@ -296,28 +296,33 @@ function ESocialPage() {
                   onChange={(e) => e.target.files?.[0] && handleImport(e.target.files[0])} 
                 />
 
-                <Button variant="outline" size="sm" onClick={() => {
-                  const ws = XLSX.utils.json_to_sheet([{
-                    "Empresa": "Exemplo LTDA",
-                    "Coligadas": "Coligada A",
-                    "CNPJ": "00.000.000/0000-00",
-                    "INSS": 1500.50,
-                    "IRRF": 300.20,
-                    "FGTS": 800.00,
-                    "PIS": 150.00,
-                    "Lancamento": "Pendente",
-                    "FUPAG": "12345",
-                    "Compensado": "Não"
-                  }]);
-                  const wb = XLSX.utils.book_new();
-                  XLSX.utils.book_append_sheet(wb, ws, "Modelo");
-                  XLSX.writeFile(wb, "modelo_esocial.xlsx");
+                <Button variant="outline" size="sm" className="hover:bg-accent/50" onClick={() => {
+                  try {
+                    const ws = XLSX.utils.json_to_sheet([{
+                      "Empresa": "Exemplo LTDA",
+                      "Coligadas": "Coligada A",
+                      "CNPJ": "00.000.000/0000-00",
+                      "INSS": 1500.50,
+                      "IRRF": 300.20,
+                      "FGTS": 800.00,
+                      "PIS": 150.00,
+                      "Lancamento": "Pendente",
+                      "FUPAG": "12345",
+                      "Compensado": "Não"
+                    }]);
+                    const wb = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(wb, ws, "Modelo");
+                    XLSX.writeFile(wb, "modelo_esocial.xlsx");
+                    toast.success("Modelo baixado com sucesso");
+                  } catch (e) {
+                    toast.error("Erro ao gerar modelo");
+                  }
                 }}>
-                  <Download className="mr-2 h-4 w-4" /> Modelo
+                  <Download className="mr-2 h-4 w-4 text-muted-foreground" /> Modelo
                 </Button>
                 
                 <Button 
-                  className="bg-indigo-600 hover:bg-indigo-700" 
+                  className="bg-indigo-600 hover:bg-indigo-700 shadow-sm active:scale-95 transition-all" 
                   size="sm" 
                   onClick={() => fileRef.current?.click()}
                   disabled={importMut.isPending}
