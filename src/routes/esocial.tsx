@@ -170,10 +170,9 @@ function ESocialPage() {
 
 
   return (
-    <SidebarProvider>
-      <div className="flex min-h-screen w-full bg-muted dark:bg-background">
-        <AppSidebar />
-        <div className="flex flex-1 flex-col">
+    <div className="flex min-h-screen w-full bg-muted dark:bg-background">
+      <AppSidebar />
+      <div className="flex flex-1 flex-col">
           <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-border bg-card/90 px-4 backdrop-blur dark:bg-card/90 dark:border-border">
             <SidebarTrigger />
             <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
