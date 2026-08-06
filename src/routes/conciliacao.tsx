@@ -15,6 +15,16 @@ export const Route = createFileRoute('/conciliacao')({
       throw redirect({ to: "/auth", search: { returnTo: "/conciliacao" } });
     }
   },
+  head: () => ({
+    meta: [
+      { title: "Conciliação Bancária | Portal Pagadoria" },
+      { name: "description", content: "Validação multi-fonte e engine de conciliação multi-nível." },
+      { property: "og:title", content: "Conciliação Bancária | Portal Pagadoria" },
+      { property: "og:description", content: "Validação multi-fonte e engine de conciliação multi-nível." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: BankReconciliationPage
 });
 
