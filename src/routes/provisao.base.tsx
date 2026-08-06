@@ -162,10 +162,6 @@ function ProvisaoBasePage() {
 
   const bulkDeleteMut = useMutation({
     mutationFn: async (ids: string[]) => {
-      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-      // Note: We use the client for now if admin client is not strictly needed for this table's RLS,
-      // but following the pattern for bulk actions, we'll implement it as a server function if needed.
-      // For simplicity and immediate fix, we'll use the existing deleteProvisao logic in a loop or a bulk call.
       const { bulkDeleteProvisao } = await import("@/lib/provisao");
       return bulkDeleteProvisao(ids);
     },

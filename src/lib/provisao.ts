@@ -103,6 +103,12 @@ export async function deleteProvisao(id: string): Promise<void> {
   if (error) throw error;
 }
 
+export async function bulkDeleteProvisao(ids: string[]): Promise<number> {
+  const { error } = await supabase.from("provisao_diaria").delete().in("id", ids);
+  if (error) throw error;
+  return ids.length;
+}
+
 export async function bulkInsertProvisao(rows: Partial<Provisao>[], replaceAll = false): Promise<number> {
   if (rows.length === 0) return 0;
   
