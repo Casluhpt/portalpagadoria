@@ -1,11 +1,15 @@
 # Changelog - Portal da Pagadoria
 
+## [v2.7.7] - 2026-08-06
+### Adicionado
+- **Evolução da IA Assistente:** Integração total com o contexto do usuário (path atual, setor, permissões RBAC e módulos permitidos).
+- **IA Consciente de Segurança:** O assistente agora respeita rigorosamente o sistema de permissões, evitando revelar áreas protegidas.
+- **Memória e Contexto:** Melhoria na retenção de contexto e memória da conversa para interações mais naturais e precisas.
+
 ## [v2.7.6] - 2026-08-06
 ### Adicionado
 - **Interação Minimalista:** Efeitos sutis de hover em botões, links e cards (elevação suave e brilho), reforçando a estética "Minimalismo Translúcido".
 - **Feedback Visual:** Interações específicas para elementos coloridos e componentes com transparência (glassmorphism).
-
-## [v2.7.5] - 2026-08-06
 ### Adicionado
 - **Status do Sistema:** Indicador visual em tempo real no rodapé do menu lateral ("Sistema Online").
 - **Conciliação de Líquidos:** Atalho direto no menu lateral para acesso rápido ao dashboard financeiro.
