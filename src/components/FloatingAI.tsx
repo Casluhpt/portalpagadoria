@@ -24,6 +24,8 @@ export function FloatingAI() {
   const { roles } = useRoles();
   const navigate = useNavigate();
   const currentPath = useRouterState({ select: (s) => s.location.pathname });
+  const [iaOnline, setIaOnline] = useState<boolean | null>(null);
+
 
   const { data: materiais = [] } = useQuery({
     queryKey: materialApoioQueryKey,
@@ -53,6 +55,38 @@ export function FloatingAI() {
       loadHistory();
     }
   }, [user, isOpen]);
+
+  useEffect(() => {
+    if (!user) return;
+    
+    const fetchIaStatus = async () => {
+      const { data } = await supabase
+        .from('app_config')
+        .select('value')
+        .eq('key', 'ia_online')
+        .single();
+      setIaOnline(data?.value !== false);
+    };
+
+    fetchIaStatus();
+
+    const channel = supabase
+      .channel('ia_status_float')
+      .on('postgres_changes', { 
+        event: 'UPDATE', 
+        schema: 'public', 
+        table: 'app_config',
+        filter: 'key=eq.ia_online'
+      }, (payload) => {
+        setIaOnline(payload.new.value !== false);
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user]);
+
 
   const handleSendMessage = async () => {
     if (!chatInput.trim() || isTyping) return;
@@ -126,9 +160,20 @@ export function FloatingAI() {
               <div>
                 <h3 className="text-sm font-bold leading-none text-foreground">IA da Pagadoria</h3>
                 <div className="mt-1 flex items-center gap-1.5">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
-                  <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">Online</span>
+                  <span className={cn(
+                    "h-1.5 w-1.5 rounded-full transition-all duration-300",
+                    iaOnline === null ? "bg-muted-foreground animate-pulse" :
+                    iaOnline ? "bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.6)]" : "bg-rose-500"
+                  )} />
+                  <span className={cn(
+                    "text-[10px] font-medium uppercase tracking-wider",
+                    iaOnline === null ? "text-muted-foreground" :
+                    iaOnline ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"
+                  )}>
+                    {iaOnline === null ? "Verificando..." : iaOnline ? "Online" : "Offline"}
+                  </span>
                 </div>
+
               </div>
             </div>
             <Button 
@@ -249,7 +294,11 @@ export function FloatingAI() {
         ) : (
           <Bot className="h-7 w-7 text-primary-foreground relative z-10 animate-bounce-slow" />
         )}
-        {!isOpen && (
+        {!isOpen && iaOnline === false && (
+          <span className="absolute inset-0 bg-rose-500/40 animate-pulse z-0" />
+        )}
+        {!isOpen && iaOnline !== false && (
+
           <span className="absolute -top-1 -right-1 flex h-4 w-4">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-foreground opacity-75"></span>
             <span className="relative inline-flex rounded-full h-4 w-4 bg-primary-foreground shadow-sm">

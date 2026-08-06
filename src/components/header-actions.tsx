@@ -1,5 +1,7 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { cn } from "@/lib/utils";
+
+
 import { Circle, Cog, History, KeyRound, LogIn, LogOut, Mail, MinusCircle, Settings, User, Users, XCircle } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -36,6 +38,8 @@ import { usePresence, type PresenceStatus } from "@/hooks/use-presence";
 import { NotificationBell } from "./notification-bell";
 import { GlobalSearch } from "./global-search";
 import { ThemeMenuSection } from "./theme-toggle";
+import { useEffect, useState } from "react";
+
 
 const roleLabel: Record<string, string> = {
   administrador: "Administração",
@@ -58,6 +62,8 @@ export function HeaderActions() {
   const { roles, isAdmin } = useRoles();
   const { setor } = useProfile();
   const { status, setStatus } = usePresence();
+  const [iaOnline, setIaOnline] = useState<boolean | null>(null);
+
   const navigate = useNavigate();
   const primary = roles[0];
 
@@ -77,6 +83,38 @@ export function HeaderActions() {
     if (error) toast.error(error.message);
     else toast.success("Enviamos um link de redefinição para seu email.");
   };
+
+  useEffect(() => {
+    if (!user) return;
+    
+    const fetchIaStatus = async () => {
+      const { data } = await supabase
+        .from('app_config')
+        .select('value')
+        .eq('key', 'ia_online')
+        .single();
+      setIaOnline(data?.value !== false);
+    };
+
+    fetchIaStatus();
+
+    const channel = supabase
+      .channel('public:app_config')
+      .on('postgres_changes', { 
+        event: 'UPDATE', 
+        schema: 'public', 
+        table: 'app_config',
+        filter: 'key=eq.ia_online'
+      }, (payload) => {
+        setIaOnline(payload.new.value !== false);
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user]);
+
 
   if (!user) {
     return (
@@ -99,7 +137,31 @@ export function HeaderActions() {
 
   return (
     <div className="flex min-w-0 items-center gap-1 sm:gap-1.5">
+      {user && (
+        <div 
+          className={cn(
+            "flex items-center gap-1.5 rounded-full px-2 py-1 transition-all duration-300 ring-1",
+            iaOnline === null ? "bg-muted/30 ring-border/50" : 
+            iaOnline ? "bg-emerald-500/10 ring-emerald-500/30" : "bg-rose-500/10 ring-rose-500/30"
+          )}
+          title={iaOnline === null ? "Verificando IA..." : iaOnline ? "IA da Pagadoria: Online" : "IA da Pagadoria: Offline"}
+        >
+          <span className={cn(
+            "h-1.5 w-1.5 rounded-full",
+            iaOnline === null ? "bg-muted-foreground animate-pulse" : 
+            iaOnline ? "bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]" : "bg-rose-500"
+          )} />
+          <span className={cn(
+            "hidden text-[9px] font-bold uppercase tracking-wider md:inline-block",
+            iaOnline === null ? "text-muted-foreground" : 
+            iaOnline ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"
+          )}>
+            IA {iaOnline === null ? "..." : iaOnline ? "Online" : "Offline"}
+          </span>
+        </div>
+      )}
       <div className="hidden lg:block">
+
         <GlobalSearch />
       </div>
       <NotificationBell />
