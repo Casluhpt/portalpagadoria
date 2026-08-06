@@ -431,8 +431,7 @@ function ESocialPage() {
               </div>
             </div>
           </main>
-        </div>
       </div>
-    </SidebarProvider>
+    </div>
   );
 }
