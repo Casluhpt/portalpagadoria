@@ -20,6 +20,8 @@ import { FaviconManager } from "@/components/favicon-manager";
 import { PortalFooter } from "@/components/portal-footer";
 import { FloatingAI } from "@/components/FloatingAI";
 import { IABannerOffline } from "@/components/ia-banner-offline";
+import { ActionContextResumo } from "@/components/action-context-resumo";
+
 
 
 import { AuthGate } from "@/components/auth-gate";
@@ -153,7 +155,9 @@ function RootComponent() {
         <Outlet />
         <IABannerOffline />
         <FloatingAI />
+        <ActionContextResumo />
         <PortalFooter />
+
 
       </AuthGate>
       <Toaster position="top-right" richColors closeButton />
