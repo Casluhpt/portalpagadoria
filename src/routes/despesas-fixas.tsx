@@ -821,7 +821,7 @@ function RegistroDialog({
       const first = entries[0];
       const v = parseFloat(String(first.valor).replace(/\./g, "").replace(",", "."));
       
-      const res = await upsertMut.mutateAsync({
+      await onSave({
         id: existente?.id,
         categoria: linha.categoria, descricao: linha.descricao, ano, mes,
         valor: v, tipo,
@@ -834,11 +834,6 @@ function RegistroDialog({
         lancado,
         meta: entries.length > 1 ? { entries } : null
       });
-
-      if (res) {
-        onClose();
-        toast.success(existente ? "Lançamento atualizado" : "Lançamento confirmado");
-      }
     } catch (err: any) {
       toast.error(err?.message ?? "Falha ao salvar lançamento");
     } finally { setSaving(false); }
@@ -1014,7 +1009,7 @@ function DescricaoDialog({
     const empresa = EMPRESAS.find((e) => e.codigo === empresaCodigo);
     setSaving(true);
     try {
-      await updateMetaMut.mutateAsync({
+      await onSave({
         categoria: linha.categoria, descricao: linha.descricao, ano,
         nova_descricao: descricao.trim() || linha.descricao,
         empresa_codigo: empresa?.codigo ?? null,
@@ -1032,7 +1027,6 @@ function DescricaoDialog({
         motivo_suspensao: suspensa ? motivoSuspensao || null : null,
         notas: notas || null,
       });
-      onClose();
     } catch (err: any) {
       toast.error(err?.message ?? "Falha ao atualizar informações");
     } finally { setSaving(false); }
