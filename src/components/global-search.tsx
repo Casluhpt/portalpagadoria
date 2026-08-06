@@ -208,75 +208,9 @@ export function GlobalSearch({ variant = "compact" }: { variant?: "compact" | "h
           {isFetching && <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" />}
         </div>
 
-        {isAiMode && (
-          <div className="max-h-[460px] overflow-y-auto">
-            <div className="px-2 py-3">
-                <div className="flex flex-col gap-4 rounded-lg border-none bg-violet-50/80 p-4 dark:bg-violet-900/20">
-                  <div className="flex items-start gap-3">
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-violet-600 text-white shadow-sm">
-                      <Bot className="h-5 w-5" />
-                    </div>
-                    <div className="flex-1 space-y-1">
-                      <p className="text-xs font-medium text-foreground italic">"{search}"</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-3 border-none pt-4">
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-violet-100 text-violet-600 shadow-sm dark:bg-violet-900/40">
-                      <Sparkles className="h-5 w-5" />
-                    </div>
-                    <div className="flex-1 space-y-2">
-                      {isAiLoading ? (
-                        <div className="flex items-center gap-2 text-xs italic text-violet-600 dark:text-violet-300">
-                          <Loader2 className="h-3 w-3 animate-spin" />
-                          Processando sua solicitação...
-                        </div>
-                      ) : (
-                        <div className="whitespace-pre-line text-xs leading-relaxed text-violet-900 dark:text-violet-100">
-                          {aiResponse}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {!isAiLoading && (
-                    <div className="mt-2 flex flex-wrap gap-2 border-none pt-3">
-                      <Button
-                        size="sm"
-                        className="h-7 gap-1.5 bg-violet-600 text-[10px] hover:bg-violet-700"
-                        onClick={() => goTo("/material-apoio", "Material de Apoio")}
-                      >
-                        <BookOpen className="h-3 w-3" /> Ver Documentação
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="h-7 text-[10px] border-violet-200 hover:bg-violet-100 dark:border-violet-800 dark:hover:bg-violet-900/40"
-                        onClick={() => setIsAiMode(false)}
-                      >
-                        Nova Pesquisa
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="h-7 text-[10px] text-violet-600 hover:text-violet-700 hover:bg-violet-100 dark:hover:bg-violet-900/40"
-                        onClick={() => {
-                          setSearch("");
-                          setIsAiMode(false);
-                          setAiResponse(null);
-                        }}
-                      >
-                        Limpar conversa
-                      </Button>
-                    </div>
-                  )}
-              </div>
-            </div>
-          </div>
-        )}
 
 
-        {true && (
+        {open && (
           <CommandList className="max-h-[460px]">
             <div className="py-6 text-center text-sm">
               <div className="flex flex-col items-center justify-center gap-1 py-6 text-center">

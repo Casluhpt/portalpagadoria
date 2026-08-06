@@ -11,7 +11,7 @@ import {
   Pencil,
   Plus,
   Search,
-  Sparkles,
+  
   Trash2,
   LifeBuoy,
   ShieldCheck,
@@ -270,9 +270,6 @@ function MaterialApoioPage() {
   const [categoria, setCategoria] = useState<string | null>(null);
   const [aberto, setAberto] = useState<string | null>(null);
 
-  const [iaPergunta, setIaPergunta] = useState("");
-  const [iaResposta, setIaResposta] = useState<string | null>(null);
-  const [iaCarregando, setIaCarregando] = useState(false);
 
   const [editando, setEditando] = useState<MaterialApoio | null>(null);
   const [criando, setCriando] = useState(false);
@@ -300,18 +297,6 @@ function MaterialApoioPage() {
     return ranked.map((m) => m.titulo);
   }, [materiais, busca]);
 
-  const contextoIa = useMemo(
-    () =>
-      materiais
-        .filter((m) => m.publicado)
-        .map(
-          (m) =>
-            `### ${m.titulo} (categoria: ${m.categoria})\nPalavras-chave: ${(m.palavras_chave ?? []).join(", ")}\n${m.conteudo}`,
-        )
-        .join("\n\n---\n\n")
-        .slice(0, 55_000),
-    [materiais],
-  );
 
   const perguntar = async (pergunta?: string) => {};
 
