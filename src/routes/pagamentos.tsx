@@ -1883,9 +1883,15 @@ function FechamentoCompetenciaButton({ onComplete, disabled, data }: { onComplet
       XLSX.utils.book_append_sheet(wb, ws, "Fechamento");
       XLSX.writeFile(wb, `fechamento-${nome}-${format(new Date(), "dd-MM-yyyy")}.xlsx`);
 
-      // Database closure and cleanup
-      const { fecharCompetenciaPagamentos } = await import("@/lib/fechamento-pagamentos");
-      await fecharCompetenciaPagamentos(nome, user.id, data);
+      // Database closure and cleanup via Server Function
+      const { fecharCompetenciaPagamentosFn } = await import("@/lib/fechamento-pagamentos.functions");
+      await fecharCompetenciaPagamentosFn({
+        data: {
+          nome,
+          usuarioId: user.id,
+          registros: data
+        }
+      });
       await logAcaoCritica({
         acao: "fechamento_competencia",
         modulo: "Pagamentos Diversos",
