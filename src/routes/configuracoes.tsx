@@ -599,10 +599,48 @@ function AdvancedSecuritySettings() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [iaLoading, setIaLoading] = useState(false);
+  const [iaOnline, setIaOnline] = useState(true);
   const [settings, setSettings] = useState({
     enabled: false,
     email: "",
   });
+
+  const fetchIaStatus = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('app_config')
+        .select('value')
+        .eq('key', 'ia_online')
+        .single();
+      
+      if (error) throw error;
+      setIaOnline(data?.value !== false);
+    } catch (e: any) {
+      console.error("Erro ao carregar status da IA:", e);
+    }
+  };
+
+  const toggleIaStatus = async (status: boolean) => {
+    setIaLoading(true);
+    try {
+      const { error } = await supabase
+        .from('app_config')
+        .upsert({
+          key: 'ia_online',
+          value: status,
+          updated_at: new Date().toISOString()
+        });
+      
+      if (error) throw error;
+      setIaOnline(status);
+      toast.success(`IA da Pagadoria agora está ${status ? 'ONLINE' : 'OFFLINE'}`);
+    } catch (e: any) {
+      toast.error("Erro ao alterar status da IA: " + e.message);
+    } finally {
+      setIaLoading(false);
+    }
+  };
 
   const fetchSettings = async () => {
     setLoading(true);
