@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Sparkles, Table as TableIcon, Wand2, Repeat, ShieldCheck, Loader2 } from "lucide-react";
+import { Zap, Table as TableIcon, Wand2, Repeat, ShieldCheck, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import {
   Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle,
@@ -45,7 +45,7 @@ export function PlanilhaOnboarding() {
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-base">
             <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-500/10">
-              <Sparkles className="h-4 w-4 text-violet-600" />
+              <Zap className="h-4 w-4 text-violet-600" />
             </span>
             Conheça a Planilha Inteligente
           </DialogTitle>
@@ -70,7 +70,7 @@ export function PlanilhaOnboarding() {
             disabled={salvando}
             onClick={() => escolher("inteligente")}
           >
-            {salvando ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+            {salvando ? <Loader2 className="h-4 w-4 animate-spin" /> : <Zap className="h-4 w-4" />}
             Ativar Planilha Inteligente
           </Button>
           <Button

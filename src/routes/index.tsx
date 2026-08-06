@@ -12,7 +12,7 @@ import {
   ScrollText,
   ShieldCheck,
   TrendingUp,
-  Sparkles,
+  Zap,
   ChevronLeft,
   ChevronRight,
 
@@ -433,7 +433,7 @@ function PortalPage() {
                                     {itens.slice(0, 4).map((it, i) => {
                                       const Icon =
                                         it.categoria === "novo"
-                                          ? Sparkles
+                                          ? Zap
                                           : it.categoria === "correção" || it.categoria === "correcao"
                                             ? Bug
                                             : it.categoria === "seguranca" || it.categoria === "segurança"

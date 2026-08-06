@@ -129,7 +129,7 @@ function BankReconciliationPage() {
                   <p className="text-muted-foreground font-medium">Conciliação Bancária v2.0</p>
                   <div className="mt-4 text-left max-w-2xl mx-auto space-y-4">
                     <p className="text-sm text-primary font-bold border-b border-primary/20 pb-2 flex items-center gap-2">
-                      <Sparkles className="h-4 w-4" /> Tecnologias de Conciliação Ativas:
+                      <Zap className="h-4 w-4" /> Tecnologias de Conciliação Ativas:
                     </p>
                     <ul className="text-sm text-muted-foreground space-y-3">
                       <li className="flex gap-3">
@@ -300,7 +300,7 @@ function ConciliacaoAtivaView({ onResults }: { onResults: (res: ConciliacaoItem[
               { level: 1, label: "Exata", desc: "Confiança 90-100%", icon: CheckCircle2, color: "text-emerald-500" },
               { level: 2, label: "Aproximada", desc: "Data +/- 2 dias", icon: CheckCircle2, color: "text-blue-500" },
               { level: 3, label: "Divergente", desc: "Necessita Justificativa", icon: AlertTriangle, color: "text-amber-500" },
-              { level: 4, label: "Tarifas", desc: "Ajuste < R$ 20,00", icon: Sparkles, color: "text-violet-500" },
+              { level: 4, label: "Tarifas", desc: "Ajuste < R$ 20,00", icon: Zap, color: "text-violet-500" },
               { level: 5, label: "Desconhecido", desc: "Sem referência", icon: XCircle, color: "text-red-500" },
             ].map((n) => (
               <div key={n.level} className="p-4 space-y-1">
@@ -429,7 +429,7 @@ function ConciliacaoSemanalView() {
         {previewData && previewData.length > 0 && (
           <div className="mt-8 space-y-4">
             <h4 className="text-sm font-bold flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-primary" />
+              <Zap className="h-4 w-4 text-primary" />
               Prévia dos Resultados ({previewData.length} registros encontrados)
             </h4>
             <div className="rounded-lg border border-white/10 bg-white/5 overflow-hidden">
