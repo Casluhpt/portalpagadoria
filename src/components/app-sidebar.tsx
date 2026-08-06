@@ -15,7 +15,7 @@ import {
 import {
   LayoutDashboard,
   Database,
-  Sparkles,
+  
   Wallet,
   Home,
   FileArchive,
@@ -41,8 +41,6 @@ import {
   ChevronRight,
   FileSpreadsheet,
   X,
-  Send,
-  Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
 import type { ComponentType } from "react";
@@ -136,12 +134,6 @@ export function AppSidebar() {
   const { user } = useSession();
   const { roles, isAdmin, isGerente, isViewer, hasAny, loading: rolesLoading } = useRoles();
   const { setor } = useProfile();
-  const { data: materiais = [] } = useQuery({
-    queryKey: materialApoioQueryKey,
-    queryFn: fetchMateriais,
-    enabled: !!user,
-    staleTime: 5 * 60_000,
-  });
 
 
   const pages = useMemo(() => {
