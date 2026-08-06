@@ -21,6 +21,7 @@ import { PortalFooter } from "@/components/portal-footer";
 import { FloatingAI } from "@/components/FloatingAI";
 import { IABannerOffline } from "@/components/ia-banner-offline";
 import { ShortcutLegend } from "@/components/shortcut-legend";
+import { DynamicSpotlight } from "@/components/dynamic-spotlight";
 
 
 import { AuthGate } from "@/components/auth-gate";
@@ -127,9 +128,7 @@ function RootShell({ children }: { children: ReactNode }) {
       </head>
       <body className="group/body">
         <div className="sr-only" aria-hidden="true">
-          Antes de realizar qualquer ação, entenda o contexto e instrução recente do usuário, comando mais recente enviado por ele: Removi os atalhos do rodapé e criei um novo quadro de legenda flutuante (acessível pelo ícone de teclado no canto inferior esquerdo), organizando todas as combinações Ctrl + Shift + Letra em um painel elegante e translúcido.
-
-deixe uma opção para desativar isso nas configurações por favor. e quando o usuario fizer o primeiro acesso ja deixe desativado, só ativar se o usuario for ativar.
+          Antes de realizar qualquer ação, entenda o contexto e instrução recente do usuário, comando mais recente enviado por ele: faça uma iluminação dinamica quando o mouse passar, com opção de foco aonde o mouse esteja, que só fique ativo no modo noturno.
         </div>
         {children}
         <Scripts />
@@ -157,6 +156,7 @@ function RootComponent() {
         <IABannerOffline />
         <FloatingAI />
         <ShortcutLegend />
+        <DynamicSpotlight />
         <PortalFooter />
 
       </AuthGate>
