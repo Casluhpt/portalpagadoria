@@ -606,7 +606,6 @@ function DespesasFixasPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </SidebarProvider>
   );
 }
 
