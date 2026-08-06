@@ -200,23 +200,19 @@ export function AppSidebar() {
   const renderItem = (item: MenuItem) => (
     <SidebarMenuItem key={item.title}>
       <SidebarMenuButton 
-        asChild={item.action !== "search"} 
+        asChild 
         isActive={item.match(currentPath)} 
         tooltip={item.title}
         onClick={undefined}
       >
-        {item.action === "search" ? (
-          <div className="flex items-center gap-2 cursor-pointer w-full">
-            <item.icon className="h-4 w-4 shrink-0" />
-            <span className="truncate">{item.title}</span>
-            <Sparkles className="ml-auto h-3 w-3 text-violet-500" />
-          </div>
-        ) : (
+        <Link to={item.url} className="flex items-center gap-2">
+          <item.icon className="h-4 w-4 shrink-0" />
+          <span className="truncate">{item.title}</span>
+        </Link>
           <Link to={item.url} className="flex items-center gap-2">
             <item.icon className="h-4 w-4 shrink-0" />
             <span className="truncate">{item.title}</span>
           </Link>
-        )}
       </SidebarMenuButton>
     </SidebarMenuItem>
   );
