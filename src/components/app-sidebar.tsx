@@ -224,21 +224,7 @@ export function AppSidebar() {
   }, [isViewer, rolesLoading, currentPath, navigate]);
 
   const canSee = (item: MenuItem): boolean => {
-    const resourceMap: Record<string, string> = {
-      "/principal": "principal",
-      "/provisao": "provisao",
-      "/conciliacao": "conciliacao",
-      "/pagamentos": "pagamentos",
-      "/despesas-fixas": "despesas",
-      "/esocial": "esocial",
-      "/anexos": "anexos",
-      "/exportacao": "exportacao",
-      "/administracao": "administracao",
-      "/fechamento": "fechamento",
-      "/divergencias": "divergencias",
-      "/material-apoio": "material-apoio",
-      "/auditoria": "auditoria",
-    };
+
 
     if (isAdmin) return true;
     if (isViewer) return isViewerAllowed(item.url);
