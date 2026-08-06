@@ -272,6 +272,9 @@ function LancamentosTab({ colaboradorNome, userId, isAdmin }: { colaboradorNome:
 
       if (currentStatus === 'ativo') {
         setFilaOpen(false);
+      } else if (currentStatus === 'aguardando') {
+        // Se estiver aguardando, garante que o modal esteja aberto
+        setFilaOpen(true);
       }
     } else {
       setPosicaoFila(null);
