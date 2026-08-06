@@ -624,19 +624,40 @@ function AdvancedSecuritySettings() {
   const toggleIaStatus = async (status: boolean) => {
     setIaLoading(true);
     try {
-      const { error } = await supabase
+      // First, check if the record exists to decide between insert and update
+      // This helps avoid RLS issues with upsert if only update is allowed
+      const { data: existing } = await supabase
         .from('app_config')
-        .upsert({
-          key: 'ia_online',
-          value: status,
-          updated_at: new Date().toISOString()
-        });
+        .select('key')
+        .eq('key', 'ia_online')
+        .single();
+
+      let result;
+      if (existing) {
+        result = await supabase
+          .from('app_config')
+          .update({
+            value: status,
+            updated_at: new Date().toISOString()
+          })
+          .eq('key', 'ia_online');
+      } else {
+        result = await supabase
+          .from('app_config')
+          .insert({
+            key: 'ia_online',
+            value: status,
+            updated_at: new Date().toISOString()
+          });
+      }
       
-      if (error) throw error;
+      if (result.error) throw result.error;
+      
       setIaOnline(status);
       toast.success(`IA da Pagadoria agora está ${status ? 'ONLINE' : 'OFFLINE'}`);
     } catch (e: any) {
-      toast.error("Erro ao alterar status da IA: " + e.message);
+      console.error("Erro ao alterar status da IA:", e);
+      toast.error("Erro ao alterar status da IA: " + (e.message || "Erro desconhecido"));
     } finally {
       setIaLoading(false);
     }
