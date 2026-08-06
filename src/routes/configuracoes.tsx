@@ -11,13 +11,21 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { HelpCircle, Bug, AlertCircle, MessageSquare, Send, CheckCircle2, Paperclip, X, Loader2, Settings, Users, History, ChevronRight, Activity, Cloud, ShieldCheck, Mail, Save, Code, Zap, Database, ShieldAlert, RefreshCw, Trash2, Lock, Table as TableIcon, Image as ImageIcon, Keyboard } from "lucide-react";
+import { 
+  HelpCircle, Bug, AlertCircle, MessageSquare, Send, CheckCircle2, Paperclip, X, Loader2, 
+  Settings, Users, History, ChevronRight, Activity, Cloud, ShieldCheck, Mail, Save, 
+  Code, Zap, Database, ShieldAlert, RefreshCw, Trash2, Lock, Table as TableIcon, 
+  Image as ImageIcon, Keyboard, FileText, Shield, Clock 
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { usePlanilhaModo } from "@/hooks/use-planilha-modo";
 import { useState, useRef, useEffect } from "react";
 import { useSession } from "@/hooks/use-session";
 import { useMutation } from "@tanstack/react-query";
 import { sendSupportRequest } from "@/lib/suporte.functions";
+import { useErrorLogStore, type SystemError } from "@/hooks/use-error-log-store";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
@@ -420,7 +428,7 @@ function DiagnosticPanel() {
               </div>
             ) : (
               <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
-                {errors.map((error) => (
+                {errors.map((error: SystemError) => (
                   <div key={error.id} className="p-3 border rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
                     <div className="flex items-start justify-between gap-2 mb-2">
                       <div className="flex items-center gap-2">
