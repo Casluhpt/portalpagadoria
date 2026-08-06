@@ -56,6 +56,7 @@ function roleVariant(r: string): "default" | "secondary" | "outline" | "destruct
 }
 
 function UsuariosTable() {
+  const [selectedUserForRBAC, setSelectedUserForRBAC] = useState<AdminUserRow | null>(null);
   const listFn = useServerFn(listAdminUsers);
   const resetFn = useServerFn(resetUserPassword);
   const setRoleFn = useServerFn(setUserRole);
@@ -563,6 +564,16 @@ function UserTableRow({ u, user, roleMut, setorMut, nomeMut, deleteMut, resetMut
       )}
       <td className="whitespace-nowrap border-b border-border px-3 py-2 text-right">
         <div className="flex items-center justify-end gap-1">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 text-indigo-600 hover:bg-indigo-50 hover:text-indigo-700"
+            title="Gerenciar Módulos e Permissões"
+            onClick={() => setSelectedUserForRBAC(u)}
+          >
+            <ShieldCheck className="h-4 w-4" />
+          </Button>
+
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground" title="Redefinir senha">

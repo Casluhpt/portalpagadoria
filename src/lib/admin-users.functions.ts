@@ -305,14 +305,100 @@ export const setUserNome = createServerFn({ method: "POST" })
 export const getAppModules = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async () => {
-    const { supabase: sb } = await import("@/integrations/supabase/client.server");
-    const { data, error } = await sb
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data, error } = await supabaseAdmin
       .from("app_modules")
       .select("*")
       .order("name");
     
     if (error) throw error;
     return data;
+  });
+
+export const getUserModules = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .validator((userId: string) => userId)
+  .handler(async ({ data: userId }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data, error } = await supabaseAdmin
+      .from("user_modules")
+      .select("module_id")
+      .eq("user_id", userId);
+    
+    if (error) throw error;
+    return data.map((m: any) => m.module_id);
+  });
+
+export const toggleUserModule = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((input: { userId: string; moduleId: string; enabled: boolean }) => input)
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    
+    if (data.enabled) {
+      const { error } = await supabaseAdmin
+        .from("user_modules")
+        .insert({ user_id: data.userId, module_id: data.moduleId });
+      if (error && error.code !== "23505") throw error; // Ignore duplicates
+    } else {
+      const { error } = await supabaseAdmin
+        .from("user_modules")
+        .delete()
+        .eq("user_id", data.userId)
+        .eq("module_id", data.moduleId);
+      if (error) throw error;
+    }
+    
+    return { success: true };
+  });
+
+export const getUserSpecificPermissions = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .validator((userId: string) => userId)
+  .handler(async ({ data: userId }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data, error } = await supabaseAdmin
+      .from("user_specific_permissions")
+      .select("*")
+      .eq("user_id", userId);
+    
+    if (error) throw error;
+    return data;
+  });
+
+export const setUserSpecificPermission = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((input: { userId: string; resource: string; action: string; isAllowed: boolean }) => input)
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin
+      .from("user_specific_permissions")
+      .upsert({
+        user_id: data.userId,
+        resource: data.resource,
+        action: data.action,
+        is_allowed: data.isAllowed,
+        updated_at: new Date().toISOString()
+      }, { onConflict: "user_id,resource,action" });
+    
+    if (error) throw error;
+    return { success: true };
+  });
+
+export const removeUserSpecificPermission = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((input: { userId: string; resource: string; action: string }) => input)
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin
+      .from("user_specific_permissions")
+      .delete()
+      .eq("user_id", data.userId)
+      .eq("resource", data.resource)
+      .eq("action", data.action);
+    
+    if (error) throw error;
+    return { success: true };
   });
 
 export const getUserModules = createServerFn({ method: "GET" })
