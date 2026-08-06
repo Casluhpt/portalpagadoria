@@ -319,13 +319,12 @@ export function AppSidebar() {
           <SidebarGroupContent>
             {user ? (
               <div className="space-y-2 px-2 pb-2 group-data-[collapsible=icon]:hidden">
-                <div className="flex items-center justify-between px-2 py-1 mb-1 rounded-md hover:bg-sidebar-accent/30 transition-colors">
+                <div className="flex items-center justify-between px-2 py-1 mb-1 rounded-md bg-emerald-500/10 border border-emerald-500/20 shadow-[0_0_10px_rgba(16,185,129,0.1)]">
                   <div className="flex items-center gap-1.5">
-                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Status</span>
                     <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                    <span className="text-[10px] text-emerald-600 font-medium">Online</span>
+                    <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-tight">Sistema Online</span>
                   </div>
-                  <ChevronRight className="h-3 w-3 text-muted-foreground/50" />
+                  <span className="text-[9px] text-emerald-600/70 font-mono">v2.7.5</span>
                 </div>
                 <LiveClock />
                 <div className="rounded-md bg-sidebar-accent/40 px-2 py-1.5 text-xs text-sidebar-foreground">
