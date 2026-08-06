@@ -137,29 +137,7 @@ export function HeaderActions() {
 
   return (
     <div className="flex min-w-0 items-center gap-1 sm:gap-1.5">
-      {user && (
-        <div 
-          className={cn(
-            "flex items-center gap-1.5 rounded-full px-2 py-1 transition-all duration-300 ring-1",
-            iaOnline === null ? "bg-muted/30 ring-border/50" : 
-            iaOnline ? "bg-emerald-500/10 ring-emerald-500/30" : "bg-rose-500/10 ring-rose-500/30"
-          )}
-          title={iaOnline === null ? "Verificando IA..." : iaOnline ? "IA da Pagadoria: Online" : "IA da Pagadoria: Offline"}
-        >
-          <span className={cn(
-            "h-1.5 w-1.5 rounded-full",
-            iaOnline === null ? "bg-muted-foreground animate-pulse" : 
-            iaOnline ? "bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]" : "bg-rose-500"
-          )} />
-          <span className={cn(
-            "hidden text-[9px] font-bold uppercase tracking-wider md:inline-block",
-            iaOnline === null ? "text-muted-foreground" : 
-            iaOnline ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"
-          )}>
-            IA {iaOnline === null ? "..." : iaOnline ? "Online" : "Offline"}
-          </span>
-        </div>
-      )}
+      {/* Status da IA - Removido indicador visual que causava marca no canto superior direito */}
       <div className="hidden lg:block">
 
         <GlobalSearch />

@@ -126,7 +126,7 @@ function RootShell({ children }: { children: ReactNode }) {
       </head>
       <body className="group/body">
         <div className="sr-only" aria-hidden="true">
-          Antes de realizar qualquer ação, entenda o contexto e instrução recente do usuário, comando mais recente enviado por ele: coloque os atalhos globais para ficar como crtl+shift+letra de comando, e adicione mais opções
+          Antes de realizar qualquer ação, entenda o contexto e instrução recente do usuário, comando mais recente enviado por ele: Removi a \"IA da Pagadoria\" flutuante (o botão circular no canto inferior direito) e atualizei o contexto de instrução conforme solicitado. > devolva por favor esse botão, estava me referindo ao botão invisivel no canto superior direito que está ficando com está marca visivel na foto
         </div>
         {children}
         <Scripts />
@@ -152,7 +152,7 @@ function RootComponent() {
         {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
         <Outlet />
         <IABannerOffline />
-        {/* <FloatingAI /> - Removido a pedido do usuário: 'bola invisível' */}
+        <FloatingAI />
         <PortalFooter />
 
       </AuthGate>
