@@ -12,7 +12,7 @@ import * as XLSX from "xlsx";
 import { toast } from "sonner";
 
 import { AppSidebar } from "@/components/app-sidebar";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -38,6 +38,16 @@ import {
 import { EMPRESAS } from "@/lib/despesas-fixas.functions";
 
 export const Route = createFileRoute("/aprovacao")({
+  head: () => ({
+    meta: [
+      { title: "Processo de Aprovação | Portal Pagadoria" },
+      { name: "description", content: "Controle de evidências de agendamento bancário e fluxos de aprovação." },
+      { property: "og:title", content: "Processo de Aprovação | Portal Pagadoria" },
+      { property: "og:description", content: "Controle de evidências de agendamento bancário e fluxos de aprovação." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: AprovacaoPage,
 });
 
@@ -81,7 +91,7 @@ function AprovacaoPage() {
   const invalidate = () => qc.invalidateQueries({ queryKey });
 
   return (
-    <SidebarProvider>
+    <div className="flex min-h-screen w-full bg-background">
       <AppSidebar />
       <main className="flex-1 min-w-0">
         <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b bg-background/95 px-4 backdrop-blur">
@@ -127,7 +137,7 @@ function AprovacaoPage() {
           </Tabs>
         </div>
       </main>
-    </SidebarProvider>
+    </div>
   );
 }
 

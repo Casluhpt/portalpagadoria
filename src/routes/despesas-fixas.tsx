@@ -1,4 +1,4 @@
-import { createFileRoute, redirect, Link } from "@tanstack/react-router";
+import { createFileRoute, redirect, Link } from "@tanstack/react-router"; // fix attempt
 import { AppLogo } from "@/components/app-logo";
 import { useMemo, useState } from "react";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
@@ -42,6 +42,16 @@ export const Route = createFileRoute("/despesas-fixas")({
       throw redirect({ to: "/auth", search: { returnTo: "/despesas-fixas" } });
     }
   },
+  head: () => ({
+    meta: [
+      { title: "Despesas Fixas | Portal Pagadoria" },
+      { name: "description", content: "Controle e gestão orçamentária de despesas fixas (PJ, Fornecedores e Penhora)." },
+      { property: "og:title", content: "Despesas Fixas | Portal Pagadoria" },
+      { property: "og:description", content: "Controle e gestão orçamentária de despesas fixas (PJ, Fornecedores e Penhora)." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: DespesasFixasPage,
 });
 
@@ -281,7 +291,7 @@ function DespesasFixasPage() {
   };
 
   return (
-    <SidebarProvider>
+    <>
       <div className="flex min-h-screen w-full bg-gradient-to-br from-muted via-background to-emerald-50/40">
         <AppSidebar />
         <div className="flex flex-1 flex-col">
@@ -597,7 +607,7 @@ function DespesasFixasPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </SidebarProvider>
+    </>
   );
 }
 

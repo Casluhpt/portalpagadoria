@@ -7,7 +7,7 @@ import { toast } from "sonner";
 
 import { AppSidebar } from "@/components/app-sidebar";
 import { HeaderActions } from "@/components/header-actions";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -35,6 +35,16 @@ type AuditTab = "log" | "criticas" | "excluidos";
 export const Route = createFileRoute("/auditoria")({
   validateSearch: (s: Record<string, unknown>) => ({
     tab: (s.tab === "excluidos" || s.tab === "criticas" ? s.tab : "log") as AuditTab,
+  }),
+  head: () => ({
+    meta: [
+      { title: "Auditoria | Portal Pagadoria" },
+      { name: "description", content: "Logs de auditoria, ações críticas e recuperação de registros excluídos." },
+      { property: "og:title", content: "Auditoria | Portal Pagadoria" },
+      { property: "og:description", content: "Logs de auditoria, ações críticas e recuperação de registros excluídos." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
   }),
   component: AuditoriaPage,
 });
@@ -81,50 +91,48 @@ function AuditoriaPage() {
   const { tab } = Route.useSearch();
   const navigate = Route.useNavigate();
   return (
-    <SidebarProvider>
-      <div className="flex min-h-screen w-full bg-background">
-        <AppSidebar />
-        <div className="flex flex-1 flex-col">
-          <header className="sticky top-0 z-10 flex h-14 items-center gap-4 border-b border-border bg-background/80 px-4 backdrop-blur">
-            <SidebarTrigger />
-            <h1 className="truncate text-sm font-semibold text-foreground">Auditoria</h1>
-            <div className="ml-auto">
-              <HeaderActions />
+    <div className="flex min-h-screen w-full bg-background">
+      <AppSidebar />
+      <div className="flex flex-1 flex-col">
+        <header className="sticky top-0 z-10 flex h-14 items-center gap-4 border-b border-border bg-background/80 px-4 backdrop-blur">
+          <SidebarTrigger />
+          <h1 className="truncate text-sm font-semibold text-foreground">Auditoria</h1>
+          <div className="ml-auto">
+            <HeaderActions />
+          </div>
+        </header>
+        <RestrictedArea area="Auditoria" anyOf={["administrador", "auditor"]}>
+          <Tabs
+            value={tab}
+            onValueChange={(v) => navigate({ search: { tab: v as AuditTab }, replace: true })}
+            className="flex flex-1 flex-col"
+          >
+            <div className="border-b border-border bg-background px-4 pt-3">
+              <TabsList>
+                <TabsTrigger value="log" className="gap-1.5">
+                  <ScrollText className="h-3.5 w-3.5" /> Log de Auditoria
+                </TabsTrigger>
+                <TabsTrigger value="criticas" className="gap-1.5">
+                  <ShieldCheck className="h-3.5 w-3.5" /> Ações Críticas
+                </TabsTrigger>
+                <TabsTrigger value="excluidos" className="gap-1.5">
+                  <Trash2 className="h-3.5 w-3.5" /> Registros Excluídos
+                </TabsTrigger>
+              </TabsList>
             </div>
-          </header>
-          <RestrictedArea area="Auditoria" anyOf={["administrador", "auditor"]}>
-            <Tabs
-              value={tab}
-              onValueChange={(v) => navigate({ search: { tab: v as AuditTab }, replace: true })}
-              className="flex flex-1 flex-col"
-            >
-              <div className="border-b border-border bg-background px-4 pt-3">
-                <TabsList>
-                  <TabsTrigger value="log" className="gap-1.5">
-                    <ScrollText className="h-3.5 w-3.5" /> Log de Auditoria
-                  </TabsTrigger>
-                  <TabsTrigger value="criticas" className="gap-1.5">
-                    <ShieldCheck className="h-3.5 w-3.5" /> Ações Críticas
-                  </TabsTrigger>
-                  <TabsTrigger value="excluidos" className="gap-1.5">
-                    <Trash2 className="h-3.5 w-3.5" /> Registros Excluídos
-                  </TabsTrigger>
-                </TabsList>
-              </div>
-              <TabsContent value="log" className="mt-0 flex-1">
-                <AuditoriaContent />
-              </TabsContent>
-              <TabsContent value="criticas" className="mt-0 flex-1">
-                <AcoesCriticasView />
-              </TabsContent>
-              <TabsContent value="excluidos" className="mt-0 flex-1">
-                <RegistrosExcluidosView />
-              </TabsContent>
-            </Tabs>
-          </RestrictedArea>
-        </div>
+            <TabsContent value="log" className="mt-0 flex-1">
+              <AuditoriaContent />
+            </TabsContent>
+            <TabsContent value="criticas" className="mt-0 flex-1">
+              <AcoesCriticasView />
+            </TabsContent>
+            <TabsContent value="excluidos" className="mt-0 flex-1">
+              <RegistrosExcluidosView />
+            </TabsContent>
+          </Tabs>
+        </RestrictedArea>
       </div>
-    </SidebarProvider>
+    </div>
   );
 }
 

@@ -14,7 +14,7 @@ import autoTable from "jspdf-autotable";
 
 import { AppSidebar } from "@/components/app-sidebar";
 import { HeaderActions } from "@/components/header-actions";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -24,6 +24,16 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/historico")({
+  head: () => ({
+    meta: [
+      { title: "Histórico de Versões | Portal Pagadoria" },
+      { name: "description", content: "Acompanhe a evolução do portal, novas funcionalidades e correções implementadas." },
+      { property: "og:title", content: "Histórico de Versões | Portal Pagadoria" },
+      { property: "og:description", content: "Acompanhe a evolução do portal, novas funcionalidades e correções implementadas." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: HistoricoPage,
 });
 
@@ -80,14 +90,12 @@ function HistoricoPage() {
   }
 
   return (
-    <SidebarProvider>
-      <div className="flex min-h-screen w-full bg-background">
-        <AppSidebar />
-        <div className="flex flex-1 flex-col">
-          <Content />
-        </div>
+    <div className="flex min-h-screen w-full bg-background">
+      <AppSidebar />
+      <div className="flex flex-1 flex-col">
+        <Content />
       </div>
-    </SidebarProvider>
+    </div>
   );
 }
 

@@ -33,7 +33,7 @@ import { useRoles } from "@/hooks/use-roles";
 import { useSession } from "@/hooks/use-session";
 import logoPagadoria from "@/assets/logo-pagadoria.png.asset.json";
 import { GlobalSearch } from "@/components/global-search";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -286,10 +286,9 @@ function PortalPage() {
   ];
 
   return (
-    <SidebarProvider>
-      <div className="flex min-h-screen w-full bg-[#F8FAFC] dark:bg-background transition-colors duration-300">
-        <AppSidebar />
-        <div className="flex flex-1 flex-col">
+    <div className="flex min-h-screen w-full bg-[#F8FAFC] dark:bg-background transition-colors duration-300">
+      <AppSidebar />
+      <div className="flex flex-1 flex-col">
           <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-border bg-card/90 px-4 backdrop-blur">
             <SidebarTrigger />
             <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
@@ -514,7 +513,6 @@ function PortalPage() {
           </main>
         </div>
       </div>
-    </SidebarProvider>
   );
 }
 
