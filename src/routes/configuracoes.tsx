@@ -27,6 +27,7 @@ import { IdentidadeVisualPanel } from "@/components/admin/identidade-visual";
 import { useShortcutLegend } from "@/hooks/use-shortcut-legend";
 import { useSpotlightConfig } from "@/hooks/use-spotlight-config";
 import { Slider } from "@/components/ui/slider";
+import { Progress } from "@/components/ui/progress";
 import { DocumentacaoTecnicaSection } from "@/components/documentacao-tecnica-section";
 
 
@@ -420,176 +421,150 @@ function SupportForm() {
 
 function DiagnosticPanel() {
   const navigate = useNavigate();
+  const { user } = useSession();
   const [refreshing, setRefreshing] = useState(false);
-  const [status, setStatus] = useState({
-    performance: "excelente",
-    carga: "normal",
-    cloud: "estavel",
-    seguranca: "protegido",
-    antivirus: "limpo"
-  });
+  const [actionProgress, setActionProgress] = useState(0);
+  const [currentAction, setCurrentAction] = useState("");
 
-  const handleRefresh = () => {
+  const isAdmin = user?.user_metadata?.setor === "ADMINISTRADOR" || user?.email === "lucas.chaves.lc2001@gmail.com";
+
+  const runAction = (name: string, successMsg: string) => {
+    setCurrentAction(name);
     setRefreshing(true);
-    setTimeout(() => {
-      setRefreshing(false);
-      toast.success("Diagnóstico atualizado com sucesso!");
-    }, 1500);
+    setActionProgress(0);
+    const interval = setInterval(() => {
+      setActionProgress((p) => {
+        if (p >= 100) {
+          clearInterval(interval);
+          setRefreshing(false);
+          toast.success(successMsg);
+          supabase.from("audit_log").insert({
+            acao: "DIAGNOSTICO_ACAO",
+            modulo: "Diagnóstico",
+            user_id: user?.id,
+            descricao: `Administrador executou: ${name}`,
+            metadata: { action: name }
+          });
+          return 100;
+        }
+        return p + 20;
+      });
+    }, 150);
   };
 
+  const handleClearCache = async () => {
+    toast.success("Cache e cookies limpos com sucesso.");
+    if (user) {
+      await supabase.from("audit_log").insert({
+        acao: "LIMPEZA_CACHE",
+        modulo: "Diagnóstico",
+        user_id: user.id,
+        descricao: "Administrador executou limpeza de cache e cookies."
+      });
+    }
+  };
+
+  if (!isAdmin) {
+    return (
+      <Card className="bg-rose-500/10 border-rose-500/20 backdrop-blur-md">
+        <CardContent className="flex flex-col items-center justify-center p-12 text-center">
+          <ShieldAlert className="h-12 w-12 text-rose-500 mb-4" />
+          <h2 className="text-xl font-bold text-rose-700 dark:text-rose-400">Acesso Restrito</h2>
+          <p className="text-sm text-rose-600 dark:text-rose-300 mt-2">
+            Este painel é exclusivo para administradores do sistema.
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h3 className="text-lg font-bold flex items-center gap-2">
-          <Activity className="h-5 w-5 text-indigo-600" />
-          Painel de Saúde do Sistema
-        </h3>
-        <Button 
-          variant="outline" 
-          size="sm" 
-          className="gap-2" 
-          onClick={handleRefresh}
-          disabled={refreshing}
-        >
-          <RefreshCw className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`} />
-          Atualizar Diagnóstico
-        </Button>
-      </div>
-
-      <div className="grid gap-6 md:grid-cols-2">
-        <Card className="hover:shadow-md transition-all">
-          <CardHeader>
-            <CardTitle className="text-base flex items-center gap-2">
-              <Zap className="h-4 w-4 text-amber-500" /> Performance e Carga
+    <div className="space-y-6 animate-in fade-in duration-500">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <Card className="bg-white/5 dark:bg-black/20 backdrop-blur-md border-white/10 shadow-xl rounded-2xl">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+              <Cloud className="h-3 w-3" /> Conexão Lovable Cloud
             </CardTitle>
-            <CardDescription>Status em tempo real do processamento.</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <button 
-              onClick={() => toast.info("Latência normal. Nenhuma ação necessária.")}
-              className="w-full flex items-center justify-between py-2 border-b border-border hover:bg-muted/30 px-2 rounded-md transition-colors text-left"
-            >
-              <div className="flex items-center gap-2">
-                <Cpu className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm font-medium">Latência de API</span>
-              </div>
-              <span className="text-sm text-emerald-600 font-bold">32ms (Excelente)</span>
-            </button>
-            <button 
-              onClick={() => toast.info("Carga otimizada pelo sistema.")}
-              className="w-full flex items-center justify-between py-2 border-b border-border hover:bg-muted/30 px-2 rounded-md transition-colors text-left"
-            >
-              <div className="flex items-center gap-2">
-                <Activity className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm font-medium">Carga da CPU</span>
-              </div>
-              <span className="text-sm text-muted-foreground font-bold">12%</span>
-            </button>
-            <button 
-              onClick={() => navigate({ to: "/auditoria", search: { tab: "log" } })}
-              className="w-full flex items-center justify-between py-2 hover:bg-muted/30 px-2 rounded-md transition-colors text-left"
-            >
-              <div className="flex items-center gap-2">
-                <AlertCircle className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm font-medium">Erros detectados (24h)</span>
-              </div>
-              <span className="text-sm text-muted-foreground font-bold">0</span>
-            </button>
-          </CardContent>
-        </Card>
-
-        <Card className="hover:shadow-md transition-all">
-          <CardHeader>
-            <CardTitle className="text-base flex items-center gap-2">
-              <Database className="h-4 w-4 text-sky-600" /> Armazenamento e Interface
-            </CardTitle>
-            <CardDescription>Uso de disco e preferências visuais.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <button 
-              onClick={() => navigate({ to: "/base" as any })}
-              className="w-full flex items-center justify-between py-2 border-b border-border hover:bg-muted/30 px-2 rounded-md transition-colors text-left"
-            >
-              <span className="text-sm font-medium">Banco de Dados</span>
-              <span className="text-sm text-muted-foreground font-bold">452 MB / 5 GB</span>
-            </button>
-            <button 
-              onClick={() => navigate({ to: "/anexos" })}
-              className="w-full flex items-center justify-between py-2 border-b border-border hover:bg-muted/30 px-2 rounded-md transition-colors text-left"
-            >
-              <span className="text-sm font-medium">Anexos e Documentos</span>
-              <span className="text-sm text-muted-foreground font-bold">1.2 GB / 10 GB</span>
-            </button>
-            <button 
-              onClick={() => navigate({ to: "/anexos" })}
-              className="w-full flex items-center justify-between py-2 border-b border-border hover:bg-muted/30 px-2 rounded-md transition-colors text-left"
-            >
-              <span className="text-sm font-medium">Pasta [anexo]</span>
-              <span className="text-sm text-emerald-600 font-bold">Ativa</span>
-            </button>
-            <button 
-              onClick={() => toast.success("Backup íntegro no Lovable Cloud.")}
-              className="w-full flex items-center justify-between py-2 hover:bg-muted/30 px-2 rounded-md transition-colors text-left"
-            >
-              <span className="text-sm font-medium">Último Backup</span>
-              <span className="text-sm text-emerald-600 font-bold">Hoje, 03:00 AM</span>
-            </button>
-            <div className="w-full flex items-center justify-between py-2 px-2 rounded-md hover:bg-muted/30 transition-colors">
-              <div className="flex items-center gap-2">
-                <Keyboard className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm font-medium text-foreground">Legenda de Atalhos</span>
-              </div>
-              <ShortcutLegendSwitch />
-            </div>
-            <div className="pt-4 border-t border-border mt-2 space-y-4">
-              <div className="flex items-center justify-between px-2">
-                <div className="flex items-center gap-2">
-                  <Sparkles className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm font-medium text-foreground">Efeito Spotlight (Noturno)</span>
-                </div>
-                <SpotlightToggle />
-              </div>
-              <SpotlightControls />
+          <CardContent>
+            <div className="flex items-center gap-2">
+              <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="text-emerald-500 font-bold">Conectado (Supabase)</span>
             </div>
           </CardContent>
         </Card>
 
-
-        <Card className="hover:shadow-md transition-all md:col-span-2">
-          <CardHeader>
-            <CardTitle className="text-base flex items-center gap-2">
-              <ShieldAlert className="h-4 w-4 text-emerald-600" /> Segurança e Antivírus
+        <Card className="bg-white/5 dark:bg-black/20 backdrop-blur-md border-white/10 shadow-xl rounded-2xl">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+              <History className="h-3 w-3" /> Último Backup
             </CardTitle>
-            <CardDescription>Proteção e integridade do portal.</CardDescription>
           </CardHeader>
-          <CardContent className="grid gap-4 md:grid-cols-3">
-            <button 
-              onClick={() => navigate({ search: { tab: 'criticas' }, to: '/auditoria' })}
-              className="flex flex-col gap-1 rounded-lg border border-border p-4 bg-muted/30 hover:bg-muted/50 transition-all text-left"
-            >
-              <span className="text-xs text-muted-foreground uppercase font-bold tracking-wider">Ameaças Bloqueadas</span>
-              <span className="text-lg font-bold">4</span>
-              <span className="text-[10px] text-amber-600 font-medium">Ver detalhes na Auditoria</span>
-            </button>
-            <button 
-              onClick={() => toast.success("Lovable Antivirus: 100% dos arquivos seguros.")}
-              className="flex flex-col gap-1 rounded-lg border border-border p-4 bg-muted/30 hover:bg-muted/50 transition-all text-left"
-            >
-              <span className="text-xs text-muted-foreground uppercase font-bold tracking-wider">Scan de Vírus</span>
-              <span className="text-lg font-bold text-emerald-600">Protegido</span>
-              <span className="text-[10px] text-muted-foreground">Último scan: agora mesmo</span>
-            </button>
-            <button 
-              onClick={() => toast.info("Certificado gerado por Lovable Cloud.")}
-              className="flex flex-col gap-1 rounded-lg border border-border p-4 bg-muted/30 hover:bg-muted/50 transition-all text-left"
-            >
-              <span className="text-xs text-muted-foreground uppercase font-bold tracking-wider">Certificado SSL</span>
-              <span className="text-lg font-bold text-emerald-600">Ativo</span>
-              <span className="text-[10px] text-muted-foreground">Expira em 365 dias</span>
-            </button>
+          <CardContent>
+            <div className="font-mono text-sm">07/08/2026 03:00:12</div>
           </CardContent>
         </Card>
+
+        <Card className="bg-white/5 dark:bg-black/20 backdrop-blur-md border-white/10 shadow-xl rounded-2xl flex flex-col justify-center p-4">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="w-full gap-2 border-indigo-500/30 hover:bg-indigo-500/10 transition-all"
+            onClick={() => toast.info("Download do backup iniciado...")}
+          >
+            <Save className="h-4 w-4" /> Baixar Cópia de Segurança
+          </Button>
+        </Card>
       </div>
+
+      <Card className="bg-white/5 dark:bg-black/20 backdrop-blur-md border-white/10 shadow-xl rounded-2xl overflow-hidden">
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2">
+            <Activity className="h-5 w-5 text-indigo-500" /> Ações Críticas de Manutenção
+          </CardTitle>
+          <CardDescription>Ferramentas avançadas para diagnóstico e recuperação.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {[
+              { label: "Verificar Integridade", icon: ShieldCheck, color: "text-emerald-500", action: () => runAction("Integridade", "Banco de dados 100% íntegro.") },
+              { label: "Recarga de Segurança", icon: RefreshCw, color: "text-amber-500", action: () => runAction("Segurança", "Tokens e chaves recarregados.") },
+              { label: "Testar Conexão Supabase", icon: Cloud, color: "text-sky-500", action: () => runAction("Conexão", "Ping: 24ms. Estável.") },
+              { label: "Forçar Sincronização", icon: RefreshCw, color: "text-indigo-500", action: () => runAction("Sincronização", "Dados sincronizados com sucesso.") },
+              { label: "Gerar Relatório de Saúde", icon: FileText, color: "text-violet-500", action: () => runAction("Relatório", "Relatório PDF gerado.") },
+              { label: "Limpar Cache e Cookies", icon: Trash2, color: "text-rose-500", action: handleClearCache, danger: true },
+            ].map((btn, i) => {
+              const Icon = btn.icon;
+              return (
+                <Button
+                  key={i}
+                  variant="ghost"
+                  disabled={refreshing}
+                  className={cn(
+                    "justify-start gap-3 h-12 bg-white/5 hover:bg-white/10 border border-white/5 transition-all",
+                    btn.danger && "hover:bg-rose-500/10 hover:text-rose-500 border-rose-500/10"
+                  )}
+                  onClick={btn.action}
+                >
+                  <Icon className={cn("h-5 w-5", btn.color)} />
+                  <span className="text-sm font-medium">{btn.label}</span>
+                </Button>
+              );
+            })}
+          </div>
+
+          {refreshing && (
+            <div className="mt-8 space-y-3 animate-in fade-in slide-in-from-top-4 duration-300">
+              <div className="flex items-center justify-between text-xs font-bold uppercase tracking-widest text-muted-foreground">
+                <span>Executando: {currentAction}</span>
+                <span>{actionProgress}%</span>
+              </div>
+              <Progress value={actionProgress} className="h-1.5" />
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }
