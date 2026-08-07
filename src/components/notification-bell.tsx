@@ -231,7 +231,7 @@ export function NotificationBell() {
           </div>
         </div>
         {showVersionCard && latestVersion && (
-          <div className="relative border-b border-violet-100 bg-gradient-to-r from-violet-50 to-indigo-50 dark:from-violet-950/40 dark:to-indigo-950/40 dark:border-violet-800/30 px-4 py-3">
+          <div className="relative border-b border-violet-100/20 bg-gradient-to-r from-violet-50/50 to-indigo-50/50 dark:from-violet-950/20 dark:to-indigo-950/20 backdrop-blur-sm px-4 py-3">
             <button
               onClick={dismissVersion}
               aria-label="Dispensar novidade"
