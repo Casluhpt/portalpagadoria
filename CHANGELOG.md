@@ -1,5 +1,16 @@
 # Changelog - Portal da Pagadoria
 
+## [v2.9.x] - 2026-08-07
+### Alterado
+- **Saúde do Portal:** A seção "Auditoria e Logs" das Configurações passa a se chamar "Saúde do Portal", mantendo status de integridade, segurança, auditoria e relatórios exportáveis (acesso exclusivo de Administradores, com registro em auditoria).
+
+### Adicionado
+- **Aba Suporte Técnico:** Novo canal dedicado aos colaboradores em Configurações, com abertura de chamado, histórico, chat (quando disponível) e Documentação/FAQs.
+- **Governança de Chamados:** Administradores visualizam todos os chamados; demais perfis visualizam apenas os próprios.
+- **Design Glassmorphic:** Cards e abas translúcidas com blur, ícones padronizados (h-5) e responsividade em desktop, tablet e mobile.
+
+
+
 ## [v2.7.7] - 2026-08-06
 ### Adicionado
 - **Evolução da IA Assistente:** Integração total com o contexto do usuário (path atual, setor, permissões RBAC e módulos permitidos).

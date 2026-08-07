@@ -29,6 +29,8 @@ import { useSpotlightConfig } from "@/hooks/use-spotlight-config";
 import { Slider } from "@/components/ui/slider";
 import { Progress } from "@/components/ui/progress";
 import { DocumentacaoTecnicaSection } from "@/components/documentacao-tecnica-section";
+import { SuporteTecnicoPanel } from "@/components/suporte-tecnico-panel";
+
 
 
 export const Route = createFileRoute("/configuracoes")({
@@ -41,7 +43,8 @@ function ConfiguracoesPage() {
 
   const sidebarItems = [
     { id: "suporte", label: "Perfil e Segurança", icon: ShieldCheck },
-    { id: "diagnostico", label: "Auditoria e Logs", icon: History },
+    { id: "diagnostico", label: "Saúde do Portal", icon: Activity },
+    { id: "suporte-tecnico", label: "Suporte Técnico", icon: HelpCircle },
     { id: "identidade", label: "Aparência e Interface", icon: ImageIcon },
     { id: "ia-assistente", label: "IA Assistente", icon: Sparkles },
     { id: "notificacoes", label: "Notificações", icon: Bell },
@@ -51,6 +54,7 @@ function ConfiguracoesPage() {
     { id: "administracao", label: "Gestão de Usuários", icon: Users },
     { id: "documentacao", label: "Documentação Técnica", icon: Code },
   ];
+
 
   return (
     <SidebarProvider>
@@ -127,11 +131,16 @@ function ConfiguracoesPage() {
                   {activeTab === "suporte" && (
                     <div className="grid gap-6">
                        <AdvancedSecuritySettings />
-                       <SupportForm />
                     </div>
                   )}
                   {activeTab === "diagnostico" && <DiagnosticPanel />}
+                  {activeTab === "suporte-tecnico" && (
+                    <SuporteTecnicoPanel>
+                      <SupportForm />
+                    </SuporteTecnicoPanel>
+                  )}
                   {activeTab === "identidade" && <IdentidadeVisualPanel />}
+
                   {activeTab === "administracao" && <UsuariosTable />}
                   {activeTab === "documentacao" && <DocumentacaoTecnicaSection />}
                   
