@@ -1,0 +1,21 @@
+Versão: vv2.8.2 (Inativação da IA Assistente)
+Data: 07/08/2026
+
+ALTERAÇÕES:
+1. DESATIVAÇÃO FUNCIONAL:
+   - Hardcoded a função `perguntarIa` para retornar erro 403 (desativada) independente de configuração de banco.
+   - Removidos os componentes `FloatingAI` e `IABannerOffline` da renderização raiz.
+
+2. LIMPEZA VISUAL (INTERFACE):
+   - Sidebar: Removido item "IA da Pagadoria" e renomeado grupo para "Suporte Técnico".
+   - Central de Busca (Ctrl+K): Removido botão "Perguntar IA", selo de IA no botão de gatilho e fallback de "Nenhum resultado".
+   - Cabeçalho: Removidas referências e indicadores de status.
+
+3. CONTROLE ADMINISTRATIVO:
+   - Configurações > Segurança: O interruptor da IA foi travado em "OFFLINE" e desabilitado visualmente, exibindo a mensagem de diretriz administrativa.
+
+4. GOVERNANÇA:
+   - Atualizados os contextos ocultos do sistema para refletir a nova diretriz de inativação.
+   - Mensagem padrão implementada: "Funcionalidade de IA desativada pelo administrador."
+
+ASSINADO: ADMINISTRAÇÃO PORTAL PAGADORIA

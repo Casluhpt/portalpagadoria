@@ -18,25 +18,27 @@ const SYSTEM = `Projeto: Portal da Pagadoria
 
 Versão: vv2.8.2
 
-Objetivo: Verificação técnica e correção de erros críticos
+Objetivo: Inativação completa da IA Assistente (remoção visual e funcional)
 
 Instruções:
 
-1. Validar anexos no módulo de Configurações (whitelist + antivírus).
+1. Desativar interruptor mestre em Configurações > Segurança, mantendo IA em estado Offline permanente.
 
-2. Implementar fallback de desbloqueio na Fila Virtual (timeout + reentrada).
+2. Remover indicadores visuais de status (Online/Offline) do cabeçalho e da interface de chat.
 
-3. Adicionar auditoria obrigatória para overrides de competência em Despesas Fixas.
+3. Ocultar completamente o módulo de IA Assistente da navegação, menus e Central de Busca Total.
 
-4. Criar rollback automático em divergências críticas da Conciliação Bancária.
+4. Bloquear fallback automático da Central de Busca para IA.
 
-5. Inserir fallback textual para status da IA (Online/Offline).
+5. Garantir que nenhuma chamada de API ou serviço da IA seja executada durante a inativação.
 
-6. Expandir trilha de auditoria em exclusões/restaurações de dados.
+6. Registrar todas as ações de inativação em log imutável para auditoria.
 
-Diretriz visual: manter padrão Minimalismo Translúcido.
+7. Exibir mensagem padrão em áreas afetadas: "Funcionalidade de IA desativada pelo administrador."
 
-Governança: reforçar RLS e RBAC em todas as tabelas.
+Diretriz visual: manter padrão Minimalismo Translúcido sem espaços vazios ou placeholders da IA.
+
+Governança: reforçar RLS e RBAC para impedir reativação não autorizada.
 
 Entrega: patch incremental com changelog público.
 
@@ -75,10 +77,10 @@ export const perguntarIa = createServerFn({ method: "POST" })
     
     const isOnline = config?.value !== false;
     
-    if (!isOnline) {
+    if (true) { // Inativação permanente v2.8.2
       return { 
         resposta: null, 
-        erro: "IA de Suporte da Pagadoria: O serviço está temporariamente OFFLINE por manutenção administrativa." 
+        erro: "Funcionalidade de IA desativada pelo administrador." 
       };
     }
 

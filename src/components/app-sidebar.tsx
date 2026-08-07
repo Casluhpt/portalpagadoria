@@ -92,7 +92,7 @@ const navigationGroups = [
   { id: "operacao", label: "Operação e Resultados" },
   { id: "financeiro", label: "Financeiro e Controle" },
   { id: "base_anexos", label: "[anexo] e Relatórios" },
-  { id: "apoio", label: "Suporte e IA" }
+  { id: "apoio", label: "Suporte Técnico" }
 ];
 
 const mainItems: MenuItem[] = [
@@ -114,7 +114,8 @@ const mainItems: MenuItem[] = [
   { title: "Central de Divergências", url: "/divergencias", icon: AlertTriangle, match: (p: string) => p.startsWith("/divergencias"), group: "geral" },
 
   { title: "Material de Apoio", url: "/material-apoio", icon: BookOpen, match: (p: string) => p.startsWith("/material-apoio"), group: "apoio" },
-  { title: "IA da Pagadoria", url: "#", icon: Sparkles, match: (p: string) => false, action: "search", group: "apoio" },
+  // IA Removida v2.8.2
+  // { title: "IA da Pagadoria", url: "#", icon: Sparkles, match: (p: string) => false, action: "search", group: "apoio" },
 ];
 
 const advancedItems: MenuItem[] = [
