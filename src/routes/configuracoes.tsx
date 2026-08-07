@@ -29,6 +29,8 @@ import { useSpotlightConfig } from "@/hooks/use-spotlight-config";
 import { Slider } from "@/components/ui/slider";
 import { Progress } from "@/components/ui/progress";
 import { DocumentacaoTecnicaSection } from "@/components/documentacao-tecnica-section";
+import { SuporteTecnicoPanel } from "@/components/suporte-tecnico-panel";
+
 
 
 export const Route = createFileRoute("/configuracoes")({
