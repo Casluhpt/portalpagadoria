@@ -38,11 +38,9 @@ import {
   CommandSeparator,
 } from "@/components/ui/command";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { buscarNoPortal, type PortalHit } from "@/lib/portal-search";
 import { fetchMateriais, materialApoioQueryKey } from "@/lib/material-apoio";
 import { perguntarIa } from "@/lib/ia.functions";
-import { cn } from "@/lib/utils";
 
 const RECENT_SEARCHES_KEY = "global_search_history";
 
@@ -56,16 +54,13 @@ const grupoIcon: Record<PortalHit["grupo"], typeof Users> = {
   "Material de Apoio": BookOpen,
 };
 
-export function GlobalSearch({ variant = "compact" }: { variant?: "compact" | "hero" | "floating" }) {
+export function GlobalSearch({ variant = "compact" }: { variant?: "compact" | "hero" }) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [history, setHistory] = useState<string[]>([]);
   const [isAiMode, setIsAiMode] = useState(false);
   const [aiResponse, setAiResponse] = useState<string | null>(null);
   const [isAiLoading, setIsAiLoading] = useState(false);
-  const [chatMessages, setChatMessages] = useState<{ role: "user" | "assistant"; content: string }[]>([]);
-  const [isTyping, setIsTyping] = useState(false);
-
 
   const navigate = useNavigate();
   const { isAdmin, hasAny } = useRoles();
@@ -198,44 +193,21 @@ export function GlobalSearch({ variant = "compact" }: { variant?: "compact" | "h
     return Array.from(map.entries());
   }, [hits]);
 
-  const trigger = useMemo(() => {
-    if (variant === "floating") {
-      return (
-        <button
-          onClick={() => setOpen(true)}
-          className={cn(
-            "fixed bottom-4 right-4 z-[100] flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-violet-600 to-indigo-700 text-white shadow-2xl transition-all hover:scale-110 active:scale-95 group",
-            open && "scale-0 opacity-0 pointer-events-none"
-          )}
-          title="Busca Global e IA"
-        >
-          <Search className="h-6 w-6" />
-          <span className="absolute -top-1 -right-1 flex h-4 w-4">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-violet-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-4 w-4 bg-violet-500 ring-2 ring-white"></span>
-          </span>
-        </button>
-      );
-    }
-
-    if (variant === "hero") {
-      return (
-        <button
-          onClick={() => setOpen(true)}
-          className="group flex w-full items-center gap-3 rounded-2xl border border-violet-200/80 bg-card px-4 py-4 text-left shadow-lg shadow-violet-100/50 transition-all duration-300 hover:border-violet-400 hover:shadow-xl hover:shadow-violet-200/50 dark:bg-card dark:shadow-none"
-        >
-          <Search className="h-5 w-5 shrink-0 text-violet-600" />
-          <span className="flex-1 truncate text-sm text-muted-foreground">
-            Matrícula, usuário, empresa, colaborador, fornecedor, competência, cards…
-          </span>
-          <span className="hidden items-center gap-1 rounded-full bg-violet-100 px-2.5 py-1 text-[10px] font-semibold text-violet-700 sm:flex dark:bg-violet-900/40 dark:text-violet-300">
-            <Sparkles className="h-3 w-3" /> IA Assistente
-          </span>
-        </button>
-      );
-    }
-
-    return (
+  const trigger =
+    variant === "hero" ? (
+      <button
+        onClick={() => setOpen(true)}
+        className="group flex w-full items-center gap-3 rounded-2xl border border-violet-200/80 bg-card px-4 py-4 text-left shadow-lg shadow-violet-100/50 transition-all duration-300 hover:border-violet-400 hover:shadow-xl hover:shadow-violet-200/50 dark:bg-card dark:shadow-none"
+      >
+        <Search className="h-5 w-5 shrink-0 text-violet-600" />
+        <span className="flex-1 truncate text-sm text-muted-foreground">
+          Matrícula, usuário, empresa, colaborador, fornecedor, competência, cards…
+        </span>
+        <span className="hidden items-center gap-1 rounded-full bg-violet-100 px-2.5 py-1 text-[10px] font-semibold text-violet-700 sm:flex dark:bg-violet-900/40 dark:text-violet-300">
+          <Sparkles className="h-3 w-3" /> IA Assistente
+        </span>
+      </button>
+    ) : (
       <Button
         variant="outline"
         className="relative h-9 w-9 p-0 xl:h-10 xl:w-64 xl:justify-start xl:px-3 xl:py-2"
@@ -248,8 +220,6 @@ export function GlobalSearch({ variant = "compact" }: { variant?: "compact" | "h
         </span>
       </Button>
     );
-  }, [variant, open]);
-
 
   return (
     <>

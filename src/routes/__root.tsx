@@ -20,8 +20,6 @@ import { FaviconManager } from "@/components/favicon-manager";
 import { PortalFooter } from "@/components/portal-footer";
 import { ShortcutLegend } from "@/components/shortcut-legend";
 import { DynamicSpotlight } from "@/components/dynamic-spotlight";
-import { GlobalSearch } from "@/components/global-search";
-
 
 
 import { AuthGate } from "@/components/auth-gate";
@@ -153,9 +151,7 @@ function RootComponent() {
         <BackButton />
         {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
         <Outlet />
-        <GlobalSearch variant="floating" />
         <ShortcutLegend />
-
         <DynamicSpotlight />
         <PortalFooter />
 
