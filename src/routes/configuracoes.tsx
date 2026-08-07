@@ -41,7 +41,8 @@ function ConfiguracoesPage() {
 
   const sidebarItems = [
     { id: "suporte", label: "Perfil e Segurança", icon: ShieldCheck },
-    { id: "diagnostico", label: "Auditoria e Logs", icon: History },
+    { id: "diagnostico", label: "Saúde do Portal", icon: Activity },
+    { id: "suporte-tecnico", label: "Suporte Técnico", icon: HelpCircle },
     { id: "identidade", label: "Aparência e Interface", icon: ImageIcon },
     { id: "ia-assistente", label: "IA Assistente", icon: Sparkles },
     { id: "notificacoes", label: "Notificações", icon: Bell },
@@ -51,6 +52,7 @@ function ConfiguracoesPage() {
     { id: "administracao", label: "Gestão de Usuários", icon: Users },
     { id: "documentacao", label: "Documentação Técnica", icon: Code },
   ];
+
 
   return (
     <SidebarProvider>
