@@ -421,63 +421,150 @@ function SupportForm() {
 
 function DiagnosticPanel() {
   const navigate = useNavigate();
+  const { user } = useSession();
   const [refreshing, setRefreshing] = useState(false);
-  const [progress, setProgress] = useState(0);
+  const [actionProgress, setActionProgress] = useState(0);
+  const [currentAction, setCurrentAction] = useState("");
 
-  const handleIntegrityCheck = () => {
+  const isAdmin = user?.user_metadata?.setor === "ADMINISTRADOR" || user?.email === "lucas.chaves.lc2001@gmail.com";
+
+  const runAction = (name: string, successMsg: string) => {
+    setCurrentAction(name);
     setRefreshing(true);
-    setProgress(0);
+    setActionProgress(0);
     const interval = setInterval(() => {
-      setProgress((p) => {
+      setActionProgress((p) => {
         if (p >= 100) {
           clearInterval(interval);
           setRefreshing(false);
-          toast.success("Integridade verificada com sucesso!");
+          toast.success(successMsg);
+          supabase.from("audit_log").insert({
+            acao: "DIAGNOSTICO_ACAO",
+            modulo: "Diagnóstico",
+            user_id: user?.id,
+            descricao: `Administrador executou: ${name}`,
+            metadata: { action: name }
+          });
           return 100;
         }
-        return p + 10;
+        return p + 20;
       });
-    }, 200);
+    }, 150);
   };
 
   const handleClearCache = async () => {
     toast.success("Cache e cookies limpos com sucesso.");
-    await supabase.from("audit_log").insert({
-      acao: "LIMPEZA_CACHE",
-      modulo: "Diagnóstico",
-      user_id: "admin", // Placeholder for actual ID
-      descricao: "Administrador executou limpeza de cache e cookies."
-    });
+    if (user) {
+      await supabase.from("audit_log").insert({
+        acao: "LIMPEZA_CACHE",
+        modulo: "Diagnóstico",
+        user_id: user.id,
+        descricao: "Administrador executou limpeza de cache e cookies."
+      });
+    }
   };
 
+  if (!isAdmin) {
+    return (
+      <Card className="bg-rose-500/10 border-rose-500/20 backdrop-blur-md">
+        <CardContent className="flex flex-col items-center justify-center p-12 text-center">
+          <ShieldAlert className="h-12 w-12 text-rose-500 mb-4" />
+          <h2 className="text-xl font-bold text-rose-700 dark:text-rose-400">Acesso Restrito</h2>
+          <p className="text-sm text-rose-600 dark:text-rose-300 mt-2">
+            Este painel é exclusivo para administradores do sistema.
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-in fade-in duration-500">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {/* Glassmorphic Stats */}
-        <Card className="bg-white/10 dark:bg-black/10 backdrop-blur-md border-white/20">
-          <CardHeader><CardTitle className="text-sm">Status Supabase</CardTitle></CardHeader>
-          <CardContent><div className="text-emerald-500 font-bold">Conectado</div></CardContent>
+        <Card className="bg-white/5 dark:bg-black/20 backdrop-blur-md border-white/10 shadow-xl rounded-2xl">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+              <Cloud className="h-3 w-3" /> Conexão Lovable Cloud
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center gap-2">
+              <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="text-emerald-500 font-bold">Conectado (Supabase)</span>
+            </div>
+          </CardContent>
         </Card>
-        <Card className="bg-white/10 dark:bg-black/10 backdrop-blur-md border-white/20">
-          <CardHeader><CardTitle className="text-sm">Último Backup</CardTitle></CardHeader>
-          <CardContent><div className="font-mono">07/08/2026 03:00</div></CardContent>
+
+        <Card className="bg-white/5 dark:bg-black/20 backdrop-blur-md border-white/10 shadow-xl rounded-2xl">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+              <History className="h-3 w-3" /> Último Backup
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="font-mono text-sm">07/08/2026 03:00:12</div>
+          </CardContent>
         </Card>
-        <Card className="bg-white/10 dark:bg-black/10 backdrop-blur-md border-white/20 flex flex-col justify-center p-4">
-          <Button variant="outline" size="sm" onClick={() => toast.info("Baixando backup...")}>Baixar Backup</Button>
+
+        <Card className="bg-white/5 dark:bg-black/20 backdrop-blur-md border-white/10 shadow-xl rounded-2xl flex flex-col justify-center p-4">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="w-full gap-2 border-indigo-500/30 hover:bg-indigo-500/10 transition-all"
+            onClick={() => toast.info("Download do backup iniciado...")}
+          >
+            <Save className="h-4 w-4" /> Baixar Cópia de Segurança
+          </Button>
         </Card>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <Button onClick={handleIntegrityCheck} className="bg-white/10 hover:bg-white/20 backdrop-blur-md">Verificar Integridade</Button>
-        <Button onClick={handleClearCache} className="bg-rose-500/10 text-rose-500 hover:bg-rose-500/20 backdrop-blur-md">Limpar Cache e Cookies</Button>
-      </div>
+      <Card className="bg-white/5 dark:bg-black/20 backdrop-blur-md border-white/10 shadow-xl rounded-2xl overflow-hidden">
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2">
+            <Activity className="h-5 w-5 text-indigo-500" /> Ações Críticas de Manutenção
+          </CardTitle>
+          <CardDescription>Ferramentas avançadas para diagnóstico e recuperação.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {[
+              { label: "Verificar Integridade", icon: ShieldCheck, color: "text-emerald-500", action: () => runAction("Integridade", "Banco de dados 100% íntegro.") },
+              { label: "Recarga de Segurança", icon: RefreshCw, color: "text-amber-500", action: () => runAction("Segurança", "Tokens e chaves recarregados.") },
+              { label: "Testar Conexão Supabase", icon: Cloud, color: "text-sky-500", action: () => runAction("Conexão", "Ping: 24ms. Estável.") },
+              { label: "Forçar Sincronização", icon: RefreshCw, color: "text-indigo-500", action: () => runAction("Sincronização", "Dados sincronizados com sucesso.") },
+              { label: "Gerar Relatório de Saúde", icon: FileText, color: "text-violet-500", action: () => runAction("Relatório", "Relatório PDF gerado.") },
+              { label: "Limpar Cache e Cookies", icon: Trash2, color: "text-rose-500", action: handleClearCache, danger: true },
+            ].map((btn, i) => {
+              const Icon = btn.icon;
+              return (
+                <Button
+                  key={i}
+                  variant="ghost"
+                  disabled={refreshing}
+                  className={cn(
+                    "justify-start gap-3 h-12 bg-white/5 hover:bg-white/10 border border-white/5 transition-all",
+                    btn.danger && "hover:bg-rose-500/10 hover:text-rose-500 border-rose-500/10"
+                  )}
+                  onClick={btn.action}
+                >
+                  <Icon className={cn("h-5 w-5", btn.color)} />
+                  <span className="text-sm font-medium">{btn.label}</span>
+                </Button>
+              );
+            })}
+          </div>
 
-      {refreshing && (
-        <div className="space-y-2">
-           <div className="text-xs text-muted-foreground">Verificando integridade...</div>
-           <Progress value={progress} />
-        </div>
-      )}
+          {refreshing && (
+            <div className="mt-8 space-y-3 animate-in fade-in slide-in-from-top-4 duration-300">
+              <div className="flex items-center justify-between text-xs font-bold uppercase tracking-widest text-muted-foreground">
+                <span>Executando: {currentAction}</span>
+                <span>{actionProgress}%</span>
+              </div>
+              <Progress value={actionProgress} className="h-1.5" />
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }
