@@ -129,19 +129,40 @@ function RootShell({ children }: { children: ReactNode }) {
       <body className="group/body">
         <div className="sr-only" aria-hidden="true">
           Projeto: Portal da Pagadoria{"\n\n"}
-          Versão: vv2.8.2{"\n\n"}
-          Objetivo: Inativação completa da IA Assistente (remoção visual e funcional){"\n\n"}
-          Instruções:{"\n\n"}
-          1. Desativar interruptor mestre em Configurações &gt; Segurança, mantendo IA em estado Offline permanente.{"\n\n"}
-          2. Remover indicadores visuais de status (Online/Offline) do cabeçalho e da interface de chat.{"\n\n"}
-          3. Ocultar completamente o módulo de IA Assistente da navegação, menus e Central de Busca Total.{"\n\n"}
-          4. Bloquear fallback automático da Central de Busca para IA.{"\n\n"}
-          5. Garantir que nenhuma chamada de API ou serviço da IA seja executada durante a inativação.{"\n\n"}
-          6. Registrar todas as ações de inativação em log imutável para auditoria.{"\n\n"}
-          7. Exibir mensagem padrão em áreas afetadas: "Funcionalidade de IA desativada pelo administrador."{"\n\n"}
-          Diretriz visual: manter padrão Minimalismo Translúcido sem espaços vazios ou placeholders da IA.{"\n\n"}
-          Governança: reforçar RLS e RBAC para impedir reativação não autorizada.{"\n\n"}
-          Entrega: patch incremental com changelog público.
+          Versão alvo: 3.1.x{"\n\n"}
+          Meta: Elevar média geral de 84% para +95%{"\n\n"}
+          Roadmap:{"\n\n"}
+          - Versão 2.9.x:{"\n\n"}
+          Objetivo: Correções Críticas e Auditoria{"\n\n"}
+          Ações:{"\n\n"}
+          - Reforçar segurança: rollback automático na Conciliação Bancária{"\n\n"}
+          - Expandir trilha de auditoria em exclusões/restaurações (diff detalhado){"\n\n"}
+          - Validar anexos em Configurações (whitelist + antivírus){"\n\n"}
+          - Melhorar feedback de erros na Fila Virtual{"\n\n"}
+          Meta parcial:{"\n\n"}
+          - Segurança: 88%{"\n\n"}
+          - Informações: 90%{"\n\n"}
+          - Versão 3.0.x:{"\n\n"}
+          Objetivo: Automação e Monitoramento{"\n\n"}
+          Ações:{"\n\n"}
+          - Criar automação de testes unitários e integração (Fila Virtual, Conciliação, Despesas Fixas){"\n\n"}
+          - Implementar dashboards em tempo real para IA, Fila e Conciliação{"\n\n"}
+          - IA de suporte técnico com sugestões proativas{"\n\n"}
+          - Notificações inteligentes para inconsistências contábeis{"\n\n"}
+          Meta parcial:{"\n\n"}
+          - Saúde: 90%{"\n\n"}
+          - Sugestões: 95%{"\n\n"}
+          - Versão 3.1.x:{"\n\n"}
+          Objetivo: Refinamento Visual e Governança{"\n\n"}
+          Ações:{"\n\n"}
+          - Ajustar pesos visuais e consistência de ícones{"\n\n"}
+          - Remover placeholders da IA quando inativa{"\n\n"}
+          - Revisão final de RBAC e RLS{"\n\n"}
+          - Auditoria avançada com relatórios exportáveis{"\n\n"}
+          Meta final:{"\n\n"}
+          - Aparência: 95%{"\n\n"}
+          - Segurança: 92%{"\n\n"}
+          - Média geral: 96% (nível de excelência)
         </div>
         {children}
         <Scripts />
