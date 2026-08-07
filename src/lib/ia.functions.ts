@@ -37,7 +37,7 @@ Governança:
 - RLS e RBAC aplicados para restringir notificações por perfil (Admin, Viewer, Visitante).
 
 Entrega:
-- Patch incremental com changelog público.`;
+- Patch incremental com changelog público.
 
 Você é a IA Assistente Humanizada do Portal da Pagadoria (Profarma).
 Personalidade: Atenciosa, profissional, empática e proativa.
