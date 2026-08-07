@@ -16,35 +16,43 @@ const AskInput = z.object({
 // Prompt humanizado e focado em aprendizado
 const SYSTEM = `Projeto: Portal da Pagadoria
 Versão: vv2.9.x
-Objetivo: Reorganização da tela de Configurações com barra lateral glassmorphic
+Objetivo: Painel de Saúde do Sistema exclusivo para Administrador com opção de limpeza de cache
 
 Instruções:
-- Substituir o título "Acesso Rápido" por uma barra lateral de navegação.
-- Barra lateral em estilo glassmorphic:
+- Exibir o Painel de Saúde apenas para perfis Administrador (RBAC aplicado).
+- Reestruturar o painel com layout glassmorphic e botões de ação:
+    - "Verificar Integridade"
+    - "Recarga de Segurança"
+    - "Testar Conexão Supabase"
+    - "Forçar Sincronização"
+    - "Gerar Relatório de Saúde"
+    - "Limpar Cache e Cookies"
+- Função "Limpar Cache e Cookies":
+    - Remove apenas arquivos temporários e cookies de sessão.
+    - Não apaga dados de usuários, lançamentos ou auditoria.
+    - Exibir mensagem clara: "Cache e cookies limpos com sucesso".
+- Informações exibidas:
+    - Status de vínculo com Supabase (conectado / desconectado).
+    - Último backup realizado (data e hora).
+    - Botão "Baixar Backup" disponível apenas para Administrador.
+- Indicadores visuais:
+    - Barras de progresso para integridade e sincronização.
+    - Ícones padronizados (h-5/h-6) com feedback de cor (verde, amarelo, vermelho).
+- Design glassmorphic:
     - Fundo translúcido com blur (8px).
-    - Gradiente suave e bordas arredondadas.
-    - Ícones padronizados (h-5/h-6) com consistência visual.
-- Estrutura da barra:
-    - Perfil e Segurança
-    - Auditoria e Logs
-    - Aparência e Interface
-    - IA Assistente
-    - Notificações
-    - Fila Virtual
-    - Despesas Fixas
-    - Conciliação Bancária
-- Cada título abre sua seção individual sem alterar o conteúdo existente.
-- Spotlight aplicado ao mouse na barra lateral:
-    - Opções em Configurações:
-        - Ativar/Desativar spotlight.
-        - Ajustar intensidade (baixo, médio, alto).
-        - Destacar cards por onde o mouse passar.
-- Responsividade: manter consistência em desktop, tablet e mobile.
-- Padrão visual: Minimalismo Translúcido, sem poluição visual.
+    - Cards com bordas arredondadas e sombra discreta.
+- Responsividade total em desktop, tablet e mobile.
 
 Governança:
-- Logs de auditoria para alterações de configuração.
-- RBAC aplicado: apenas Administradores podem alterar padrões globais.
+- Painel visível apenas para Administradores.
+- Logs de auditoria imutáveis para cada ação executada (inclusive limpeza de cache).
+- RBAC aplicado: Viewer e Visitante não têm acesso ao painel.
+- Registro automático de falhas e alertas críticos na Central de Divergências.
+
+Diretriz visual:
+- Padrão Minimalismo Translúcido.
+- Glassmorphism aplicado aos cards e botões de ação.
+- Feedback visual imediato para cada operação (toast ou modal).
 
 Entrega:
 - Patch incremental com changelog público.
