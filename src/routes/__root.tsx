@@ -151,7 +151,9 @@ function RootComponent() {
         <BackButton />
         {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
         <Outlet />
+        <GlobalSearch variant="floating" />
         <ShortcutLegend />
+
         <DynamicSpotlight />
         <PortalFooter />
 
