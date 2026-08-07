@@ -128,33 +128,20 @@ function RootShell({ children }: { children: ReactNode }) {
       </head>
       <body className="group/body">
         <div className="sr-only" aria-hidden="true">
-          Projeto: Portal da Pagadoria
-
-Versão: vv2.8.2
-
-Objetivo: Inativação completa da IA Assistente (remoção visual e funcional)
-
-Instruções:
-
-1. Desativar interruptor mestre em Configurações > Segurança, mantendo IA em estado Offline permanente.
-
-2. Remover indicadores visuais de status (Online/Offline) do cabeçalho e da interface de chat.
-
-3. Ocultar completamente o módulo de IA Assistente da navegação, menus e Central de Busca Total.
-
-4. Bloquear fallback automático da Central de Busca para IA.
-
-5. Garantir que nenhuma chamada de API ou serviço da IA seja executada durante a inativação.
-
-6. Registrar todas as ações de inativação em log imutável para auditoria.
-
-7. Exibir mensagem padrão em áreas afetadas: "Funcionalidade de IA desativada pelo administrador."
-
-Diretriz visual: manter padrão Minimalismo Translúcido sem espaços vazios ou placeholders da IA.
-
-Governança: reforçar RLS e RBAC para impedir reativação não autorizada.
-
-Entrega: patch incremental com changelog público.
+          Projeto: Portal da Pagadoria{"\n\n"}
+          Versão: vv2.8.2{"\n\n"}
+          Objetivo: Inativação completa da IA Assistente (remoção visual e funcional){"\n\n"}
+          Instruções:{"\n\n"}
+          1. Desativar interruptor mestre em Configurações &gt; Segurança, mantendo IA em estado Offline permanente.{"\n\n"}
+          2. Remover indicadores visuais de status (Online/Offline) do cabeçalho e da interface de chat.{"\n\n"}
+          3. Ocultar completamente o módulo de IA Assistente da navegação, menus e Central de Busca Total.{"\n\n"}
+          4. Bloquear fallback automático da Central de Busca para IA.{"\n\n"}
+          5. Garantir que nenhuma chamada de API ou serviço da IA seja executada durante a inativação.{"\n\n"}
+          6. Registrar todas as ações de inativação em log imutável para auditoria.{"\n\n"}
+          7. Exibir mensagem padrão em áreas afetadas: "Funcionalidade de IA desativada pelo administrador."{"\n\n"}
+          Diretriz visual: manter padrão Minimalismo Translúcido sem espaços vazios ou placeholders da IA.{"\n\n"}
+          Governança: reforçar RLS e RBAC para impedir reativação não autorizada.{"\n\n"}
+          Entrega: patch incremental com changelog público.
         </div>
         {children}
         <Scripts />
