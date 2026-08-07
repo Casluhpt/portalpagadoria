@@ -44,9 +44,6 @@ import { fetchMateriais, materialApoioQueryKey } from "@/lib/material-apoio";
 import { perguntarIa } from "@/lib/ia.functions";
 import { cn } from "@/lib/utils";
 
-import { fetchMateriais, materialApoioQueryKey } from "@/lib/material-apoio";
-import { perguntarIa } from "@/lib/ia.functions";
-
 const RECENT_SEARCHES_KEY = "global_search_history";
 
 const grupoIcon: Record<PortalHit["grupo"], typeof Users> = {

@@ -20,6 +20,8 @@ import { FaviconManager } from "@/components/favicon-manager";
 import { PortalFooter } from "@/components/portal-footer";
 import { ShortcutLegend } from "@/components/shortcut-legend";
 import { DynamicSpotlight } from "@/components/dynamic-spotlight";
+import { GlobalSearch } from "@/components/global-search";
+
 
 
 import { AuthGate } from "@/components/auth-gate";
