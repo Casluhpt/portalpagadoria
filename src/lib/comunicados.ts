@@ -37,11 +37,14 @@ export async function marcarLido(comunicadoId: string, userId: string): Promise<
     .upsert({ comunicado_id: comunicadoId, user_id: userId }, { onConflict: "comunicado_id,user_id" });
   if (error) throw error;
   
-  // Auditoria
-  await supabase.from("notification_audit").insert({
-    notification_id: comunicadoId,
+  // Auditoria usando audit_log existente
+  await supabase.from("audit_log").insert({
+    acao: "NOTIFICACAO_LIDA",
+    modulo: "Comunicados",
+    tabela: "comunicados",
+    registro_id: comunicadoId,
     user_id: userId,
-    action: 'read'
+    descricao: `Notificação lida pelo usuário`
   });
 }
 
@@ -53,14 +56,17 @@ export async function marcarTodosLidos(ids: string[], userId: string): Promise<v
     .upsert(rows, { onConflict: "comunicado_id,user_id" });
   if (error) throw error;
 
-  // Auditoria em massa
-  await supabase.from("notification_audit").insert(
-    ids.map(id => ({
-      notification_id: id,
+  // Auditoria em massa usando audit_log existente
+  if (ids.length > 0) {
+    await supabase.from("audit_log").insert({
+      acao: "NOTIFICACOES_LIDAS_MASSA",
+      modulo: "Comunicados",
+      tabela: "comunicados",
       user_id: userId,
-      action: 'read_bulk'
-    }))
-  );
+      descricao: `Usuário marcou ${ids.length} notificações como lidas`,
+      metadata: { ids }
+    });
+  }
 }
 
 export async function excluirComunicadosPermanente(ids: string[], userId: string): Promise<void> {
