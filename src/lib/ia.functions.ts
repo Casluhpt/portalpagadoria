@@ -84,6 +84,7 @@ export const perguntarIa = createServerFn({ method: "POST" })
       };
     }
 
+    // v2.8.2 IA Desativada - O código abaixo é mantido para referência mas nunca executado
     if (!key) {
       console.error("[IA] LOVABLE_API_KEY is missing");
       return { 
@@ -111,7 +112,7 @@ export const perguntarIa = createServerFn({ method: "POST" })
       const messages = [
         { 
           role: "system", 
-          content: `${SYSTEM}${patterns ? `\nPadrões de Aprendizado do Usuário: ${JSON.stringify(patterns.patterns)}` : ""}${data.appState ? `\nCONTEXTO DO APP:\n${JSON.stringify(data.appState)}` : ""}` 
+          content: `${SYSTEM}${(patterns as any)?.patterns ? `\nPadrões de Aprendizado do Usuário: ${JSON.stringify((patterns as any).patterns)}` : ""}${data.appState ? `\nCONTEXTO DO APP:\n${JSON.stringify(data.appState)}` : ""}` 
         },
         ...(historico?.reverse().map((h: any) => ({ role: h.role, content: h.content })) || []),
         {
@@ -125,7 +126,7 @@ export const perguntarIa = createServerFn({ method: "POST" })
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Lovable-API-Key": key,
+          "Lovable-API-Key": key || "",
         },
         body: JSON.stringify({
           model: "google/gemini-2.5-flash",
