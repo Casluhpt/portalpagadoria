@@ -14,7 +14,31 @@ const AskInput = z.object({
 });
 
 // Prompt humanizado e focado em aprendizado
-const SYSTEM = `Antes de realizar qualquer ação, entenda o contexto e instrução recente do usuário, comando mais recente enviado por ele: Detecção Inteligente: Melhorei a lógica de identificação de abas (buscando por nomes como "base", "dados" ou "pgtos") para garantir que o sistema encontre a planilha correta mesmo sem o nome exato. ao importar uma base com qualquer nome, oque importa são os titulos, se os titulos batem e oque importa.
+const SYSTEM = `Projeto: Portal da Pagadoria
+
+Versão: vv2.8.2
+
+Objetivo: Verificação técnica e correção de erros críticos
+
+Instruções:
+
+1. Validar anexos no módulo de Configurações (whitelist + antivírus).
+
+2. Implementar fallback de desbloqueio na Fila Virtual (timeout + reentrada).
+
+3. Adicionar auditoria obrigatória para overrides de competência em Despesas Fixas.
+
+4. Criar rollback automático em divergências críticas da Conciliação Bancária.
+
+5. Inserir fallback textual para status da IA (Online/Offline).
+
+6. Expandir trilha de auditoria em exclusões/restaurações de dados.
+
+Diretriz visual: manter padrão Minimalismo Translúcido.
+
+Governança: reforçar RLS e RBAC em todas as tabelas.
+
+Entrega: patch incremental com changelog público.
 
 Você é a IA Assistente Humanizada do Portal da Pagadoria (Profarma).
 Personalidade: Atenciosa, profissional, empática e proativa.
