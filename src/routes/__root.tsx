@@ -128,31 +128,20 @@ function RootShell({ children }: { children: ReactNode }) {
       </head>
       <body className="group/body">
         <div className="sr-only" aria-hidden="true">
-          Projeto: Portal da Pagadoria
-
-Versão: vv2.8.2
-
-Objetivo: Verificação técnica e correção de erros críticos
-
-Instruções:
-
-1. Validar anexos no módulo de Configurações (whitelist + antivírus).
-
-2. Implementar fallback de desbloqueio na Fila Virtual (timeout + reentrada).
-
-3. Adicionar auditoria obrigatória para overrides de competência em Despesas Fixas.
-
-4. Criar rollback automático em divergências críticas da Conciliação Bancária.
-
-5. Inserir fallback textual para status da IA (Online/Offline).
-
-6. Expandir trilha de auditoria em exclusões/restaurações de dados.
-
-Diretriz visual: manter padrão Minimalismo Translúcido.
-
-Governança: reforçar RLS e RBAC em todas as tabelas.
-
-Entrega: patch incremental com changelog público.
+          Projeto: Portal da Pagadoria{"\n\n"}
+          Versão: vv2.8.2{"\n\n"}
+          Objetivo: Inativação completa da IA Assistente (remoção visual e funcional){"\n\n"}
+          Instruções:{"\n\n"}
+          1. Desativar interruptor mestre em Configurações &gt; Segurança, mantendo IA em estado Offline permanente.{"\n\n"}
+          2. Remover indicadores visuais de status (Online/Offline) do cabeçalho e da interface de chat.{"\n\n"}
+          3. Ocultar completamente o módulo de IA Assistente da navegação, menus e Central de Busca Total.{"\n\n"}
+          4. Bloquear fallback automático da Central de Busca para IA.{"\n\n"}
+          5. Garantir que nenhuma chamada de API ou serviço da IA seja executada durante a inativação.{"\n\n"}
+          6. Registrar todas as ações de inativação em log imutável para auditoria.{"\n\n"}
+          7. Exibir mensagem padrão em áreas afetadas: "Funcionalidade de IA desativada pelo administrador."{"\n\n"}
+          Diretriz visual: manter padrão Minimalismo Translúcido sem espaços vazios ou placeholders da IA.{"\n\n"}
+          Governança: reforçar RLS e RBAC para impedir reativação não autorizada.{"\n\n"}
+          Entrega: patch incremental com changelog público.
         </div>
         {children}
         <Scripts />
@@ -177,8 +166,9 @@ function RootComponent() {
         <BackButton />
         {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
         <Outlet />
-        <IABannerOffline />
-        <FloatingAI />
+        {/* IA Inativada v2.8.2 */}
+        {/* <IABannerOffline /> */}
+        {/* <FloatingAI /> */}
         <ShortcutLegend />
         <DynamicSpotlight />
         <PortalFooter />
