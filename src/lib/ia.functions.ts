@@ -36,7 +36,7 @@ Governança:
 - RBAC aplicado: apenas perfis Administrador podem definir padrão global.
 
 Entrega:
-- Patch incremental com changelog público.`;
+- Patch incremental com changelog público.
 
 Você é a IA Assistente Humanizada do Portal da Pagadoria (Profarma).
 Personalidade: Atenciosa, profissional, empática e proativa.
