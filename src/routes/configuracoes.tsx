@@ -888,12 +888,30 @@ function ShortcutLegendSwitch() {
 
 function SpotlightToggle() {
   const { config, updateConfig } = useSpotlightConfig();
+  const { user } = useSession();
+
+  const handleToggle = async (enabled: boolean) => {
+    updateConfig({ enabled });
+    
+    // Auditoria
+    if (user) {
+      await supabase.from("audit_log").insert({
+        acao: "CONFIG_SPOTLIGHT_ESTADO",
+        modulo: "Interface",
+        tabela: "config_user",
+        user_id: user.id,
+        descricao: `Efeito Spotlight ${enabled ? 'ativado' : 'desativado'} pelo usuário.`,
+        metadata: { enabled }
+      });
+    }
+  };
+
   return (
     <div className="flex items-center space-x-2">
       <Switch 
         id="spotlight-toggle" 
         checked={config.enabled} 
-        onCheckedChange={(enabled) => updateConfig({ enabled })}
+        onCheckedChange={handleToggle}
       />
       <Label htmlFor="spotlight-toggle" className="text-[10px] text-muted-foreground">
         {config.enabled ? "Ativado" : "Desativado"}
@@ -904,8 +922,24 @@ function SpotlightToggle() {
 
 function SpotlightControls() {
   const { config, updateConfig } = useSpotlightConfig();
+  const { user } = useSession();
   
   if (!config.enabled) return null;
+
+  const handleIntensityChange = async (val: number) => {
+    updateConfig({ intensity: val });
+    // Auditamos apenas ao finalizar ou em debounced (aqui faremos a cada mudança por simplicidade conforme pedido)
+    if (user) {
+      await supabase.from("audit_log").insert({
+        acao: "CONFIG_SPOTLIGHT_INTENSIDADE",
+        modulo: "Interface",
+        tabela: "config_user",
+        user_id: user.id,
+        descricao: `Intensidade do Spotlight ajustada para ${val}%`,
+        metadata: { intensity: val }
+      });
+    }
+  };
 
   return (
     <div className="px-2 space-y-6 pb-2 animate-in fade-in slide-in-from-top-2 duration-300">
@@ -915,11 +949,17 @@ function SpotlightControls() {
         </div>
         <Slider 
           value={[config.intensity]} 
-          min={0} 
-          max={30} 
+          min={1} 
+          max={20} 
           step={1}
           onValueChange={([val]) => updateConfig({ intensity: val })}
+          onValueCommit={([val]) => handleIntensityChange(val)}
         />
+        <div className="flex justify-between text-[9px] text-muted-foreground px-1">
+          <span>Discreto</span>
+          <span>Médio</span>
+          <span>Alto</span>
+        </div>
       </div>
       
       <div className="space-y-3">
@@ -929,7 +969,7 @@ function SpotlightControls() {
         <Slider 
           value={[config.radius]} 
           min={200} 
-          max={1200} 
+          max={1000} 
           step={50}
           onValueChange={([val]) => updateConfig({ radius: val })}
         />

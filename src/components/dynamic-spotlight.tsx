@@ -44,10 +44,10 @@ export function DynamicSpotlight() {
 
   return (
     <div
-      className="pointer-events-none fixed inset-0 z-[9999] transition-opacity duration-500 ease-out"
+      className="pointer-events-none fixed inset-0 z-[9999] transition-opacity duration-700 ease-out"
       style={{
         opacity: isVisible ? 1 : 0,
-        background: `radial-gradient(${config.radius}px circle at ${position.x}px ${position.y}px, color-mix(in oklab, var(--primary) ${config.intensity}%, transparent), transparent 80%)`,
+        background: `radial-gradient(${config.radius}px circle at ${position.x}px ${position.y}px, color-mix(in oklab, var(--primary) ${config.intensity}%, transparent), transparent 100%)`,
         willChange: "background",
       }}
     />

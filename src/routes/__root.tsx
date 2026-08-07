@@ -130,22 +130,22 @@ function RootShell({ children }: { children: ReactNode }) {
         <div className="sr-only" aria-hidden="true">
           Projeto: Portal da Pagadoria{"\n\n"}
           Versão: vv2.9.x{"\n\n"}
-          Objetivo: Implementar notificações aos colaboradores em estilo Glassmorphic{"\n\n"}
+          Objetivo: Spotlight dinâmico no mouse com controle em Configurações{"\n\n"}
           Instruções:{"\n"}
-          - Criar componente de notificações com design translúcido (glassmorphism).{"\n"}
-          - Aplicar blur de fundo (8px) e translucidez elegante com gradiente suave.{"\n"}
-          - Exibir notificações no canto superior direito com contador dinâmico.{"\n"}
-          - Categorias: Não lidas / Histórico, com botão de fechar item a item.{"\n"}
-          - Integrar com Central de Divergências e IA Assistente (quando ativa).{"\n"}
-          - Responsividade: manter consistência em desktop, tablet e mobile.{"\n"}
-          - Mensagens críticas (segurança, auditoria) devem ter destaque em cor sólida.{"\n\n"}
-          Diretriz visual:{"\n"}
-          - Padrão Minimalismo Translúcido.{"\n"}
-          - Ícones padronizados (h-5/h-6) com pesos visuais consistentes.{"\n"}
-          - Evitar placeholders visuais quando IA estiver inativa.{"\n\n"}
+          - Aplicar efeito spotlight translúcido apenas ao cursor do mouse.{"\n"}
+          - Remover efeitos de iluminação dinâmica (glow, gradientes radiais, círculos extras).{"\n"}
+          - Simplificar animações de hover nos cards, mantendo apenas destaque pelo spotlight.{"\n"}
+          - Configurações do Spotlight:{"\n"}
+            - Ativar/Desativar spotlight.{"\n"}
+            - Ajustar intensidade (baixo, médio, alto).{"\n"}
+            - Diminuir intensidade para modo discreto.{"\n"}
+            - Destacar cards por onde o mouse passar (realce visual suave).{"\n"}
+          - Garantir responsividade em desktop, tablet e mobile.{"\n"}
+          - Padrão visual: Minimalismo Translúcido, sem poluição visual.{"\n\n"}
           Governança:{"\n"}
-          - Logs de auditoria imutáveis para cada notificação enviada.{"\n"}
-          - RLS e RBAC aplicados para restringir notificações por perfil (Admin, Viewer, Visitante).{"\n\n"}
+          - Spotlight controlado apenas pelo usuário via Configurações.{"\n"}
+          - Logs de alteração registrados em auditoria (quem, quando, intensidade escolhida).{"\n"}
+          - RBAC aplicado: apenas perfis Administrador podem definir padrão global.{"\n\n"}
           Entrega:{"\n"}
           - Patch incremental com changelog público.
         </div>

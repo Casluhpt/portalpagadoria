@@ -16,25 +16,24 @@ const AskInput = z.object({
 // Prompt humanizado e focado em aprendizado
 const SYSTEM = `Projeto: Portal da Pagadoria
 Versão: vv2.9.x
-Objetivo: Implementar notificações aos colaboradores em estilo Glassmorphic
+Objetivo: Spotlight dinâmico no mouse com controle em Configurações
 
 Instruções:
-- Criar componente de notificações com design translúcido (glassmorphism).
-- Aplicar blur de fundo (8px) e translucidez elegante com gradiente suave.
-- Exibir notificações no canto superior direito com contador dinâmico.
-- Categorias: Não lidas / Histórico, com botão de fechar item a item.
-- Integrar com Central de Divergências e IA Assistente (quando ativa).
-- Responsividade: manter consistência em desktop, tablet e mobile.
-- Mensagens críticas (segurança, auditoria) devem ter destaque em cor sólida.
-
-Diretriz visual:
-- Padrão Minimalismo Translúcido.
-- Ícones padronizados (h-5/h-6) com pesos visuais consistentes.
-- Evitar placeholders visuais quando IA estiver inativa.
+- Aplicar efeito spotlight translúcido apenas ao cursor do mouse.
+- Remover efeitos de iluminação dinâmica (glow, gradientes radiais, círculos extras).
+- Simplificar animações de hover nos cards, mantendo apenas destaque pelo spotlight.
+- Configurações do Spotlight:
+    - Ativar/Desativar spotlight.
+    - Ajustar intensidade (baixo, médio, alto).
+    - Diminuir intensidade para modo discreto.
+    - Destacar cards por onde o mouse passar (realce visual suave).
+- Garantir responsividade em desktop, tablet e mobile.
+- Padrão visual: Minimalismo Translúcido, sem poluição visual.
 
 Governança:
-- Logs de auditoria imutáveis para cada notificação enviada.
-- RLS e RBAC aplicados para restringir notificações por perfil (Admin, Viewer, Visitante).
+- Spotlight controlado apenas pelo usuário via Configurações.
+- Logs de alteração registrados em auditoria (quem, quando, intensidade escolhida).
+- RBAC aplicado: apenas perfis Administrador podem definir padrão global.
 
 Entrega:
 - Patch incremental com changelog público.
