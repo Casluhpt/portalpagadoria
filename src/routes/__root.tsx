@@ -130,22 +130,36 @@ function RootShell({ children }: { children: ReactNode }) {
         <div className="sr-only" aria-hidden="true">
           Projeto: Portal da Pagadoria{"\n\n"}
           Versão: vv2.9.x{"\n\n"}
-          Objetivo: Spotlight dinâmico no mouse com controle em Configurações{"\n\n"}
+          Objetivo: Reorganização da tela de Configurações com barra lateral glassmorphic{"\n\n"}
           Instruções:{"\n"}
-          - Aplicar efeito spotlight translúcido apenas ao cursor do mouse.{"\n"}
-          - Remover efeitos de iluminação dinâmica (glow, gradientes radiais, círculos extras).{"\n"}
-          - Simplificar animações de hover nos cards, mantendo apenas destaque pelo spotlight.{"\n"}
-          - Configurações do Spotlight:{"\n"}
-            - Ativar/Desativar spotlight.{"\n"}
-            - Ajustar intensidade (baixo, médio, alto).{"\n"}
-            - Diminuir intensidade para modo discreto.{"\n"}
-            - Destacar cards por onde o mouse passar (realce visual suave).{"\n"}
-          - Garantir responsividade em desktop, tablet e mobile.{"\n"}
-          - Padrão visual: Minimalismo Translúcido, sem poluição visual.{"\n\n"}
+          - Substituir o título "Acesso Rápido" por uma barra lateral de navegação.{"\n"}
+          - Barra lateral em estilo glassmorphic:{"\n"}
+            - Fundo translúcido com blur (8px).{"\n"}
+            - Gradiente suave e bordas arredondadas.{"\n"}
+            - Ícones padronizados (h-5/h-6) com consistência visual.{"\n"}
+          - Estrutura da barra:{"\n"}
+            - Perfil e Segurança{"\n"}
+            - Auditoria e Logs{"\n"}
+            - Aparência e Interface{"\n"}
+            - IA Assistente{"\n"}
+            - Notificações{"\n"}
+            - Fila Virtual{"\n"}
+            - Despesas Fixas{"\n"}
+            - Conciliação Bancária{"\n"}
+          - Cada título abre sua seção individual sem alterar o conteúdo existente.{"\n"}
+          - Spotlight aplicado ao mouse na barra lateral:{"\n"}
+            - Opções em Configurações:{"\n"}
+              - Ativar/Desativar spotlight.{"\n"}
+              - Ajustar intensidade (baixo, médio, alto).{"\n"}
+              - Destacar cards por onde o mouse passar.{"\n"}
+          - Responsividade: manter consistência em desktop, tablet e mobile.{"\n\n"}
+          Diretriz visual:{"\n"}
+          - Padrão Minimalismo Translúcido.{"\n"}
+          - Glassmorphism aplicado apenas na barra lateral.{"\n"}
+          - Design limpo e funcional, sem poluição visual.{"\n\n"}
           Governança:{"\n"}
-          - Spotlight controlado apenas pelo usuário via Configurações.{"\n"}
-          - Logs de alteração registrados em auditoria (quem, quando, intensidade escolhida).{"\n"}
-          - RBAC aplicado: apenas perfis Administrador podem definir padrão global.{"\n\n"}
+          - Logs de auditoria para alterações de configuração.{"\n"}
+          - RBAC aplicado: apenas Administradores podem alterar padrões globais.{"\n\n"}
           Entrega:{"\n"}
           - Patch incremental com changelog público.
         </div>

@@ -11,7 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { HelpCircle, Bug, AlertCircle, MessageSquare, Send, CheckCircle2, Paperclip, X, Loader2, Settings, Users, History, ChevronRight, Activity, Cloud, ShieldCheck, Mail, Save, Code, Zap, Database, ShieldAlert, Cpu, Sparkles, RefreshCw, Trash2, Lock, Table as TableIcon, Image as ImageIcon, Keyboard } from "lucide-react";
+import { HelpCircle, Bug, AlertCircle, MessageSquare, Send, CheckCircle2, Paperclip, X, Loader2, Settings, Users, History, ChevronRight, Activity, Cloud, ShieldCheck, Mail, Save, Code, Zap, Database, ShieldAlert, Cpu, Sparkles, RefreshCw, Trash2, Lock, Table as TableIcon, Image as ImageIcon, Keyboard, Bell, ListOrdered, FileText, Landmark } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { usePlanilhaModo } from "@/hooks/use-planilha-modo";
 import { useState, useRef, useEffect } from "react";
@@ -36,6 +36,21 @@ export const Route = createFileRoute("/configuracoes")({
 
 function ConfiguracoesPage() {
   const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState("suporte");
+
+  const sidebarItems = [
+    { id: "suporte", label: "Perfil e Segurança", icon: ShieldCheck },
+    { id: "diagnostico", label: "Auditoria e Logs", icon: History },
+    { id: "identidade", label: "Aparência e Interface", icon: ImageIcon },
+    { id: "ia-assistente", label: "IA Assistente", icon: Sparkles },
+    { id: "notificacoes", label: "Notificações", icon: Bell },
+    { id: "fila-virtual", label: "Fila Virtual", icon: ListOrdered },
+    { id: "despesas-fixas", label: "Despesas Fixas", icon: FileText },
+    { id: "conciliacao", label: "Conciliação Bancária", icon: Landmark },
+    { id: "administracao", label: "Gestão de Usuários", icon: Users },
+    { id: "documentacao", label: "Documentação Técnica", icon: Code },
+  ];
+
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full bg-background">
@@ -47,7 +62,7 @@ function ConfiguracoesPage() {
               <AppLogo area="header" className="h-6 w-auto shrink-0 sm:h-7" />
               <div className="min-w-0">
                 <h1 className="truncate text-sm font-semibold text-foreground">Configurações</h1>
-                <p className="hidden truncate text-[10px] text-muted-foreground sm:block">Personalização e suporte técnico</p>
+                <p className="hidden truncate text-[10px] text-muted-foreground sm:block">Gerenciamento do portal</p>
               </div>
             </Link>
             <div className="ml-auto">
@@ -56,63 +71,142 @@ function ConfiguracoesPage() {
           </header>
           
           <main className="flex-1 p-6">
-            <Tabs defaultValue="suporte" className="w-full max-w-5xl mx-auto space-y-8">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-2">
-                <div>
-                  <h2 className="text-2xl font-bold text-foreground">Acesso Rápido</h2>
-                  <p className="text-sm text-muted-foreground">Gerencie o portal e solicite suporte técnico.</p>
-                </div>
-                <TabsList className="bg-muted/50 border border-border p-1 h-auto grid grid-cols-3 md:grid-cols-6 w-full md:w-auto">
-                  <TabsTrigger value="suporte" className="py-2.5 px-4 text-xs font-semibold data-[state=active]:bg-background data-[state=active]:shadow-sm">
-                    <HelpCircle className="h-3.5 w-3.5 mr-2" /> Suporte
-                  </TabsTrigger>
-                  <TabsTrigger value="administracao" className="py-2.5 px-4 text-xs font-semibold data-[state=active]:bg-background data-[state=active]:shadow-sm">
-                    <Users className="h-3.5 w-3.5 mr-2" /> Usuários
-                  </TabsTrigger>
-                  <TabsTrigger value="identidade" className="py-2.5 px-4 text-xs font-semibold data-[state=active]:bg-background data-[state=active]:shadow-sm">
-                    <ImageIcon className="h-3.5 w-3.5 mr-2" /> Identidade
-                  </TabsTrigger>
-                  <TabsTrigger value="documentacao" className="py-2.5 px-4 text-xs font-semibold data-[state=active]:bg-background data-[state=active]:shadow-sm">
-                    <Code className="h-3.5 w-3.5 mr-2" /> Documentação
-                  </TabsTrigger>
-                  <TabsTrigger value="diagnostico" className="py-2.5 px-4 text-xs font-semibold data-[state=active]:bg-background data-[state=active]:shadow-sm">
-                    <Activity className="h-3.5 w-3.5 mr-2" /> Diagnóstico
-                  </TabsTrigger>
-                  <TabsTrigger value="seguranca" className="py-2.5 px-4 text-xs font-semibold data-[state=active]:bg-background data-[state=active]:shadow-sm">
-                    <ShieldCheck className="h-3.5 w-3.5 mr-2" /> Segurança
-                  </TabsTrigger>
-                </TabsList>
+            <div className="max-w-6xl mx-auto flex flex-col md:flex-row gap-8">
+              {/* Sidebar Glassmorphic */}
+              <aside className="w-full md:w-64 shrink-0">
+                <nav className="sticky top-20 flex flex-col gap-2 p-2 rounded-2xl border border-white/20 bg-white/10 dark:bg-black/20 backdrop-blur-md shadow-xl">
+                  {sidebarItems.map((item) => {
+                    const Icon = item.icon;
+                    const isActive = activeTab === item.id;
+                    return (
+                      <button
+                        key={item.id}
+                        onClick={() => setActiveTab(item.id)}
+                        className={cn(
+                          "group relative flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 overflow-hidden",
+                          isActive 
+                            ? "bg-indigo-600/20 text-indigo-600 dark:text-indigo-400 border border-indigo-500/30" 
+                            : "text-muted-foreground hover:bg-white/10 dark:hover:bg-black/10 hover:text-foreground"
+                        )}
+                      >
+                        <Icon className={cn("h-5 w-5 transition-transform group-hover:scale-110", isActive && "text-indigo-600 dark:text-indigo-400")} />
+                        <span className="text-sm font-medium">{item.label}</span>
+                        {isActive && (
+                          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-indigo-600 rounded-full" />
+                        )}
+                        
+                        {/* Spotlight Effect for Sidebar Items */}
+                        <div className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-[radial-gradient(circle_at_var(--x,_50%)_var(--y,_50%),_rgba(79,70,229,0.15)_0%,_transparent_100%)]" 
+                          onMouseMove={(e) => {
+                            const rect = e.currentTarget.getBoundingClientRect();
+                            const x = e.clientX - rect.left;
+                            const y = e.clientY - rect.top;
+                            e.currentTarget.style.setProperty("--x", `${x}px`);
+                            e.currentTarget.style.setProperty("--y", `${y}px`);
+                          }}
+                        />
+                      </button>
+                    );
+                  })}
+                </nav>
+              </aside>
 
+              {/* Content Area */}
+              <div className="flex-1 min-w-0 space-y-8">
+                <div className="mb-8">
+                  <h2 className="text-3xl font-bold tracking-tight text-foreground">
+                    {sidebarItems.find(i => i.id === activeTab)?.label}
+                  </h2>
+                  <p className="text-muted-foreground mt-1 text-sm">
+                    Ajuste as preferências de {sidebarItems.find(i => i.id === activeTab)?.label.toLowerCase()} do sistema.
+                  </p>
+                </div>
+
+                <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                  {activeTab === "suporte" && (
+                    <div className="grid gap-6">
+                       <AdvancedSecuritySettings />
+                       <SupportForm />
+                    </div>
+                  )}
+                  {activeTab === "diagnostico" && <DiagnosticPanel />}
+                  {activeTab === "identidade" && <IdentidadeVisualPanel />}
+                  {activeTab === "administracao" && <UsuariosTable />}
+                  {activeTab === "documentacao" && <DocumentacaoTecnicaSection />}
+                  
+                  {/* Placeholders for new sections */}
+                  {activeTab === "ia-assistente" && (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <Sparkles className="h-5 w-5 text-indigo-600" /> IA Assistente
+                        </CardTitle>
+                        <CardDescription>Gerenciamento da inteligência artificial do portal.</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <AdvancedSecuritySettings />
+                      </CardContent>
+                    </Card>
+                  )}
+                  
+                  {activeTab === "notificacoes" && (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <Bell className="h-5 w-5 text-indigo-600" /> Notificações
+                        </CardTitle>
+                        <CardDescription>Configure como deseja ser alertado sobre eventos importantes.</CardDescription>
+                      </CardHeader>
+                      <CardContent className="h-40 flex items-center justify-center text-muted-foreground italic text-sm">
+                        Módulo de notificações em desenvolvimento v2.9.x
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {activeTab === "fila-virtual" && (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <ListOrdered className="h-5 w-5 text-indigo-600" /> Fila Virtual
+                        </CardTitle>
+                        <CardDescription>Gestão de concorrência e fila de edição.</CardDescription>
+                      </CardHeader>
+                      <CardContent className="h-40 flex items-center justify-center text-muted-foreground italic text-sm">
+                        Acesse [Pagamentos Diversos] para visualizar a fila em tempo real.
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {activeTab === "despesas-fixas" && (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <FileText className="h-5 w-5 text-indigo-600" /> Despesas Fixas
+                        </CardTitle>
+                        <CardDescription>Configurações globais de competências e fechamentos.</CardDescription>
+                      </CardHeader>
+                      <CardContent className="h-40 flex items-center justify-center text-muted-foreground italic text-sm">
+                        Utilize o módulo principal para gerenciar os lançamentos.
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {activeTab === "conciliacao" && (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <Landmark className="h-5 w-5 text-indigo-600" /> Conciliação Bancária
+                        </CardTitle>
+                        <CardDescription>Parâmetros de identificação inteligente de extratos.</CardDescription>
+                      </CardHeader>
+                      <CardContent className="h-40 flex items-center justify-center text-muted-foreground italic text-sm">
+                        Consulte o módulo de Conciliação v2.0 para regras de De-Para.
+                      </CardContent>
+                    </Card>
+                  )}
+                </div>
               </div>
-
-              <TabsContent value="suporte" className="m-0 focus-visible:outline-none">
-                <SupportForm />
-              </TabsContent>
-
-              <TabsContent value="administracao" className="m-0 focus-visible:outline-none">
-                <UsuariosTable />
-              </TabsContent>
-              <TabsContent value="identidade" className="m-0 focus-visible:outline-none">
-                <IdentidadeVisualPanel />
-              </TabsContent>
-
-              <TabsContent value="documentacao" className="m-0 focus-visible:outline-none">
-                <DocumentacaoTecnicaSection />
-              </TabsContent>
-
-
-
-              <TabsContent value="diagnostico" className="m-0 focus-visible:outline-none">
-                <DiagnosticPanel />
-              </TabsContent>
-
-              <TabsContent value="seguranca" className="m-0 focus-visible:outline-none">
-                <div className="grid gap-6 md:grid-cols-2">
-                  <AdvancedSecuritySettings />
-                  <SmartConfigPanel />
-                </div>
-              </TabsContent>
-            </Tabs>
+            </div>
           </main>
         </div>
       </div>
