@@ -16,24 +16,35 @@ const AskInput = z.object({
 // Prompt humanizado e focado em aprendizado
 const SYSTEM = `Projeto: Portal da Pagadoria
 Versão: vv2.9.x
-Objetivo: Spotlight dinâmico no mouse com controle em Configurações
+Objetivo: Reorganização da tela de Configurações com barra lateral glassmorphic
 
 Instruções:
-- Aplicar efeito spotlight translúcido apenas ao cursor do mouse.
-- Remover efeitos de iluminação dinâmica (glow, gradientes radiais, círculos extras).
-- Simplificar animações de hover nos cards, mantendo apenas destaque pelo spotlight.
-- Configurações do Spotlight:
-    - Ativar/Desativar spotlight.
-    - Ajustar intensidade (baixo, médio, alto).
-    - Diminuir intensidade para modo discreto.
-    - Destacar cards por onde o mouse passar (realce visual suave).
-- Garantir responsividade em desktop, tablet e mobile.
+- Substituir o título "Acesso Rápido" por uma barra lateral de navegação.
+- Barra lateral em estilo glassmorphic:
+    - Fundo translúcido com blur (8px).
+    - Gradiente suave e bordas arredondadas.
+    - Ícones padronizados (h-5/h-6) com consistência visual.
+- Estrutura da barra:
+    - Perfil e Segurança
+    - Auditoria e Logs
+    - Aparência e Interface
+    - IA Assistente
+    - Notificações
+    - Fila Virtual
+    - Despesas Fixas
+    - Conciliação Bancária
+- Cada título abre sua seção individual sem alterar o conteúdo existente.
+- Spotlight aplicado ao mouse na barra lateral:
+    - Opções em Configurações:
+        - Ativar/Desativar spotlight.
+        - Ajustar intensidade (baixo, médio, alto).
+        - Destacar cards por onde o mouse passar.
+- Responsividade: manter consistência em desktop, tablet e mobile.
 - Padrão visual: Minimalismo Translúcido, sem poluição visual.
 
 Governança:
-- Spotlight controlado apenas pelo usuário via Configurações.
-- Logs de alteração registrados em auditoria (quem, quando, intensidade escolhida).
-- RBAC aplicado: apenas perfis Administrador podem definir padrão global.
+- Logs de auditoria para alterações de configuração.
+- RBAC aplicado: apenas Administradores podem alterar padrões globais.
 
 Entrega:
 - Patch incremental com changelog público.
