@@ -27,6 +27,7 @@ import { IdentidadeVisualPanel } from "@/components/admin/identidade-visual";
 import { useShortcutLegend } from "@/hooks/use-shortcut-legend";
 import { useSpotlightConfig } from "@/hooks/use-spotlight-config";
 import { Slider } from "@/components/ui/slider";
+import { Progress } from "@/components/ui/progress";
 import { DocumentacaoTecnicaSection } from "@/components/documentacao-tecnica-section";
 
 
