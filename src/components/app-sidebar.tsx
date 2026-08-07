@@ -114,7 +114,8 @@ const mainItems: MenuItem[] = [
   { title: "Central de Divergências", url: "/divergencias", icon: AlertTriangle, match: (p: string) => p.startsWith("/divergencias"), group: "geral" },
 
   { title: "Material de Apoio", url: "/material-apoio", icon: BookOpen, match: (p: string) => p.startsWith("/material-apoio"), group: "apoio" },
-  { title: "IA da Pagadoria", url: "#", icon: Sparkles, match: (p: string) => false, action: "search", group: "apoio" },
+  { title: "Busca e IA", url: "#", icon: Sparkles, match: (p: string) => false, action: "search", group: "apoio" },
+
 ];
 
 const advancedItems: MenuItem[] = [
@@ -266,8 +267,9 @@ export function AppSidebar() {
         isActive={item.match(currentPath)} 
         tooltip={item.title}
         onClick={item.action === "search" ? () => {
-          setChatOpen(true);
+          document.dispatchEvent(new KeyboardEvent("keydown", { key: "k", ctrlKey: true, shiftKey: true }));
         } : undefined}
+
       >
         {item.action === "search" ? (
           <div className="flex items-center gap-2 cursor-pointer w-full">
