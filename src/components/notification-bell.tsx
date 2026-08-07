@@ -175,7 +175,7 @@ export function NotificationBell() {
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent align="end" collisionPadding={12} className="w-[calc(100vw-1.5rem)] max-w-96 p-0 sm:w-96">
+      <PopoverContent align="end" collisionPadding={12} className="w-[calc(100vw-1.5rem)] max-w-96 p-0 sm:w-96 backdrop-blur-md bg-white/70 dark:bg-black/70 border-white/20 dark:border-white/10 shadow-2xl overflow-hidden rounded-xl animate-in fade-in zoom-in duration-200">
         <div className="flex items-center justify-between border-b border-border px-4 py-3">
           <div>
             <div className="flex items-center gap-2">
@@ -231,7 +231,7 @@ export function NotificationBell() {
           </div>
         </div>
         {showVersionCard && latestVersion && (
-          <div className="relative border-b border-violet-100 bg-gradient-to-r from-violet-50 to-indigo-50 dark:from-violet-950/40 dark:to-indigo-950/40 dark:border-violet-800/30 px-4 py-3">
+          <div className="relative border-b border-violet-100/20 bg-gradient-to-r from-violet-50/50 to-indigo-50/50 dark:from-violet-950/20 dark:to-indigo-950/20 backdrop-blur-sm px-4 py-3">
             <button
               onClick={dismissVersion}
               aria-label="Dispensar novidade"
@@ -350,10 +350,10 @@ function NotifList({
           {items.map((c) => (
             <li
               key={c.id}
-              className={`group relative flex items-start gap-3 px-4 py-3 pr-9 text-sm transition-colors ${
+              className={`group relative flex items-start gap-3 px-4 py-3 pr-9 text-sm transition-all duration-300 border-b border-border/50 last:border-0 ${
                 selectedIds.has(c.id) 
-                  ? "bg-violet-100/50 dark:bg-violet-900/30" 
-                  : c.lido ? "bg-card" : "bg-violet-50/60 dark:bg-violet-950/20"
+                  ? "bg-violet-100/30 dark:bg-violet-900/20" 
+                  : c.lido ? "bg-transparent" : "bg-violet-50/40 dark:bg-violet-950/10"
               }`}
             >
               <div className="mt-1 flex shrink-0 items-center gap-2">

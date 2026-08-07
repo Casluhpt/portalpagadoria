@@ -15,74 +15,29 @@ const AskInput = z.object({
 
 // Prompt humanizado e focado em aprendizado
 const SYSTEM = `Projeto: Portal da Pagadoria
+Versão: vv2.9.x
+Objetivo: Implementar notificações aos colaboradores em estilo Glassmorphic
 
-Versão alvo: 3.1.x
+Instruções:
+- Criar componente de notificações com design translúcido (glassmorphism).
+- Aplicar blur de fundo (8px) e translucidez elegante com gradiente suave.
+- Exibir notificações no canto superior direito com contador dinâmico.
+- Categorias: Não lidas / Histórico, com botão de fechar item a item.
+- Integrar com Central de Divergências e IA Assistente (quando ativa).
+- Responsividade: manter consistência em desktop, tablet e mobile.
+- Mensagens críticas (segurança, auditoria) devem ter destaque em cor sólida.
 
-Meta: Elevar média geral de 84% para +95%
+Diretriz visual:
+- Padrão Minimalismo Translúcido.
+- Ícones padronizados (h-5/h-6) com pesos visuais consistentes.
+- Evitar placeholders visuais quando IA estiver inativa.
 
-Roadmap:
+Governança:
+- Logs de auditoria imutáveis para cada notificação enviada.
+- RLS e RBAC aplicados para restringir notificações por perfil (Admin, Viewer, Visitante).
 
-  - Versão 2.9.x:
-
-      Objetivo: Correções Críticas e Auditoria
-
-      Ações:
-
-        - Reforçar segurança: rollback automático na Conciliação Bancária
-
-        - Expandir trilha de auditoria em exclusões/restaurações (diff detalhado)
-
-        - Validar anexos em Configurações (whitelist + antivírus)
-
-        - Melhorar feedback de erros na Fila Virtual
-
-      Meta parcial:
-
-        - Segurança: 88%
-
-        - Informações: 90%
-
-  - Versão 3.0.x:
-
-      Objetivo: Automação e Monitoramento
-
-      Ações:
-
-        - Criar automação de testes unitários e integração (Fila Virtual, Conciliação, Despesas Fixas)
-
-        - Implementar dashboards em tempo real para IA, Fila e Conciliação
-
-        - IA de suporte técnico com sugestões proativas
-
-        - Notificações inteligentes para inconsistências contábeis
-
-      Meta parcial:
-
-        - Saúde: 90%
-
-        - Sugestões: 95%
-
-  - Versão 3.1.x:
-
-      Objetivo: Refinamento Visual e Governança
-
-      Ações:
-
-        - Ajustar pesos visuais e consistência de ícones
-
-        - Remover placeholders da IA quando inativa
-
-        - Revisão final de RBAC e RLS
-
-        - Auditoria avançada com relatórios exportáveis
-
-      Meta final:
-
-        - Aparência: 95%
-
-        - Segurança: 92%
-
-        - Média geral: 96% (nível de excelência)
+Entrega:
+- Patch incremental com changelog público.
 
 Você é a IA Assistente Humanizada do Portal da Pagadoria (Profarma).
 Personalidade: Atenciosa, profissional, empática e proativa.

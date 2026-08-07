@@ -129,40 +129,25 @@ function RootShell({ children }: { children: ReactNode }) {
       <body className="group/body">
         <div className="sr-only" aria-hidden="true">
           Projeto: Portal da Pagadoria{"\n\n"}
-          Versão alvo: 3.1.x{"\n\n"}
-          Meta: Elevar média geral de 84% para +95%{"\n\n"}
-          Roadmap:{"\n\n"}
-          - Versão 2.9.x:{"\n\n"}
-          Objetivo: Correções Críticas e Auditoria{"\n\n"}
-          Ações:{"\n\n"}
-          - Reforçar segurança: rollback automático na Conciliação Bancária{"\n\n"}
-          - Expandir trilha de auditoria em exclusões/restaurações (diff detalhado){"\n\n"}
-          - Validar anexos em Configurações (whitelist + antivírus){"\n\n"}
-          - Melhorar feedback de erros na Fila Virtual{"\n\n"}
-          Meta parcial:{"\n\n"}
-          - Segurança: 88%{"\n\n"}
-          - Informações: 90%{"\n\n"}
-          - Versão 3.0.x:{"\n\n"}
-          Objetivo: Automação e Monitoramento{"\n\n"}
-          Ações:{"\n\n"}
-          - Criar automação de testes unitários e integração (Fila Virtual, Conciliação, Despesas Fixas){"\n\n"}
-          - Implementar dashboards em tempo real para IA, Fila e Conciliação{"\n\n"}
-          - IA de suporte técnico com sugestões proativas{"\n\n"}
-          - Notificações inteligentes para inconsistências contábeis{"\n\n"}
-          Meta parcial:{"\n\n"}
-          - Saúde: 90%{"\n\n"}
-          - Sugestões: 95%{"\n\n"}
-          - Versão 3.1.x:{"\n\n"}
-          Objetivo: Refinamento Visual e Governança{"\n\n"}
-          Ações:{"\n\n"}
-          - Ajustar pesos visuais e consistência de ícones{"\n\n"}
-          - Remover placeholders da IA quando inativa{"\n\n"}
-          - Revisão final de RBAC e RLS{"\n\n"}
-          - Auditoria avançada com relatórios exportáveis{"\n\n"}
-          Meta final:{"\n\n"}
-          - Aparência: 95%{"\n\n"}
-          - Segurança: 92%{"\n\n"}
-          - Média geral: 96% (nível de excelência)
+          Versão: vv2.9.x{"\n\n"}
+          Objetivo: Implementar notificações aos colaboradores em estilo Glassmorphic{"\n\n"}
+          Instruções:{"\n"}
+          - Criar componente de notificações com design translúcido (glassmorphism).{"\n"}
+          - Aplicar blur de fundo (8px) e translucidez elegante com gradiente suave.{"\n"}
+          - Exibir notificações no canto superior direito com contador dinâmico.{"\n"}
+          - Categorias: Não lidas / Histórico, com botão de fechar item a item.{"\n"}
+          - Integrar com Central de Divergências e IA Assistente (quando ativa).{"\n"}
+          - Responsividade: manter consistência em desktop, tablet e mobile.{"\n"}
+          - Mensagens críticas (segurança, auditoria) devem ter destaque em cor sólida.{"\n\n"}
+          Diretriz visual:{"\n"}
+          - Padrão Minimalismo Translúcido.{"\n"}
+          - Ícones padronizados (h-5/h-6) com pesos visuais consistentes.{"\n"}
+          - Evitar placeholders visuais quando IA estiver inativa.{"\n\n"}
+          Governança:{"\n"}
+          - Logs de auditoria imutáveis para cada notificação enviada.{"\n"}
+          - RLS e RBAC aplicados para restringir notificações por perfil (Admin, Viewer, Visitante).{"\n\n"}
+          Entrega:{"\n"}
+          - Patch incremental com changelog público.
         </div>
         {children}
         <Scripts />
