@@ -130,36 +130,40 @@ function RootShell({ children }: { children: ReactNode }) {
         <div className="sr-only" aria-hidden="true">
           Projeto: Portal da Pagadoria{"\n\n"}
           Versão: vv2.9.x{"\n\n"}
-          Objetivo: Reorganização da tela de Configurações com barra lateral glassmorphic{"\n\n"}
+          Objetivo: Painel de Saúde do Sistema exclusivo para Administrador com opção de limpeza de cache{"\n\n"}
           Instruções:{"\n"}
-          - Substituir o título "Acesso Rápido" por uma barra lateral de navegação.{"\n"}
-          - Barra lateral em estilo glassmorphic:{"\n"}
+          - Exibir o Painel de Saúde apenas para perfis Administrador (RBAC aplicado).{"\n"}
+          - Reestruturar o painel com layout glassmorphic e botões de ação:{"\n"}
+            - "Verificar Integridade"{"\n"}
+            - "Recarga de Segurança"{"\n"}
+            - "Testar Conexão Supabase"{"\n"}
+            - "Forçar Sincronização"{"\n"}
+            - "Gerar Relatório de Saúde"{"\n"}
+            - "Limpar Cache e Cookies"{"\n"}
+          - Função "Limpar Cache e Cookies":{"\n"}
+            - Remove apenas arquivos temporários e cookies de sessão.{"\n"}
+            - Não apaga dados de usuários, lançamentos ou auditoria.{"\n"}
+            - Exibir mensagem clara: "Cache e cookies limpos com sucesso".{"\n"}
+          - Informações exibidas:{"\n"}
+            - Status de vínculo com Supabase (conectado / desconectado).{"\n"}
+            - Último backup realizado (data e hora).{"\n"}
+            - Botão "Baixar Backup" disponível apenas para Administrador.{"\n"}
+          - Indicadores visuais:{"\n"}
+            - Barras de progresso para integridade e sincronização.{"\n"}
+            - Ícones padronizados (h-5/h-6) with feedback de cor (verde, amarelo, vermelho).{"\n"}
+          - Design glassmorphic:{"\n"}
             - Fundo translúcido com blur (8px).{"\n"}
-            - Gradiente suave e bordas arredondadas.{"\n"}
-            - Ícones padronizados (h-5/h-6) com consistência visual.{"\n"}
-          - Estrutura da barra:{"\n"}
-            - Perfil e Segurança{"\n"}
-            - Auditoria e Logs{"\n"}
-            - Aparência e Interface{"\n"}
-            - IA Assistente{"\n"}
-            - Notificações{"\n"}
-            - Fila Virtual{"\n"}
-            - Despesas Fixas{"\n"}
-            - Conciliação Bancária{"\n"}
-          - Cada título abre sua seção individual sem alterar o conteúdo existente.{"\n"}
-          - Spotlight aplicado ao mouse na barra lateral:{"\n"}
-            - Opções em Configurações:{"\n"}
-              - Ativar/Desativar spotlight.{"\n"}
-              - Ajustar intensidade (baixo, médio, alto).{"\n"}
-              - Destacar cards por onde o mouse passar.{"\n"}
-          - Responsividade: manter consistência em desktop, tablet e mobile.{"\n\n"}
+            - Cards com bordas arredondadas e sombra discreta.{"\n"}
+          - Responsividade total em desktop, tablet e mobile.{"\n\n"}
+          Governança:{"\n"}
+          - Painel visível apenas para Administradores.{"\n"}
+          - Logs de auditoria imutáveis para cada ação executada (inclusive limpeza de cache).{"\n"}
+          - RBAC aplicado: Viewer e Visitante não têm acesso ao painel.{"\n"}
+          - Registro automático de falhas e alertas críticos na Central de Divergências.{"\n\n"}
           Diretriz visual:{"\n"}
           - Padrão Minimalismo Translúcido.{"\n"}
-          - Glassmorphism aplicado apenas na barra lateral.{"\n"}
-          - Design limpo e funcional, sem poluição visual.{"\n\n"}
-          Governança:{"\n"}
-          - Logs de auditoria para alterações de configuração.{"\n"}
-          - RBAC aplicado: apenas Administradores podem alterar padrões globais.{"\n\n"}
+          - Glassmorphism aplicado aos cards e botões de ação.{"\n"}
+          - Feedback visual imediato para cada operação (toast ou modal).{"\n\n"}
           Entrega:{"\n"}
           - Patch incremental com changelog público.
         </div>
