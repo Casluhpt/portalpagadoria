@@ -350,10 +350,10 @@ function NotifList({
           {items.map((c) => (
             <li
               key={c.id}
-              className={`group relative flex items-start gap-3 px-4 py-3 pr-9 text-sm transition-colors ${
+              className={`group relative flex items-start gap-3 px-4 py-3 pr-9 text-sm transition-all duration-300 border-b border-border/50 last:border-0 ${
                 selectedIds.has(c.id) 
-                  ? "bg-violet-100/50 dark:bg-violet-900/30" 
-                  : c.lido ? "bg-card" : "bg-violet-50/60 dark:bg-violet-950/20"
+                  ? "bg-violet-100/30 dark:bg-violet-900/20" 
+                  : c.lido ? "bg-transparent" : "bg-violet-50/40 dark:bg-violet-950/10"
               }`}
             >
               <div className="mt-1 flex shrink-0 items-center gap-2">
