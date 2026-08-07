@@ -129,11 +129,16 @@ function ConfiguracoesPage() {
                   {activeTab === "suporte" && (
                     <div className="grid gap-6">
                        <AdvancedSecuritySettings />
-                       <SupportForm />
                     </div>
                   )}
                   {activeTab === "diagnostico" && <DiagnosticPanel />}
+                  {activeTab === "suporte-tecnico" && (
+                    <SuporteTecnicoPanel>
+                      <SupportForm />
+                    </SuporteTecnicoPanel>
+                  )}
                   {activeTab === "identidade" && <IdentidadeVisualPanel />}
+
                   {activeTab === "administracao" && <UsuariosTable />}
                   {activeTab === "documentacao" && <DocumentacaoTecnicaSection />}
                   
