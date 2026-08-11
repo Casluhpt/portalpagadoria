@@ -33,6 +33,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { parseMoney } from "@/lib/money";
 import * as XLSX from "xlsx";
 import { toast } from "sonner";
 import { format } from "date-fns";
@@ -120,10 +121,10 @@ function ESocialPage() {
           empresa: row["Empresa"],
           nome_coligada: row["Coligadas"],
           cnpj: row["CNPJ"]?.toString(),
-          valor_inss: parseFloat(row["INSS"]) || 0,
-          valor_irrf: parseFloat(row["IRRF"]) || 0,
-          valor_fgts: parseFloat(row["FGTS"]) || 0,
-          valor_pis: parseFloat(row["PIS"]) || 0,
+          valor_inss: parseMoney(row["INSS"]) ?? 0,
+          valor_irrf: parseMoney(row["IRRF"]) ?? 0,
+          valor_fgts: parseMoney(row["FGTS"]) ?? 0,
+          valor_pis: parseMoney(row["PIS"]) ?? 0,
           status_lancamento: row["Lancamento"] || "Pendente",
           num_fopag: row["FUPAG"]?.toString(),
           dcomp_compensado: row["Compensado"] === "Sim" || row["Compensado"] === true,

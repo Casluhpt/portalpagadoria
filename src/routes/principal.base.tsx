@@ -26,6 +26,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { logAcaoCritica } from "@/lib/audit-critico";
+import { parseMoney, formatBRL } from "@/lib/money";
 import {
   Dialog,
   DialogContent,
@@ -166,8 +167,9 @@ function BasePage() {
           const col = mapa.get(norm(k));
           if (!col || v == null || v === "") continue;
           if (col.tipo === "numero") {
-            const n = typeof v === "number" ? v : Number(String(v).replace(/[^0-9,.-]/g, "").replace(/\./g, "").replace(",", "."));
-            out[col.key] = Number.isFinite(n) ? n : null;
+            const n = parseMoney(v);
+            out[col.key] = n;
+
           } else if (col.tipo === "data") {
             const d = v instanceof Date ? v : new Date(String(v));
             out[col.key] = Number.isNaN(d.getTime()) ? null : d.toISOString().slice(0, 10);
