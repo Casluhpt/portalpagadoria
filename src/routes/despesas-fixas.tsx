@@ -324,7 +324,7 @@ function DespesasFixasPage() {
               </Button>
               {selectedKeys.size > 0 && (
                 <div className="flex items-center gap-2 border-l pl-3 ml-2">
-                  <span className="text-xs font-semibold text-indigo-600">{selectedKeys.size} selecionados</span>
+                  <span className="text-xs font-semibold text-indigo-600">{selectedKeys.size} registro(s) selecionado(s)</span>
                   <Button variant="destructive" size="sm" onClick={excluirEmLote} className="h-8 px-2">
                     <Trash2 className="h-3.5 w-3.5" />
                   </Button>
@@ -677,7 +677,12 @@ function GrupoTabela({
               onClick={(e) => onToggleSelect(l.key, e)}
             >
               <td className="border-b border-border px-2 py-1">
-                <Checkbox checked={selectedKeys.has(l.key)} onCheckedChange={() => {}} onClick={(e) => e.stopPropagation()} />
+                <Checkbox
+                  checked={selectedKeys.has(l.key)}
+                  onCheckedChange={() => onToggleSelect(l.key, { ctrlKey: true, metaKey: false, shiftKey: false } as unknown as React.MouseEvent)}
+                  onClick={(e) => e.stopPropagation()}
+                  aria-label={`Selecionar ${l.descricao}`}
+                />
               </td>
               <td className="border-b border-border px-3 py-2">
                 <button

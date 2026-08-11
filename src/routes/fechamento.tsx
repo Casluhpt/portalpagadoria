@@ -118,16 +118,16 @@ function FechamentoPage() {
                 <h2 className="text-2xl font-bold text-foreground">Histórico de Fechamentos</h2>
                 <p className="text-sm text-muted-foreground">
                   {isAdmin 
-                    ? "Manter os dados de fechamentos concluídos como imutáveis para usuários comuns, incluindo Viewer e Visitante conforme suas permissões. Administradores devem poder editar dados do histórico de fechamentos quando necessário e, se aplicável, reabrir uma competência para correções. Toda alteração administrativa deve respeitar permissões e manter rastreabilidade adequada." 
-                    : "Área restrita para consulta de competências encerradas."}
+                    ? "Cada fechamento gera um snapshot histórico independente. A competência original permanece disponível para usuários autorizados: alterações posteriores geram uma nova versão, sem sobrescrever versões anteriores, e ficam registradas em auditoria."
+                    : "Consulta das competências encerradas. Cada versão histórica é preservada."}
                 </p>
               </div>
-              <div className={`flex items-center gap-2 rounded-lg px-4 py-2 text-white font-bold shadow-lg transition-all duration-500 ${isAdmin ? 'bg-blue-600' : 'bg-red-600 animate-pulse'}`}>
+              <div className={`flex items-center gap-2 rounded-lg px-4 py-2 text-white font-bold shadow-lg transition-all duration-500 ${isAdmin ? 'bg-blue-600' : 'bg-slate-600'}`}>
                 <Info className="h-5 w-5" />
                 <span>
-                  {isAdmin 
-                    ? "ACESSO ADMINISTRATIVO: EDIÇÃO PERMITIDA" 
-                    : "INFORMATIVO: DADOS ARQUIVADOS SÃO IMUTÁVEIS"}
+                  {isAdmin
+                    ? "ACESSO ADMINISTRATIVO: EDIÇÃO PERMITIDA"
+                    : "HISTÓRICO VERSIONADO — CONSULTA DISPONÍVEL"}
                 </span>
               </div>
             </div>
