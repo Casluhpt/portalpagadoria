@@ -37,6 +37,8 @@ import { useRoles } from "@/hooks/use-roles";
 import { exportResultadosPDF } from "@/lib/export-utils";
 
 import { fetchAllLancamentos, lancamentosQueryKey, type Lancamento } from "@/lib/lancamentos";
+import { ModuleErrorBoundary } from "@/components/error-boundary";
+import { formatBRL } from "@/lib/money";
 import logoAsset from "@/assets/profarma-logo.png.asset.json";
 
 type Row = Lancamento;
@@ -53,21 +55,37 @@ const applyDisplay = (data: Lancamento[]): Row[] =>
 
 const PIE_COLORS = ["#c084fc", "#a855f7", "#7e22ce", "#9333ea", "#d8b4fe", "#e9d5ff"];
 
-const brl = (n: number) =>
-  n.toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
+const brl = (n: number | null | undefined) => formatBRL(Number(n ?? 0));
 
-const monthKey = (iso: string) => iso.slice(0, 7);
+const monthKey = (iso: string | null | undefined) => String(iso ?? "").slice(0, 7);
 const monthLabel = (key: string) => {
-  const [y, m] = key.split("-");
+  const [y = "", m = ""] = String(key ?? "").split("-");
   const names = [
     "jan", "fev", "mar", "abr", "mai", "jun",
     "jul", "ago", "set", "out", "nov", "dez",
   ];
-  return `${names[Number(m) - 1]}/${y.slice(2)}`;
+  const nome = names[Number(m) - 1] ?? m ?? "—";
+  return `${nome}/${y.slice(2)}`;
 };
 
 export const Route = createFileRoute("/principal/")({
   component: Dashboard,
+  errorComponent: ({ error, reset }) => {
+    console.error("[Resultados Principais] falha de rota", error);
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background p-6">
+        <div className="max-w-md rounded-2xl border border-border bg-card/70 p-8 text-center backdrop-blur">
+          <h2 className="text-base font-semibold text-foreground">
+            Resultados Principais não pôde carregar completamente
+          </h2>
+          <p className="mt-2 text-sm text-muted-foreground">{error.message}</p>
+          <Button size="sm" variant="outline" className="mt-4 gap-2" onClick={() => reset()}>
+            <RotateCcw className="h-4 w-4" /> Recarregar Dados
+          </Button>
+        </div>
+      </div>
+    );
+  },
 });
 
 function uniqSorted<T>(arr: (T | null | undefined)[]): T[] {
@@ -114,14 +132,19 @@ function Dashboard() {
       );
     }
 
-  return <DashboardConteudo />;
+  return (
+    <ModuleErrorBoundary modulo="Resultados Principais">
+      <DashboardConteudo />
+    </ModuleErrorBoundary>
+  );
 }
 
 function DashboardConteudo() {
-  const { data: raw, isLoading, error } = useQuery({
+  const { data: raw, isLoading, error, refetch, isFetching } = useQuery({
     queryKey: lancamentosQueryKey,
     queryFn: fetchAllLancamentos,
     staleTime: 30_000,
+    retry: 1,
   });
   const rows = useMemo(() => applyDisplay(raw ?? []), [raw]);
 
@@ -330,6 +353,20 @@ function DashboardConteudo() {
                   >
                     <RotateCcw className="mr-1.5 h-3.5 w-3.5" /> Limpar
                   </Button>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => void refetch()}
+                    disabled={isFetching}
+                    className="bg-white/10 text-white hover:bg-white/20 border-white/20"
+                  >
+                    {isFetching ? (
+                      <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                    ) : (
+                      <RotateCcw className="mr-1.5 h-3.5 w-3.5" />
+                    )}
+                    Recarregar Dados
+                  </Button>
                 </div>
               </div>
 
@@ -388,6 +425,18 @@ function DashboardConteudo() {
                   <Filter className="h-3.5 w-3.5" />
                   {activeFilterCount} filtro{activeFilterCount > 1 ? "s" : ""} ativo
                   {activeFilterCount > 1 ? "s" : ""}
+                </div>
+              )}
+
+              {error && (
+                <div className="relative mt-4 rounded-xl bg-white/10 p-3 text-sm text-white ring-1 ring-white/20">
+                  Não foi possível carregar os lançamentos agora. A página segue disponível — use
+                  “Recarregar Dados”.
+                </div>
+              )}
+              {!isLoading && !error && total === 0 && (
+                <div className="relative mt-4 rounded-xl bg-white/10 p-3 text-sm text-white ring-1 ring-white/20">
+                  Nenhum resultado disponível para os filtros selecionados.
                 </div>
               )}
 

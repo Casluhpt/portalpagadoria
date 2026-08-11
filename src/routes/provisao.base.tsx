@@ -48,6 +48,9 @@ import {
   type Provisao,
 } from "@/lib/provisao";
 import { useSession } from "@/hooks/use-session";
+import { parseMoney, formatBRL } from "@/lib/money";
+import { ImportPreviewDialog } from "@/components/import-preview-dialog";
+import { analisarArquivo, extrairLinhasValidas, formatoAceito, type CampoSpec, type PreviaImportacao } from "@/lib/import-preview";
 
 export const Route = createFileRoute("/provisao/base")({
   component: ProvisaoBasePage,
@@ -63,10 +66,15 @@ const COLS: Col[] = [
   { key: "valor", label: "Valor", kind: "number", width: 160 },
 ];
 
-const brl = (n: number | null | undefined) =>
-  n == null
-    ? ""
-    : n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+const brl = formatBRL;
+
+/** Campos obrigatórios da Base da Provisão + variações aceitas de cabeçalho. */
+const CAMPOS_IMPORT: CampoSpec[] = [
+  { key: "data", label: "Data", tipo: "data", obrigatorio: true, aliases: ["dt", "data de pagamento", "data de credito", "data credito", "vencimento", "data pgto"] },
+  { key: "empresa", label: "Empresa", tipo: "texto", obrigatorio: true, aliases: ["coligada", "cliente", "razao social"] },
+  { key: "banco", label: "Banco", tipo: "texto", obrigatorio: true, aliases: ["bank", "instituicao", "banco pagador"] },
+  { key: "valor", label: "Valor", tipo: "valor", obrigatorio: true, aliases: ["valor total", "valor lg", "vlr", "valor pago", "valor liquido"] },
+];
 
 // Excel serial date → YYYY-MM-DD
 function excelSerialToISO(serial: number): string {
@@ -96,17 +104,6 @@ function parseDate(v: unknown): string | null {
   return null;
 }
 
-function parseNumber(v: unknown): number | null {
-  if (v == null || v === "") return null;
-  if (typeof v === "number") return v;
-  const s = String(v)
-    .replace(/[R$\s]/g, "")
-    .replace(/\./g, "")
-    .replace(",", ".");
-  const n = Number(s);
-  return Number.isFinite(n) ? n : null;
-}
-
 function findKey(row: Record<string, unknown>, patterns: RegExp[]): string | undefined {
   return Object.keys(row).find((k) =>
     patterns.some((p) => p.test(k.trim().toLowerCase())),
@@ -132,6 +129,14 @@ function ProvisaoBasePage() {
   const [pendingDelete, setPendingDelete] = useState<Provisao | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [isBulkDeleteDialogOpen, setIsBulkDeleteDialogOpen] = useState(false);
+
+  // Pré-validação obrigatória da importação
+  const [arquivo, setArquivo] = useState<File | null>(null);
+  const [previa, setPrevia] = useState<PreviaImportacao | null>(null);
+  const [previaOpen, setPreviaOpen] = useState(false);
+  const [analisando, setAnalisando] = useState(false);
+  const [mapManual, setMapManual] = useState<Record<string, string | null>>({});
+  const [abaEscolhida, setAbaEscolhida] = useState<string | undefined>(undefined);
 
   const invalidate = () => qc.invalidateQueries({ queryKey: provisaoQueryKey });
 
@@ -174,47 +179,69 @@ function ProvisaoBasePage() {
     onError: (e: Error) => toast.error("Falha ao excluir registros: " + e.message),
   });
 
+  const analisar = async (
+    file: File,
+    aba?: string,
+    mapeamentoManual?: Record<string, string | null>,
+  ) => {
+    setAnalisando(true);
+    try {
+      const p = await analisarArquivo(file, { campos: CAMPOS_IMPORT, aba, mapeamentoManual });
+      setPrevia(p);
+      setPreviaOpen(true);
+    } catch (e) {
+      setPreviaOpen(false);
+      setPrevia(null);
+      toast.error((e as Error).message);
+    } finally {
+      setAnalisando(false);
+    }
+  };
+
   const importMut = useMutation({
-    mutationFn: async (file: File) => {
-      const buf = await file.arrayBuffer();
-      const wb = XLSX.read(buf, { cellDates: false });
-      const ws = wb.Sheets[wb.SheetNames[0]];
-      const rows = XLSX.utils.sheet_to_json<Record<string, unknown>>(ws, {
-        defval: null,
+    mutationFn: async () => {
+      if (!arquivo) throw new Error("Nenhum arquivo selecionado.");
+      const linhas = await extrairLinhasValidas(arquivo, {
+        campos: CAMPOS_IMPORT,
+        aba: abaEscolhida,
+        mapeamentoManual: mapManual,
       });
-      if (rows.length === 0) throw new Error("Planilha vazia.");
-      const first = rows[0] as Record<string, unknown>;
-      const dataKey = findKey(first, [/data.*cr[eé]dito/, /^data/, /vencimento/]);
-      const empresaKey = findKey(first, [/empresa/, /cliente/]);
-      const bancoKey = findKey(first, [/banco/]);
-      const valorKey = findKey(first, [/valor.*lg/, /^valor/, /vlr/]);
-      if (!dataKey || !empresaKey || !bancoKey || !valorKey) {
-        throw new Error(
-          "Colunas esperadas não encontradas. Verifique: DATA DE CREDITO, EMPRESA, BANCO, VALOR LG.",
-        );
-      }
-      const mapped = rows
-        .map((r) => ({
-          data: parseDate(r[dataKey]),
-          empresa: r[empresaKey] == null ? null : String(r[empresaKey]).trim(),
-          banco: r[bancoKey] == null ? null : String(r[bancoKey]).trim(),
-          valor: parseNumber(r[valorKey]),
-        }))
-        .filter((r) => r.data || r.empresa || r.banco || r.valor != null);
+      const mapped = linhas.map((l) => ({
+        data: (l.data as string) ?? null,
+        empresa: (l.empresa as string) ?? null,
+        banco: (l.banco as string) ?? null,
+        valor: (l.valor as number) ?? null,
+      }));
       return bulkInsertProvisao(mapped, importMode === "replace");
     },
     onSuccess: (count) => {
       invalidate();
-      toast.success(`${count} registros importados`);
+      setPreviaOpen(false);
+      setPrevia(null);
+      setArquivo(null);
+      setMapManual({});
+      setAbaEscolhida(undefined);
+      toast.success(`Importação concluída com sucesso. ${count} registro(s) gravado(s).`);
     },
-    onError: (e: Error) => toast.error("Falha na importação: " + e.message),
+    onError: (e: Error) =>
+      toast.error(
+        "Não foi possível importar o arquivo. " + e.message,
+      ),
   });
 
   const onImportClick = () => fileRef.current?.click();
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
     e.target.value = "";
-    if (f) importMut.mutate(f);
+    if (!f) return;
+    if (!formatoAceito(f.name)) {
+      toast.error("Use Excel (.xlsx/.xls), CSV ou TXT estruturado. PDF/Word não alimentam a base.");
+      return;
+    }
+    setArquivo(f);
+    setMapManual({});
+    setAbaEscolhida(undefined);
+    void analisar(f);
   };
 
   const exportXlsx = () => {
@@ -317,7 +344,7 @@ function ProvisaoBasePage() {
           <input
             ref={fileRef}
             type="file"
-            accept=".xlsx,.xls"
+            accept=".xlsx,.xls,.csv,.txt"
             className="hidden"
             onChange={onFileChange}
           />
@@ -446,6 +473,33 @@ function ProvisaoBasePage() {
           </table>
         )}
       </div>
+
+      <ImportPreviewDialog
+        open={previaOpen}
+        onOpenChange={(o) => {
+          setPreviaOpen(o);
+          if (!o) {
+            setPrevia(null);
+            setArquivo(null);
+          }
+        }}
+        previa={previa}
+        campos={CAMPOS_IMPORT}
+        analisando={analisando}
+        gravando={importMut.isPending}
+        modo={importMode}
+        onModoChange={setImportMode}
+        onAbaChange={(aba) => {
+          setAbaEscolhida(aba);
+          if (arquivo) void analisar(arquivo, aba, mapManual);
+        }}
+        onMapear={(campoKey, header) => {
+          const next = { ...mapManual, [campoKey]: header };
+          setMapManual(next);
+          if (arquivo) void analisar(arquivo, abaEscolhida, next);
+        }}
+        onConfirmar={() => importMut.mutate()}
+      />
 
       <AlertDialog
         open={!!pendingDelete}
