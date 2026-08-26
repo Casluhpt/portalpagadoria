@@ -1,13 +1,30 @@
 import { createServerFn } from "@tanstack/react-start";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 
+/**
+ * Fechamento de competência de Pagamentos Diversos.
+ *
+ * Operação destrutiva (limpa a base) — exige sessão válida e papel de
+ * administrador validado no servidor. O usuário é sempre derivado do token,
+ * nunca do payload enviado pelo cliente.
+ */
 export const fecharCompetenciaPagamentosFn = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .validator((data) => z.object({
     nome: z.string(),
-    usuarioId: z.string(),
     registros: z.array(z.any()),
   }).parse(data))
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
+    const { data: isAdmin, error: roleError } = await context.supabase.rpc("has_role", {
+      _user_id: context.userId,
+      _role: "administrador",
+    });
+    if (roleError) throw new Error("Falha ao validar permissão");
+    if (!isAdmin) throw new Error("Acesso restrito a administradores");
+
+    const usuarioId = context.userId;
+
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { format } = await import("date-fns");
 
@@ -24,11 +41,11 @@ export const fecharCompetenciaPagamentosFn = createServerFn({ method: "POST" })
         nome: data.nome,
         mes,
         ano,
-        usuario_id: data.usuarioId,
+        usuario_id: usuarioId,
         total_valor: totalValor,
         total_registros: totalRegistros
       });
-    
+
     if (insertError) throw new Error("Erro ao registrar fechamento: " + insertError.message);
 
     // 2. Clear the main table using Admin client
@@ -45,7 +62,7 @@ export const fecharCompetenciaPagamentosFn = createServerFn({ method: "POST" })
       await notificarArquivoPronto(
         `Fechamento Concluído: ${data.nome}`,
         `O fechamento da competência ${mes} foi realizado com sucesso.`,
-        data.usuarioId
+        usuarioId
       );
     } catch (e) {
       console.error("Falha ao enviar notificação de fechamento:", e);

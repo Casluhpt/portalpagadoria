@@ -45,7 +45,7 @@ export function GlobalShortcutManager() {
     r: () => navigate({ to: "/principal" }),
     s: () => navigate({ to: "/configuracoes" }),
     u: () => navigate({ to: "/usuarios" }),
-    b: () => navigate({ to: "/auditoria" }), // B de Base/Auditoria
+    b: () => navigate({ to: "/auditoria", search: { tab: "log" as const } }), // B de Base/Auditoria
     t: () => navigate({ to: "/principal/base" }), // T de Tabela de Resultados
     g: () => navigate({ to: "/divergencias" }), // G de Gap/Divergência
     l: () => navigate({ to: "/provisao/base" }), // L de Lançamentos de Provisão
